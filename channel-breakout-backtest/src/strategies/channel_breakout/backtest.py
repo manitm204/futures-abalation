@@ -104,12 +104,23 @@ def run_channel_backtest(
     *,
     exec_config: ExecutionConfig,
     starting_equity: float,
+    entry_delay_bars: int = 0,
+    missed_entry_frac: float = 0.0,
+    stress_seed: int = 0,
 ) -> tuple[list[Trade], list[EquityPoint]]:
+    """Execution-stress knobs (default off, i.e. the baseline run):
+    `entry_delay_bars` fills the entry that many extra bars late (simulating a
+    delayed/slower fill); `missed_entry_frac` randomly drops that fraction of
+    otherwise-valid signals (simulating missed entries), reproducibly seeded by
+    `stress_seed`. Higher costs / adverse fills are passed via `exec_config`
+    (commission + slippage bps), so no extra knob is needed for those.
+    """
     signal = _signal_array(data, cfg)
     exit_lb = cfg.exit_lookback
     lower = data.exit_lower(exit_lb)
     atr_mult = cfg.init_stop_atr  # None = channel exit only
     o, h, l, c, atr, ts, n = data.open, data.high, data.low, data.close, data.atr, data.ts, data.n
+    rng = np.random.default_rng(stress_seed) if missed_entry_frac > 0 else None
 
     trades: list[Trade] = []
     equity_curve: list[EquityPoint] = []
@@ -131,7 +142,13 @@ def run_channel_backtest(
             i += 1
             continue
 
-        entry_idx = i + 1
+        if rng is not None and rng.random() < missed_entry_frac:
+            i += 1  # simulated missed entry
+            continue
+
+        entry_idx = i + 1 + entry_delay_bars
+        if entry_idx >= n:
+            break
         entry_px_raw = o[entry_idx]
         if not math.isfinite(entry_px_raw):
             i += 1

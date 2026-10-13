@@ -1,0 +1,85 @@
+[
+  {
+    "description": ">= 30 trades/yr & active in >= 4 dev years",
+    "extra": {},
+    "n_after": 14864,
+    "n_before": 24576,
+    "stage": "2_trade_count"
+  },
+  {
+    "description": "dev net return > 0 & profit factor >= 1.1",
+    "extra": {},
+    "n_after": 2541,
+    "n_before": 14864,
+    "stage": "3_profitability"
+  },
+  {
+    "description": "dev Sharpe >= 0.5",
+    "extra": {},
+    "n_after": 2348,
+    "n_before": 2541,
+    "stage": "4_risk"
+  },
+  {
+    "description": ">= 70% profitable neighbors & median neighbor Sharpe >= 0.3",
+    "extra": {},
+    "n_after": 1221,
+    "n_before": 2348,
+    "stage": "5_neighborhood"
+  },
+  {
+    "description": "BH-FDR q=0.05, family=screened (m=1221 of 24576 tested)",
+    "extra": {
+      "bh_cutoff": 0.01799550112471882,
+      "by_cutoff": null,
+      "m_fdr": 1221,
+      "m_total": 24576,
+      "n_bh": 445,
+      "n_by": 0
+    },
+    "n_after": 445,
+    "n_before": 1221,
+    "stage": "7_multiple_testing"
+  },
+  {
+    "description": "validation net return > 0 & Sharpe >= 0.3",
+    "extra": {},
+    "n_after": 445,
+    "n_before": 445,
+    "stage": "8_validation"
+  },
+  {
+    "description": "net-positive under adverse exec (slippage 5.0bp, delay 1 bar, 10% missed)",
+    "extra": {},
+    "n_after": 173,
+    "n_before": 445,
+    "stage": "9_execution_stress"
+  },
+  {
+    "description": "unchanged on QQQ (soft evidence, not a gate)",
+    "extra": {
+      "n_positive_on_qqq": 173
+    },
+    "n_after": 173,
+    "n_before": 173,
+    "stage": "10_market_transfer"
+  },
+  {
+    "description": "cluster by dev return corr >= 0.8; keep best per cluster",
+    "extra": {
+      "n_clusters": 14
+    },
+    "n_after": 14,
+    "n_before": 173,
+    "stage": "11_deduplication"
+  },
+  {
+    "description": "untouched holdout: net return > 0 & Sharpe >= 0.0",
+    "extra": {
+      "n_finalists_evaluated": 14
+    },
+    "n_after": 7,
+    "n_before": 14,
+    "stage": "12_final_test"
+  }
+]
