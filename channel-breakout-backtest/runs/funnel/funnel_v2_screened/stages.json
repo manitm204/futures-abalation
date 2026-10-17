@@ -14,72 +14,72 @@
     "stage": "3_profitability"
   },
   {
-    "description": "dev Sharpe >= 0.5",
+    "description": "dev Sharpe >= 1.1",
     "extra": {},
-    "n_after": 2348,
+    "n_after": 878,
     "n_before": 2541,
     "stage": "4_risk"
   },
   {
     "description": ">= 70% profitable neighbors & median neighbor Sharpe >= 0.3",
     "extra": {},
-    "n_after": 1221,
-    "n_before": 2348,
+    "n_after": 592,
+    "n_before": 878,
     "stage": "5_neighborhood"
   },
   {
-    "description": "BH-FDR q=0.05, family=screened (m=1221 of 24576 tested)",
+    "description": "BH-FDR q=0.05, family=screened (m=592 of 24576 tested)",
     "extra": {
-      "bh_cutoff": 0.01799550112471882,
-      "by_cutoff": null,
-      "m_fdr": 1221,
+      "bh_cutoff": 0.04473881529617595,
+      "by_cutoff": 0.000999750062484379,
+      "m_fdr": 592,
       "m_total": 24576,
-      "n_bh": 445,
-      "n_by": 0
+      "n_bh": 535,
+      "n_by": 94
     },
-    "n_after": 445,
-    "n_before": 1221,
+    "n_after": 535,
+    "n_before": 592,
     "stage": "7_multiple_testing"
   },
   {
     "description": "validation net return > 0 & Sharpe >= 0.3",
     "extra": {},
-    "n_after": 445,
-    "n_before": 445,
+    "n_after": 535,
+    "n_before": 535,
     "stage": "8_validation"
   },
   {
     "description": "net-positive under adverse exec (slippage 5.0bp, delay 1 bar, 10% missed)",
     "extra": {},
-    "n_after": 173,
-    "n_before": 445,
+    "n_after": 197,
+    "n_before": 535,
     "stage": "9_execution_stress"
   },
   {
     "description": "unchanged on QQQ (soft evidence, not a gate)",
     "extra": {
-      "n_positive_on_qqq": 173
+      "n_positive_on_qqq": 197
     },
-    "n_after": 173,
-    "n_before": 173,
+    "n_after": 197,
+    "n_before": 197,
     "stage": "10_market_transfer"
   },
   {
     "description": "cluster by dev return corr >= 0.8; keep best per cluster",
     "extra": {
-      "n_clusters": 14
+      "n_clusters": 17
     },
-    "n_after": 14,
-    "n_before": 173,
+    "n_after": 17,
+    "n_before": 197,
     "stage": "11_deduplication"
   },
   {
     "description": "untouched holdout: net return > 0 & Sharpe >= 0.0",
     "extra": {
-      "n_finalists_evaluated": 14
+      "n_finalists_evaluated": 17
     },
-    "n_after": 7,
-    "n_before": 14,
+    "n_after": 8,
+    "n_before": 17,
     "stage": "12_final_test"
   }
 ]

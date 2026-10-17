@@ -238,3 +238,60 @@ See `configs/execution/default.yaml` for the full conservative default set
 (starting equity $100,000; risk 0.25%/trade; commission $0.005/share, $1.00
 minimum; 1bp adverse slippage on market/stop fills; no leverage; whole shares
 only; one open position per symbol, no pyramiding).
+
+## Channel-breakout screening funnel (configs/funnel/channel_funnel.yaml)
+
+All funnel thresholds live in `configs/funnel/channel_funnel.yaml`; the loaded
+config is hashed into every run. Commands are separate and explicit:
+`develop` (stages 1-7 + stage-9 diagnostics, development data only),
+`validate` (stage 8, frozen manifest), `final-test` (holdout, requires
+`--confirm-holdout-access`). Every bar load is appended to
+`runs/funnel/data_access_ledger.jsonl`.
+
+**Data history.** Validation (2023-24) and holdout (2025+) are NOT untouched:
+funnel_v1..v3 gated on validation and stored holdout metrics for every config,
+and the Donchian ablation report discussed holdout degradation. Recorded in
+`data_history` and printed in every report.
+
+**Backtester integrity fixes (2026-10-16)** in
+`src/strategies/channel_breakout/backtest.py`, verified by a truncation
+look-ahead test (`src/experiments/integrity.py`):
+1. The initial ATR stop and position size used the *entry* bar's ATR (which
+   includes that bar's unseen high/low/close). Now uses the last ATR known
+   before the fill.
+2. The stop was first checked on the bar after entry. It is now live on the
+   entry bar (conservative; intrabar order unknown).
+3. A "missed entry" stress re-entered on the next signal bar. It now skips the
+   whole breakout episode.
+These change results for anything using `run_channel_backtest`
+(`run_channel_ablation.py`, earlier funnel runs are not comparable).
+
+**Sharpe.** Earlier funnel Sharpe came from an equity curve with a point only
+at trade exits (flat days and open-position swings missing). The funnel now
+uses daily session-close mark-to-market returns over every trading day,
+`sqrt(252)` annualization, rf = 0 with idle cash earning 0
+(`src/analysis/daily_performance.py`).
+
+**Drawdown limit.** -30% reused from
+`src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct`.
+**Approved by the user on 2026-10-16**, together with 0.25% risk per trade.
+The approval is recorded here rather than in the funnel YAML so the
+funnel_v4_dev frozen manifest's config hash stays valid. Setting it to `null` flags risk
+approval as incomplete instead of passing silently.
+
+**DSR.** Diagnostic only and labelled `unverified` until
+`confidence.dsr_calibration_verified` is set after review. Trial-Sharpe
+variance is measured over the full grid; effective trials estimated from the
+correlation eigen-spectrum (Li-Ji primary; participation ratio, raw and
+raw+known-prior reported). The ICT search's trial count is unknown.
+
+**Trend-filter-only comparison (2026-10-16, funnel_v4_dev).** Holding SPY
+whenever a candidate's own trend filter is on (same bar size, next-bar-open
+fills, baseline costs) beat or matched the breakout candidates on Sharpe in
+both development and validation; the candidates' alpha over their own filter
+was ~0-1%/yr with t < 2 (except the 5min/ema50 candidate, whose filter alone
+loses money). The 15min EMA200 filter-only rule switches ~92 times/yr and is
+cost-sensitive: development Sharpe 1.00 at baseline costs, 0.81 at 2x, 0.63 at
+3x. It is a product of the same search (trend filters were chosen because they
+survived), not an independent finding. Details:
+`runs/funnel/funnel_v4_dev/trend_rule_comparison.json`.

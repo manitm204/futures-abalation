@@ -1,211 +1,234 @@
-"""Configurable screening funnel for strategy configurations.
+"""Pure (no-backtest) stage logic for the strategy-screening funnel.
 
-Pure stages (operate on stored per-config records; no re-backtest):
-  2 trade count + annual coverage, 3 profitability, 4 risk (Sharpe),
-  5 neighborhood stability, 7 multiple-testing (BH-FDR, BY alternative),
-  8 validation, 11 deduplication, 12 final (untouched) test.
-Stages 9 (execution stress) and 10 (market transfer) need re-backtesting and are
-driven by the orchestration script, which appends their results here.
+Stages (configs/funnel/channel_funnel.yaml holds every threshold):
+  1  backtest integrity           hard gate (per-config checks + run-level look-ahead test)
+  2  trade count & coverage       hard gate
+  3  performance & risk           hard gate
+  4  parameter stability          hard gate (+ perturbation diagnostics)
+  5  time stability               light hard gate (+ in-sample diagnostics)
+  6  deduplication                representative selection (not a rejection)
+  7  execution stress             hard gate (+ diagnostics)
+  8  frozen validation            hard gate, separate `validate` command
+  9  statistical confidence       diagnostics only (DSR, QQQ transfer)
+  10 final holdout                separate, explicit `final-test` command only
 
-Everything is tuned on DEVELOPMENT only; validation is stage 8; the untouched
-holdout is touched only at stage 12. Thresholds live in a frozen FunnelThresholds
-and are logged per run. Zero survivors is a valid outcome -- nothing is forced.
+Every config gets a status per stage from a fixed vocabulary so hard
+rejections, missing evidence, diagnostic warnings and deduplication are never
+conflated. Thresholds are read, never tuned; zero survivors is a valid outcome.
 """
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 
 import numpy as np
+from scipy.cluster.hierarchy import fcluster, linkage
+from scipy.spatial.distance import squareform
 
-from src.analysis.multiple_testing import benjamini_hochberg, benjamini_yekutieli, block_bootstrap_pvalue
-from src.analysis.neighborhood import neighborhood_stats
+from src.analysis.neighborhood import NeighborhoodStats
+from src.experiments.funnel_config import FunnelConfig
 
-
-@dataclass(frozen=True)
-class FunnelThresholds:
-    # Stage 2 -- trade count + distribution
-    min_trades_per_year: float = 30.0
-    min_active_years: int = 4           # dev years (of 5) with >= 1 trade
-    # Stage 3 -- profitability (after costs)
-    min_dev_net_return: float = 0.0     # strictly positive required
-    min_profit_factor: float = 1.10
-    # Stage 4 -- risk
-    min_dev_sharpe: float = 0.5
-    # Stage 5 -- neighborhood stability
-    min_frac_profitable_neighbors: float = 0.70
-    min_median_neighbor_sharpe: float = 0.30
-    neighborhood_include_joint: bool = True
-    # Stage 7 -- multiple testing
-    fdr_q: float = 0.05
-    fdr_method: str = "bh"              # "bh" (default) or "by" (dependence-robust)
-    # Family the FDR correction is applied over:
-    #   "full_search" (default): every tested config is a hypothesis (the honest,
-    #     stringent reading of "account for the full search including rejected configs").
-    #   "screened": only the configs that reach the FDR stage -- a less conservative
-    #     sensitivity that treats pre-screening as narrowing the hypothesis set.
-    fdr_family: str = "full_search"
-    bootstrap_n: int = 4000
-    bootstrap_block: int = 6
-    bootstrap_seed: int = 0
-    # Stage 8 -- validation
-    min_val_net_return: float = 0.0
-    min_val_sharpe: float = 0.30
-    # Stage 11 -- deduplication
-    dedup_corr_threshold: float = 0.80
-    # Stage 12 -- final (untouched) test
-    min_holdout_net_return: float = 0.0
-    min_holdout_sharpe: float = 0.0
-
-    def frozen_dict(self) -> dict:
-        return asdict(self)
+PASS = "pass"
+HARD_REJECT = "hard_reject"
+INSUFFICIENT = "insufficient_evidence"
+DEDUPLICATED = "deduplicated"
+NOT_EVALUATED = "not_evaluated"
+DIAGNOSTIC = "diagnostic_only"
 
 
 @dataclass
-class StageResult:
-    stage: str
-    description: str
-    n_before: int
-    n_after: int
-    extra: dict = field(default_factory=dict)
+class Outcome:
+    status: str
+    reasons: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    diagnostics: dict = field(default_factory=dict)
 
 
-def _passes_activity(rec: dict, n_years_dev: float, t: FunnelThresholds) -> bool:
-    tpy = (rec["dev_n_trades"] / n_years_dev) if n_years_dev > 0 else 0.0
-    active_years = sum(1 for _, c in (rec.get("dev_trades_by_year") or {}).items() if c and c > 0)
-    return tpy >= t.min_trades_per_year and active_years >= t.min_active_years
+def _resolve(hard: list[str], insufficient: list[str], warnings: list[str], diag: dict | None = None) -> Outcome:
+    if hard:
+        return Outcome(HARD_REJECT, hard + insufficient, warnings, diag or {})
+    if insufficient:
+        return Outcome(INSUFFICIENT, insufficient, warnings, diag or {})
+    return Outcome(PASS, [], warnings, diag or {})
 
 
-def run_funnel(records: list[dict], *, thresholds: FunnelThresholds, n_years_dev: float):
-    """Run the pure stages (2-5, 7, 8, 11, 12). Returns (stages, state) where
-    `state` carries survivor id-sets per stage, per-config rejection reason, the
-    p-value / FDR diagnostics, and the surviving records enriched with
-    neighborhood + p-value + cluster fields. Stress/transfer are appended later.
-    """
-    t = thresholds
-    by_id = {r["config_id"]: r for r in records}
-    m_total = len(records)  # full search -> family size for FDR
-    reason: dict[str, str] = {}
-    stages: list[StageResult] = []
+# --- Stage 1 -----------------------------------------------------------------
 
-    # Stage 2: trade count + annual coverage.
-    s2 = [r for r in records if _passes_activity(r, n_years_dev, t)]
-    for r in records:
-        if r not in s2:
-            reason[r["config_id"]] = "trade_count_or_coverage"
-    stages.append(StageResult("2_trade_count",
-        f">= {t.min_trades_per_year:.0f} trades/yr & active in >= {t.min_active_years} dev years",
-        len(records), len(s2)))
-
-    # Stage 3: profitability after costs.
-    s3 = [r for r in s2 if (r["dev_net_return"] or -1) > t.min_dev_net_return
-          and (r["dev_profit_factor"] or 0) >= t.min_profit_factor]
-    for r in s2:
-        if r not in s3:
-            reason[r["config_id"]] = "profitability"
-    stages.append(StageResult("3_profitability",
-        f"dev net return > 0 & profit factor >= {t.min_profit_factor}", len(s2), len(s3)))
-
-    # Stage 4: risk (daily Sharpe).
-    s4 = [r for r in s3 if (r["dev_sharpe"] is not None and r["dev_sharpe"] >= t.min_dev_sharpe)]
-    for r in s3:
-        if r not in s4:
-            reason[r["config_id"]] = "risk_sharpe"
-    stages.append(StageResult("4_risk", f"dev Sharpe >= {t.min_dev_sharpe}", len(s3), len(s4)))
-
-    # Stage 5: neighborhood stability (computed over the FULL grid using dev metrics).
-    nstats = neighborhood_stats(records, net_return_key="dev_net_return", sharpe_key="dev_sharpe",
-                                include_joint=t.neighborhood_include_joint)
-    s5 = []
-    for r in s4:
-        ns = nstats[r["config_id"]]
-        r["neighbor_frac_profitable"] = ns.frac_profitable
-        r["neighbor_median_sharpe"] = ns.median_sharpe
-        r["n_neighbors"] = ns.n_neighbors
-        ok = (ns.n_neighbors > 0 and ns.frac_profitable >= t.min_frac_profitable_neighbors
-              and (ns.median_sharpe == ns.median_sharpe)  # not NaN
-              and ns.median_sharpe >= t.min_median_neighbor_sharpe)
-        if ok:
-            s5.append(r)
-        else:
-            reason[r["config_id"]] = "neighborhood_stability"
-    stages.append(StageResult("5_neighborhood",
-        f">= {t.min_frac_profitable_neighbors:.0%} profitable neighbors & median neighbor Sharpe >= {t.min_median_neighbor_sharpe}",
-        len(s4), len(s5)))
-
-    # Stage 7: multiple-testing control (dependence-aware p-values + FDR over the full search).
-    for r in s5:
-        r["pvalue"] = block_bootstrap_pvalue(
-            r.get("monthly_returns") or [], n_boot=t.bootstrap_n, block=t.bootstrap_block, seed=t.bootstrap_seed
-        )
-    pvals = np.array([r["pvalue"] for r in s5], dtype=float)
-    m_fdr = m_total if t.fdr_family == "full_search" else len(s5)
-    bh_mask, bh_cut = benjamini_hochberg(pvals, q=t.fdr_q, m_total=m_fdr)
-    by_mask, by_cut = benjamini_yekutieli(pvals, q=t.fdr_q, m_total=m_fdr)
-    chosen_mask = bh_mask if t.fdr_method == "bh" else by_mask
-    s7 = [r for r, keep in zip(s5, chosen_mask) if keep]
-    for r, keep in zip(s5, chosen_mask):
-        if not keep:
-            reason[r["config_id"]] = "fdr_not_significant"
-    stages.append(StageResult("7_multiple_testing",
-        f"{t.fdr_method.upper()}-FDR q={t.fdr_q}, family={t.fdr_family} (m={m_fdr} of {m_total} tested)",
-        len(s5), len(s7),
-        extra={"bh_cutoff": bh_cut, "by_cutoff": by_cut, "n_bh": int(bh_mask.sum()),
-               "n_by": int(by_mask.sum()), "m_fdr": m_fdr, "m_total": m_total}))
-
-    # Stage 8: validation (survivors run unchanged on validation data).
-    s8 = [r for r in s7 if (r["val_net_return"] or -1) > t.min_val_net_return
-          and (r["val_sharpe"] is not None and r["val_sharpe"] >= t.min_val_sharpe)]
-    for r in s7:
-        if r not in s8:
-            reason[r["config_id"]] = "validation"
-    stages.append(StageResult("8_validation",
-        f"validation net return > 0 & Sharpe >= {t.min_val_sharpe}", len(s7), len(s8)))
-
-    state = {
-        "by_id": by_id, "reason": reason, "m_total": m_total,
-        "survivors_pre_stress": s8,
-        "fdr": {"bh_cutoff": bh_cut, "by_cutoff": by_cut, "n_bh": int(bh_mask.sum()), "n_by": int(by_mask.sum())},
-    }
-    return stages, state
+def stage1_integrity(rec: dict) -> Outcome:
+    issues = [x for x in (rec.get("integrity_issues") or "").split(";") if x]
+    return _resolve([f"integrity:{x}" for x in issues], [], [])
 
 
-def deduplicate(survivors: list[dict], *, corr_threshold: float) -> tuple[list[dict], dict[str, int]]:
-    """Greedy correlation clustering on development monthly returns; keep the
-    highest-validation-Sharpe representative per cluster. Returns (reps, cluster_of)."""
-    if not survivors:
-        return [], {}
-    ordered = sorted(survivors, key=lambda r: (r.get("val_sharpe") or -1e9), reverse=True)
-    series = {r["config_id"]: np.asarray(r.get("monthly_returns") or [], dtype=float) for r in ordered}
+# --- Stage 2 -----------------------------------------------------------------
 
-    reps: list[dict] = []
-    cluster_of: dict[str, int] = {}
-    for r in ordered:
-        if r["config_id"] in cluster_of:
-            continue
-        cid = len(reps)
-        reps.append(r)
-        cluster_of[r["config_id"]] = cid
-        a = series[r["config_id"]]
-        for other in ordered:
-            oid = other["config_id"]
-            if oid in cluster_of:
-                continue
-            b = series[oid]
-            if len(a) == len(b) and len(a) > 2 and np.std(a) > 0 and np.std(b) > 0:
-                corr = float(np.corrcoef(a, b)[0, 1])
-                if corr >= corr_threshold:
-                    cluster_of[oid] = cid
-    return reps, cluster_of
+def stage2_trade_count(rec: dict, fcfg: FunnelConfig) -> Outcome:
+    t = fcfg.trade_count
+    years = fcfg.dev_years
+    per_year = {y: int(rec.get(f"dev_year_trades_{y}") or 0) for y in years}
+    n_ok_years = sum(1 for c in per_year.values() if c >= t.min_trades_per_year)
+    completed = int(rec.get("dev_n_completed_trades") or 0)
+    hard = []
+    if completed < t.min_completed_trades:
+        hard.append(f"completed_trades {completed} < {t.min_completed_trades}")
+    if n_ok_years < t.min_years_meeting_floor:
+        hard.append(f"years_with_>={t.min_trades_per_year}_trades {n_ok_years} < {t.min_years_meeting_floor}")
+    warn = []
+    if (rec.get("dev_concurrent_overlap_trades") or 0) > 0:
+        warn.append("overlapping_positions_reduce_independence")
+    ssf = rec.get("dev_same_session_trade_frac")
+    if ssf is not None and ssf > 0:
+        warn.append(f"same_session_trades_frac={ssf:.2f}")
+    return _resolve(hard, [], warn, {"trades_by_year": per_year, "years_meeting_floor": n_ok_years})
 
 
-def final_test(finalists: list[dict], *, thresholds: FunnelThresholds) -> list[dict]:
-    """Evaluate frozen finalists on the untouched holdout; mark pass/fail (report
-    only -- selection was frozen before the holdout was touched)."""
-    t = thresholds
-    out = []
-    for r in finalists:
-        passed = ((r["holdout_net_return"] or -1) > t.min_holdout_net_return
-                  and r["holdout_sharpe"] is not None and r["holdout_sharpe"] >= t.min_holdout_sharpe)
-        out.append({**r, "holdout_pass": passed})
+# --- Stage 3 -----------------------------------------------------------------
+
+def stage3_performance(rec: dict, fcfg: FunnelConfig) -> Outcome:
+    p = fcfg.performance
+    hard, insuff, warn = [], [], []
+    nr = rec.get("dev_net_return")
+    if nr is None:
+        insuff.append("net_return_undefined")
+    elif not nr > p.min_net_return:
+        hard.append(f"net_return {nr:.4f} <= {p.min_net_return}")
+    sh = rec.get("dev_sharpe")
+    if sh is None:
+        insuff.append("sharpe_undefined")
+    elif sh < p.min_sharpe:
+        hard.append(f"sharpe {sh:.3f} < {p.min_sharpe}")
+    dd = rec.get("dev_max_drawdown")
+    if p.max_drawdown is None:
+        warn.append("risk_limit_unset:risk_approval_incomplete")
+    elif dd is None:
+        insuff.append("max_drawdown_undefined")
+    elif dd < p.max_drawdown:
+        hard.append(f"max_drawdown {dd:.3f} < {p.max_drawdown}")
+    return _resolve(hard, insuff, warn)
+
+
+# --- Stage 4 -----------------------------------------------------------------
+
+def stage4_parameter_stability(ns: NeighborhoodStats, center_sharpe: float | None,
+                               fcfg: FunnelConfig) -> Outcome:
+    s = fcfg.parameter_stability
+    diag = {"n_neighbors": ns.n_neighbors, "n_possible_neighbors": ns.n_possible,
+            "frac_profitable": ns.frac_profitable, "median_sharpe": ns.median_sharpe,
+            "center_minus_median_sharpe": (center_sharpe - ns.median_sharpe
+                                           if center_sharpe is not None and ns.median_sharpe is not None else None),
+            "n_sharpe_undefined": ns.n_sharpe_undefined, "boundary_axes": ",".join(ns.boundary_axes)}
+    warn = []
+    if ns.limited_coverage:
+        warn.append(f"limited_neighborhood_at_boundary:{','.join(ns.boundary_axes)}")
+    if ns.n_sharpe_undefined:
+        warn.append(f"neighbors_with_undefined_sharpe={ns.n_sharpe_undefined}")
+    if ns.n_neighbors == 0:
+        return _resolve([], ["no_valid_neighbors"], warn, diag)
+    hard, insuff = [], []
+    if ns.frac_profitable < s.min_frac_profitable:
+        hard.append(f"neighbor_frac_profitable {ns.frac_profitable:.2f} < {s.min_frac_profitable}")
+    if ns.median_sharpe is None:
+        insuff.append("no_neighbor_sharpe_defined")
+    elif ns.median_sharpe < s.min_median_sharpe:
+        hard.append(f"neighbor_median_sharpe {ns.median_sharpe:.3f} < {s.min_median_sharpe}")
+    return _resolve(hard, insuff, warn, diag)
+
+
+# --- Stage 5 -----------------------------------------------------------------
+
+def stage5_time_stability(rec: dict, fcfg: FunnelConfig) -> Outcome:
+    t = fcfg.time_stability
+    years = fcfg.dev_years
+    n_prof = sum(1 for y in years if (rec.get(f"dev_year_return_{y}") or 0) > 0)
+    hard = [] if n_prof >= t.min_profitable_years else [f"profitable_years {n_prof} < {t.min_profitable_years}"]
+    warn = []
+    ex = rec.get("dev_excl_best_year_return")
+    if ex is not None and ex <= 0:
+        warn.append("non_positive_without_best_year")
+    if rec.get("dev_best_year_contribution") is None:
+        warn.append("contribution_ratios_undefined")
+    if rec.get("dev_dd_recovered") is False:
+        warn.append("drawdown_unrecovered_at_window_end")
+    return _resolve(hard, [], warn, {"n_profitable_years": n_prof})
+
+
+# --- Stage 6 -----------------------------------------------------------------
+
+def monthly_returns(daily: np.ndarray, days: np.ndarray) -> np.ndarray:
+    """Compound daily returns (rows = series) into calendar-month returns."""
+    months = days.astype("datetime64[M]")
+    uniq, inv = np.unique(months, return_inverse=True)
+    logs = np.log1p(np.asarray(daily, dtype=np.float64))
+    out = np.zeros((logs.shape[0], len(uniq)))
+    for k in range(len(uniq)):
+        out[:, k] = logs[:, inv == k].sum(axis=1)
+    return np.expm1(out)
+
+
+def correlation_matrix(series: np.ndarray) -> np.ndarray:
+    """Pearson correlation of rows; rows with zero variance get 0 off-diagonal."""
+    X = np.asarray(series, dtype=np.float64)
+    sd = X.std(axis=1)
+    Z = np.zeros_like(X)
+    ok = sd > 0
+    Z[ok] = (X[ok] - X[ok].mean(axis=1, keepdims=True)) / sd[ok, None]
+    C = (Z @ Z.T) / X.shape[1]
+    np.fill_diagonal(C, 1.0)
+    return np.clip(C, -1.0, 1.0)
+
+
+def cluster_by_correlation(ids: list[str], series: np.ndarray, *, threshold: float,
+                           method: str = "complete") -> dict[str, int]:
+    """Agglomerative clustering on distance 1 - corr, cut at 1 - threshold.
+
+    With complete linkage a cluster's merge height is its MAXIMUM pairwise
+    distance, so every pair inside a cluster has corr >= threshold -- no
+    correlation chaining (A~B, B~C but A!~C) can glue dissimilar configs."""
+    if not ids:
+        return {}
+    if len(ids) == 1:
+        return {ids[0]: 0}
+    D = np.clip(1.0 - correlation_matrix(series), 0.0, 2.0)
+    np.fill_diagonal(D, 0.0)
+    Z = linkage(squareform(D, checks=False), method=method)
+    labels = fcluster(Z, t=1.0 - threshold + 1e-12, criterion="distance")
+    # Relabel deterministically by the smallest config_id in each cluster.
+    first: dict[int, str] = {}
+    for cid, lab in zip(ids, labels):
+        first[lab] = min(first.get(lab, cid), cid)
+    order = {lab: i for i, lab in enumerate(sorted(first, key=lambda k: first[k]))}
+    return {cid: order[lab] for cid, lab in zip(ids, labels)}
+
+
+def representative_key(rec: dict) -> tuple:
+    """Deterministic development-stage ordering: higher median neighbor Sharpe,
+    more profitable dev years, higher dev Sharpe, then stable config_id."""
+    def neg(x):
+        return -x if x is not None else float("inf")
+    return (neg(rec.get("neighbor_median_sharpe")), neg(rec.get("n_profitable_years")),
+            neg(rec.get("dev_sharpe")), rec["config_id"])
+
+
+def select_representatives(recs: list[dict], cluster_of: dict[str, int]) -> list[dict]:
+    """One representative per cluster, returned in development ordering."""
+    by_cluster: dict[int, list[dict]] = {}
+    for r in recs:
+        by_cluster.setdefault(cluster_of[r["config_id"]], []).append(r)
+    reps = [min(members, key=representative_key) for members in by_cluster.values()]
+    return sorted(reps, key=representative_key)
+
+
+# --- Reporting ---------------------------------------------------------------
+
+def survivor_table(rows: list[dict], universe: int) -> list[dict]:
+    """rows: [{stage, evaluated, passed, hard_reject, insufficient, deduplicated, kind}]."""
+    out, prev = [], universe
+    for r in rows:
+        passed = r.get("passed")
+        out.append({
+            **r,
+            "pct_of_universe": (100.0 * passed / universe) if (passed is not None and universe) else None,
+            "pct_of_previous": (100.0 * passed / prev) if (passed is not None and prev) else None,
+        })
+        if passed is not None and r.get("kind") != DIAGNOSTIC:
+            prev = passed
     return out

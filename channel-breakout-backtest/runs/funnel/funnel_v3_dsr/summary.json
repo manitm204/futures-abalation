@@ -1,0 +1,127 @@
+{
+  "dedup": {
+    "n_clusters": 42
+  },
+  "dsr": {
+    "expected_max_sharpe": 0.4028073115483698,
+    "n_search_trials": 24576,
+    "n_trials": 42,
+    "var_trial_sharpes": 0.03326011777810529
+  },
+  "elapsed_s": 55.7,
+  "experiment_id": "funnel_v3_dsr",
+  "finalists": [],
+  "n_configs": 24576,
+  "n_finalists": 0,
+  "n_holdout_pass": 0,
+  "rejection_counts": {
+    "deflated_sharpe": 42,
+    "duplicate": 550,
+    "neighborhood_stability": 286,
+    "profitability": 12323,
+    "risk_sharpe": 1663,
+    "trade_count_or_coverage": 9712
+  },
+  "stages": [
+    {
+      "description": ">= 30 trades/yr & active in >= 4 dev years",
+      "extra": {},
+      "n_after": 14864,
+      "n_before": 24576,
+      "stage": "2_trade_count"
+    },
+    {
+      "description": "dev net return > 0 & profit factor >= 1.1",
+      "extra": {},
+      "n_after": 2541,
+      "n_before": 14864,
+      "stage": "3_profitability"
+    },
+    {
+      "description": "dev Sharpe >= 1.1",
+      "extra": {},
+      "n_after": 878,
+      "n_before": 2541,
+      "stage": "4_risk"
+    },
+    {
+      "description": ">= 70% profitable neighbors & median neighbor Sharpe >= 0.3",
+      "extra": {},
+      "n_after": 592,
+      "n_before": 878,
+      "stage": "5_neighborhood"
+    },
+    {
+      "description": "cluster by dev-return corr >= 0.8; keep best dev-Sharpe rep",
+      "extra": {
+        "n_clusters": 42
+      },
+      "n_after": 42,
+      "n_before": 592,
+      "stage": "6_dedup"
+    },
+    {
+      "description": "Deflated Sharpe Ratio >= 0.95 (N_eff=42 independent trials, SR*=0.403)",
+      "extra": {
+        "expected_max_sharpe": 0.4028073115483698,
+        "min_dsr": 0.95,
+        "n_search_trials": 24576,
+        "n_trials": 42,
+        "var_trial_sharpes": 0.03326011777810529
+      },
+      "n_after": 0,
+      "n_before": 42,
+      "stage": "7_deflated_sharpe"
+    },
+    {
+      "description": "validation net return > 0 & Sharpe >= 0.3",
+      "extra": {},
+      "n_after": 0,
+      "n_before": 0,
+      "stage": "8_validation"
+    },
+    {
+      "description": "net-positive under adverse exec (slippage 5.0bp, delay 1 bar, 10% missed)",
+      "extra": {},
+      "n_after": 0,
+      "n_before": 0,
+      "stage": "9_execution_stress"
+    },
+    {
+      "description": "unchanged on QQQ (soft evidence, not a gate)",
+      "extra": {
+        "n_positive_on_qqq": 0
+      },
+      "n_after": 0,
+      "n_before": 0,
+      "stage": "10_market_transfer"
+    },
+    {
+      "description": "untouched holdout: net return > 0 & Sharpe >= 0.0",
+      "extra": {
+        "n_finalists_evaluated": 0
+      },
+      "n_after": 0,
+      "n_before": 0,
+      "stage": "11_final_test"
+    }
+  ],
+  "started_at": "2026-10-16T18:41:36.221064+00:00",
+  "symbol": "SPY",
+  "thresholds": {
+    "dedup_corr_threshold": 0.8,
+    "min_active_years": 4,
+    "min_dev_net_return": 0.0,
+    "min_dev_sharpe": 1.1,
+    "min_dsr": 0.95,
+    "min_frac_profitable_neighbors": 0.7,
+    "min_holdout_net_return": 0.0,
+    "min_holdout_sharpe": 0.0,
+    "min_median_neighbor_sharpe": 0.3,
+    "min_profit_factor": 1.1,
+    "min_trades_per_year": 30.0,
+    "min_val_net_return": 0.0,
+    "min_val_sharpe": 0.3,
+    "neighborhood_include_joint": true
+  }
+}

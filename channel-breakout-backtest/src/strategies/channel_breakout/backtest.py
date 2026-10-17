@@ -8,15 +8,24 @@ one-pass, non-overlapping state machine instead, but reuses the engine's
 execution primitives (sizing, slippage, commission) and emits engine `Trade` /
 `EquityPoint` objects, so `compute_metrics` and the split analysis are unchanged.
 
-Execution assumptions match the shared engine's: long-only; a breakout confirmed
-at bar *i*'s close fills at bar *i+1*'s open (next-bar, no look-ahead); risk-based
-sizing on the protective level at entry; commission + adverse slippage on every
-fill; one position at a time (compounding equity).
+Execution assumptions (audited for the screening funnel's stage 1):
+  * long-only, one position at a time (no overlapping trades), compounding equity;
+  * a breakout confirmed at bar *i*'s close fills at bar *i+1+delay*'s open;
+  * the ATR used for the initial stop / sizing is the last ATR known before the
+    entry fill (bar entry-1's close) -- never the entry bar's own ATR, which
+    includes that bar's not-yet-seen high/low/close;
+  * the stop is live from the ENTRY bar onward: if the entry bar's low touches
+    the protective level the trade exits on that bar (conservative: the intrabar
+    path is unknown, so we assume the adverse touch happened);
+  * a bar that gaps through the stop fills at the (worse) open, otherwise at the
+    stop level; adverse slippage + commission on every fill;
+  * there is no profit target, so a bar can never touch both stop and target.
 """
 
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 
 import numpy as np
 import polars as pl
@@ -43,6 +52,18 @@ class ChannelData:
         self.close = df["close"].to_numpy().astype(float)
         self.atr = df["atr"].to_numpy().astype(float)
         self.n = df.height
+        # NY session date per bar (datetime64[D]); day_end_idx = last bar of each session.
+        if "session_date_ny" in df.columns:
+            sd = df["session_date_ny"]
+        else:
+            sd = df["bar_open_ts"].dt.convert_time_zone("America/New_York").dt.date()
+        self.session_date = sd.to_numpy().astype("datetime64[D]")
+        if self.n:
+            change = np.flatnonzero(self.session_date[1:] != self.session_date[:-1])
+            self.day_end_idx = np.append(change, self.n - 1)
+        else:
+            self.day_end_idx = np.array([], dtype=int)
+        self.days = self.session_date[self.day_end_idx]
         self._df = df
         self._upper: dict[int, np.ndarray] = {}
         self._lower: dict[int, np.ndarray] = {}
@@ -86,7 +107,59 @@ class ChannelData:
         raise ValueError(f"Unknown trend_filter {trend_filter!r}")
 
 
-def _signal_array(data: ChannelData, cfg: ChannelBreakoutConfig) -> np.ndarray:
+@dataclass(frozen=True)
+class ChannelParams:
+    """Free-valued strategy parameters (the grid's ChannelBreakoutConfig restricts
+    values to the grid lattice). Used for off-grid parameter perturbations; the
+    backtester accepts either type (same attribute names)."""
+
+    symbol: str
+    timeframe: str
+    entry_lookback: int
+    exit_lookback: int
+    buffer_atr: float
+    init_stop_atr: float | None
+    confirm: int
+    trend_filter: str
+
+    @classmethod
+    def from_config(cls, cfg: ChannelBreakoutConfig) -> "ChannelParams":
+        return cls(cfg.symbol, cfg.timeframe, cfg.entry_lookback, cfg.exit_lookback,
+                   cfg.buffer_atr, cfg.init_stop_atr, cfg.confirm, cfg.trend_filter)
+
+
+@dataclass
+class SimResult:
+    """Trades plus the bar indices needed for mark-to-market and integrity checks."""
+
+    trades: list[Trade]
+    equity_curve: list[EquityPoint]
+    signal_idx: np.ndarray
+    entry_idx: np.ndarray
+    exit_idx: np.ndarray
+    quantity: np.ndarray
+    entry_px: np.ndarray       # entry fill price (after slippage)
+    exit_px: np.ndarray        # exit fill price (after slippage)
+    stop_level: np.ndarray     # raw protective level that triggered the exit (nan if forced)
+    entry_commission: np.ndarray
+    realized_pnl: np.ndarray
+    forced_close: np.ndarray   # True = position still open at end of data, closed at last bar
+
+
+def scale_variable_costs(exec_config: ExecutionConfig, multiplier: float) -> ExecutionConfig:
+    """Scale the VARIABLE execution costs (per-share commission, slippage bps)
+    by `multiplier`, always starting from the given baseline so stress scenarios
+    never compound (1.5x is 1.5x baseline, not 1.5x of an already-stressed run).
+    The per-order commission minimum is a fixed cost and is left unchanged."""
+    return exec_config.model_copy(update={
+        "commission_per_share": exec_config.commission_per_share * multiplier,
+        "slippage_bps_market": exec_config.slippage_bps_market * multiplier,
+        "slippage_bps_stop": exec_config.slippage_bps_stop * multiplier,
+        "slippage_bps_limit_adverse": exec_config.slippage_bps_limit_adverse * multiplier,
+    })
+
+
+def _signal_array(data: ChannelData, cfg) -> np.ndarray:
     """Boolean per-bar long-entry signal (confirmed at that bar's close)."""
     upper = data.entry_upper(cfg.entry_lookback)
     threshold = upper + cfg.buffer_atr * data.atr
@@ -98,32 +171,34 @@ def _signal_array(data: ChannelData, cfg: ChannelBreakoutConfig) -> np.ndarray:
     return raw & data.trend_ok(cfg.trend_filter)
 
 
-def run_channel_backtest(
+def simulate_channel(
     data: ChannelData,
-    cfg: ChannelBreakoutConfig,
+    cfg,
     *,
     exec_config: ExecutionConfig,
     starting_equity: float,
     entry_delay_bars: int = 0,
     missed_entry_frac: float = 0.0,
     stress_seed: int = 0,
-) -> tuple[list[Trade], list[EquityPoint]]:
+) -> SimResult:
     """Execution-stress knobs (default off, i.e. the baseline run):
-    `entry_delay_bars` fills the entry that many extra bars late (simulating a
-    delayed/slower fill); `missed_entry_frac` randomly drops that fraction of
-    otherwise-valid signals (simulating missed entries), reproducibly seeded by
-    `stress_seed`. Higher costs / adverse fills are passed via `exec_config`
-    (commission + slippage bps), so no extra knob is needed for those.
+    `entry_delay_bars` fills the entry that many extra bars late; the order /
+    position logic is re-run so later trades shift accordingly.
+    `missed_entry_frac` randomly drops that fraction of breakout EPISODES (a
+    contiguous run of signal bars): the whole episode is skipped, so a missed
+    entry is genuinely missed rather than re-taken one bar later. Reproducibly
+    seeded by `stress_seed`. Cost stress is passed via `exec_config`
+    (see `scale_variable_costs`).
     """
     signal = _signal_array(data, cfg)
-    exit_lb = cfg.exit_lookback
-    lower = data.exit_lower(exit_lb)
+    lower = data.exit_lower(cfg.exit_lookback)
     atr_mult = cfg.init_stop_atr  # None = channel exit only
     o, h, l, c, atr, ts, n = data.open, data.high, data.low, data.close, data.atr, data.ts, data.n
     rng = np.random.default_rng(stress_seed) if missed_entry_frac > 0 else None
 
     trades: list[Trade] = []
     equity_curve: list[EquityPoint] = []
+    rows: list[tuple] = []
     equity = starting_equity
     seq = 0
     i = 0
@@ -143,7 +218,8 @@ def run_channel_backtest(
             continue
 
         if rng is not None and rng.random() < missed_entry_frac:
-            i += 1  # simulated missed entry
+            while i < n and signal[i]:  # skip the whole breakout episode
+                i += 1
             continue
 
         entry_idx = i + 1 + entry_delay_bars
@@ -154,10 +230,10 @@ def run_channel_backtest(
             i += 1
             continue
 
-        atr_entry = atr[entry_idx] if math.isfinite(atr[entry_idx]) else atr[i]
+        atr_known = atr[entry_idx - 1]  # last ATR known before the entry fill
         atr_stop_level = (
-            entry_px_raw - atr_mult * atr_entry
-            if (atr_mult is not None and math.isfinite(atr_entry))
+            entry_px_raw - atr_mult * atr_known
+            if (atr_mult is not None and math.isfinite(atr_known))
             else None
         )
         protective0 = eff_stop(entry_idx, atr_stop_level)
@@ -185,9 +261,10 @@ def run_channel_backtest(
         )
         risk_per_share = entry_fill_px - protective0
 
-        # Walk forward for the trailing-channel / ATR stop (checked from entry_idx+1).
+        # Stop is live from the entry bar itself (conservative; see module doc).
         exit_idx = None
-        for j in range(entry_idx + 1, n):
+        stop_hit = float("nan")
+        for j in range(entry_idx, n):
             lv = eff_stop(j, atr_stop_level)
             if math.isfinite(lv) and l[j] <= lv:
                 gapped = o[j] < lv
@@ -197,10 +274,12 @@ def run_channel_backtest(
                     extended_hours=False, config=exec_config,
                 )
                 exit_idx = j
+                stop_hit = lv
                 reason = ExitReason.STOP_LOSS
                 break
 
-        if exit_idx is None:  # data ended with the position open -> forced close at last bar
+        forced = exit_idx is None
+        if forced:  # data ended with the position open -> forced close at last bar
             j = n - 1
             exit_px = _apply_slippage(
                 c[j], side="long", action="sell", bps=exec_config.slippage_bps_market,
@@ -227,9 +306,36 @@ def run_channel_backtest(
             commission_total=commissions, holding_bars=exit_idx - entry_idx,
         )
         trades.append(trade)
+        rows.append((i, entry_idx, exit_idx, qty, entry_fill_px, exit_px, stop_hit,
+                     entry_fill.commission, realized, forced))
         equity += realized
         equity_curve.append(EquityPoint(ts=ts[exit_idx], cash=equity, position_value=0.0, equity=equity))
 
-        i = exit_idx  # resume signal search after the exit bar
+        i = max(exit_idx, i + 1)  # resume signal search at the exit bar
 
-    return trades, equity_curve
+    cols = list(zip(*rows)) if rows else [()] * 10
+    return SimResult(
+        trades=trades, equity_curve=equity_curve,
+        signal_idx=np.asarray(cols[0], dtype=np.int64), entry_idx=np.asarray(cols[1], dtype=np.int64),
+        exit_idx=np.asarray(cols[2], dtype=np.int64), quantity=np.asarray(cols[3], dtype=float),
+        entry_px=np.asarray(cols[4], dtype=float), exit_px=np.asarray(cols[5], dtype=float),
+        stop_level=np.asarray(cols[6], dtype=float), entry_commission=np.asarray(cols[7], dtype=float),
+        realized_pnl=np.asarray(cols[8], dtype=float), forced_close=np.asarray(cols[9], dtype=bool),
+    )
+
+
+def run_channel_backtest(
+    data: ChannelData,
+    cfg,
+    *,
+    exec_config: ExecutionConfig,
+    starting_equity: float,
+    entry_delay_bars: int = 0,
+    missed_entry_frac: float = 0.0,
+    stress_seed: int = 0,
+) -> tuple[list[Trade], list[EquityPoint]]:
+    """Back-compatible wrapper returning (trades, exit-point equity curve)."""
+    sim = simulate_channel(data, cfg, exec_config=exec_config, starting_equity=starting_equity,
+                           entry_delay_bars=entry_delay_bars, missed_entry_frac=missed_entry_frac,
+                           stress_seed=stress_seed)
+    return sim.trades, sim.equity_curve

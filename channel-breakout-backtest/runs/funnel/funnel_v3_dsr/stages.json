@@ -1,0 +1,84 @@
+[
+  {
+    "description": ">= 30 trades/yr & active in >= 4 dev years",
+    "extra": {},
+    "n_after": 14864,
+    "n_before": 24576,
+    "stage": "2_trade_count"
+  },
+  {
+    "description": "dev net return > 0 & profit factor >= 1.1",
+    "extra": {},
+    "n_after": 2541,
+    "n_before": 14864,
+    "stage": "3_profitability"
+  },
+  {
+    "description": "dev Sharpe >= 1.1",
+    "extra": {},
+    "n_after": 878,
+    "n_before": 2541,
+    "stage": "4_risk"
+  },
+  {
+    "description": ">= 70% profitable neighbors & median neighbor Sharpe >= 0.3",
+    "extra": {},
+    "n_after": 592,
+    "n_before": 878,
+    "stage": "5_neighborhood"
+  },
+  {
+    "description": "cluster by dev-return corr >= 0.8; keep best dev-Sharpe rep",
+    "extra": {
+      "n_clusters": 42
+    },
+    "n_after": 42,
+    "n_before": 592,
+    "stage": "6_dedup"
+  },
+  {
+    "description": "Deflated Sharpe Ratio >= 0.95 (N_eff=42 independent trials, SR*=0.403)",
+    "extra": {
+      "expected_max_sharpe": 0.4028073115483698,
+      "min_dsr": 0.95,
+      "n_search_trials": 24576,
+      "n_trials": 42,
+      "var_trial_sharpes": 0.03326011777810529
+    },
+    "n_after": 0,
+    "n_before": 42,
+    "stage": "7_deflated_sharpe"
+  },
+  {
+    "description": "validation net return > 0 & Sharpe >= 0.3",
+    "extra": {},
+    "n_after": 0,
+    "n_before": 0,
+    "stage": "8_validation"
+  },
+  {
+    "description": "net-positive under adverse exec (slippage 5.0bp, delay 1 bar, 10% missed)",
+    "extra": {},
+    "n_after": 0,
+    "n_before": 0,
+    "stage": "9_execution_stress"
+  },
+  {
+    "description": "unchanged on QQQ (soft evidence, not a gate)",
+    "extra": {
+      "n_positive_on_qqq": 0
+    },
+    "n_after": 0,
+    "n_before": 0,
+    "stage": "10_market_transfer"
+  },
+  {
+    "description": "untouched holdout: net return > 0 & Sharpe >= 0.0",
+    "extra": {
+      "n_finalists_evaluated": 0
+    },
+    "n_after": 0,
+    "n_before": 0,
+    "stage": "11_final_test"
+  }
+]

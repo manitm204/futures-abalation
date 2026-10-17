@@ -10,6 +10,7 @@ testing many configurations (DSR only).
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 import numpy as np
@@ -82,6 +83,35 @@ def probabilistic_sharpe_ratio(
     return float(stats.norm.cdf(z))
 
 
+def expected_max_sharpe(*, n_trials: int, variance_of_trial_sharpes: float) -> float:
+    """Expected MAXIMUM (per-period) Sharpe ratio across `n_trials` independent
+    trials whose Sharpe estimates have variance `variance_of_trial_sharpes`,
+    under the null of zero true edge. Expected-maximum-of-n-Gaussians
+    approximation from Bailey & Lopez de Prado (2014). Returns 0.0 for a single
+    trial (no selection to correct for)."""
+    if n_trials < 1:
+        raise ValueError("n_trials must be >= 1")
+    if n_trials == 1:
+        return 0.0
+    euler_gamma = 0.5772156649
+    z_term = (1 - euler_gamma) * stats.norm.ppf(1 - 1 / n_trials) + euler_gamma * stats.norm.ppf(1 - 1 / (n_trials * np.e))
+    return float(np.sqrt(max(0.0, variance_of_trial_sharpes)) * z_term)
+
+
+def sharpe_moments(returns) -> tuple[float, int, float, float] | None:
+    """(per-period Sharpe, n, skew, EXCESS kurtosis) from a return series, or
+    None if too short / degenerate. Sharpe is mean/std with ddof=1; moments feed
+    the PSR/DSR non-normality correction and are in the same per-period units."""
+    x = np.asarray([v for v in (returns if returns is not None else []) if v is not None], dtype=float)
+    x = x[np.isfinite(x)]
+    if len(x) < 3:
+        return None
+    sd = float(x.std(ddof=1))
+    if sd == 0:
+        return None
+    return float(x.mean() / sd), len(x), float(stats.skew(x)), float(stats.kurtosis(x))
+
+
 def deflated_sharpe_ratio(
     observed_sharpe: float,
     *,
@@ -98,14 +128,96 @@ def deflated_sharpe_ratio(
     Uses the expected-maximum-of-n-Gaussians approximation from Bailey & Lopez
     de Prado (2014).
     """
-    if n_trials < 1:
-        raise ValueError("n_trials must be >= 1")
-    euler_gamma = 0.5772156649
-    if n_trials == 1:
-        expected_max_sharpe = 0.0
-    else:
-        z_term = (1 - euler_gamma) * stats.norm.ppf(1 - 1 / n_trials) + euler_gamma * stats.norm.ppf(1 - 1 / (n_trials * np.e))
-        expected_max_sharpe = np.sqrt(variance_of_trial_sharpes) * z_term
+    sr_star = expected_max_sharpe(n_trials=n_trials, variance_of_trial_sharpes=variance_of_trial_sharpes)
     return probabilistic_sharpe_ratio(
-        observed_sharpe, benchmark_sharpe=expected_max_sharpe, n_returns=n_returns, skew=skew, kurtosis=kurtosis
+        observed_sharpe, benchmark_sharpe=sr_star, n_returns=n_returns, skew=skew, kurtosis=kurtosis
     )
+
+
+# --- Search-adjusted confidence (funnel stage 9) -----------------------------
+
+
+def lag1_autocorr(returns) -> float | None:
+    x = np.asarray(returns, dtype=float)
+    x = x[np.isfinite(x)]
+    if len(x) < 4 or x[:-1].std() == 0 or x[1:].std() == 0:
+        return None
+    return float(np.corrcoef(x[:-1], x[1:])[0, 1])
+
+
+def effective_n_observations(n: int, rho1: float | None) -> float:
+    """AR(1) effective sample size n * (1 - rho) / (1 + rho) for positive lag-1
+    autocorrelation; negative/undefined rho leaves n unchanged (conservative:
+    never inflates the sample)."""
+    if rho1 is None or rho1 <= 0:
+        return float(n)
+    return float(n) * (1 - rho1) / (1 + rho1)
+
+
+def correlation_eigenvalues(returns_matrix: np.ndarray) -> tuple[np.ndarray, int]:
+    """Eigenvalues of the N x N correlation matrix of N return series (rows) over
+    T periods, computed via the T x T dual Gram matrix (same non-zero spectrum).
+    Rows with zero variance are dropped. Returns (eigenvalues desc, N used)."""
+    X = np.asarray(returns_matrix, dtype=np.float64)
+    sd = X.std(axis=1, ddof=1)
+    X = X[sd > 0]
+    n, t = X.shape
+    if n < 2:
+        return np.array([float(n)]), n
+    Z = (X - X.mean(axis=1, keepdims=True)) / X.std(axis=1, ddof=1, keepdims=True)
+    G = (Z.T @ Z) / (t - 1)  # T x T, trace == n
+    ev = np.linalg.eigvalsh(G)[::-1]
+    return np.clip(ev, 0.0, None), n
+
+
+def effective_number_of_trials(eigenvalues: np.ndarray, n_series: int) -> dict:
+    """Effective number of independent trials from the correlation spectrum.
+
+    li_ji: Li & Ji (2005) sum_i [I(l_i >= 1) + (l_i - floor(l_i))]
+    participation_ratio: (sum l)^2 / sum l^2 (tends to be small/conservative)
+    n_components_95: eigenvectors needed for 95% of the variance.
+    All are bounded by the number of periods T (matrix rank)."""
+    ev = np.asarray(eigenvalues, dtype=float)
+    li_ji = float(np.sum((ev >= 1).astype(float) + (ev - np.floor(ev))))
+    pr = float(ev.sum() ** 2 / np.sum(ev**2)) if np.sum(ev**2) > 0 else 1.0
+    frac = np.cumsum(ev) / ev.sum() if ev.sum() > 0 else np.array([1.0])
+    n95 = int(np.searchsorted(frac, 0.95) + 1)
+    return {"li_ji": max(1.0, li_ji), "participation_ratio": max(1.0, pr),
+            "n_components_95": n95, "n_series": int(n_series), "rank_bound_T": int(len(ev))}
+
+
+def dsr_audit(
+    returns,
+    *,
+    n_trials: float,
+    variance_of_trial_sharpes: float,
+    periods_per_year: int,
+    serial_adjust: bool = True,
+) -> dict:
+    """DSR with every input and assumption logged. Sharpe, benchmark SR* and the
+    trial-Sharpe variance are all in the SAME per-period (daily) units; skew is
+    the sample skew and kurtosis is EXCESS (converted to the paper's raw-kurtosis
+    term inside `probabilistic_sharpe_ratio`). Serial dependence is handled by
+    replacing n with the AR(1) effective sample size."""
+    mom = sharpe_moments(returns)
+    if mom is None:
+        return {"dsr": None, "status_reason": "undefined_return_moments"}
+    sr, n, sk, ku = mom
+    rho = lag1_autocorr(returns) if serial_adjust else None
+    n_eff = effective_n_observations(n, rho) if serial_adjust else float(n)
+    n_trials_int = max(1, int(round(n_trials)))
+    sr_star = expected_max_sharpe(n_trials=n_trials_int, variance_of_trial_sharpes=variance_of_trial_sharpes)
+    n_used = max(2, int(math.floor(n_eff)))
+    dsr = probabilistic_sharpe_ratio(sr, benchmark_sharpe=sr_star, n_returns=n_used, skew=sk, kurtosis=ku)
+    psr0 = probabilistic_sharpe_ratio(sr, benchmark_sharpe=0.0, n_returns=n_used, skew=sk, kurtosis=ku)
+    ann = math.sqrt(periods_per_year)
+    return {
+        "dsr": dsr, "psr_vs_zero": psr0,
+        "sharpe_per_period": sr, "sharpe_annualized": sr * ann,
+        "benchmark_sharpe_per_period": sr_star, "benchmark_sharpe_annualized": sr_star * ann,
+        "n_trials": n_trials_int, "variance_of_trial_sharpes_per_period": variance_of_trial_sharpes,
+        "n_observations": n, "n_effective_observations": n_eff, "n_used": n_used,
+        "lag1_autocorr": rho, "skew": sk, "excess_kurtosis": ku,
+        "kurtosis_convention": "excess (normal=0); PSR uses (excess+2)/4 == (raw-1)/4",
+        "return_frequency": "daily", "periods_per_year": periods_per_year,
+    }

@@ -1,217 +1,724 @@
-"""Configurable screening funnel over the ~25k channel-breakout configs (SPY).
+"""Strategy-screening funnel over the 24,576-config channel-breakout grid (SPY).
 
-Pipeline (thresholds frozen in FunnelThresholds, logged per run):
-  prep  re-backtest every config once -> dev/val/holdout metrics + dev monthly
-        return series + dev trades-by-year (saved to parquet, reused on re-run)
-  2-8   pure stages: trade count+coverage, profitability, risk, neighborhood,
-        multiple-testing (BH-FDR over full search; BY reported), validation
-  9     execution stress: adverse costs + entry delay + missed entries; break-even cost
-  10    market transfer: survivors re-run unchanged on QQQ (soft evidence)
-  11    deduplication: cluster by dev monthly-return correlation, keep best rep
-  12    final test: untouched holdout (frozen finalists), pass/fail reported
+All thresholds: configs/funnel/channel_funnel.yaml (hashed into every output).
 
-Saves stage counts, rejection reasons, and survivor sets at every stage.
-Zero survivors is a valid outcome.
+Commands (each is a separate, explicit step):
+  develop     stages 1-7 on DEVELOPMENT data only (2018-2022; later bars are never
+              loaded), plus stage-9 diagnostics (DSR audit, QQQ transfer on the
+              development period). Freezes the representatives to a hashed manifest.
+  validate    stage 8: evaluates the frozen manifest on 2023-2024. Refuses to run
+              if the config changed since `develop`. Writes the selection manifest.
+  final-test  stage 10: evaluates a frozen selection manifest on the holdout.
+              Requires --confirm-holdout-access; every access is ledgered.
 
 Usage:
-  python scripts/run_channel_funnel.py --experiment-id funnel_v1 --n-workers 12
+  python scripts/run_channel_funnel.py develop --experiment-id funnel_v4 --n-workers 12
+  python scripts/run_channel_funnel.py validate --experiment-id funnel_v4
+  python scripts/run_channel_funnel.py final-test --manifest runs/funnel/funnel_v4/selection_manifest.json \
+      --confirm-holdout-access
 """
 
 from __future__ import annotations
 
+import hashlib
+import json
+import subprocess
 import time
-from datetime import datetime, timezone
+from collections import Counter
+from datetime import date, datetime, timezone
 from pathlib import Path
 
+import numpy as np
 import polars as pl
 import typer
 
-from src.data.aggregation import aggregate_bars
-from src.engine.metrics import compute_metrics
-from src.experiments.ablation_runner import RunMeta, _split_metrics
+from src.analysis.neighborhood import neighborhood_stats
+from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
+from src.data.aggregation import AGG_INTERVAL_MINUTES, aggregate_bars
 from src.experiments.channel_grid import channel_grid
-from src.experiments.funnel import FunnelThresholds, deduplicate, final_test, run_funnel
-from src.experiments.funnel_prep import build_records
-from src.experiments.validation import DEFAULT_SPLIT
-from src.strategies.channel_breakout.backtest import ChannelData
+from src.experiments.data_access import (
+    DEFAULT_LEDGER,
+    append_ledger,
+    authorize_holdout_access,
+    load_phase_bars,
+    read_ledger,
+)
+from src.experiments.funnel import (
+    DEDUPLICATED,
+    DIAGNOSTIC,
+    HARD_REJECT,
+    INSUFFICIENT,
+    NOT_EVALUATED,
+    PASS,
+    Outcome,
+    cluster_by_correlation,
+    correlation_matrix,
+    monthly_returns,
+    representative_key,
+    select_representatives,
+    stage1_integrity,
+    stage2_trade_count,
+    stage3_performance,
+    stage4_parameter_stability,
+    stage5_time_stability,
+    survivor_table,
+)
+from src.experiments.funnel_config import (
+    DEFAULT_FUNNEL_CONFIG,
+    PROJECT_ROOT,
+    FunnelConfig,
+    load_execution_config,
+    load_funnel_config,
+)
+from src.experiments.funnel_prep import Job, build_dev_records, run_jobs
+from src.experiments.funnel_robustness import breakeven_multiplier, interval_overlap, perturbations, quantile
+from src.experiments.integrity import truncation_invariance
+from src.strategies.channel_breakout.backtest import ChannelParams
 from src.strategies.channel_breakout.config import ChannelBreakoutConfig
-from src.utils.config_models import DEFAULT_EXECUTION_CONFIG
+from src.utils.hashing import canonical_json
 from src.utils.logging import configure_logging, get_logger
+from src.utils.seeds import derive_seed
 from src.utils.serialization import atomic_write_json
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-app = typer.Typer()
+app = typer.Typer(add_completion=False)
 logger = get_logger(__name__)
-
-N_YEARS_DEV = 5.0  # 2018-2022
-TIMEFRAMES = ("5min", "15min", "1h")
-
-# Frozen execution-stress scenario (stage 9).
-STRESS = {"slippage_bps": 5.0, "entry_delay_bars": 1, "missed_entry_frac": 0.10, "seed": 7}
-BREAKEVEN_BPS = [1.0, 2.0, 3.0, 5.0, 8.0, 12.0, 20.0, 30.0, 50.0]
-
-
-def _load_1min(clean_root: Path, symbol: str) -> pl.DataFrame:
-    base = clean_root / f"symbol={symbol}" / "timeframe=1min"
-    files = sorted(base.rglob("*.parquet"))
-    return pl.concat([pl.read_parquet(f) for f in files]).sort("bar_open_ts")
+OUT_ROOT = PROJECT_ROOT / "runs" / "funnel"
+PREP_SOURCES = ["src/strategies/channel_breakout/backtest.py", "src/analysis/daily_performance.py",
+                "src/experiments/funnel_prep.py", "src/experiments/integrity.py"]
+GRID_KEYS = ("symbol", "timeframe", "entry_lookback", "exit_ratio", "buffer_atr", "init_stop",
+             "confirm", "trend_filter", "atr_period")
+BREAKEVEN_GRID = [0.0, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0, 8.0, 11.0, 15.0, 20.0, 25.0]
 
 
-def _cfg_from_record(r: dict) -> ChannelBreakoutConfig:
-    keys = ("symbol", "timeframe", "entry_lookback", "exit_ratio", "buffer_atr",
-            "init_stop", "confirm", "trend_filter", "atr_period")
-    return ChannelBreakoutConfig(**{k: r[k] for k in keys if k in r})
+# --- helpers ---------------------------------------------------------------------------------
+
+def _sha(obj) -> str:
+    return hashlib.sha256(canonical_json(obj).encode()).hexdigest()
 
 
-def _split_nr_sharpe(data: ChannelData, cfg, meta: RunMeta, **stress) -> dict:
-    from src.strategies.channel_breakout.backtest import run_channel_backtest
-    eq0 = meta.execution_config.starting_equity
-    trades, equity = run_channel_backtest(data, cfg, exec_config=meta.execution_config, starting_equity=eq0, **stress)
-    sp = _split_metrics(trades, equity, meta)
-    return sp
+def _git(*args: str) -> str:
+    return subprocess.run(["git", *args], cwd=PROJECT_ROOT, capture_output=True, text=True).stdout
 
+
+def _provenance(fcfg: FunnelConfig, config_path: Path) -> dict:
+    manifests = {}
+    for sym in {fcfg.symbol, fcfg.confidence.transfer_symbol} - {None}:
+        p = PROJECT_ROOT / "data" / "metadata" / f"manifest_{sym}_1min.json"
+        if p.exists():
+            m = json.loads(p.read_text())
+            manifests[sym] = {k: m.get(k) for k in ("provider", "cleaning_version", "schema_version",
+                              "download_timestamp", "actual_coverage_start", "actual_coverage_end",
+                              "row_count", "adjustment_status")}
+    return {
+        "git_commit": _git("rev-parse", "HEAD").strip(),
+        "git_dirty": bool(_git("status", "--porcelain", "--untracked-files=no").strip()),
+        "git_diff_sha256": hashlib.sha256(_git("diff", "HEAD").encode()).hexdigest(),
+        "config_path": str(config_path), "config_sha256": fcfg.config_sha256(), "seed": fcfg.seed,
+        "data_manifests": manifests,
+        "available_data_endpoint_per_manifest": {s: m["actual_coverage_end"] for s, m in manifests.items()},
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def _frames(fcfg, symbol, phase, *, command, experiment_id, authorization=None):
+    bars, info = load_phase_bars(fcfg, symbol, phase, command=command, experiment_id=experiment_id,
+                                 authorization=authorization)
+    return {f"{symbol}|{tf}": aggregate_bars(bars, timeframe=tf) for tf in fcfg.data.timeframes}, info
+
+
+def _params(rec: dict, symbol: str | None = None) -> ChannelParams:
+    cfg = ChannelBreakoutConfig(**{k: rec[k] for k in GRID_KEYS if k in rec})
+    p = ChannelParams.from_config(cfg)
+    return p if symbol is None else ChannelParams(**{**p.__dict__, "symbol": symbol})
+
+
+def _set(rec: dict, stage: int, out: Outcome) -> None:
+    rec[f"s{stage}_status"] = out.status
+    rec[f"s{stage}_reasons"] = "; ".join(out.reasons)
+    rec[f"s{stage}_warnings"] = "; ".join(out.warnings)
+
+
+def _fmt(x, nd=3, pct=False):
+    if x is None or (isinstance(x, float) and not np.isfinite(x)):
+        return "n/a"
+    return f"{100 * x:.1f}%" if pct else f"{x:.{nd}f}"
+
+
+def _prep_fingerprint(fcfg, ec, data_info) -> str:
+    src = {p: hashlib.sha256((PROJECT_ROOT / p).read_bytes()).hexdigest() for p in PREP_SOURCES}
+    return _sha({"src": src, "exec": ec.model_dump(mode="json"), "data": data_info["partition_fingerprint"],
+                 "end": data_info["phase_end"], "metrics": fcfg.metrics.model_dump(mode="json"),
+                 "ts": fcfg.time_stability.model_dump(mode="json"), "atr": fcfg.data.atr_period,
+                 "dev": fcfg.data.development.model_dump(mode="json"), "tfs": fcfg.data.timeframes})
+
+
+# --- develop ---------------------------------------------------------------------------------
 
 @app.command()
-def main(
+def develop(
     experiment_id: str = typer.Option(...),
     n_workers: int = typer.Option(12),
-    fdr_method: str = typer.Option("bh", help="bh (default) or by (dependence-robust)"),
-    fdr_family: str = typer.Option("full_search", help="full_search (default) or screened"),
-    clean_root: Path = typer.Option(PROJECT_ROOT / "data" / "clean"),
-    out_dir: Path = typer.Option(PROJECT_ROOT / "runs" / "funnel"),
-    reuse_prep: bool = typer.Option(True, help="Reuse the records parquet if present"),
+    config: Path = typer.Option(DEFAULT_FUNNEL_CONFIG),
+    out_dir: Path = typer.Option(OUT_ROOT),
+    reuse_prep: bool = typer.Option(True, help="Reuse records if the prep fingerprint matches"),
 ) -> None:
+    """Stages 1-7 (+ stage-9 diagnostics) on development data only."""
     configure_logging()
     t0 = time.time()
-    exp_dir = out_dir / experiment_id
-    exp_dir.mkdir(parents=True, exist_ok=True)
-    thresholds = FunnelThresholds(fdr_method=fdr_method, fdr_family=fdr_family)
+    fcfg = load_funnel_config(config)
+    ec = load_execution_config(fcfg)
+    exp = out_dir / experiment_id
+    exp.mkdir(parents=True, exist_ok=True)
+    prov = _provenance(fcfg, config)
+    dev = fcfg.data.development
+    sym = fcfg.symbol
+    ppy = fcfg.metrics.periods_per_year
 
-    # --- SPY frames + grid ---
-    spy_1m = _load_1min(clean_root, "SPY")
-    spy_frames = {tf: aggregate_bars(spy_1m, timeframe=tf) for tf in TIMEFRAMES}
-    grid = channel_grid(("SPY",))
-    meta = RunMeta(experiment_id=experiment_id, code_version="funnel", strategy_name="channel_breakout",
-                   execution_config=DEFAULT_EXECUTION_CONFIG, split=DEFAULT_SPLIT)
+    frames, data_info = _frames(fcfg, sym, "development", command="develop", experiment_id=experiment_id)
+    grid = channel_grid((sym,))
+    universe = len(grid)
 
-    # --- prep: records (reuse if present) ---
-    recs_path = exp_dir / "records.parquet"
-    if reuse_prep and recs_path.exists():
-        records = pl.read_parquet(recs_path).to_dicts()
-        logger.info("records_loaded", n=len(records))
+    # ---- Stage 1 (run level): empirical look-ahead test on a seeded sample ----
+    rng = np.random.default_rng(derive_seed(fcfg.seed, "integrity_sample"))
+    sample = [grid[i] for i in rng.choice(universe, size=min(fcfg.integrity.truncation_check_sample, universe),
+                                          replace=False)]
+    fracs = tuple(float(x) for x in np.linspace(0.3, 0.9, fcfg.integrity.truncation_points))
+    trunc = {ce.config_id: truncation_invariance(frames[f"{sym}|{ce.config.timeframe}"], ce.config,
+                                                 exec_config=ec, atr_period=fcfg.data.atr_period, cut_fracs=fracs)
+             for ce in sample}
+    trunc_fail = {k: v for k, v in trunc.items() if v}
+    integrity_run = {"truncation_sample": len(sample), "cut_fractions": fracs, "failures": trunc_fail,
+                     "checks_per_config": ["entry_not_after_signal_bar", "exit_before_entry", "overlapping_positions",
+                                           "entry_fill_better_than_open", "stop_fill_better_than_min_open_stop",
+                                           "forced_close_not_final_trade", "commission_below_minimum",
+                                           "unexpected_profit_target"],
+                     "audit_notes": AUDIT_NOTES}
+    atomic_write_json(exp / "integrity.json", integrity_run)
+    if trunc_fail:
+        typer.echo(f"STAGE 1 FAILED: look-ahead detected in {len(trunc_fail)} sampled configs; see {exp/'integrity.json'}")
+        raise typer.Exit(2)
+    logger.info("stage1_lookahead_ok", sample=len(sample))
+
+    # ---- Prep: one development-only backtest per config ----
+    fp = _prep_fingerprint(fcfg, ec, data_info)
+    rec_path, ret_path, meta_path = exp / "records.parquet", exp / "dev_daily_returns.npy", exp / "prep_meta.json"
+    if reuse_prep and rec_path.exists() and ret_path.exists() and meta_path.exists() \
+            and json.loads(meta_path.read_text()).get("fingerprint") == fp:
+        records = pl.read_parquet(rec_path).to_dicts()
+        R = np.load(ret_path)
+        logger.info("prep_reused", n=len(records))
     else:
-        logger.info("prep_start", n_configs=len(grid))
-        records = build_records(grid, spy_frames, meta=meta, n_workers=n_workers)
-        pl.DataFrame(records).write_parquet(recs_path)
-        logger.info("prep_done", n=len(records), elapsed_s=round(time.time() - t0, 1))
+        records, R = build_dev_records(grid, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
+        pl.DataFrame(records, infer_schema_length=None).write_parquet(rec_path)
+        np.save(ret_path, R)
+        atomic_write_json(meta_path, {"fingerprint": fp, "n": len(records), "built_s": round(time.time() - t0, 1)})
+        logger.info("prep_built", n=len(records), elapsed_s=round(time.time() - t0, 1))
+    days = np.unique(frames[f"{sym}|{fcfg.data.timeframes[0]}"]["session_date_ny"].to_numpy()
+                     .astype("datetime64[D]"))
+    days = days[(days >= np.datetime64(dev.start)) & (days <= np.datetime64(dev.end))]
+    assert R.shape == (len(records), len(days)), (R.shape, len(days))
+    row = {r["config_id"]: i for i, r in enumerate(records)}
+    by_id = {r["config_id"]: r for r in records}
+    for r in records:
+        for s in range(1, 8):
+            r[f"s{s}_status"], r[f"s{s}_reasons"], r[f"s{s}_warnings"] = NOT_EVALUATED, "", ""
+    table: list[dict] = [{"stage": "0 universe", "kind": "universe", "evaluated": universe, "passed": universe}]
 
-    # --- pure stages 2-8 ---
-    stages, state = run_funnel(records, thresholds=thresholds, n_years_dev=N_YEARS_DEV)
-    survivors = state["survivors_pre_stress"]
-    logger.info("pure_stages_done", survivors=len(survivors))
+    def gate(stage: int, name: str, pool: list[dict], fn) -> list[dict]:
+        keep = []
+        for r in pool:
+            out = fn(r)
+            _set(r, stage, out)
+            if out.status == PASS:
+                keep.append(r)
+        c = Counter(r[f"s{stage}_status"] for r in pool)
+        table.append({"stage": name, "kind": "hard_gate", "evaluated": len(pool), "passed": len(keep),
+                      "hard_reject": c[HARD_REJECT], "insufficient_evidence": c[INSUFFICIENT],
+                      "with_warnings": sum(1 for r in pool if r[f"s{stage}_warnings"])})
+        logger.info("stage_done", stage=name, evaluated=len(pool), passed=len(keep))
+        return keep
 
-    # --- stage 9: execution stress (+ break-even cost) on SPY ---
-    spy_data = {tf: ChannelData(df) for tf, df in spy_frames.items()}
-    stressed_meta = RunMeta(
-        experiment_id=experiment_id, code_version="funnel", strategy_name="channel_breakout",
-        execution_config=DEFAULT_EXECUTION_CONFIG.model_copy(update={
-            "slippage_bps_market": STRESS["slippage_bps"], "slippage_bps_stop": STRESS["slippage_bps"]}),
-        split=DEFAULT_SPLIT,
-    )
-    stress_survivors = []
-    for r in survivors:
-        cfg = _cfg_from_record(r)
-        data = spy_data[r["timeframe"]]
-        sp = _split_nr_sharpe(data, cfg, stressed_meta,
-                              entry_delay_bars=STRESS["entry_delay_bars"],
-                              missed_entry_frac=STRESS["missed_entry_frac"], stress_seed=STRESS["seed"])
-        r["stress_dev_net_return"] = sp["development"]["net_return_pct"]
-        r["stress_dev_sharpe"] = sp["development"]["sharpe"]
-        # break-even slippage: scan until dev net return crosses 0
-        be = None
-        prev_bps, prev_nr = None, None
-        for bps in BREAKEVEN_BPS:
-            m2 = RunMeta(experiment_id=experiment_id, code_version="f", strategy_name="channel_breakout",
-                         execution_config=DEFAULT_EXECUTION_CONFIG.model_copy(update={
-                             "slippage_bps_market": bps, "slippage_bps_stop": bps}), split=DEFAULT_SPLIT)
-            nr = _split_nr_sharpe(data, cfg, m2)["development"]["net_return_pct"] or 0.0
-            if nr <= 0:
-                be = bps if prev_bps is None else prev_bps + (bps - prev_bps) * (prev_nr / (prev_nr - nr))
-                break
-            prev_bps, prev_nr = bps, nr
-        r["breakeven_slippage_bps"] = be if be is not None else float(BREAKEVEN_BPS[-1])
-        if (r["stress_dev_net_return"] or -1) > 0:
-            stress_survivors.append(r)
+    s1 = gate(1, "1 backtest integrity", records, stage1_integrity)
+    s2 = gate(2, "2 trade count & coverage", s1, lambda r: stage2_trade_count(r, fcfg))
+    s3 = gate(3, "3 performance & risk", s2, lambda r: stage3_performance(r, fcfg))
+
+    # ---- Stage 4: immediate neighbors from the FULL universe ----
+    ps = fcfg.parameter_stability
+    nstats = neighborhood_stats(records, net_return_key="dev_net_return", sharpe_key="dev_sharpe",
+                                include_joint=ps.neighbor_mode == "single_and_joint",
+                                only_ids={r["config_id"] for r in s3})
+
+    def _s4(r):
+        out = stage4_parameter_stability(nstats[r["config_id"]], r.get("dev_sharpe"), fcfg)
+        for k, v in out.diagnostics.items():
+            r[f"neighbor_{k}"] = v
+        return out
+    s4 = gate(4, "4 parameter stability", s3, _s4)
+
+    # Perturbation diagnostics (never a gate) for stage-4 survivors.
+    pjobs = []
+    for r in s4:
+        for k, p in enumerate(perturbations(_params(r), config_id=r["config_id"], base_seed=fcfg.seed,
+                                            pcfg=ps.perturbation)):
+            pjobs.append(Job(f"{r['config_id']}|p{k}", p, dev.start, dev.end))
+    pres = run_jobs(pjobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
+    for r in s4:
+        ms = [pres[f"{r['config_id']}|p{k}"]["metrics"] for k in range(ps.perturbation.n_per_config)]
+        sh = [m["sharpe"] for m in ms]
+        med = quantile(sh, 0.5)
+        r["perturb_n"] = len(ms)
+        r["perturb_frac_profitable"] = float(np.mean([m["net_return"] > 0 for m in ms])) if ms else None
+        r["perturb_median_sharpe"] = med
+        r["perturb_p10_sharpe"] = quantile(sh, 0.1)
+        r["perturb_center_minus_median_sharpe"] = (r["dev_sharpe"] - med) if med is not None else None
+
+    s5 = gate(5, "5 time stability", s4, lambda r: stage5_time_stability(r, fcfg))
+    for r in s5:
+        r["n_profitable_years"] = r.get("dev_n_profitable_years")  # representative ordering key
+
+    # ---- Stage 6: complete-linkage dedup on development monthly returns ----
+    dd = fcfg.dedup
+    ids5 = [r["config_id"] for r in s5]
+    rows5 = [row[c] for c in ids5]
+    M5 = monthly_returns(R[rows5], days) if ids5 else np.zeros((0, 0))
+    cluster_of = cluster_by_correlation(ids5, M5, threshold=dd.corr_threshold, method=dd.linkage)
+    reps = select_representatives(s5, cluster_of)
+    rep_of = {cluster_of[r["config_id"]]: r["config_id"] for r in reps}
+    ijobs = [Job(f"{c}|iv", _params(by_id[c]), dev.start, dev.end, return_series=True) for c in ids5]
+    ivs = {k.split("|")[0]: v["intervals"] for k, v in
+           run_jobs(ijobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers).items()}
+    Cm = correlation_matrix(M5) if ids5 else None
+    Cd = correlation_matrix(R[rows5].astype(np.float64)) if ids5 else None
+    pos5 = {c: i for i, c in enumerate(ids5)}
+    clusters = []
+    for k in sorted(set(cluster_of.values())):
+        members = sorted([c for c in ids5 if cluster_of[c] == k], key=lambda c: representative_key(by_id[c]))
+        rep = rep_of[k]
+        idx = [pos5[c] for c in members]
+        sub = Cm[np.ix_(idx, idx)]
+        others = [c for c in members if c != rep]
+        dcorr = [float(Cd[pos5[rep], pos5[c]]) for c in others]
+        ovl = [interval_overlap(ivs[rep], ivs[c]) for c in others]
+        clusters.append({"cluster": k, "representative": rep, "size": len(members), "members": members,
+                         "min_pairwise_monthly_corr": float(sub.min()) if len(members) > 1 else None,
+                         "rep_daily_corr_min": min(dcorr) if dcorr else None,
+                         "rep_daily_corr_median": quantile(dcorr, 0.5),
+                         "rep_trade_overlap_median": quantile(ovl, 0.5),
+                         "rep_trade_overlap_min": quantile(ovl, 0.0)})
+    for r in s5:
+        k = cluster_of[r["config_id"]]
+        r["dedup_cluster"] = k
+        r["dedup_representative"] = rep_of[k]
+        if rep_of[k] == r["config_id"]:
+            _set(r, 6, Outcome(PASS))
         else:
-            state["reason"][r["config_id"]] = "execution_stress"
-    stages.append(_mk("9_execution_stress",
-        f"net-positive under adverse exec (slippage {STRESS['slippage_bps']}bp, delay {STRESS['entry_delay_bars']} bar, {STRESS['missed_entry_frac']:.0%} missed)",
-        len(survivors), len(stress_survivors)))
+            _set(r, 6, Outcome(DEDUPLICATED, [f"represented_by {rep_of[k]} (cluster {k})"]))
+    table.append({"stage": "6 deduplication", "kind": "dedup", "evaluated": len(s5), "passed": len(reps),
+                  "deduplicated": len(s5) - len(reps), "n_clusters": len(reps)})
 
-    # --- stage 10: market transfer to QQQ (soft; not a gate) ---
-    qqq_1m = _load_1min(clean_root, "QQQ")
-    qqq_data = {tf: ChannelData(aggregate_bars(qqq_1m, timeframe=tf)) for tf in TIMEFRAMES}
-    n_transfer_pos = 0
-    for r in stress_survivors:
-        cfg = _cfg_from_record(r)
-        sp = _split_nr_sharpe(qqq_data[r["timeframe"]], cfg, meta)
-        r["qqq_val_sharpe"] = sp["validation"]["sharpe"]
-        r["qqq_val_net_return"] = sp["validation"]["net_return_pct"]
-        if (r["qqq_val_net_return"] or -1) > 0:
-            n_transfer_pos += 1
-    stages.append(_mk("10_market_transfer",
-        "unchanged on QQQ (soft evidence, not a gate)", len(stress_survivors), len(stress_survivors),
-        extra={"n_positive_on_qqq": n_transfer_pos}))
+    # ---- Stage 7: execution stress on representatives (development data) ----
+    st = fcfg.execution_stress
+    mults = sorted({1.0, st.gate_cost_multiplier, *st.diagnostic_cost_multipliers,
+                    *[m for m in BREAKEVEN_GRID if m <= st.breakeven_max_multiplier]})
+    sjobs = []
+    for r in reps:
+        c, p = r["config_id"], _params(r)
+        sjobs += [Job(f"{c}|cost|{m}", p, dev.start, dev.end, cost_multiplier=m) for m in mults]
+        sjobs.append(Job(f"{c}|delay", p, dev.start, dev.end, entry_delay_bars=st.entry_delay_bars))
+        sjobs += [Job(f"{c}|miss|{k}", p, dev.start, dev.end, missed_entry_frac=st.missed_entry_frac,
+                      seed=derive_seed(fcfg.seed, "missed", c, str(k))) for k in range(st.missed_entry_sims)]
+    sres = run_jobs(sjobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
 
-    # --- stage 11: dedup ---
-    reps, cluster_of = deduplicate(stress_survivors, corr_threshold=thresholds.dedup_corr_threshold)
-    stages.append(_mk("11_deduplication",
-        f"cluster by dev return corr >= {thresholds.dedup_corr_threshold}; keep best per cluster",
-        len(stress_survivors), len(reps), extra={"n_clusters": len(reps)}))
+    def _s7(r):
+        c = r["config_id"]
+        cost = {m: sres[f"{c}|cost|{m}"]["metrics"] for m in mults}
+        for m in mults:
+            r[f"stress_cost_{m}x_net_return"] = cost[m]["net_return"]
+            r[f"stress_cost_{m}x_sharpe"] = cost[m]["sharpe"]
+        dl = sres[f"{c}|delay"]["metrics"]
+        mins = AGG_INTERVAL_MINUTES[r["timeframe"]]
+        r["stress_delay_label"] = f"{st.entry_delay_bars} bar entry delay = {st.entry_delay_bars * mins} min ({r['timeframe']} bars)"
+        r["stress_delay_net_return"], r["stress_delay_sharpe"] = dl["net_return"], dl["sharpe"]
+        miss = [sres[f"{c}|miss|{k}"]["metrics"] for k in range(st.missed_entry_sims)]
+        nr, sh = [m["net_return"] for m in miss], [m["sharpe"] for m in miss]
+        r["stress_missed_median_net_return"], r["stress_missed_p10_net_return"] = quantile(nr, 0.5), quantile(nr, 0.1)
+        r["stress_missed_median_sharpe"], r["stress_missed_p10_sharpe"] = quantile(sh, 0.5), quantile(sh, 0.1)
+        r["stress_missed_frac_positive"] = float(np.mean([x > 0 for x in nr]))
+        be, be_status = breakeven_multiplier(mults, [cost[m]["net_return"] for m in mults])
+        r["breakeven_cost_multiplier"], r["breakeven_status"] = be, be_status
+        r["breakeven_slippage_bps_per_side"] = be * ec.slippage_bps_market if be is not None else None
+        g = cost[st.gate_cost_multiplier]["net_return"]
+        warn = []
+        for m in st.diagnostic_cost_multipliers:
+            if not cost[m]["net_return"] > 0:
+                warn.append(f"non_positive_at_{m}x_costs")
+        if not dl["net_return"] > 0:
+            warn.append("non_positive_with_entry_delay")
+        if r["stress_missed_p10_net_return"] is not None and r["stress_missed_p10_net_return"] <= 0:
+            warn.append("missed_entry_p10_non_positive")
+        if g is None:
+            return Outcome(INSUFFICIENT, ["stress_net_return_undefined"], warn)
+        if not g > 0:
+            return Outcome(HARD_REJECT, [f"net_return {g:.4f} <= 0 at {st.gate_cost_multiplier}x costs"], warn)
+        return Outcome(PASS, [], warn)
+    s7 = gate(7, "7 execution stress", reps, _s7)
 
-    # --- stage 12: final (untouched) test ---
-    finalists = final_test(reps, thresholds=thresholds)
-    n_pass = sum(1 for r in finalists if r["holdout_pass"])
-    stages.append(_mk("12_final_test",
-        f"untouched holdout: net return > 0 & Sharpe >= {thresholds.min_holdout_sharpe}",
-        len(reps), n_pass, extra={"n_finalists_evaluated": len(reps)}))
+    # ---- Freeze representatives BEFORE any validation data is touched ----
+    frozen = _manifest(fcfg, ec, prov, experiment_id, s7, by_id, cluster_of)
+    frozen_sha = _sha(frozen)
+    atomic_write_json(exp / "frozen_representatives.json", frozen)
+    (exp / "frozen_representatives.sha256").write_text(frozen_sha + "\n")
+    append_ledger({"event": "freeze_representatives", "experiment_id": experiment_id,
+                   "manifest_sha256": frozen_sha, "n_candidates": len(s7)})
 
-    # --- persist everything ---
-    atomic_write_json(exp_dir / "thresholds.json", {**thresholds.frozen_dict(), "stress": STRESS})
-    atomic_write_json(exp_dir / "stages.json", [vars(s) for s in stages])
-    from collections import Counter
-    atomic_write_json(exp_dir / "rejection_counts.json", dict(Counter(state["reason"].values())))
-    pl.DataFrame([{"config_id": c, "reason": why} for c, why in state["reason"].items()]).write_parquet(
-        exp_dir / "rejections.parquet")
+    # ---- Stage 9 diagnostics: DSR audit + QQQ transfer (development period) ----
+    conf = fcfg.confidence
+    srs = np.array([r["dev_sharpe_per_period"] for r in records if r.get("dev_sharpe_per_period") is not None])
+    var_sr = float(np.var(srs, ddof=1)) if len(srs) > 1 else 0.0
+    ev, n_used = correlation_eigenvalues(R)
+    neff = effective_number_of_trials(ev, n_used)
+    known_prior = sum(t.n_configs or 0 for t in fcfg.research_history if "channel_breakout grid" not in t.name)
+    trial_options = {"li_ji": neff["li_ji"], "participation_ratio": neff["participation_ratio"],
+                     "raw": float(universe), "raw_plus_known_prior": float(universe + known_prior)}
+    primary = conf.effective_trials_method
+    dsr_meta = {"variance_of_trial_sharpes_per_period": var_sr, "n_configs_with_defined_sharpe": int(len(srs)),
+                "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+                "effective_trials": neff, "trial_count_options": trial_options, "primary_method": primary,
+                "serial_dependence": conf.serial_dependence, "calibration_verified": conf.dsr_calibration_verified,
+                "research_history": [t.model_dump() for t in fcfg.research_history],
+                "unresolved": DSR_UNRESOLVED}
+    for r in reps:
+        rets = R[row[r["config_id"]]].astype(np.float64)
+        audits = {k: dsr_audit(rets, n_trials=v, variance_of_trial_sharpes=var_sr, periods_per_year=ppy,
+                               serial_adjust=conf.serial_dependence == "lag1_effective_n")
+                  for k, v in trial_options.items()}
+        a = audits[primary]
+        r["dsr"] = a.get("dsr")
+        r["dsr_benchmark_sharpe_annualized"] = a.get("benchmark_sharpe_annualized")
+        r["dsr_n_trials"] = a.get("n_trials")
+        for k in trial_options:
+            r[f"dsr_{k}"] = audits[k].get("dsr")
+        r["dsr_label"] = _dsr_label(r["dsr"], conf)
+        r["dsr_audit"] = json.dumps(audits, default=float)
+    qqq = conf.transfer_symbol
+    if qqq and s7:
+        qframes, _ = _frames(fcfg, qqq, "development", command="develop:transfer", experiment_id=experiment_id)
+        qres = run_jobs([Job(f"{r['config_id']}|qqq", _params(r, qqq), dev.start, dev.end) for r in s7],
+                        qframes, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
+        for r in s7:
+            m = qres[f"{r['config_id']}|qqq"]["metrics"]
+            r["qqq_dev_net_return"], r["qqq_dev_sharpe"], r["qqq_dev_max_drawdown"] = (
+                m["net_return"], m["sharpe"], m["max_drawdown"])
+    labels = Counter(r["dsr_label"] for r in s7)
+    table.append({"stage": "8 frozen validation", "kind": "hard_gate", "evaluated": None, "passed": None,
+                  "note": "not run in `develop`; run the `validate` command on the frozen manifest"})
+    table.append({"stage": "9 DSR / transfer", "kind": DIAGNOSTIC, "evaluated": len(s7), "passed": None,
+                  "note": "diagnostic only: " + ", ".join(f"{k}: {v}" for k, v in labels.items())})
+    table.append({"stage": "10 final holdout", "kind": "explicit_command", "evaluated": None, "passed": None,
+                  "note": "not run; `final-test` command only"})
+    stable = survivor_table(table, universe)
 
-    def _slim(r):
-        keys = ["config_id", "symbol", "timeframe", "entry_lookback", "exit_ratio", "buffer_atr",
-                "init_stop", "confirm", "trend_filter", "exit_lookback", "dev_n_trades",
-                "dev_net_return", "dev_profit_factor", "dev_sharpe", "val_net_return", "val_sharpe",
-                "holdout_net_return", "holdout_sharpe", "neighbor_frac_profitable",
-                "neighbor_median_sharpe", "pvalue", "stress_dev_net_return", "stress_dev_sharpe",
-                "breakeven_slippage_bps", "qqq_val_sharpe", "qqq_val_net_return", "holdout_pass"]
-        return {k: r.get(k) for k in keys}
+    # ---- Persist ----
+    for r in records:
+        stages = [s for s in range(1, 8) if r[f"s{s}_status"] != NOT_EVALUATED]
+        last = stages[-1] if stages else 0
+        r["last_stage_evaluated"] = last
+        r["final_status"] = r[f"s{last}_status"] if last else NOT_EVALUATED
+        r["research_survivor_dev"] = r.get("s7_status") == PASS
+    pl.DataFrame(records, infer_schema_length=None).write_parquet(exp / "config_status.parquet")
+    np.save(exp / "dev_days.npy", days.astype("datetime64[D]").astype(str))
+    atomic_write_json(exp / "survivor_table.json", stable)
+    pl.DataFrame(stable, infer_schema_length=None).write_csv(exp / "survivor_table.csv")
+    atomic_write_json(exp / "clusters.json", clusters)
+    atomic_write_json(exp / "dsr_inputs.json", dsr_meta)
+    atomic_write_json(exp / "representatives.json", [_slim(r) for r in reps])
+    rej = Counter()
+    for r in records:
+        for s in range(1, 8):
+            if r[f"s{s}_status"] in (HARD_REJECT, INSUFFICIENT):
+                for why in r[f"s{s}_reasons"].split("; "):
+                    rej[f"s{s}:{r[f's{s}_status']}:{why.split(' ')[0]}"] += 1
+    summary = {
+        "experiment_id": experiment_id, "mode": "development_only", "symbol": sym, "n_configs": universe,
+        "provenance": prov, "data_access": data_info, "data_history": fcfg.data_history.model_dump(),
+        "thresholds": fcfg.model_dump(mode="json"), "survivor_table": stable,
+        "rejection_reason_counts": dict(sorted(rej.items())),
+        "frozen_manifest_sha256": frozen_sha, "n_frozen_candidates": len(s7),
+        "dsr": dsr_meta, "integrity": {k: v for k, v in integrity_run.items() if k != "audit_notes"},
+        "elapsed_s": round(time.time() - t0, 1),
+    }
+    atomic_write_json(exp / "summary.json", summary)
+    (exp / "report.md").write_text(_report(summary, fcfg, reps, clusters, s7, by_id))
+    typer.echo(f"develop done: {universe} configs -> {len(reps)} representatives -> {len(s7)} frozen "
+               f"research candidates (dev only). See {exp}")
 
-    atomic_write_json(exp_dir / "finalists.json", [_slim({**r, **{"holdout_pass": r.get("holdout_pass")}})
-                                                   for r in finalists])
-    atomic_write_json(exp_dir / "summary.json", {
-        "experiment_id": experiment_id, "symbol": "SPY", "n_configs": len(records),
-        "fdr_method": fdr_method, "fdr": state["fdr"], "thresholds": thresholds.frozen_dict(),
-        "stages": [vars(s) for s in stages],
-        "rejection_counts": dict(Counter(state["reason"].values())),
-        "finalists": [_slim(r) for r in finalists],
-        "n_finalists": len(finalists), "n_holdout_pass": n_pass,
-        "started_at": datetime.now(timezone.utc).isoformat(), "elapsed_s": round(time.time() - t0, 1),
-    })
-    logger.info("funnel_complete", experiment_id=experiment_id, finalists=len(finalists),
-                holdout_pass=n_pass, elapsed_s=round(time.time() - t0, 1))
-    typer.echo(f"Funnel done: {len(records)} configs -> {len(reps)} finalists -> {n_pass} pass holdout. See {exp_dir}")
+
+def _dsr_label(dsr, conf) -> str:
+    if not conf.dsr_calibration_verified:
+        return "unverified"
+    if dsr is None:
+        return "insufficient search-adjusted evidence"
+    return "passes configured DSR criterion" if dsr >= conf.dsr_threshold else "insufficient search-adjusted evidence"
 
 
-def _mk(stage, desc, nb, na, extra=None):
-    from src.experiments.funnel import StageResult
-    return StageResult(stage, desc, nb, na, extra or {})
+def _manifest(fcfg, ec, prov, experiment_id, cands, by_id, cluster_of) -> dict:
+    return {
+        "experiment_id": experiment_id, "frozen_at": datetime.now(timezone.utc).isoformat(),
+        "config_sha256": fcfg.config_sha256(), "code_version": prov["git_commit"], "git_dirty": prov["git_dirty"],
+        "git_diff_sha256": prov["git_diff_sha256"], "seed": fcfg.seed, "symbol": fcfg.symbol,
+        "data_windows": fcfg.data.model_dump(mode="json"),
+        "selection_rules": {
+            "gates": ["1 integrity", "2 trade count", "3 performance & risk", "4 parameter stability",
+                      "5 time stability", "6 dedup (complete linkage, representative)", "7 execution stress"],
+            "ordering": "median neighbor Sharpe desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+            "validation_is_not_used_for_ranking": True,
+        },
+        "sizing_and_costs": ec.model_dump(mode="json"),
+        "acceptance_validation": fcfg.validation.model_dump(mode="json"),
+        "acceptance_holdout": fcfg.holdout.acceptance.model_dump(mode="json"),
+        "candidates": [{"dev_order": i + 1, "config_id": r["config_id"],
+                        "params": {k: r[k] for k in GRID_KEYS} | {"exit_lookback": r["exit_lookback"]},
+                        "cluster": cluster_of[r["config_id"]],
+                        "dev_sharpe": r["dev_sharpe"], "dev_net_return": r["dev_net_return"],
+                        "neighbor_median_sharpe": r.get("neighbor_median_sharpe"),
+                        "n_profitable_years": r.get("dev_n_profitable_years")} for i, r in enumerate(cands)],
+    }
+
+
+SLIM_KEYS = ["config_id", "timeframe", "entry_lookback", "exit_ratio", "exit_lookback", "buffer_atr", "init_stop",
+             "confirm", "trend_filter", "dedup_cluster", "dev_n_completed_trades", "dev_net_return", "dev_cagr",
+             "dev_sharpe", "dev_max_drawdown", "dev_max_dd_duration_days", "dev_profit_factor", "dev_exposure",
+             "dev_turnover_annual", "dev_n_profitable_years", "dev_excl_best_year_return", "dev_excl_best_year_sharpe",
+             "dev_best_year", "dev_best_year_contribution", "dev_top_k_trades_contribution",
+             "dev_top_frac_trades_contribution", "neighbor_n_neighbors", "neighbor_n_possible_neighbors",
+             "neighbor_frac_profitable", "neighbor_median_sharpe", "neighbor_center_minus_median_sharpe",
+             "neighbor_boundary_axes", "perturb_median_sharpe", "perturb_p10_sharpe", "perturb_frac_profitable",
+             "stress_cost_1.5x_net_return", "stress_cost_2.0x_net_return", "stress_delay_label",
+             "stress_delay_net_return", "stress_missed_median_net_return", "stress_missed_p10_net_return",
+             "breakeven_cost_multiplier", "breakeven_status", "s7_status", "s7_reasons", "s7_warnings",
+             "dsr", "dsr_label", "dsr_n_trials", "dsr_benchmark_sharpe_annualized", "dsr_li_ji",
+             "dsr_participation_ratio", "dsr_raw", "dsr_raw_plus_known_prior",
+             "qqq_dev_net_return", "qqq_dev_sharpe", "qqq_dev_max_drawdown"]
+
+
+def _slim(r: dict) -> dict:
+    out = {k: r.get(k) for k in SLIM_KEYS}
+    for k, v in r.items():
+        if k.startswith(("dev_year_return_", "dev_year_sharpe_", "dev_year_trades_")):
+            out[k] = v
+    return out
+
+
+AUDIT_NOTES = [
+    "Signal at bar i uses the channel of bars < i (rolling max shifted by 1) and bar i's close; entry fills at bar i+1's open.",
+    "FIXED (this revision): initial ATR stop / sizing used the ENTRY bar's ATR (look-ahead); now uses the last ATR known before the fill.",
+    "FIXED (this revision): stop was first checked on the bar AFTER entry; it is now live on the entry bar (conservative).",
+    "FIXED (this revision): a 'missed entry' re-entered on the next signal bar; it now skips the whole breakout episode.",
+    "Gaps through the stop fill at the worse open; adverse slippage + commission on every fill.",
+    "No profit target exists, so no bar can touch both stop and target; checked per trade.",
+    "Development backtests run on data physically truncated at the development end; open positions are force-closed at the last development bar and flagged (not counted as completed).",
+    "Sharpe: daily session-close mark-to-market returns over every trading day (flat days = 0), sqrt(252) annualization, rf = 0, idle cash earns 0.",
+    "Positions are held overnight (no session-end flattening) by strategy design; overnight gaps are captured by the gap-fill rule.",
+]
+
+DSR_UNRESOLVED = [
+    "Effective-trial count is estimated from the eigen-spectrum of the 24,576-config development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+    "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+    "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+    "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark).",
+]
+
+
+def _report(summary, fcfg, reps, clusters, s7, by_id) -> str:
+    dh = fcfg.data_history
+    L = [f"# Screening funnel -- {summary['experiment_id']} (development stages only)", ""]
+    pv = summary["provenance"]
+    L += [f"- Code: `{pv['git_commit'][:12]}` (dirty working tree: {pv['git_dirty']}, diff sha256 `{pv['git_diff_sha256'][:12]}`)",
+          f"- Config: `{pv['config_path']}` sha256 `{pv['config_sha256'][:16]}`; seed {pv['seed']}",
+          f"- Data loaded: {summary['data_access']['first_session']} .. {summary['data_access']['actual_last_session']} "
+          f"(phase end {summary['data_access']['phase_end']}); available endpoint per manifest: {pv['available_data_endpoint_per_manifest']}",
+          f"- Frozen manifest sha256: `{summary['frozen_manifest_sha256'][:16]}` ({summary['n_frozen_candidates']} candidates)",
+          "", "## Data history (not untouched)", "",
+          f"- Validation 2023-2024 previously used for selection: **{dh.validation_previously_used_for_selection}** -- {dh.validation_note}",
+          f"- Holdout 2025+ previously inspected: **{dh.holdout_previously_inspected}** -- {dh.holdout_note}",
+          "", "## Survivor counts", "",
+          "| Stage | Kind | Evaluated | Passed | Hard reject | Insufficient evidence | Deduplicated | With warnings | % of universe | % of previous | Note |",
+          "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
+    for t in summary["survivor_table"]:
+        def g(k):
+            v = t.get(k)
+            return "" if v is None else (f"{v:.2f}" if isinstance(v, float) else str(v))
+        L.append(f"| {t['stage']} | {t['kind']} | {g('evaluated')} | {g('passed')} | {g('hard_reject')} | "
+                 f"{g('insufficient_evidence')} | {g('deduplicated')} | {g('with_warnings')} | {g('pct_of_universe')} | "
+                 f"{g('pct_of_previous')} | {t.get('note', '')} |")
+    L += ["", "## Rejection reasons", "", "| Stage:status:reason | Count |", "|---|---:|"]
+    L += [f"| {k} | {v} |" for k, v in summary["rejection_reason_counts"].items()]
+    L += ["", "## Representatives (development ordering)", "",
+          "Annual figures are **in-sample diagnostics**, not out-of-sample tests.", "",
+          "| # | config | tf | entry/exit | buf | stop | conf | trend | trades | net ret | CAGR | Sharpe | maxDD | DD days | PF | expo | turn/yr | nbr n/possible | nbr prof | nbr med SR | ctr-med | prof yrs | ex-best ret | best-yr contrib | top-k contrib | stress 1.5x | 2x | delay | miss med/p10 | BE mult | s7 | DSR (label) | QQQ dev SR |",
+          "|---|---|---|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|---:|"]
+    for i, r in enumerate(reps, 1):
+        L.append(
+            f"| {i} | `{r['config_id'][:8]}` | {r['timeframe']} | {r['entry_lookback']}/{r['exit_lookback']} | {r['buffer_atr']} | "
+            f"{r['init_stop']} | {r['confirm']} | {r['trend_filter']} | {r['dev_n_completed_trades']} | "
+            f"{_fmt(r['dev_net_return'], pct=True)} | {_fmt(r['dev_cagr'], pct=True)} | {_fmt(r['dev_sharpe'], 2)} | "
+            f"{_fmt(r['dev_max_drawdown'], pct=True)} | {r['dev_max_dd_duration_days']} | {_fmt(r['dev_profit_factor'], 2)} | "
+            f"{_fmt(r['dev_exposure'], pct=True)} | {_fmt(r['dev_turnover_annual'], 1)} | "
+            f"{r.get('neighbor_n_neighbors')}/{r.get('neighbor_n_possible_neighbors')} | {_fmt(r.get('neighbor_frac_profitable'), 2)} | "
+            f"{_fmt(r.get('neighbor_median_sharpe'), 2)} | {_fmt(r.get('neighbor_center_minus_median_sharpe'), 2)} | "
+            f"{r.get('dev_n_profitable_years')} | {_fmt(r.get('dev_excl_best_year_return'), pct=True)} | "
+            f"{_fmt(r.get('dev_best_year_contribution'), 2)} | {_fmt(r.get('dev_top_k_trades_contribution'), 2)} | "
+            f"{_fmt(r.get('stress_cost_1.5x_net_return'), pct=True)} | {_fmt(r.get('stress_cost_2.0x_net_return'), pct=True)} | "
+            f"{_fmt(r.get('stress_delay_net_return'), pct=True)} | {_fmt(r.get('stress_missed_median_net_return'), pct=True)}/"
+            f"{_fmt(r.get('stress_missed_p10_net_return'), pct=True)} | {_fmt(r.get('breakeven_cost_multiplier'), 1)} ({r.get('breakeven_status')}) | "
+            f"{r['s7_status']} | {_fmt(r.get('dsr'), 3)} ({r.get('dsr_label')}) | {_fmt(r.get('qqq_dev_sharpe'), 2)} |")
+    years = fcfg.dev_years
+    L += ["", "### Per-year development slices (in-sample diagnostics)", "",
+          "| # | " + " | ".join(f"{y} ret / SR / trades" for y in years) + " |", "|---|" + "---|" * len(years)]
+    for i, r in enumerate(reps, 1):
+        L.append(f"| {i} | " + " | ".join(
+            f"{_fmt(r.get(f'dev_year_return_{y}'), pct=True)} / {_fmt(r.get(f'dev_year_sharpe_{y}'), 2)} / {r.get(f'dev_year_trades_{y}')}"
+            for y in years) + " |")
+    L += ["", "### Clusters", "", "| cluster | rep | size | min pairwise monthly corr | rep daily corr (min/med) | rep trade overlap (min/med) |",
+          "|---:|---|---:|---:|---|---|"]
+    for c in clusters:
+        L.append(f"| {c['cluster']} | `{c['representative'][:8]}` | {c['size']} | {_fmt(c['min_pairwise_monthly_corr'], 2)} | "
+                 f"{_fmt(c['rep_daily_corr_min'], 2)}/{_fmt(c['rep_daily_corr_median'], 2)} | "
+                 f"{_fmt(c['rep_trade_overlap_min'], 2)}/{_fmt(c['rep_trade_overlap_median'], 2)} |")
+    L += ["", "Deduplication removes redundant candidates; it does not erase the search or make clusters independent trials.",
+          "", "## Stage 9 -- DSR audit (diagnostic, not a gate)", ""]
+    d = summary["dsr"]
+    L += [f"- Return frequency: daily (all Sharpe, SR*, variance in per-period daily units; annualized x sqrt(252) for display)",
+          f"- Trial-Sharpe variance (per period): {d['variance_of_trial_sharpes_per_period']:.3e} over {d['n_configs_with_defined_sharpe']} configs ({d['sharpe_dispersion_source']})",
+          f"- Effective trials: Li-Ji {d['effective_trials']['li_ji']:.1f}, participation ratio {d['effective_trials']['participation_ratio']:.1f}, "
+          f"95%-variance components {d['effective_trials']['n_components_95']} (rank bound T = {d['effective_trials']['rank_bound_T']}); raw grid {d['trial_count_options']['raw']:.0f}; raw + known prior {d['trial_count_options']['raw_plus_known_prior']:.0f}",
+          f"- Primary method: {d['primary_method']}; serial dependence: {d['serial_dependence']} (AR(1) effective n); kurtosis passed as excess",
+          f"- Calibration verified: **{d['calibration_verified']}** -> labels are `unverified` until reviewed", "",
+          "Unresolved:"] + [f"- {x}" for x in d["unresolved"]]
+    L += ["", "A candidate can be a research survivor (passes stages 1-7) without passing DSR; the two are reported separately.",
+          "QQQ results are unchanged rules on the development period: supporting evidence, not an independent replication.",
+          "", "## Integrity audit", ""] + [f"- {x}" for x in AUDIT_NOTES]
+    L += [f"- Look-ahead truncation test: {summary['integrity']['truncation_sample']} sampled configs x "
+          f"{len(summary['integrity']['cut_fractions'])} cut points, failures: {len(summary['integrity']['failures'])}"]
+    L += ["", "## Unresolved assumptions", ""] + [f"- {x}" for x in UNRESOLVED]
+    return "\n".join(L) + "\n"
+
+
+UNRESOLVED = [
+    "Drawdown limit -30% is reused from src/experiments/validation.py; it has not been separately approved as a risk limit for this strategy.",
+    "Drawdown is measured on daily session-close mark-to-market; intraday drawdown is deeper.",
+    "rf = 0 and idle cash earns 0: Sharpe vs. cash is overstated in high-rate years (2023-2024 ~5%).",
+    "Variable cost stress scales per-share commission and slippage bps; the $1 per-order minimum commission is treated as fixed.",
+    "Trades are attributed to the year/window of their entry session; a position open at the development end is force-closed and excluded from completed-trade counts.",
+    "Neighbor lattice treats timeframe and init_stop (1.5 < 2 < 3 < off) as ordered axes; trend_filter is held fixed (categorical).",
+]
+
+
+# --- validate --------------------------------------------------------------------------------
+
+@app.command()
+def validate(
+    experiment_id: str = typer.Option(...),
+    n_workers: int = typer.Option(8),
+    config: Path = typer.Option(DEFAULT_FUNNEL_CONFIG),
+    out_dir: Path = typer.Option(OUT_ROOT),
+) -> None:
+    """Stage 8: frozen representatives on 2023-2024. No retuning; development ordering preserved."""
+    configure_logging()
+    exp = out_dir / experiment_id
+    fcfg = load_funnel_config(config)
+    ec = load_execution_config(fcfg)
+    summary = json.loads((exp / "summary.json").read_text())
+    manifest = json.loads((exp / "frozen_representatives.json").read_text())
+    if _sha(manifest) != summary["frozen_manifest_sha256"]:
+        raise typer.BadParameter("Frozen manifest hash mismatch -- manifest was modified after `develop`.")
+    if fcfg.config_sha256() != manifest["config_sha256"]:
+        raise typer.BadParameter("Config changed since `develop`; thresholds must stay fixed. Re-run develop.")
+    v, vc = fcfg.data.validation, fcfg.validation
+    frames, info = _frames(fcfg, fcfg.symbol, "validation", command="validate", experiment_id=experiment_id)
+    jobs = [Job(c["config_id"], ChannelParams.from_config(ChannelBreakoutConfig(
+        **{k: c["params"][k] for k in GRID_KEYS})), v.start, v.end) for c in manifest["candidates"]]
+    res = run_jobs(jobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
+    results, passed = [], []
+    for c in manifest["candidates"]:
+        m = res[c["config_id"]]["metrics"]
+        hard, insuff = [], []
+        if not m["net_return"] > vc.min_net_return:
+            hard.append(f"net_return {m['net_return']:.4f} <= {vc.min_net_return}")
+        if m["sharpe"] is None:
+            insuff.append("sharpe_undefined")
+        elif m["sharpe"] < vc.min_sharpe:
+            hard.append(f"sharpe {m['sharpe']:.3f} < {vc.min_sharpe}")
+        if vc.max_drawdown is not None and m["max_drawdown"] < vc.max_drawdown:
+            hard.append(f"max_drawdown {m['max_drawdown']:.3f} < {vc.max_drawdown}")
+        if m["n_completed_trades"] < vc.min_completed_trades:
+            hard.append(f"completed_trades {m['n_completed_trades']} < {vc.min_completed_trades}")
+        status = HARD_REJECT if hard else INSUFFICIENT if insuff else PASS
+        results.append({"dev_order": c["dev_order"], "config_id": c["config_id"], "status": status,
+                        "reasons": hard + insuff, "metrics": m})
+        if status == PASS:
+            passed.append(c)
+    out = {"experiment_id": experiment_id, "validation_window": [str(v.start), str(v.end)], "data_access": info,
+           "validation_previously_used_for_selection": fcfg.data_history.validation_previously_used_for_selection,
+           "note": "Ordering is the frozen development ordering; validation results are never used to re-rank.",
+           "results": results}
+    atomic_write_json(exp / "validation_results.json", out)
+    selection = {**manifest, "validated_at": datetime.now(timezone.utc).isoformat(),
+                 "frozen_manifest_sha256": summary["frozen_manifest_sha256"],
+                 "candidates": passed,
+                 "validation_summary": [{k: r[k] for k in ("config_id", "status", "reasons")} for r in results]}
+    sel_sha = _sha(selection)
+    atomic_write_json(exp / "selection_manifest.json", selection)
+    (exp / "selection_manifest.sha256").write_text(sel_sha + "\n")
+    append_ledger({"event": "selection_manifest", "experiment_id": experiment_id, "manifest_sha256": sel_sha,
+                   "n_candidates": len(passed)})
+    typer.echo(f"validate: {len(manifest['candidates'])} frozen -> {len(passed)} pass validation "
+               f"(previously-inspected data). Selection manifest sha256 {sel_sha[:16]}")
+
+
+# --- final-test ------------------------------------------------------------------------------
+
+@app.command("final-test")
+def final_test(
+    manifest: Path = typer.Option(..., exists=True),
+    confirm_holdout_access: bool = typer.Option(False, "--confirm-holdout-access"),
+    n_workers: int = typer.Option(4),
+    config: Path = typer.Option(DEFAULT_FUNNEL_CONFIG),
+) -> None:
+    """Stage 10: evaluate a frozen selection manifest on the holdout. Explicit only."""
+    configure_logging()
+    sel = json.loads(manifest.read_text())
+    sel_sha = _sha(sel)
+    auth = authorize_holdout_access(manifest_sha256=sel_sha, confirm=confirm_holdout_access, command="final-test")
+    fcfg = load_funnel_config(config)
+    if fcfg.config_sha256() != sel["config_sha256"]:
+        raise typer.BadParameter("Config changed since the manifest was frozen.")
+    ec = load_execution_config(fcfg)
+    prior = [e for e in read_ledger(DEFAULT_LEDGER) if e.get("phase") == "holdout"]
+    frames, info = _frames(fcfg, fcfg.symbol, "holdout", command="final-test",
+                           experiment_id=sel["experiment_id"], authorization=auth)
+    h, acc = fcfg.data.holdout, fcfg.holdout.acceptance
+    end = date.fromisoformat(info["actual_last_session"])
+    jobs = [Job(c["config_id"], ChannelParams.from_config(ChannelBreakoutConfig(
+        **{k: c["params"][k] for k in GRID_KEYS})), h.start, end) for c in sel["candidates"]]
+    res = run_jobs(jobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
+    results = []
+    for c in sel["candidates"]:  # manifest order; never re-ranked by holdout performance
+        m = res[c["config_id"]]["metrics"]
+        ok = (m["net_return"] > acc.min_net_return and m["sharpe"] is not None and m["sharpe"] >= acc.min_sharpe
+              and (acc.max_drawdown is None or m["max_drawdown"] >= acc.max_drawdown)
+              and (acc.min_completed_trades is None or m["n_completed_trades"] >= acc.min_completed_trades))
+        results.append({"dev_order": c["dev_order"], "config_id": c["config_id"], "accepted": ok, "metrics": m})
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    out = {"manifest": str(manifest), "manifest_sha256": sel_sha, "holdout_window": [str(h.start), str(end)],
+           "actual_data_endpoint": str(end), "data_access": info, "prior_holdout_accesses": len(prior),
+           "holdout_previously_inspected": fcfg.data_history.holdout_previously_inspected,
+           "label": ("holdout previously inspected -- NOT an untouched test"
+                     if fcfg.data_history.holdout_previously_inspected or prior else "first recorded holdout access"),
+           "note": "Results in frozen development order; holdout performance is not used to rank or pick a winner.",
+           "results": results}
+    atomic_write_json(manifest.parent / f"holdout_results_{stamp}.json", out)
+    typer.echo(f"final-test: {sum(r['accepted'] for r in results)}/{len(results)} meet acceptance; {out['label']}")
 
 
 if __name__ == "__main__":

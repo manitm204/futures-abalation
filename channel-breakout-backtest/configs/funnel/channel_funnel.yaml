@@ -1,0 +1,129 @@
+# Channel-breakout screening funnel -- the ONE place every threshold lives.
+#
+# Thresholds are fixed for the duration of a run and are hashed into every run's
+# outputs. They are NEVER adjusted automatically to hit a survivor count; zero
+# survivors is a valid outcome. Changing a value here is a new research trial
+# and should be recorded under `research_history` below.
+
+version: 1
+strategy: channel_breakout
+symbol: SPY
+seed: 20261016
+
+data:
+  clean_root: data/clean
+  development: {start: 2018-01-01, end: 2022-12-31}
+  validation:  {start: 2023-01-01, end: 2024-12-31}
+  # end: null -> the actual available endpoint, recorded at access time.
+  holdout:     {start: 2025-01-01, end: null}
+  timeframes: ["5min", "15min", "1h"]
+  atr_period: 14
+
+# What has ALREADY influenced selection. Neither slice is untouched; reports
+# must say so. (Set from the repo's own history: runs/funnel/funnel_v1..v3 and
+# the Donchian ablation report all computed and inspected these slices.)
+data_history:
+  validation_previously_used_for_selection: true
+  validation_note: >-
+    funnel_v1, funnel_v2_screened and funnel_v3_dsr gated on 2023-2024
+    validation metrics, and thresholds (Sharpe gate, multiple-testing method)
+    were changed between those runs. Validation is previously inspected data.
+  holdout_previously_inspected: true
+  holdout_note: >-
+    funnel_v1..v3 records.parquet store 2025-2026 holdout metrics for all
+    24,576 configs, and the Donchian ablation report discussed holdout
+    degradation. The holdout is NOT an untouched test.
+
+metrics:
+  return_frequency: daily          # mark-to-market equity at each session close
+  periods_per_year: 252            # Sharpe = mean/std(daily) * sqrt(252)
+  risk_free_rate_annual: 0.0
+  cash_treatment: >-
+    Idle cash earns 0% and the Sharpe excess return is measured against a 0%
+    risk-free rate, so the two assumptions are consistent. In 2023-2024 the
+    real T-bill rate was ~5%, so Sharpe vs. cash is overstated there.
+  drawdown_basis: daily session-close mark-to-market (understates intraday DD)
+
+execution:
+  baseline: configs/execution/default.yaml   # commission $0.005/sh (min $1), 1bp slippage
+
+integrity:            # stage 1
+  truncation_check_sample: 40       # random configs re-run on truncated data (look-ahead test)
+  truncation_points: 3
+
+trade_count:          # stage 2 -- hard gate
+  min_completed_trades: 150
+  min_trades_per_year: 10
+  min_years_meeting_floor: 4
+
+performance:          # stage 3 -- hard gate
+  min_net_return: 0.0               # strictly greater than
+  min_sharpe: 0.75                  # annualized, daily MTM returns incl. flat days
+  # Reused from src/experiments/validation.py FunnelThresholds.max_dev_drawdown_pct.
+  # Set to null to mark risk approval INCOMPLETE (no limit is invented).
+  max_drawdown: -0.30
+  max_drawdown_source: src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct
+
+parameter_stability:  # stage 4 -- hard gate
+  neighbor_mode: single_axis        # immediate neighbors: one step on one ordered axis
+  min_frac_profitable: 0.70
+  min_median_sharpe: 0.30
+  perturbation:                     # diagnostic only, never a gate
+    n_per_config: 20
+    integer_rel_step: 0.15          # entry/exit lookback +/- up to 15% (>= 1 bar, never 0)
+    buffer_atr_abs: 0.05
+    init_stop_atr_abs: 0.25
+    min_init_stop_atr: 0.5
+
+time_stability:       # stage 5 -- light hard gate + diagnostics
+  min_profitable_years: 3
+  top_trades_k: 5
+  top_trades_frac: 0.05
+
+dedup:                # stage 6
+  corr_threshold: 0.80
+  return_basis: monthly
+  linkage: complete                 # every within-cluster pair has corr >= threshold
+
+execution_stress:     # stage 7
+  gate_cost_multiplier: 1.5         # hard gate: positive dev net return
+  diagnostic_cost_multipliers: [2.0]
+  entry_delay_bars: 1
+  missed_entry_frac: 0.10
+  missed_entry_sims: 100
+  breakeven_max_multiplier: 25.0
+
+validation:           # stage 8 -- hard gate (frozen representatives only)
+  min_net_return: 0.0
+  min_sharpe: 0.30
+  max_drawdown: -0.30
+  min_completed_trades: 60
+
+confidence:           # stage 9 -- diagnostics only
+  dsr_threshold: 0.95
+  # The DSR label stays "unverified" until a person reviews the calibration
+  # (effective-trial estimate, prior research count) and flips this flag.
+  dsr_calibration_verified: false
+  effective_trials_method: li_ji    # li_ji | participation_ratio | raw
+  serial_dependence: lag1_effective_n
+  transfer_symbol: QQQ              # unchanged rules, development period only
+
+holdout:              # stage 10 -- explicit `final-test` command only
+  acceptance:
+    min_net_return: 0.0
+    min_sharpe: 0.0
+    max_drawdown: -0.30
+    min_completed_trades: null
+
+# Known earlier research trials on this data. Used for DSR sensitivity and to
+# stop the search history from being silently erased.
+research_history:
+  - name: ict_silver_bullet_search
+    n_configs: null
+    note: "Earlier ICT Silver Bullet search on the same SPY data; trial count not recorded."
+  - name: donchian_ablation (donchian_v1)
+    n_configs: 3888
+    note: "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+  - name: channel_breakout grid (funnel_v1, v2_screened, v3_dsr)
+    n_configs: 24576
+    note: "Same grid as this run; three funnel variants with changed thresholds/methods."
