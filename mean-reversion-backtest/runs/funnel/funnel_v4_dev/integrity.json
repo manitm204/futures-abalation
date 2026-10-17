@@ -1,0 +1,30 @@
+{
+  "audit_notes": [
+    "Signal at bar i uses the channel of bars < i (rolling max shifted by 1) and bar i's close; entry fills at bar i+1's open.",
+    "FIXED (this revision): initial ATR stop / sizing used the ENTRY bar's ATR (look-ahead); now uses the last ATR known before the fill.",
+    "FIXED (this revision): stop was first checked on the bar AFTER entry; it is now live on the entry bar (conservative).",
+    "FIXED (this revision): a 'missed entry' re-entered on the next signal bar; it now skips the whole breakout episode.",
+    "Gaps through the stop fill at the worse open; adverse slippage + commission on every fill.",
+    "No profit target exists, so no bar can touch both stop and target; checked per trade.",
+    "Development backtests run on data physically truncated at the development end; open positions are force-closed at the last development bar and flagged (not counted as completed).",
+    "Sharpe: daily session-close mark-to-market returns over every trading day (flat days = 0), sqrt(252) annualization, rf = 0, idle cash earns 0.",
+    "Positions are held overnight (no session-end flattening) by strategy design; overnight gaps are captured by the gap-fill rule."
+  ],
+  "checks_per_config": [
+    "entry_not_after_signal_bar",
+    "exit_before_entry",
+    "overlapping_positions",
+    "entry_fill_better_than_open",
+    "stop_fill_better_than_min_open_stop",
+    "forced_close_not_final_trade",
+    "commission_below_minimum",
+    "unexpected_profit_target"
+  ],
+  "cut_fractions": [
+    0.3,
+    0.6000000000000001,
+    0.9
+  ],
+  "failures": {},
+  "truncation_sample": 40
+}

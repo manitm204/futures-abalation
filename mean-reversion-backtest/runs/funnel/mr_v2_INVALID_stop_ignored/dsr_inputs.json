@@ -1,0 +1,49 @@
+{
+  "calibration_verified": false,
+  "effective_trials": {
+    "li_ji": 1682.0000000000546,
+    "n_components_95": 346,
+    "n_series": 227600,
+    "participation_ratio": 29.899689146233932,
+    "rank_bound_T": 1259
+  },
+  "n_configs_with_defined_sharpe": 227600,
+  "primary_method": "li_ji",
+  "research_history": [
+    {
+      "n_configs": null,
+      "name": "ict_silver_bullet_search",
+      "note": "Earlier ICT Silver Bullet search on the same SPY data; trial count not recorded."
+    },
+    {
+      "n_configs": 3888,
+      "name": "donchian_ablation (donchian_v1)",
+      "note": "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+    },
+    {
+      "n_configs": 24576,
+      "name": "channel_breakout grid (funnel_v1, v2_screened, v3_dsr, v4_dev)",
+      "note": "Channel-breakout grid on the same SPY data; four funnel variants with changed thresholds/methods."
+    },
+    {
+      "n_configs": 75000,
+      "name": "mean_reversion v1 grid (mr_v1)",
+      "note": "Same strategy family, earlier parameter space; 15 frozen candidates, 0 passed validation."
+    }
+  ],
+  "serial_dependence": "lag1_effective_n",
+  "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+  "trial_count_options": {
+    "li_ji": 1682.0000000000546,
+    "participation_ratio": 29.899689146233932,
+    "raw": 240000.0,
+    "raw_plus_known_prior": 343464.0
+  },
+  "unresolved": [
+    "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+    "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+    "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+    "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+  ],
+  "variance_of_trial_sharpes_per_period": 0.0021823748830044425
+}

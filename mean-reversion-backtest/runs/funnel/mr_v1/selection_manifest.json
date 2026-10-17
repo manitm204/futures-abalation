@@ -1,0 +1,202 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 60,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [],
+  "code_version": "737d995cb21f058147e5d884938b8164f530d592",
+  "config_sha256": "b62843a01348ec8721f19fed7af69f4fa34582abe6d4ce987adbaf6d5ff44705",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "5min",
+      "15min",
+      "1h"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "mr_v1",
+  "frozen_at": "2026-10-17T01:18:12.688141+00:00",
+  "frozen_manifest_sha256": "91f73e59b0e55da84bb9e0855a9a5a13c3065112e40aeda780a2346dcdb51d77",
+  "git_diff_sha256": "69bec2df2078cfecfd911264f1de1efa08b4295e2a2122abf42a202ef4132da9",
+  "git_dirty": true,
+  "seed": 20261016,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, representative)",
+      "7 execution stress"
+    ],
+    "ordering": "median neighbor Sharpe desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": true,
+    "commission_minimum": 1.0,
+    "commission_per_share": 0.005,
+    "extended_hours_slippage_multiplier": 2.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 1.0,
+    "slippage_bps_stop": 1.0,
+    "starting_equity": 100000.0
+  },
+  "symbol": "SPY",
+  "validated_at": "2026-10-17T01:18:56.280480+00:00",
+  "validation_summary": [
+    {
+      "config_id": "cfg_1698cdc926f075784814",
+      "reasons": [
+        "net_return -0.0248 <= 0.0",
+        "sharpe -0.552 < 0.3",
+        "completed_trades 51 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_b0d06b9fbf8cb6bfaed8",
+      "reasons": [
+        "net_return -0.0294 <= 0.0",
+        "sharpe -0.645 < 0.3",
+        "completed_trades 51 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_98bfbf30286df27c0fcc",
+      "reasons": [
+        "net_return -0.0638 <= 0.0",
+        "sharpe -1.378 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_834a938e4c6cc3958272",
+      "reasons": [
+        "net_return -0.0614 <= 0.0",
+        "sharpe -1.353 < 0.3",
+        "completed_trades 58 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_be5d15d7b99d53db4f54",
+      "reasons": [
+        "sharpe 0.270 < 0.3",
+        "completed_trades 47 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_4958a2528c071c981687",
+      "reasons": [
+        "net_return -0.0666 <= 0.0",
+        "sharpe -1.239 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_12b540ae9560d7e26c7a",
+      "reasons": [
+        "net_return -0.0110 <= 0.0",
+        "sharpe -0.262 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_899ec7cf660a803f153b",
+      "reasons": [
+        "net_return -0.1222 <= 0.0",
+        "sharpe -2.099 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_779c982a73b205e63e5e",
+      "reasons": [
+        "net_return -0.0777 <= 0.0",
+        "sharpe -1.355 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_d6fe9aa1c97d75322777",
+      "reasons": [
+        "sharpe 0.236 < 0.3",
+        "completed_trades 46 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5eea947e942babc5e1bd",
+      "reasons": [
+        "net_return -0.0039 <= 0.0",
+        "sharpe -0.119 < 0.3",
+        "completed_trades 59 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_26a9f15279cb57a41e48",
+      "reasons": [
+        "completed_trades 59 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_df25067f014c7e231fe0",
+      "reasons": [
+        "net_return -0.0736 <= 0.0",
+        "sharpe -1.255 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_941aa47655c236ddcc4b",
+      "reasons": [
+        "net_return -0.0507 <= 0.0",
+        "sharpe -0.790 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_c6114d91e570ec79df48",
+      "reasons": [
+        "net_return -0.0584 <= 0.0",
+        "sharpe -1.472 < 0.3",
+        "completed_trades 58 < 60"
+      ],
+      "status": "hard_reject"
+    }
+  ]
+}

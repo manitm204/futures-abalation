@@ -1,0 +1,412 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 60,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 6,
+      "config_id": "cfg_cd00af5e89b0c21a28e6",
+      "dev_net_return": 0.12901202927545152,
+      "dev_order": 1,
+      "dev_sharpe": 0.7813325686855593,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.7495542060914954,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.1,
+        "confirm": 1,
+        "entry_lookback": 40,
+        "exit_lookback": 40,
+        "exit_ratio": 1.0,
+        "init_stop": "3",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "ema200"
+      }
+    },
+    {
+      "cluster": 10,
+      "config_id": "cfg_2f28f53754e69374ce74",
+      "dev_net_return": 0.12649674405150035,
+      "dev_order": 2,
+      "dev_sharpe": 0.7699684226105803,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.7102387840949074,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.1,
+        "confirm": 1,
+        "entry_lookback": 30,
+        "exit_lookback": 30,
+        "exit_ratio": 1.0,
+        "init_stop": "3",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "ema200"
+      }
+    },
+    {
+      "cluster": 4,
+      "config_id": "cfg_34cb5704bcd8328d67bf",
+      "dev_net_return": 0.13976819244294258,
+      "dev_order": 3,
+      "dev_sharpe": 0.8075804496231701,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.6926281088943526,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.0,
+        "confirm": 1,
+        "entry_lookback": 55,
+        "exit_lookback": 55,
+        "exit_ratio": 1.0,
+        "init_stop": "3",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "ema200"
+      }
+    },
+    {
+      "cluster": 1,
+      "config_id": "cfg_d367f1ec50f78e34337d",
+      "dev_net_return": 0.05038369651500041,
+      "dev_order": 4,
+      "dev_sharpe": 0.9002363636986486,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.6829723798189778,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.1,
+        "confirm": 2,
+        "entry_lookback": 40,
+        "exit_lookback": 30,
+        "exit_ratio": 0.75,
+        "init_stop": "off",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "sma100"
+      }
+    },
+    {
+      "cluster": 5,
+      "config_id": "cfg_5eb7868bbe82e74715f2",
+      "dev_net_return": 0.10352088337026077,
+      "dev_order": 5,
+      "dev_sharpe": 0.7892364343108029,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.6648476371145267,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.0,
+        "confirm": 2,
+        "entry_lookback": 40,
+        "exit_lookback": 40,
+        "exit_ratio": 1.0,
+        "init_stop": "3",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "sma200"
+      }
+    },
+    {
+      "cluster": 8,
+      "config_id": "cfg_8b2969cde52492690945",
+      "dev_net_return": 0.06053182224139997,
+      "dev_order": 6,
+      "dev_sharpe": 0.9348587279919199,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.6477532811081151,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.1,
+        "confirm": 1,
+        "entry_lookback": 55,
+        "exit_lookback": 55,
+        "exit_ratio": 1.0,
+        "init_stop": "off",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "ema200"
+      }
+    },
+    {
+      "cluster": 12,
+      "config_id": "cfg_3e76d8eafb2fa160c66c",
+      "dev_net_return": 0.052044344622200756,
+      "dev_order": 7,
+      "dev_sharpe": 0.8850206657178553,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.647454634079605,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.1,
+        "confirm": 2,
+        "entry_lookback": 40,
+        "exit_lookback": 20,
+        "exit_ratio": 0.5,
+        "init_stop": "off",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "sma200"
+      }
+    },
+    {
+      "cluster": 13,
+      "config_id": "cfg_55d353046498a0c23265",
+      "dev_net_return": 0.18443218323319832,
+      "dev_order": 8,
+      "dev_sharpe": 0.812625939738919,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.6213308495630689,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.1,
+        "confirm": 1,
+        "entry_lookback": 40,
+        "exit_lookback": 40,
+        "exit_ratio": 1.0,
+        "init_stop": "2",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "ema200"
+      }
+    },
+    {
+      "cluster": 2,
+      "config_id": "cfg_0e38525b09a61c0740f8",
+      "dev_net_return": 0.05352966485600086,
+      "dev_order": 9,
+      "dev_sharpe": 0.9175629964264223,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5955474679243334,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.1,
+        "confirm": 2,
+        "entry_lookback": 55,
+        "exit_lookback": 13,
+        "exit_ratio": 0.25,
+        "init_stop": "off",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "ema100"
+      }
+    },
+    {
+      "cluster": 11,
+      "config_id": "cfg_397270bbd18f370cb405",
+      "dev_net_return": 0.059384854095200224,
+      "dev_order": 10,
+      "dev_sharpe": 0.9481300611790318,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5771474008894129,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.1,
+        "confirm": 2,
+        "entry_lookback": 30,
+        "exit_lookback": 15,
+        "exit_ratio": 0.5,
+        "init_stop": "off",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "ema100"
+      }
+    },
+    {
+      "cluster": 3,
+      "config_id": "cfg_0ad37dd491d2973253d6",
+      "dev_net_return": 0.043826529904300804,
+      "dev_order": 11,
+      "dev_sharpe": 0.8120595362479137,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5671148852593693,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.0,
+        "confirm": 2,
+        "entry_lookback": 55,
+        "exit_lookback": 27,
+        "exit_ratio": 0.5,
+        "init_stop": "off",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "sma200"
+      }
+    },
+    {
+      "cluster": 9,
+      "config_id": "cfg_2d1292c869fa363fb8d2",
+      "dev_net_return": 0.06372436620989985,
+      "dev_order": 12,
+      "dev_sharpe": 0.7628732591491895,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5376754023856553,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.0,
+        "confirm": 1,
+        "entry_lookback": 55,
+        "exit_lookback": 27,
+        "exit_ratio": 0.5,
+        "init_stop": "off",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "ema100"
+      }
+    },
+    {
+      "cluster": 0,
+      "config_id": "cfg_2cabc4f136a53b079e59",
+      "dev_net_return": 0.06481111612480017,
+      "dev_order": 13,
+      "dev_sharpe": 0.8172128448959909,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5352103972112782,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.0,
+        "confirm": 1,
+        "entry_lookback": 15,
+        "exit_lookback": 7,
+        "exit_ratio": 0.5,
+        "init_stop": "off",
+        "symbol": "SPY",
+        "timeframe": "1h",
+        "trend_filter": "sma50"
+      }
+    },
+    {
+      "cluster": 14,
+      "config_id": "cfg_53678dd3cc8dfd7be97a",
+      "dev_net_return": 0.11026565702510083,
+      "dev_order": 14,
+      "dev_sharpe": 0.8282276515296896,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.43501213823087126,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.5,
+        "confirm": 1,
+        "entry_lookback": 55,
+        "exit_lookback": 55,
+        "exit_ratio": 1.0,
+        "init_stop": "off",
+        "symbol": "SPY",
+        "timeframe": "5min",
+        "trend_filter": "ema50"
+      }
+    },
+    {
+      "cluster": 7,
+      "config_id": "cfg_34e67c0e4f697a9f04ab",
+      "dev_net_return": 0.05769843248220008,
+      "dev_order": 15,
+      "dev_sharpe": 0.9869021146942498,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.4325772410658542,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.1,
+        "confirm": 2,
+        "entry_lookback": 30,
+        "exit_lookback": 15,
+        "exit_ratio": 0.5,
+        "init_stop": "off",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "sma200"
+      }
+    },
+    {
+      "cluster": 15,
+      "config_id": "cfg_986128ed4e7f399d07e5",
+      "dev_net_return": 0.08165550337809946,
+      "dev_order": 16,
+      "dev_sharpe": 0.7714373971036114,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.3923685698371114,
+      "params": {
+        "atr_period": 14,
+        "buffer_atr": 0.25,
+        "confirm": 1,
+        "entry_lookback": 30,
+        "exit_lookback": 15,
+        "exit_ratio": 0.5,
+        "init_stop": "off",
+        "symbol": "SPY",
+        "timeframe": "15min",
+        "trend_filter": "ema100"
+      }
+    }
+  ],
+  "code_version": "737d995cb21f058147e5d884938b8164f530d592",
+  "config_sha256": "59ab3f74a9f0a486746a398f80569386ed272518858b4a337fd3865164753a35",
+  "data_windows": {
+    "atr_period": 14,
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "5min",
+      "15min",
+      "1h"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "funnel_v4_dev",
+  "frozen_at": "2026-10-16T19:28:49.517938+00:00",
+  "git_diff_sha256": "7bb371241a724a3670e288d24f64189b8299e1ce42ea53714c14c17ba0dd7f43",
+  "git_dirty": true,
+  "seed": 20261016,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, representative)",
+      "7 execution stress"
+    ],
+    "ordering": "median neighbor Sharpe desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": true,
+    "commission_minimum": 1.0,
+    "commission_per_share": 0.005,
+    "extended_hours_slippage_multiplier": 2.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 1.0,
+    "slippage_bps_stop": 1.0,
+    "starting_equity": 100000.0
+  },
+  "symbol": "SPY"
+}
