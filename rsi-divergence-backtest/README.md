@@ -68,6 +68,32 @@ PYTHONPATH=. python scripts/run_rsi_funnel.py final-test --manifest runs/funnel/
 
 Thresholds: `configs/funnel/rsi_funnel.yaml` (identical gates to `mr_funnel.yaml`).
 
+**v2 space (rsi_v2, 69,984 configs on 5min/15min):** narrower values plus three
+filters, each "off" = the v1 rule: `rsi_extreme` (off/40-60/30-70: first pivot's
+RSI <= 40 / 30; long-only, so only the lower threshold applies), `adx_filter`
+(off/lt30/lt20: Wilder ADX(14) at the confirmation close < 30 / < 20) and
+`min_price_div_atr` (0/0.1/0.25/0.5: low_q - low_p >= k x ATR(14) at the second
+pivot). Same gates; `configs/funnel/rsi_funnel_v2.yaml` selects the space.
+
+```bash
+PYTHONPATH=. python scripts/run_rsi_funnel.py develop  --experiment-id rsi_v2 --config configs/funnel/rsi_funnel_v2.yaml --n-workers 12
+PYTHONPATH=. python scripts/run_rsi_funnel.py validate --experiment-id rsi_v2 --config configs/funnel/rsi_funnel_v2.yaml
+```
+
+**v3 space (rsi_v3, 248,832 configs on 5min/15min; not run yet):** v2 narrowed
+(ADX filter fixed off, max hold adds 72) plus three rules, long side only:
+`trend_filter` (off/ema20/ema50/ema200: close at the confirmation bar above
+EMA(n)), `entry_confirmation` (immediate, or breakout: the first close above the
+confirmation bar's high within 3 bars, entering at the next open; no breakout =
+no trade) and `session_window` (full / excl_first30 / excl_last30 /
+excl_first_last30: the entry fill bar may not open 09:30-10:00 / 15:30-16:00 New
+York time; such entries are skipped, not deferred).
+
+```bash
+PYTHONPATH=. python scripts/run_rsi_funnel.py develop  --experiment-id rsi_v3 --config configs/funnel/rsi_funnel_v3.yaml --n-workers 12
+PYTHONPATH=. python scripts/run_rsi_funnel.py validate --experiment-id rsi_v3 --config configs/funnel/rsi_funnel_v3.yaml
+```
+
 ## Mean-reversion screening funnel (inherited)
 
 Same funnel as the channel-breakout study, applied to a long-only SPY

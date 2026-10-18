@@ -1,9 +1,14 @@
-"""Strategy-screening funnel over the 98,304-config RSI-divergence grid (SPY; 5min/15min/1h bars).
+"""Strategy-screening funnel over the RSI-divergence grids (SPY).
 
 Same stages and thresholds as the mean-reversion and channel-breakout funnels;
 only the base strategy (src/strategies/rsi_divergence/) and its grid
-(src/experiments/rsi_grid.py: 32,768 configs per timeframe) differ.
-All thresholds: configs/funnel/rsi_funnel.yaml (hashed into every output).
+(src/experiments/rsi_grid.py) differ. The YAML's `strategy` picks the space:
+`rsi_divergence` (v1, 98,304 configs on 5min/15min/1h; configs/funnel/rsi_funnel.yaml)
+or `rsi_divergence_v2` (v2, 69,984 configs on 5min/15min with the RSI-extreme,
+ADX and minimum-price-divergence filters; configs/funnel/rsi_funnel_v2.yaml)
+or `rsi_divergence_v3` (v3, 248,832 configs adding the EMA trend filter, breakout
+entry confirmation and entry session window; configs/funnel/rsi_funnel_v3.yaml).
+All thresholds live in the YAML (hashed into every output).
 
 Commands (each is a separate, explicit step):
   develop     stages 1-7 on DEVELOPMENT data only (2018-2022; later bars are never
@@ -19,6 +24,7 @@ Usage:
   python scripts/run_rsi_funnel.py validate --experiment-id rsi_v1
   python scripts/run_rsi_funnel.py final-test --manifest runs/funnel/rsi_v1/selection_manifest.json \
       --confirm-holdout-access
+  (v2 / v3: add --config configs/funnel/rsi_funnel_v2.yaml / _v3.yaml and --experiment-id rsi_v2 / rsi_v3)
 """
 
 from __future__ import annotations
@@ -35,7 +41,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.analysis.neighborhood import LATTICE_RSI, neighborhood_stats
+from src.analysis.neighborhood import LATTICE_RSI, LATTICE_RSI_V2, LATTICE_RSI_V3, neighborhood_stats
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.data.aggregation import AGG_INTERVAL_MINUTES, aggregate_bars
 from src.experiments.data_access import (
@@ -78,10 +84,10 @@ from src.experiments.funnel_robustness import (
     perturbations_rsi,
     quantile,
 )
-from src.experiments.rsi_grid import rsi_grid
+from src.experiments.rsi_grid import rsi_grid, rsi_grid_v2, rsi_grid_v3
 from src.experiments.rsi_integrity import CHECKS, truncation_invariance
 from src.strategies.rsi_divergence.backtest import RSIParams
-from src.strategies.rsi_divergence.config import RSIDivergenceConfig
+from src.strategies.rsi_divergence.config import RSIDivergenceConfig, RSIDivergenceV2Config, RSIDivergenceV3Config
 from src.utils.hashing import canonical_json
 from src.utils.logging import configure_logging, get_logger
 from src.utils.seeds import derive_seed
@@ -98,6 +104,18 @@ SPACES = {
         "grid": rsi_grid, "cls": RSIDivergenceConfig, "lattice": LATTICE_RSI, "perturb": perturbations_rsi,
         "keys": ("symbol", "timeframe", "rsi_lookback", "pivot_left", "pivot_right", "max_pivot_gap",
                  "min_rsi_diff", "stop_atr", "target_r", "max_hold"),
+    },
+    "rsi_divergence_v2": {
+        "grid": rsi_grid_v2, "cls": RSIDivergenceV2Config, "lattice": LATTICE_RSI_V2, "perturb": perturbations_rsi,
+        "keys": ("symbol", "timeframe", "rsi_lookback", "pivot_left", "pivot_right", "max_pivot_gap",
+                 "min_rsi_diff", "stop_atr", "target_r", "max_hold", "rsi_extreme", "adx_filter",
+                 "min_price_div_atr"),
+    },
+    "rsi_divergence_v3": {
+        "grid": rsi_grid_v3, "cls": RSIDivergenceV3Config, "lattice": LATTICE_RSI_V3, "perturb": perturbations_rsi,
+        "keys": ("symbol", "timeframe", "rsi_lookback", "pivot_left", "pivot_right", "max_pivot_gap",
+                 "min_rsi_diff", "stop_atr", "target_r", "max_hold", "rsi_extreme", "adx_filter",
+                 "min_price_div_atr", "trend_filter", "entry_confirmation", "session_window"),
     },
 }
 SPACE = SPACES["rsi_divergence"]
@@ -542,6 +560,8 @@ AUDIT_NOTES = [
     "Development backtests run on data physically truncated at the development end; open positions are force-closed at the last development bar and flagged (not counted as completed).",
     "Sharpe: daily session-close mark-to-market returns over every trading day (flat days = 0), sqrt(252) annualization, rf = 0, idle cash earns 0.",
     "Positions are held overnight (no session-end flattening), as in the other families; RSI, pivots and ATR run continuously across sessions over RTH bars only.",
+    "v2 filters (off = v1 rule): rsi_extreme requires the FIRST pivot's RSI_q <= 40 / 30 (long-only, so only the bullish lower threshold applies); adx_filter requires Wilder ADX(14) at the confirmation close c < 30 / < 20 (TradingView ta.dmi convention; NaN during warm-up rejects the signal); min_price_div_atr requires low_q - low_p >= k x ATR(14) at the second pivot p (known at c >= p; k = 0 keeps the strict lower low).",
+    "v3 rules (off = v2 rule): trend_filter requires close_c > EMA(20/50/200) of closes at the confirmation bar c (EMA seeded with the SMA of the first n closes; NaN rejects); entry_confirmation=breakout waits up to 3 bars after c for the FIRST close above high_c and enters at the next open (no breakout -> no trade; 1R uses the ATR at that close); session_window skips (does not defer) an entry whose fill bar opens 09:30-10:00 and/or 15:30-16:00 New York clock time.",
 ]
 
 DSR_UNRESOLVED = [
@@ -553,7 +573,7 @@ DSR_UNRESOLVED = [
     "Prices are split-adjusted but NOT dividend-adjusted: SPY's ~1.5%/yr dividend is not credited while long, and an ex-dividend drop can create a spurious price lower low.",
     "Long-only regular bullish divergence; bearish / hidden divergences and short trades are not tested.",
     "Pivots are detected on RSI (TradingView built-in convention) and price is compared at those same bars; a price-pivot-based definition would select different signals.",
-    "Neighbor lattice: every axis is ordered (timeframe, RSI period, pivot left/right, max pivot gap, min RSI diff, stop ATR, target R, max hold); only symbol is held fixed.",
+    "Neighbor lattice: v1 orders every axis (timeframe, RSI period, pivot left/right, max pivot gap, min RSI diff, stop ATR, target R, max hold; only symbol fixed); v2 also orders rsi_extreme (off < 40/60 < 30/70), adx_filter (off < 30 < 20) and min_price_div_atr, and holds pivot_right (single value) fixed; v3 orders the numeric axes plus rsi_extreme and min_price_div_atr, and holds pivot_right, adx_filter (single values), trend_filter, entry_confirmation and session_window (categorical) fixed.",
     "All lookbacks, pivot widths, gaps and holding periods are counted in bars of the config's timeframe, so the same values span very different clock time on 5min vs 1h bars.",
 ]
 
@@ -640,9 +660,11 @@ UNRESOLVED = [
     "rf = 0 and idle cash earns 0: Sharpe vs. cash is overstated in high-rate years (2023-2024 ~5%).",
     "Variable cost stress scales per-share commission and slippage bps; the $1 per-order minimum commission is treated as fixed.",
     "Trades are attributed to the year/window of their entry session; a position open at the development end is force-closed and excluded from completed-trade counts.",
-    "Prices are split-adjusted but NOT dividend-adjusted: SPY's ~1.5%/yr dividend is not credited while long, and each ex-dividend drop slightly lowers z (a small bias toward entries on ex-div dates).",
-    "Neighbor lattice: v1 orders timeframe, mean/std lookback, entry/exit z and max hold; v2 orders timeframe, mean lookback, entry/exit z, max holding bars, cooldown and ATR stop (1.0 < 1.5 < 2.0 < 3.0 < none). mean_type, trend_filter (and v2 entry_confirmation) are held fixed (categorical).",
-    "All lookbacks, trend SMAs and holding periods are counted in bars of the config's timeframe (e.g. sma200 on 5min bars spans ~2.6 sessions), not in trading days.",
+    "Prices are split-adjusted but NOT dividend-adjusted: SPY's ~1.5%/yr dividend is not credited while long, and an ex-dividend drop can create a spurious price lower low.",
+    "Long-only regular bullish divergence; bearish / hidden divergences and short trades are not tested (the RSI-extreme upper threshold, the below-EMA short rule and the below-low breakout are therefore unused).",
+    "v3 session window uses New York clock time, so on half-days (13:00 close) 'exclude last 30 minutes' does not exclude 12:30-13:00; an excluded entry is skipped, not deferred to the next allowed bar.",
+    "Neighbor lattice: v1 orders every axis (only symbol fixed); v2 orders every axis except pivot_right (a single value, held fixed), with the filters ordered loosest to strictest: rsi_extreme off < 40/60 < 30/70, adx_filter off < 30 < 20, min_price_div_atr 0 < 0.1 < 0.25 < 0.5.",
+    "All lookbacks, pivot widths, gaps and holding periods are counted in bars of the config's timeframe, not in trading days.",
 ]
 
 

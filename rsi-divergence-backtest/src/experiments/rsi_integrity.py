@@ -4,7 +4,12 @@ Two layers:
   * `check_sim_integrity` runs on EVERY config's simulation: the signal really is
     a bullish divergence between two confirmed RSI pivot lows (pivot p known at
     c = p + pivot_right, previous pivot q within max_pivot_gap, RSI higher low by
-    >= min_rsi_diff, price lower low), the signal precedes the entry, 1R comes
+    >= min_rsi_diff, price lower low; v2: first-pivot RSI at/below the extreme threshold, ADX at
+    the confirmation close below the cap, price lower low by >= k x ATR at p),
+    v3: close above the trend EMA at c, a breakout entry triggered by the FIRST
+    close above high_c within BREAKOUT_BARS bars (immediate: trigger = c), the
+    entry fill bar outside the excluded session window), the signal precedes the
+    entry, 1R comes
     from the ATR known before the fill, stop/target sit at the configured
     distances from the raw entry open, stop exits really touched the stop and
     filled no better than min(open, stop), target exits really touched the target
@@ -24,6 +29,7 @@ import numpy as np
 import polars as pl
 
 from src.strategies.rsi_divergence.backtest import (
+    BREAKOUT_BARS,
     RSIData,
     SimResult,
     as_params,
@@ -41,7 +47,9 @@ CHECKS = ["entry_signal_condition_not_met", "pivot_not_confirmed_at_signal_bar",
           "forced_close_not_final_trade", "commission_below_minimum", "stop_not_from_atr_known_before_entry",
           "target_not_at_configured_r", "stop_exit_without_touch", "stop_fill_better_than_min_open_stop",
           "target_exit_without_touch", "target_fill_better_than_target", "target_exit_on_stop_bar",
-          "stop_or_target_touched_before_exit"]
+          "stop_or_target_touched_before_exit", "rsi_extreme_filter_violated", "adx_filter_violated",
+          "price_divergence_below_min", "trend_filter_violated", "breakout_trigger_invalid",
+          "entry_not_after_trigger", "entry_in_excluded_session_window"]
 
 
 def check_sim_integrity(sim: SimResult, data: RSIData, exec_config: ExecutionConfig, cfg) -> list[str]:
@@ -58,6 +66,26 @@ def check_sim_integrity(sim: SimResult, data: RSIData, exec_config: ExecutionCon
     bad |= np.array([int(a) not in piv or int(b) not in piv for a, b in zip(p, q)])
     if bad.any():
         issues.append("entry_signal_condition_not_met")
+    if cfg.rsi_extreme_lower is not None and (r[q] > cfg.rsi_extreme_lower + _EPS).any():
+        issues.append("rsi_extreme_filter_violated")
+    if cfg.adx_max is not None and not (data.adx[c] < cfg.adx_max).all():
+        issues.append("adx_filter_violated")
+    if cfg.min_price_div_atr and not (data.low[q] - data.low[p] >= cfg.min_price_div_atr * data.atr[p] - _EPS).all():
+        issues.append("price_divergence_below_min")
+    if cfg.trend_ema is not None and not (data.close[c] > data.ema(cfg.trend_ema)[c]).all():
+        issues.append("trend_filter_violated")
+    t = sim.trigger_idx
+    if cfg.entry_breakout:
+        earlier = np.array([bool((data.close[ci + 1:ti] > data.high[ci]).any()) for ci, ti in zip(c, t)])
+        # the trigger must be the FIRST close above high_c within the window
+        if ((t <= c) | (t > c + BREAKOUT_BARS) | ~(data.close[t] > data.high[c]) | earlier).any():
+            issues.append("breakout_trigger_invalid")
+    elif (t != c).any():
+        issues.append("breakout_trigger_invalid")
+    if (sim.entry_idx <= t).any():
+        issues.append("entry_not_after_trigger")
+    if not data.entry_allowed(cfg.session_window)[sim.entry_idx].all():
+        issues.append("entry_in_excluded_session_window")
     if (c != p + cfg.pivot_right).any():
         issues.append("pivot_not_confirmed_at_signal_bar")
     if (sim.entry_idx <= c).any():

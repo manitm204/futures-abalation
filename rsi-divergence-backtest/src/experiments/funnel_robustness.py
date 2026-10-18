@@ -80,7 +80,12 @@ def perturbations_rsi(p: RSIParams, *, config_id: str, base_seed: int, pcfg: Per
     `integer_rel_step` (at least 1 bar; RSI period >= 2, pivot widths >= 1); the
     minimum RSI difference by uniform +/- `rsi_diff_abs` points (never below 0);
     stop ATR multiple and target R by up to +/- `float_rel_step` RELATIVE (stop
-    >= 0.25 ATR, target >= 0.25 R). Timeframe and symbol are never perturbed."""
+    >= 0.25 ATR, target >= 0.25 R). Timeframe and symbol are never perturbed.
+    v2 filters that are on: the RSI-extreme and ADX thresholds and the minimum
+    price divergence (ATR multiples) move by up to +/- `float_rel_step` relative.
+    A filter that is off stays off and draws nothing, so v1 perturbations are unchanged.
+    v3: a trend EMA that is on moves by a non-zero integer of up to `integer_rel_step`
+    (>= 2 bars); entry confirmation and session window are categorical and kept."""
     rng = np.random.default_rng(derive_seed(base_seed, "perturb", config_id))
 
     def step_int(v: int, lo: int) -> int:
@@ -100,6 +105,11 @@ def perturbations_rsi(p: RSIParams, *, config_id: str, base_seed: int, pcfg: Per
         min_rsi_diff=max(0.0, p.min_rsi_diff + float(rng.uniform(-pcfg.rsi_diff_abs, pcfg.rsi_diff_abs))),
         stop_atr=step_rel(p.stop_atr, 0.25), target_r=step_rel(p.target_r, 0.25),
         max_hold=step_int(p.max_hold, 1),
+        rsi_extreme_lower=None if p.rsi_extreme_lower is None else step_rel(p.rsi_extreme_lower, 1.0),
+        adx_max=None if p.adx_max is None else step_rel(p.adx_max, 1.0),
+        min_price_div_atr=step_rel(p.min_price_div_atr, 0.0) if p.min_price_div_atr else 0.0,
+        trend_ema=None if p.trend_ema is None else step_int(p.trend_ema, 2),
+        entry_breakout=p.entry_breakout, session_window=p.session_window,
     ) for _ in range(pcfg.n_per_config)]
 
 

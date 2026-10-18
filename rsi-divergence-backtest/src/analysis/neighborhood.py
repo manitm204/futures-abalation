@@ -62,6 +62,40 @@ ORDERED_AXES_RSI: dict[str, list] = {
 }
 FIXED_AXES_RSI = ["symbol"]
 
+# RSI-divergence v2 lattice. The filters run from loosest to strictest (off first);
+# pivot_right has a single value, so it is held fixed rather than ordered.
+ORDERED_AXES_RSI_V2: dict[str, list] = {
+    "timeframe": ["5min", "15min"],
+    "rsi_lookback": [7, 10, 14],
+    "pivot_left": [3, 5, 8],
+    "max_pivot_gap": [8, 12, 24],
+    "min_rsi_diff": [0.0, 5.0],
+    "stop_atr": [1.5, 2.0, 2.5],
+    "target_r": [1.5, 2.0, 3.0],
+    "max_hold": [24, 48],
+    "rsi_extreme": ["off", "40/60", "30/70"],
+    "adx_filter": ["off", "lt30", "lt20"],
+    "min_price_div_atr": [0.0, 0.1, 0.25, 0.5],
+}
+FIXED_AXES_RSI_V2 = ["symbol", "pivot_right"]
+
+# RSI-divergence v3 lattice. Single-value axes (pivot_right, adx_filter) and the
+# categorical rules (trend filter, entry confirmation, session window) are held
+# fixed; "off" has no natural place among EMA lengths, as with MR's trend_filter.
+ORDERED_AXES_RSI_V3: dict[str, list] = {
+    "timeframe": ["5min", "15min"],
+    "rsi_lookback": [7, 10, 14],
+    "pivot_left": [3, 5],
+    "max_pivot_gap": [12, 24],
+    "min_rsi_diff": [0.0, 5.0],
+    "stop_atr": [1.5, 2.0, 2.5],
+    "target_r": [1.5, 2.0, 3.0],
+    "max_hold": [24, 48, 72],
+    "rsi_extreme": ["off", "40/60", "30/70"],
+    "min_price_div_atr": [0.0, 0.25],
+}
+FIXED_AXES_RSI_V3 = ["symbol", "pivot_right", "adx_filter", "trend_filter", "entry_confirmation", "session_window"]
+
 
 @dataclass(frozen=True)
 class Lattice:
@@ -76,6 +110,8 @@ class Lattice:
 LATTICE_V1 = Lattice(ORDERED_AXES, FIXED_AXES)
 LATTICE_V2 = Lattice(ORDERED_AXES_V2, FIXED_AXES_V2)
 LATTICE_RSI = Lattice(ORDERED_AXES_RSI, FIXED_AXES_RSI)
+LATTICE_RSI_V2 = Lattice(ORDERED_AXES_RSI_V2, FIXED_AXES_RSI_V2)
+LATTICE_RSI_V3 = Lattice(ORDERED_AXES_RSI_V3, FIXED_AXES_RSI_V3)
 
 
 @dataclass(frozen=True)

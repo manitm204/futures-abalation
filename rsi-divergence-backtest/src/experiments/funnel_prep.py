@@ -57,8 +57,8 @@ FAMILIES = {
 
 
 def family_for(fcfg: FunnelConfig) -> Family:
-    """The YAML's `strategy` -> its family (mean_reversion_v2 is the mean_reversion family)."""
-    name = "mean_reversion" if fcfg.strategy.startswith("mean_reversion") else fcfg.strategy
+    """The YAML's `strategy` -> its family (`<family>_v2` spaces share their family's simulator)."""
+    name = next((f for f in FAMILIES if fcfg.strategy.startswith(f)), fcfg.strategy)
     if name not in FAMILIES:
         raise ValueError(f"Unknown strategy {fcfg.strategy!r}; expected one of {sorted(FAMILIES)}")
     return FAMILIES[name]

@@ -211,3 +211,215 @@ def test_funnel_record_and_script_import():
     mod._select_space(FCFG)
     assert mod.GRID_KEYS[1:] == tuple(AXES)
     assert mod._params({**ce.config.model_dump(mode="json")}) == RSIParams.from_config(ce.config)
+
+
+# --- v2 space: RSI-extreme / ADX / minimum price divergence filters ------------------------
+
+def _adx_reference(h, l, c, n=14):
+    """Plain-loop Wilder ADX (TradingView ta.dmi) to check the vectorized version."""
+    N = len(c)
+    tr, pdm, mdm = [None] * N, [None] * N, [None] * N
+    for t in range(1, N):
+        up, dn = h[t] - h[t - 1], l[t - 1] - l[t]
+        pdm[t] = up if up > dn and up > 0 else 0.0
+        mdm[t] = dn if dn > up and dn > 0 else 0.0
+        tr[t] = max(h[t] - l[t], abs(h[t] - c[t - 1]), abs(l[t] - c[t - 1]))
+
+    def rma(x, start):
+        out, prev = [None] * N, None
+        for t in range(start, N):
+            if t == start + n - 1:
+                prev = sum(x[start:start + n]) / n
+            elif t >= start + n:
+                prev += (x[t] - prev) / n
+            out[t] = prev
+        return out
+
+    st, sp, sm = rma(tr, 1), rma(pdm, 1), rma(mdm, 1)
+    dx = [None] * N
+    for t in range(n, N):
+        pdi, mdi = 100 * sp[t] / st[t], 100 * sm[t] / st[t]
+        dx[t] = 100 * abs(pdi - mdi) / (pdi + mdi) if pdi + mdi > 0 else 0.0
+    return rma(dx, n)
+
+
+def test_wilder_adx_matches_reference_and_is_causal():
+    from src.strategies.rsi_divergence.backtest import wilder_adx
+    bars = _walk(400, seed=4)
+    h, l, c = (bars[k].to_numpy() for k in ("high", "low", "close"))
+    a = wilder_adx(h, l, c, 14)
+    ref = _adx_reference(h, l, c, 14)
+    assert np.isnan(a[:27]).all() and np.isfinite(a[27:]).all()
+    assert np.allclose(a[27:], np.array(ref[27:], dtype=float))
+    assert np.allclose(wilder_adx(h[:200], l[:200], c[:200]), a[:200], equal_nan=True)
+
+
+def test_v2_filters_on_injected_rsi():
+    n = 60
+    close = np.full(n, 100.0)
+    lows = [None] * n
+    lows[20], lows[35] = 98.0, 97.0
+    data = RSIData(_bars(list(close), lows=lows))
+    rsi = np.full(n, 50.0)
+    rsi[20], rsi[35] = 35.0, 40.0
+    data._cache[("rsi", 7)] = rsi
+    base = data.divergences(7, 3, 1, 48, 0.0)[0].tolist()
+    assert base == [36]
+    assert data.divergences(7, 3, 1, 48, 0.0, rsi_lower=40.0)[0].tolist() == [36]   # RSI_q 35 <= 40
+    assert len(data.divergences(7, 3, 1, 48, 0.0, rsi_lower=30.0)[0]) == 0          # 35 > 30
+    atr_p = data.atr[35]
+    k_ok, k_bad = 0.99 / atr_p, 1.01 / atr_p                                         # price gap is 1.0
+    assert data.divergences(7, 3, 1, 48, 0.0, min_px_atr=k_ok)[0].tolist() == [36]
+    assert len(data.divergences(7, 3, 1, 48, 0.0, min_px_atr=k_bad)[0]) == 0
+    data._cache[("adx",)] = np.full(n, 25.0)
+    assert data.divergences(7, 3, 1, 48, 0.0, adx_max=30.0)[0].tolist() == [36]
+    assert len(data.divergences(7, 3, 1, 48, 0.0, adx_max=20.0)[0]) == 0
+    assert data.divergences(7, 3, 1, 48, 0.0)[0].tolist() == base                    # cache not polluted
+
+
+def test_v2_grid_sim_integrity_and_wiring():
+    from src.analysis.neighborhood import LATTICE_RSI_V2
+    from src.experiments.rsi_grid import AXES_V2, rsi_grid_v2
+    from src.strategies.rsi_divergence.config import RSIDivergenceV2Config
+    assert variants_per_symbol(AXES_V2) == 69_984
+    g = rsi_grid_v2(("SPY",))
+    assert len(g) == 69_984 and len({ce.config_id for ce in g}) == 69_984
+    assert not {ce.config_id for ce in g} & {ce.config_id for ce in rsi_grid(("SPY",))[:5000]}
+    with pytest.raises(Exception):
+        RSIDivergenceV2Config(symbol="SPY", adx_filter="lt25")
+    bars = _walk(seed=6)
+    cfg = RSIDivergenceV2Config(symbol="SPY", rsi_lookback=7, pivot_left=3, max_pivot_gap=24, rsi_extreme="40/60",
+                                adx_filter="lt30", min_price_div_atr=0.1, stop_atr=1.5, target_r=1.5)
+    p = RSIParams.from_config(cfg)
+    assert (p.rsi_extreme_lower, p.adx_max, p.min_price_div_atr) == (40.0, 30.0, 0.1)
+    data, sim = _sim(bars, p)
+    _, loose = _sim(bars, RSIParams(**{**p.__dict__, "rsi_extreme_lower": None, "adx_max": None,
+                                       "min_price_div_atr": 0.0}))
+    assert 0 < len(sim.trades) < len(loose.trades)
+    assert check_sim_integrity(sim, data, EC, p) == []
+    assert truncation_invariance(bars, p, exec_config=EC) == []
+    off = RSIParams(**{**p.__dict__, "rsi_extreme_lower": 1.0})
+    assert "rsi_extreme_filter_violated" in check_sim_integrity(sim, data, EC, off)
+    cfgs = [{"config_id": ce.config_id, **ce.config.model_dump(mode="json")} for ce in g[:3000]]
+    nb = neighbor_ids(cfgs, lattice=LATTICE_RSI_V2)
+    assert all(len(v) >= 1 for v in nb.values())
+    ps = perturbations_rsi(p, config_id="x", base_seed=1, pcfg=FCFG.parameter_stability.perturbation)
+    assert all(x.adx_max is not None and x.rsi_extreme_lower is not None and x.min_price_div_atr > 0 for x in ps)
+    p_off = RSIParams.from_config(RSIDivergenceV2Config(symbol="SPY"))
+    assert all(x.adx_max is None and x.rsi_extreme_lower is None and x.min_price_div_atr == 0
+               for x in perturbations_rsi(p_off, config_id="x", base_seed=1, pcfg=FCFG.parameter_stability.perturbation))
+    fv2 = load_funnel_config(ROOT / "configs" / "funnel" / "rsi_funnel_v2.yaml")
+    assert fv2.strategy == "rsi_divergence_v2" and family_for(fv2).data_cls is RSIData
+    spec = importlib.util.spec_from_file_location("run_rsi_funnel_v2", ROOT / "scripts" / "run_rsi_funnel.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    mod._select_space(fv2)
+    assert mod.GRID_KEYS[1:] == tuple(AXES_V2)
+    assert mod._params(cfg.model_dump(mode="json")) == p
+
+
+# --- v3 space: EMA trend filter / breakout entry / entry session window -------------------
+
+def test_ema_matches_reference_and_is_causal():
+    from src.strategies.rsi_divergence.backtest import ema
+    rng = np.random.default_rng(8)
+    c = 100 + np.cumsum(rng.normal(0, 1, 120))
+    e = ema(c, 20)
+    assert np.isnan(e[:19]).all() and e[19] == pytest.approx(c[:20].mean())
+    ref = c[:20].mean()
+    for t in range(20, 120):
+        ref = ref + 2 / 21 * (c[t] - ref)
+        assert e[t] == pytest.approx(ref)
+    assert np.allclose(ema(c[:60], 20), e[:60], equal_nan=True)
+
+
+def test_trend_filter_on_injected_rsi():
+    n = 60
+    lows = [None] * n
+    lows[20], lows[35] = 98.0, 97.0
+    data = RSIData(_bars([100.0] * n, lows=lows))
+    rsi = np.full(n, 50.0)
+    rsi[20], rsi[35] = 25.0, 30.0
+    data._cache[("rsi", 7)] = rsi
+    data._cache[("ema", 20)] = np.full(n, 99.0)   # close 100 > 99 -> long allowed
+    data._cache[("ema", 50)] = np.full(n, 101.0)  # close 100 < 101 -> filtered
+    assert data.divergences(7, 3, 1, 48, 0.0, trend_ema=20)[0].tolist() == [36]
+    assert len(data.divergences(7, 3, 1, 48, 0.0, trend_ema=50)[0]) == 0
+    assert data.divergences(7, 3, 1, 48, 0.0)[0].tolist() == [36]
+
+
+def _v3(**kw) -> RSIParams:
+    return RSIParams(**{**P.__dict__, "max_pivot_gap": 24, "stop_atr": 1.5, "max_hold": 24, **kw})
+
+
+def test_breakout_entry_rule_and_integrity():
+    from src.strategies.rsi_divergence.backtest import BREAKOUT_BARS
+    bars = _walk(seed=9)
+    base = _v3()
+    brk = _v3(entry_breakout=True)
+    data, imm = _sim(bars, base)
+    data, sim = _sim(bars, brk)
+    assert 0 < len(sim.trades) <= len(imm.trades)
+    assert (imm.trigger_idx == imm.signal_idx).all() and (imm.entry_idx == imm.signal_idx + 1).all()
+    c, t = sim.signal_idx, sim.trigger_idx
+    assert ((t > c) & (t <= c + BREAKOUT_BARS)).all() and (sim.entry_idx == t + 1).all()
+    assert (data.close[t] > data.high[c]).all()
+    for ci, ti in zip(c, t):
+        assert not (data.close[ci + 1:ti] > data.high[ci]).any()  # first breakout close
+    assert check_sim_integrity(sim, data, EC, brk) == []
+    assert truncation_invariance(bars, brk, exec_config=EC) == []
+    sim.trigger_idx[0] += 1
+    assert "breakout_trigger_invalid" in check_sim_integrity(sim, data, EC, brk)
+
+
+def test_session_window_and_trend_integrity():
+    bars = _walk(seed=10)
+    data, full = _sim(bars, _v3())
+    m = data.minute_ny
+    assert m[0] == 570 and m[25] == 945  # 15-min test bars: 09:30 .. 15:45 New York
+    first = (m[full.entry_idx] < 600)
+    last = (m[full.entry_idx] >= 930)
+    assert first.any() and last.any()
+    for w in ("excl_first30", "excl_last30", "excl_first_last30"):
+        p = _v3(session_window=w, trend_ema=20)
+        data, sim = _sim(bars, p)
+        em = m[sim.entry_idx]
+        assert len(sim.trades) > 0
+        assert not (("first" in w) and (em < 600).any()) and not (("last" in w) and (em >= 930).any())
+        assert (data.close[sim.signal_idx] > data.ema(20)[sim.signal_idx]).all()
+        assert check_sim_integrity(sim, data, EC, p) == []
+        assert truncation_invariance(bars, p, exec_config=EC) == []
+    data, full = _sim(bars, _v3())  # full-session trades include 09:30-10:00 entries
+    assert "entry_in_excluded_session_window" in check_sim_integrity(full, data, EC, _v3(session_window="excl_first30"))
+
+
+def test_v3_grid_and_wiring():
+    from src.analysis.neighborhood import LATTICE_RSI_V3
+    from src.experiments.rsi_grid import AXES_V3, rsi_grid_v3
+    from src.strategies.rsi_divergence.config import RSIDivergenceV3Config
+    assert variants_per_symbol(AXES_V3) == 248_832
+    assert variants_per_symbol({k: v for k, v in AXES_V3.items() if k != "timeframe"}) == 124_416
+    g = rsi_grid_v3(("SPY",))
+    assert len(g) == 248_832 and len({ce.config_id for ce in g}) == 248_832
+    with pytest.raises(Exception):
+        RSIDivergenceV3Config(symbol="SPY", adx_filter="lt30")
+    cfg = RSIDivergenceV3Config(symbol="SPY", trend_filter="ema50", entry_confirmation="breakout",
+                                session_window="excl_first_last30", rsi_extreme="30/70", min_price_div_atr=0.25)
+    p = RSIParams.from_config(cfg)
+    assert (p.trend_ema, p.entry_breakout, p.session_window, p.adx_max, p.rsi_extreme_lower) == \
+        (50, True, "excl_first_last30", None, 30.0)
+    cfgs = [{"config_id": ce.config_id, **ce.config.model_dump(mode="json")} for ce in g[:4000]]
+    nb = neighbor_ids(cfgs, lattice=LATTICE_RSI_V3)
+    assert all(len(v) >= 1 for v in nb.values())
+    ps = perturbations_rsi(p, config_id="x", base_seed=1, pcfg=FCFG.parameter_stability.perturbation)
+    assert all(x.trend_ema is not None and x.trend_ema != 50 and x.entry_breakout
+               and x.session_window == "excl_first_last30" for x in ps)
+    fv3 = load_funnel_config(ROOT / "configs" / "funnel" / "rsi_funnel_v3.yaml")
+    assert fv3.strategy == "rsi_divergence_v3" and family_for(fv3).data_cls is RSIData
+    assert fv3.data.timeframes == ["5min", "15min"]
+    spec = importlib.util.spec_from_file_location("run_rsi_funnel_v3", ROOT / "scripts" / "run_rsi_funnel.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    mod._select_space(fv3)
+    assert mod.GRID_KEYS[1:] == tuple(AXES_V3)
+    assert mod._params(cfg.model_dump(mode="json")) == p

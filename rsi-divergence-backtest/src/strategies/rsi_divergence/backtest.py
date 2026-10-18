@@ -12,6 +12,17 @@ convention), decided at bar c's close from data through bar c only:
                RSI_p - RSI_q > 0 and >= min_rsi_diff   (RSI higher low)
                low_p < low_q                            (price lower low, at the pivot bars)
     long entry signal at the confirmation bar c.
+v2 filters (each off by default, so v1 configs are unchanged):
+    rsi_extreme_lower : RSI_q <= threshold (the FIRST pivot is oversold)
+    adx_max           : ADX(14)_c < threshold (Wilder ADX at the confirmation close)
+    min_price_div_atr : low_q - low_p >= k x ATR(14)_p (k = 0 keeps the strict lower low)
+v3 rules (each off by default):
+    trend_ema         : close_c > EMA(n)_c (EMA of closes seeded with the SMA of the first n)
+    entry_breakout    : wait up to BREAKOUT_BARS bars after c for a close above high_c;
+                        enter at the open after that close (no breakout -> no trade)
+    session_window    : the entry FILL bar may not open 09:30-10:00 and/or 15:30-16:00
+                        New York time (clock time, so half-days keep their 12:30-13:00
+                        bars); an excluded entry is skipped, not deferred
 All lookbacks are in bars and run continuously across sessions (RTH bars only).
 
 Execution assumptions (audited by src/experiments/rsi_integrity.py):
@@ -50,10 +61,12 @@ from numpy.lib.stride_tricks import sliding_window_view
 from src.engine.events import EquityPoint, ExitReason, Fill, Trade
 from src.engine.fills import _apply_slippage, _commission
 from src.features.atr import wilder_atr
+from src.strategies.rsi_divergence.config import ADX_MAX, BREAKOUT_BARS, RSI_EXTREME_LOWER, TREND_EMA
 from src.utils.config_models import ExecutionConfig
 
 STOP_EXIT, TARGET_EXIT, TIME_EXIT, FORCED = "stop_exit", "target_exit", "time_exit", "forced_close"
 ATR_PERIOD = 14
+ADX_PERIOD = 14
 
 
 def wilder_rsi(close: np.ndarray, period: int) -> np.ndarray:
@@ -78,6 +91,67 @@ def wilder_rsi(close: np.ndarray, period: int) -> np.ndarray:
         al += (loss[t] - al) / period
         out[t + 1] = rsi(ag, al)
     return out
+
+
+def _rma(x: np.ndarray, period: int, start: int) -> np.ndarray:
+    """Wilder smoothing of x[start:], seeded with the mean of its first `period`
+    values (first defined at start + period - 1); NaN before that."""
+    out = np.full(len(x), np.nan)
+    seed_end = start + period
+    if seed_end > len(x):
+        return out
+    prev = x[start:seed_end].mean()
+    out[seed_end - 1] = prev
+    for t in range(seed_end, len(x)):
+        prev += (x[t] - prev) / period
+        out[t] = prev
+    return out
+
+
+def ema(close: np.ndarray, period: int) -> np.ndarray:
+    """Causal EMA (alpha = 2 / (period + 1)) seeded with the SMA of the first
+    `period` closes (first defined at index period - 1); NaN before that."""
+    out = np.full(len(close), np.nan)
+    if len(close) < period:
+        return out
+    a = 2.0 / (period + 1)
+    prev = close[:period].mean()
+    out[period - 1] = prev
+    for t in range(period, len(close)):
+        prev += a * (close[t] - prev)
+        out[t] = prev
+    return out
+
+
+# Entry session windows: excluded New York minutes-of-day [start, end) for the entry fill bar.
+SESSION_EXCLUDE: dict[str, tuple[tuple[int, int], ...]] = {
+    "full": (),
+    "excl_first30": ((570, 600),),
+    "excl_last30": ((930, 960),),
+    "excl_first_last30": ((570, 600), (930, 960)),
+}
+
+
+def wilder_adx(high: np.ndarray, low: np.ndarray, close: np.ndarray, period: int = 14) -> np.ndarray:
+    """Causal Wilder ADX (TradingView ta.dmi convention: RMA-smoothed TR/+DM/-DM,
+    DX = 100|+DI - -DI| / (+DI + -DI), ADX = RMA(DX)). ADX_t uses bars <= t; first
+    defined at index 2 * period - 1."""
+    n = len(close)
+    out = np.full(n, np.nan)
+    if n < 2 * period:
+        return out
+    up = np.r_[np.nan, high[1:] - high[:-1]]
+    dn = np.r_[np.nan, low[:-1] - low[1:]]
+    pdm = np.where((up > dn) & (up > 0), up, 0.0)
+    mdm = np.where((dn > up) & (dn > 0), dn, 0.0)
+    tr = np.r_[np.nan, np.maximum.reduce([high[1:] - low[1:], np.abs(high[1:] - close[:-1]),
+                                          np.abs(low[1:] - close[:-1])])]
+    s_tr, s_p, s_m = _rma(tr, period, 1), _rma(pdm, period, 1), _rma(mdm, period, 1)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        pdi, mdi = 100 * s_p / s_tr, 100 * s_m / s_tr
+        dx = np.where(pdi + mdi > 0, 100 * np.abs(pdi - mdi) / (pdi + mdi), 0.0)
+    dx[: period] = np.nan
+    return _rma(dx, period, period)
 
 
 def pivot_lows(x: np.ndarray, left: int, right: int) -> np.ndarray:
@@ -134,9 +208,35 @@ class RSIData:
     def pivots(self, period: int, left: int, right: int) -> np.ndarray:
         return self._get(("piv", period, left, right), lambda: pivot_lows(self.rsi(period), left, right))
 
-    def divergences(self, period: int, left: int, right: int, max_gap: int,
-                    min_diff: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def divergences(self, period: int, left: int, right: int, max_gap: int, min_diff: float,
+                    rsi_lower: float | None = None, adx_max: float | None = None,
+                    min_px_atr: float = 0.0, trend_ema: int | None = None,
+                    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """(signal bar c, pivot p, previous pivot q) for every bullish divergence, sorted by c."""
+        if trend_ema is not None:
+            def trended():
+                c, p, q = self.divergences(period, left, right, max_gap, min_diff, rsi_lower, adx_max, min_px_atr)
+                with np.errstate(invalid="ignore"):
+                    ok = self.close[c] > self.ema(trend_ema)[c]  # NaN (warm-up) -> filtered out
+                return c[ok], p[ok], q[ok]
+            return self._get(("divt", period, left, right, max_gap, float(min_diff), rsi_lower, adx_max,
+                              float(min_px_atr), trend_ema), trended)
+        if rsi_lower is not None or adx_max is not None or min_px_atr:
+            def filtered():
+                c, p, q = self.divergences(period, left, right, max_gap, min_diff)
+                ok = np.ones(len(c), bool)
+                if rsi_lower is not None:
+                    ok &= self.rsi(period)[q] <= rsi_lower
+                if adx_max is not None:
+                    with np.errstate(invalid="ignore"):
+                        ok &= self.adx[c] < adx_max  # NaN (warm-up) -> filtered out
+                if min_px_atr:
+                    with np.errstate(invalid="ignore"):
+                        ok &= self.low[q] - self.low[p] >= min_px_atr * self.atr[p]
+                return c[ok], p[ok], q[ok]
+            return self._get(("divf", period, left, right, max_gap, float(min_diff), rsi_lower, adx_max,
+                              float(min_px_atr)), filtered)
+
         def calc():
             pv = self.pivots(period, left, right)
             if len(pv) < 2:
@@ -148,6 +248,31 @@ class RSIData:
             ok = (p - q <= max_gap) & (dr > 0) & (dr >= min_diff) & (self.low[p] < self.low[q])
             return p[ok] + right, p[ok], q[ok]
         return self._get(("div", period, left, right, max_gap, float(min_diff)), calc)
+
+    def ema(self, period: int) -> np.ndarray:
+        return self._get(("ema", period), lambda: ema(self.close, period))
+
+    @property
+    def minute_ny(self) -> np.ndarray:
+        """New York clock minute-of-day of each bar's open (09:30 -> 570)."""
+        def calc():
+            t = self._df["bar_open_ts"].dt.convert_time_zone("America/New_York")
+            return (t.dt.hour().cast(pl.Int32) * 60 + t.dt.minute().cast(pl.Int32)).to_numpy()
+        return self._get(("minute_ny",), calc)
+
+    def entry_allowed(self, window: str) -> np.ndarray:
+        """Bool per bar: may an entry fill on this bar's open under `window`?"""
+        def calc():
+            m = self.minute_ny
+            ok = np.ones(self.n, bool)
+            for a, b in SESSION_EXCLUDE[window]:
+                ok &= ~((m >= a) & (m < b))
+            return ok
+        return self._get(("window", window), calc)
+
+    @property
+    def adx(self) -> np.ndarray:
+        return self._get(("adx",), lambda: wilder_adx(self.high, self.low, self.close, ADX_PERIOD))
 
     @property
     def atr(self) -> np.ndarray:
@@ -170,12 +295,25 @@ class RSIParams:
     stop_atr: float
     target_r: float
     max_hold: int
+    rsi_extreme_lower: float | None = None   # v2: RSI_q <= this (None = off)
+    adx_max: float | None = None             # v2: ADX(14)_c < this (None = off)
+    min_price_div_atr: float = 0.0           # v2: low_q - low_p >= this x ATR(14)_p
+    trend_ema: int | None = None             # v3: close_c > EMA(this)_c (None = off)
+    entry_breakout: bool = False             # v3: wait for a close above high_c (BREAKOUT_BARS bars)
+    session_window: str = "full"             # v3: SESSION_EXCLUDE key for the entry fill bar
 
     @classmethod
     def from_config(cls, cfg) -> "RSIParams":
+        v2 = {}
+        if hasattr(cfg, "rsi_extreme"):
+            v2 = {"rsi_extreme_lower": RSI_EXTREME_LOWER[cfg.rsi_extreme], "adx_max": ADX_MAX[cfg.adx_filter],
+                  "min_price_div_atr": float(cfg.min_price_div_atr)}
+        if hasattr(cfg, "trend_filter"):
+            v2 |= {"trend_ema": TREND_EMA[cfg.trend_filter], "entry_breakout": cfg.entry_confirmation == "breakout",
+                   "session_window": cfg.session_window}
         return cls(cfg.symbol, cfg.timeframe, cfg.rsi_lookback, cfg.pivot_left, cfg.pivot_right,
                    cfg.max_pivot_gap, float(cfg.min_rsi_diff), float(cfg.stop_atr), float(cfg.target_r),
-                   cfg.max_hold)
+                   cfg.max_hold, **v2)
 
 
 def as_params(cfg) -> RSIParams:
@@ -204,6 +342,7 @@ class SimResult:
     stop_level: np.ndarray
     target_level: np.ndarray
     atr_used: np.ndarray       # ATR that set 1R
+    trigger_idx: np.ndarray    # bar whose close triggered the entry (c, or the breakout bar)
 
 
 def scale_variable_costs(exec_config: ExecutionConfig, multiplier: float) -> ExecutionConfig:
@@ -221,7 +360,8 @@ def scale_variable_costs(exec_config: ExecutionConfig, multiplier: float) -> Exe
 def signal_arrays(data: RSIData, cfg) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     cfg = as_params(cfg)
     return data.divergences(cfg.rsi_lookback, cfg.pivot_left, cfg.pivot_right, cfg.max_pivot_gap,
-                            cfg.min_rsi_diff)
+                            cfg.min_rsi_diff, cfg.rsi_extreme_lower, cfg.adx_max, cfg.min_price_div_atr,
+                            cfg.trend_ema)
 
 
 def _whole_shares(equity: float, px: float, ec: ExecutionConfig) -> int:
@@ -265,15 +405,26 @@ def simulate_rsi_divergence(
     seq = 0
     next_ok = 0  # earliest bar a signal may be confirmed on (no position open)
 
+    allowed = data.entry_allowed(cfg.session_window)
     for s in range(len(sig_c)):
         ci = int(sig_c[s])
         if ci < next_ok:
             continue
         if rng is not None and rng.random() < missed_entry_frac:
             continue
-        entry_idx = ci + 1 + entry_delay_bars
+        trig = ci
+        if cfg.entry_breakout:
+            hit_b = np.flatnonzero(c[ci + 1:min(ci + 1 + BREAKOUT_BARS, n)] > hi[ci])
+            if not len(hit_b):
+                continue  # no breakout close within the window -> no trade
+            trig = ci + 1 + int(hit_b[0])
+        entry_idx = trig + 1 + entry_delay_bars
         if entry_idx >= n:
+            if cfg.entry_breakout:
+                continue
             break
+        if not allowed[entry_idx]:
+            continue  # entry bar inside an excluded session window -> skipped, not deferred
         a_known = atr[entry_idx - 1]
         if not math.isfinite(a_known) or a_known <= 0:
             continue  # ATR warm-up: no usable 1R -> skip this signal
@@ -333,14 +484,14 @@ def simulate_rsi_divergence(
             holding_bars=exit_idx - entry_idx,
         ))
         rows.append((ci, int(sig_p[s]), int(sig_q[s]), entry_idx, exit_idx, decision, qty, entry_fill_px, exit_px,
-                     entry_fill.commission, realized, forced, why, stop, target, a_known))
+                     entry_fill.commission, realized, forced, why, stop, target, a_known, trig))
         equity += realized
         equity_curve.append(EquityPoint(ts=ts[exit_idx], cash=equity, position_value=0.0, equity=equity))
         if forced:
             break
         next_ok = exit_idx
 
-    cols = list(zip(*rows)) if rows else [()] * 16
+    cols = list(zip(*rows)) if rows else [()] * 17
     i64 = lambda k: np.asarray(cols[k], dtype=np.int64)  # noqa: E731
     f64 = lambda k: np.asarray(cols[k], dtype=float)  # noqa: E731
     return SimResult(
@@ -349,5 +500,5 @@ def simulate_rsi_divergence(
         decision_idx=i64(5), quantity=f64(6), entry_px=f64(7), exit_px=f64(8), entry_commission=f64(9),
         realized_pnl=f64(10), forced_close=np.asarray(cols[11], dtype=bool),
         exit_reason=np.asarray(cols[12], dtype=object), stop_level=f64(13), target_level=f64(14),
-        atr_used=f64(15),
+        atr_used=f64(15), trigger_idx=i64(16),
     )
