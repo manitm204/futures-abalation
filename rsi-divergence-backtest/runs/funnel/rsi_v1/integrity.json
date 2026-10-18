@@ -1,0 +1,46 @@
+{
+  "audit_notes": [
+    "RSI = Wilder RSI(rsi_lookback) of closes (bars of the config's timeframe), seeded with the simple average of the first N gains/losses; RSI_t uses closes up to and including bar t.",
+    "An RSI pivot low at bar p (RSI_p < the pivot_left RSIs before it and <= the pivot_right RSIs after it) is only known at the close of bar p + pivot_right; that confirmation bar is the signal bar, and the entry fills at the NEXT bar's open.",
+    "Bullish divergence: between two CONSECUTIVE confirmed RSI pivot lows q < p with p - q <= max_pivot_gap, RSI_p - RSI_q > 0 and >= min_rsi_diff (RSI higher low) and low_p < low_q (price lower low at the pivot bars).",
+    "1R = stop_atr x ATR(14) using the ATR known before the entry fill; stop = entry-bar open - 1R, target = entry-bar open + target_r x R, both live from the entry bar.",
+    "Stop touch exits at the worse of the bar's open and the stop; target touch exits AT the target (a gap above it is not credited); a bar touching both is treated as a stop exit (conservative).",
+    "Otherwise the position exits at the next bar's open after max_hold bars, so a time exit fills exactly max_hold bars after entry. Sizing: as many whole shares as current equity affords (no leverage), as in the mean-reversion funnels.",
+    "Signals confirmed while a position is open are ignored; missed-entry stress drops whole signals (each divergence is a single-bar event), never re-entering one bar later.",
+    "Adverse slippage + commission on every fill; a fill at a session's first bar bears the full overnight gap.",
+    "Development backtests run on data physically truncated at the development end; open positions are force-closed at the last development bar and flagged (not counted as completed).",
+    "Sharpe: daily session-close mark-to-market returns over every trading day (flat days = 0), sqrt(252) annualization, rf = 0, idle cash earns 0.",
+    "Positions are held overnight (no session-end flattening), as in the other families; RSI, pivots and ATR run continuously across sessions over RTH bars only."
+  ],
+  "checks_per_config": [
+    "entry_signal_condition_not_met",
+    "pivot_not_confirmed_at_signal_bar",
+    "entry_not_after_signal_bar",
+    "exit_before_entry",
+    "exit_decided_before_entry",
+    "time_exit_not_at_max_hold",
+    "exit_not_next_open_after_decision",
+    "overlapping_positions",
+    "entry_fill_better_than_open",
+    "exit_fill_better_than_open",
+    "holding_period_exceeds_max_hold",
+    "position_exceeds_equity",
+    "forced_close_not_final_trade",
+    "commission_below_minimum",
+    "stop_not_from_atr_known_before_entry",
+    "target_not_at_configured_r",
+    "stop_exit_without_touch",
+    "stop_fill_better_than_min_open_stop",
+    "target_exit_without_touch",
+    "target_fill_better_than_target",
+    "target_exit_on_stop_bar",
+    "stop_or_target_touched_before_exit"
+  ],
+  "cut_fractions": [
+    0.3,
+    0.6000000000000001,
+    0.9
+  ],
+  "failures": {},
+  "truncation_sample": 40
+}

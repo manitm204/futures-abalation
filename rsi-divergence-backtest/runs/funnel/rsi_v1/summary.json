@@ -1,0 +1,416 @@
+{
+  "data_access": {
+    "actual_last_session": "2022-12-30",
+    "command": "develop",
+    "experiment_id": "rsi_v1",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 60,
+    "partition_fingerprint": "f9fa45045d564258",
+    "phase": "development",
+    "phase_end": "2022-12-31",
+    "rows": 489140,
+    "symbol": "SPY"
+  },
+  "data_history": {
+    "holdout_note": "SPY 2025-2026 holdout metrics were computed and inspected for the Donchian ablation and the channel-breakout funnels (funnel_v1..v3 records.parquet). The holdout is NOT an untouched test of SPY.",
+    "holdout_previously_inspected": true,
+    "validation_note": "No RSI-divergence config has been evaluated on 2023-2024, but the same slice gated the mean-reversion funnels (mr_v1, mr_v2), the channel-breakout funnels and the Donchian ablation, so it is not untouched SPY data.",
+    "validation_previously_used_for_selection": true
+  },
+  "dsr": {
+    "calibration_verified": false,
+    "effective_trials": {
+      "li_ji": 1203.0000000000014,
+      "n_components_95": 236,
+      "n_series": 91712,
+      "participation_ratio": 26.874659780397852,
+      "rank_bound_T": 1259
+    },
+    "n_configs_with_defined_sharpe": 91712,
+    "primary_method": "li_ji",
+    "research_history": [
+      {
+        "n_configs": null,
+        "name": "ict_silver_bullet_search",
+        "note": "Earlier ICT Silver Bullet search on the same SPY data; trial count not recorded."
+      },
+      {
+        "n_configs": 3888,
+        "name": "donchian_ablation (donchian_v1)",
+        "note": "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+      },
+      {
+        "n_configs": 24576,
+        "name": "channel_breakout grid (funnel_v1, v2_screened, v3_dsr, v4_dev)",
+        "note": "Channel-breakout grid on the same SPY data; four funnel variants with changed thresholds/methods."
+      },
+      {
+        "n_configs": 75000,
+        "name": "mean_reversion v1 grid (mr_v1)",
+        "note": "Mean-reversion v1 on the same SPY data; 15 frozen candidates, 0 passed validation."
+      },
+      {
+        "n_configs": 240000,
+        "name": "mean_reversion v2 grid (mr_v2)",
+        "note": "Mean-reversion v2 on the same SPY data; 4 frozen candidates, 1 passed validation (2023-2024)."
+      }
+    ],
+    "serial_dependence": "lag1_effective_n",
+    "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+    "trial_count_options": {
+      "li_ji": 1203.0000000000014,
+      "participation_ratio": 26.874659780397852,
+      "raw": 98304.0,
+      "raw_plus_known_prior": 441768.0
+    },
+    "unresolved": [
+      "Drawdown limit -30% is reused from the channel-breakout funnel (src/experiments/validation.py); that approval was given for 0.25%-risk stop-based sizing, while this strategy invests full equity per trade (the ATR stop bounds the per-trade loss, but not as a fixed % of equity) -- it has not been separately approved for this sizing.",
+      "Drawdown is measured on daily session-close mark-to-market; intraday drawdown is deeper.",
+      "rf = 0 and idle cash earns 0: Sharpe vs. cash is overstated in high-rate years (2023-2024 ~5%).",
+      "Variable cost stress scales per-share commission and slippage bps; the $1 per-order minimum commission is treated as fixed. Baseline limit (target) slippage is 0 bps, so cost stress does not touch target fills.",
+      "Trades are attributed to the year/window of their entry session; a position open at the development end is force-closed and excluded from completed-trade counts.",
+      "Prices are split-adjusted but NOT dividend-adjusted: SPY's ~1.5%/yr dividend is not credited while long, and an ex-dividend drop can create a spurious price lower low.",
+      "Long-only regular bullish divergence; bearish / hidden divergences and short trades are not tested.",
+      "Pivots are detected on RSI (TradingView built-in convention) and price is compared at those same bars; a price-pivot-based definition would select different signals.",
+      "Neighbor lattice: every axis is ordered (timeframe, RSI period, pivot left/right, max pivot gap, min RSI diff, stop ATR, target R, max hold); only symbol is held fixed.",
+      "All lookbacks, pivot widths, gaps and holding periods are counted in bars of the config's timeframe, so the same values span very different clock time on 5min vs 1h bars."
+    ],
+    "variance_of_trial_sharpes_per_period": 0.0008112710399570362
+  },
+  "elapsed_s": 409.8,
+  "experiment_id": "rsi_v1",
+  "frozen_manifest_sha256": "8cb7d9806dd2d46fef804755bb6f197a0aec0c1ea18a6f8c86805953c7264244",
+  "integrity": {
+    "checks_per_config": [
+      "entry_signal_condition_not_met",
+      "pivot_not_confirmed_at_signal_bar",
+      "entry_not_after_signal_bar",
+      "exit_before_entry",
+      "exit_decided_before_entry",
+      "time_exit_not_at_max_hold",
+      "exit_not_next_open_after_decision",
+      "overlapping_positions",
+      "entry_fill_better_than_open",
+      "exit_fill_better_than_open",
+      "holding_period_exceeds_max_hold",
+      "position_exceeds_equity",
+      "forced_close_not_final_trade",
+      "commission_below_minimum",
+      "stop_not_from_atr_known_before_entry",
+      "target_not_at_configured_r",
+      "stop_exit_without_touch",
+      "stop_fill_better_than_min_open_stop",
+      "target_exit_without_touch",
+      "target_fill_better_than_target",
+      "target_exit_on_stop_bar",
+      "stop_or_target_touched_before_exit"
+    ],
+    "cut_fractions": [
+      0.3,
+      0.6000000000000001,
+      0.9
+    ],
+    "failures": {},
+    "truncation_sample": 40
+  },
+  "mode": "development_only",
+  "n_configs": 98304,
+  "n_frozen_candidates": 33,
+  "provenance": {
+    "available_data_endpoint_per_manifest": {
+      "QQQ": "2026-08-18",
+      "SPY": "2026-08-18"
+    },
+    "config_path": "/home/manit/Desktop/fun_projects/abalation_backtest/rsi-divergence-backtest/configs/funnel/rsi_funnel.yaml",
+    "config_sha256": "b52a22567b28b75948bad4abeeab1691cbeac8e4bfb924392023d8ded1d0fe78",
+    "created_at": "2026-10-17T15:23:36.593705+00:00",
+    "data_manifests": {
+      "QQQ": {
+        "actual_coverage_end": "2026-08-18",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "split_adjusted",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-08-19T15:47:38.862005+00:00",
+        "provider": "fmp",
+        "row_count": 841838,
+        "schema_version": "1.0.0"
+      },
+      "SPY": {
+        "actual_coverage_end": "2026-08-18",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "split_adjusted",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-08-19T15:47:23.246434+00:00",
+        "provider": "fmp",
+        "row_count": 842209,
+        "schema_version": "1.0.0"
+      }
+    },
+    "git_commit": "737d995cb21f058147e5d884938b8164f530d592",
+    "git_diff_sha256": "965ab665384ae717a55a9b74325797f70ca8ece1f4552a9580da555fe012d16c",
+    "git_dirty": true,
+    "seed": 20261016
+  },
+  "rejection_reason_counts": {
+    "s2:hard_reject:completed_trades": 67148,
+    "s2:hard_reject:years_with_>=10_trades": 47401,
+    "s3:hard_reject:max_drawdown": 25,
+    "s3:hard_reject:net_return": 23337,
+    "s3:hard_reject:sharpe": 30962,
+    "s4:hard_reject:neighbor_frac_profitable": 2,
+    "s4:hard_reject:neighbor_median_sharpe": 1,
+    "s5:hard_reject:profitable_years": 3
+  },
+  "survivor_table": [
+    {
+      "evaluated": 98304,
+      "kind": "universe",
+      "passed": 98304,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "0 universe"
+    },
+    {
+      "evaluated": 98304,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 98304,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "1 backtest integrity",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 98304,
+      "hard_reject": 67148,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 31156,
+      "pct_of_previous": 31.693522135416668,
+      "pct_of_universe": 31.693522135416668,
+      "stage": "2 trade count & coverage",
+      "with_warnings": 50473
+    },
+    {
+      "evaluated": 31156,
+      "hard_reject": 30962,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 194,
+      "pct_of_previous": 0.6226730003851586,
+      "pct_of_universe": 0.19734700520833334,
+      "stage": "3 performance & risk",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 194,
+      "hard_reject": 3,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 191,
+      "pct_of_previous": 98.45360824742268,
+      "pct_of_universe": 0.19429524739583334,
+      "stage": "4 parameter stability",
+      "with_warnings": 194
+    },
+    {
+      "evaluated": 191,
+      "hard_reject": 3,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 188,
+      "pct_of_previous": 98.42931937172774,
+      "pct_of_universe": 0.19124348958333334,
+      "stage": "5 time stability",
+      "with_warnings": 182
+    },
+    {
+      "deduplicated": 155,
+      "evaluated": 188,
+      "kind": "dedup",
+      "n_clusters": 33,
+      "passed": 33,
+      "pct_of_previous": 17.5531914893617,
+      "pct_of_universe": 0.0335693359375,
+      "stage": "6 deduplication"
+    },
+    {
+      "evaluated": 33,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 33,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 0.0335693359375,
+      "stage": "7 execution stress",
+      "with_warnings": 1
+    },
+    {
+      "evaluated": null,
+      "kind": "hard_gate",
+      "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "8 frozen validation"
+    },
+    {
+      "evaluated": 33,
+      "kind": "diagnostic_only",
+      "note": "diagnostic only: unverified: 33",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "9 DSR / transfer"
+    },
+    {
+      "evaluated": null,
+      "kind": "explicit_command",
+      "note": "not run; `final-test` command only",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "10 final holdout"
+    }
+  ],
+  "symbol": "SPY",
+  "thresholds": {
+    "confidence": {
+      "dsr_calibration_verified": false,
+      "dsr_threshold": 0.95,
+      "effective_trials_method": "li_ji",
+      "serial_dependence": "lag1_effective_n",
+      "transfer_symbol": "QQQ"
+    },
+    "data": {
+      "clean_root": "data/clean",
+      "development": {
+        "end": "2022-12-31",
+        "start": "2018-01-01"
+      },
+      "holdout": {
+        "end": null,
+        "start": "2025-01-01"
+      },
+      "timeframes": [
+        "5min",
+        "15min",
+        "1h"
+      ],
+      "validation": {
+        "end": "2024-12-31",
+        "start": "2023-01-01"
+      }
+    },
+    "data_history": {
+      "holdout_note": "SPY 2025-2026 holdout metrics were computed and inspected for the Donchian ablation and the channel-breakout funnels (funnel_v1..v3 records.parquet). The holdout is NOT an untouched test of SPY.",
+      "holdout_previously_inspected": true,
+      "validation_note": "No RSI-divergence config has been evaluated on 2023-2024, but the same slice gated the mean-reversion funnels (mr_v1, mr_v2), the channel-breakout funnels and the Donchian ablation, so it is not untouched SPY data.",
+      "validation_previously_used_for_selection": true
+    },
+    "dedup": {
+      "corr_threshold": 0.8,
+      "linkage": "complete",
+      "return_basis": "monthly"
+    },
+    "execution": {
+      "baseline": "configs/execution/default.yaml"
+    },
+    "execution_stress": {
+      "breakeven_max_multiplier": 25.0,
+      "diagnostic_cost_multipliers": [
+        2.0
+      ],
+      "entry_delay_bars": 1,
+      "gate_cost_multiplier": 1.5,
+      "missed_entry_frac": 0.1,
+      "missed_entry_sims": 100
+    },
+    "holdout": {
+      "acceptance": {
+        "max_drawdown": -0.3,
+        "min_completed_trades": null,
+        "min_net_return": 0.0,
+        "min_sharpe": 0.0
+      }
+    },
+    "integrity": {
+      "truncation_check_sample": 40,
+      "truncation_points": 3
+    },
+    "metrics": {
+      "cash_treatment": "Idle cash earns 0% and the Sharpe excess return is measured against a 0% risk-free rate, so the two assumptions are consistent. In 2023-2024 the real T-bill rate was ~5%, so Sharpe vs. cash is overstated there.",
+      "drawdown_basis": "daily session-close mark-to-market (understates intraday DD)",
+      "periods_per_year": 252,
+      "return_frequency": "daily",
+      "risk_free_rate_annual": 0.0
+    },
+    "parameter_stability": {
+      "min_frac_profitable": 0.7,
+      "min_median_sharpe": 0.3,
+      "neighbor_mode": "single_axis",
+      "perturbation": {
+        "float_rel_step": 0.15,
+        "integer_rel_step": 0.15,
+        "n_per_config": 20,
+        "rsi_diff_abs": 1.0,
+        "z_abs": null
+      }
+    },
+    "performance": {
+      "max_drawdown": -0.3,
+      "max_drawdown_source": "src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct",
+      "min_net_return": 0.0,
+      "min_sharpe": 0.75
+    },
+    "research_history": [
+      {
+        "n_configs": null,
+        "name": "ict_silver_bullet_search",
+        "note": "Earlier ICT Silver Bullet search on the same SPY data; trial count not recorded."
+      },
+      {
+        "n_configs": 3888,
+        "name": "donchian_ablation (donchian_v1)",
+        "note": "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+      },
+      {
+        "n_configs": 24576,
+        "name": "channel_breakout grid (funnel_v1, v2_screened, v3_dsr, v4_dev)",
+        "note": "Channel-breakout grid on the same SPY data; four funnel variants with changed thresholds/methods."
+      },
+      {
+        "n_configs": 75000,
+        "name": "mean_reversion v1 grid (mr_v1)",
+        "note": "Mean-reversion v1 on the same SPY data; 15 frozen candidates, 0 passed validation."
+      },
+      {
+        "n_configs": 240000,
+        "name": "mean_reversion v2 grid (mr_v2)",
+        "note": "Mean-reversion v2 on the same SPY data; 4 frozen candidates, 1 passed validation (2023-2024)."
+      }
+    ],
+    "seed": 20261016,
+    "strategy": "rsi_divergence",
+    "symbol": "SPY",
+    "time_stability": {
+      "min_profitable_years": 3,
+      "top_trades_frac": 0.05,
+      "top_trades_k": 5
+    },
+    "trade_count": {
+      "min_completed_trades": 150,
+      "min_trades_per_year": 10,
+      "min_years_meeting_floor": 4
+    },
+    "validation": {
+      "max_drawdown": -0.3,
+      "min_completed_trades": 60,
+      "min_net_return": 0.0,
+      "min_sharpe": 0.3
+    },
+    "version": 1
+  }
+}
