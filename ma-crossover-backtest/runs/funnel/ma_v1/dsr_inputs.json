@@ -1,0 +1,74 @@
+{
+  "calibration_verified": false,
+  "effective_trials": {
+    "li_ji": 1058.0000000000032,
+    "n_components_95": 95,
+    "n_series": 60000,
+    "participation_ratio": 3.2120527664901335,
+    "rank_bound_T": 1259
+  },
+  "n_configs_with_defined_sharpe": 60000,
+  "primary_method": "li_ji",
+  "research_history": [
+    {
+      "n_configs": null,
+      "name": "ict_silver_bullet_search",
+      "note": "Earlier ICT Silver Bullet search on the same SPY data; trial count not recorded."
+    },
+    {
+      "n_configs": 3888,
+      "name": "donchian_ablation (donchian_v1)",
+      "note": "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+    },
+    {
+      "n_configs": 24576,
+      "name": "channel_breakout grid (funnel_v1, v2_screened, v3_dsr, v4_dev)",
+      "note": "Channel-breakout grid on the same SPY data; four funnel variants with changed thresholds/methods."
+    },
+    {
+      "n_configs": 75000,
+      "name": "mean_reversion v1 grid (mr_v1)",
+      "note": "Mean-reversion v1 on the same SPY data; 15 frozen candidates, 0 passed validation."
+    },
+    {
+      "n_configs": 240000,
+      "name": "mean_reversion v2 grid (mr_v2)",
+      "note": "Mean-reversion v2 on the same SPY data; 4 frozen candidates, 1 passed validation (2023-2024)."
+    },
+    {
+      "n_configs": 98304,
+      "name": "rsi_divergence v1 grid (rsi_v1)",
+      "note": "RSI divergence; 33 frozen candidates, 8 passed validation (2023-2024)."
+    },
+    {
+      "n_configs": 69984,
+      "name": "rsi_divergence v2 grid (rsi_v2)",
+      "note": "RSI divergence with RSI-extreme / ADX / price-divergence filters; 91 frozen candidates, 35 passed validation (2023-2024)."
+    },
+    {
+      "n_configs": 248832,
+      "name": "rsi_divergence v3 grid (rsi_v3)",
+      "note": "RSI divergence with trend filter / breakout entry / session window; 172 frozen candidates, 51 passed validation (2023-2024)."
+    }
+  ],
+  "serial_dependence": "lag1_effective_n",
+  "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+  "trial_count_options": {
+    "li_ji": 1058.0000000000032,
+    "participation_ratio": 3.2120527664901335,
+    "raw": 60000.0,
+    "raw_plus_known_prior": 820584.0
+  },
+  "unresolved": [
+    "Drawdown limit -30% is reused from the channel-breakout funnel (src/experiments/validation.py); that approval was given for 0.25%-risk stop-based sizing, while this strategy invests full equity per trade (and may run with no stop at all) -- it has not been separately approved for this sizing.",
+    "Drawdown is measured on daily session-close mark-to-market; intraday drawdown is deeper.",
+    "rf = 0 and idle cash earns 0: Sharpe vs. cash is overstated in high-rate years (2023-2024 ~5%).",
+    "Variable cost stress scales per-share commission and slippage bps; the $1 per-order minimum commission is treated as fixed.",
+    "Trades are attributed to the year/window of their entry session; a position open at the development end is force-closed and excluded from completed-trade counts.",
+    "Prices are split-adjusted but NOT dividend-adjusted: SPY's ~1.5%/yr dividend is not credited while long.",
+    "Long-only: bearish crossovers only exit; short trades are not tested (the slope filter's short side is unused).",
+    "Neighbor lattice: timeframe, fast length, slow length, confirm bars, ATR buffer, stop (1.5 < 2.0 < 2.5 < 3.0 < off) and slope filter (off < on) are ordered; ma_pair is categorical and held fixed.",
+    "All MA lengths, confirmation bars and the 5-bar slope lookback are counted in bars of the config's timeframe, so the same values span very different clock time on 5min vs 1h bars."
+  ],
+  "variance_of_trial_sharpes_per_period": 0.0004523572231983521
+}
