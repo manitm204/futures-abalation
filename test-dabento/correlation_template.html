@@ -1,0 +1,375 @@
+<title>Futures Correlation Matrix</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+/* Layout: one working column. Controls on top, the 10x10 matrix as the centerpiece, the selected pair's history below. */
+:root {
+  --bg: #f5f6f4; --surface: #ffffff; --ink: #17201b; --ink-2: #4a554f; --muted: #7a857f; --line: #dde2de;
+  --accent: #1f5f8b;
+  --neg: #c62828; --mid: #f0f1ee; --pos: #1b8a3c;
+  --cell-ink-dark: #111814; --cell-ink-light: #ffffff;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1311; --surface: #161b18; --ink: #e6ebe7; --ink-2: #aab4ad; --muted: #7c8781; --line: #29302c;
+  --accent: #74b4e0; --neg: #e04848; --mid: #222825; --pos: #2fae57; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #0f1311; --surface: #161b18; --ink: #e6ebe7; --ink-2: #aab4ad; --muted: #7c8781; --line: #29302c;
+  --accent: #74b4e0; --neg: #e04848; --mid: #222825; --pos: #2fae57; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 22px; }
+header { display: grid; gap: 6px; }
+h1 { font-family: var(--f-display); font-weight: 600; font-size: 28px; line-height: 1.15; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-weight: 600; font-size: 18px; margin: 0; }
+.sub { color: var(--ink-2); margin: 0; max-width: 68ch; }
+.label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; }
+.num { font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: end; }
+.ctl { display: grid; gap: 6px; min-width: 0; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.seg button { font: inherit; font-size: 13px; color: var(--ink-2); background: none; border: 0; padding: 6px 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.seg button:focus-visible, input[type=range]:focus-visible, td.cell:focus-visible, .step:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.datectl { flex: 1 1 320px; }
+.daterow { display: flex; gap: 10px; align-items: center; }
+.daterow input { flex: 1; min-width: 0; accent-color: var(--accent); }
+.step { font: inherit; font-size: 13px; background: var(--surface); color: var(--ink-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 9px; cursor: pointer; }
+.step:disabled, .daterow input:disabled { opacity: 0.4; cursor: default; }
+.datelabel { font-family: var(--f-data); font-size: 13px; color: var(--ink); white-space: nowrap; min-width: 9ch; }
+
+.summary { display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--ink-2); font-size: 13px; }
+.summary b { color: var(--ink); font-weight: 500; }
+
+.matrix-box { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+table.matrix { border-collapse: separate; border-spacing: 3px; margin: 0 auto; }
+.matrix th { font-family: var(--f-display); font-weight: 600; font-size: 13px; color: var(--ink-2); padding: 2px 4px; }
+.matrix thead th { height: 26px; vertical-align: bottom; }
+.matrix tbody th { text-align: right; padding-right: 8px; }
+td.cell { width: 62px; height: 46px; text-align: center; font-family: var(--f-data); font-size: 13px; font-variant-numeric: tabular-nums;
+  border-radius: 4px; cursor: pointer; background-clip: padding-box; position: relative; }
+td.cell.diag { cursor: default; }
+td.cell.sel { box-shadow: 0 0 0 2px var(--ink) inset; }
+td.cell.nodata { color: var(--muted); }
+.gl { border-left: 8px solid transparent; }
+.gt { border-top: 8px solid transparent; }
+th.gl, th.gt { border-color: transparent; }
+.groups { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--muted); margin-top: 10px; justify-content: center; }
+
+.legend { display: grid; gap: 4px; width: min(360px, 100%); margin: 14px auto 0; }
+.legend .bar { height: 10px; border-radius: 3px; }
+.legend .ticks { display: flex; justify-content: space-between; font-family: var(--f-data); font-size: 11px; color: var(--muted); }
+
+.pair { display: grid; gap: 10px; }
+.pairhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+.pairhead .stat { color: var(--ink-2); font-size: 13px; }
+.chart-box { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 6px 4px; position: relative; }
+#chart { display: block; width: 100%; height: 260px; }
+#chart text { font-family: var(--f-data); font-size: 11px; fill: var(--muted); }
+.notes { color: var(--muted); font-size: 12.5px; display: grid; gap: 4px; max-width: 75ch; }
+.notes p { margin: 0; }
+
+#tip { position: fixed; z-index: 20; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 6px; padding: 7px 10px; font-size: 12.5px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); max-width: 260px; }
+#tip .v { font-family: var(--f-data); font-size: 15px; font-weight: 500; }
+#tip .m { color: var(--muted); font-size: 11.5px; }
+@media (max-width: 520px) { h1 { font-size: 23px; } td.cell { width: 46px; height: 38px; font-size: 11.5px; } .matrix-box { padding: 8px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="label">CME futures · 15-minute returns</div>
+    <h1>Futures Correlation Matrix</h1>
+    <p class="sub" id="lede">Correlation of 15-minute log returns between the 10 markets, measured over a trailing window of trading sessions. Drag the date to see how relationships change over time. Click any cell to chart that pair's history.</p>
+  </header>
+
+  <div class="controls">
+    <div class="ctl">
+      <span class="label" id="winlabel">Rolling window</span>
+      <div class="seg" role="group" aria-labelledby="winlabel" id="winseg">
+        <button type="button" data-w="20" id="w20">20 sessions</button>
+        <button type="button" data-w="60" id="w60">60 sessions</button>
+        <button type="button" data-w="120" id="w120">120 sessions</button>
+        <button type="button" data-w="full" id="wfull">Full history</button>
+      </div>
+    </div>
+    <div class="ctl datectl">
+      <label class="label" for="date">Window ending</label>
+      <div class="daterow">
+        <button type="button" class="step" id="prev" aria-label="Previous week">◀</button>
+        <input type="range" id="date" min="0" max="0" step="1" value="0">
+        <button type="button" class="step" id="next" aria-label="Next week">▶</button>
+        <span class="datelabel" id="datelabel"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="matrix-box">
+    <table class="matrix" id="matrix" aria-label="Correlation matrix"></table>
+    <div class="groups"><span>Equity index: ES NQ YM RTY</span><span>Energy: CL</span><span>Metals: GC</span><span>FX: 6E 6J</span><span>Treasuries: ZN ZB</span></div>
+    <div class="legend" aria-hidden="true">
+      <div class="bar" id="legendbar"></div>
+      <div class="ticks"><span>−1.0</span><span>−0.5</span><span>0</span><span>+0.5</span><span>+1.0</span></div>
+    </div>
+  </div>
+
+  <section class="pair">
+    <div class="pairhead">
+      <h2 id="pairtitle"></h2>
+      <span class="stat" id="pairstat"></span>
+    </div>
+    <div class="chart-box"><svg id="chart" role="img" aria-label="Rolling correlation history for the selected pair"></svg></div>
+  </section>
+
+  <div class="notes">
+    <p>Windows: 20 sessions is about 1 month (~1,800 bars), 60 is about a quarter, 120 is about half a year. A snapshot is taken at the last session of each week.</p>
+    <p>Data: Databento GLBX.MDP3 front-month continuous contracts (<span class="num" id="span"></span>), 1-minute bars resampled to 15 minutes. Returns that span a contract roll are excluded. 6J is quoted in USD per yen, so it rises when the yen strengthens.</p>
+  </div>
+</div>
+<div id="tip" hidden></div>
+
+<script>
+const D = __DATA__;
+const M = D.markets, N = M.length;
+const GROUP_START = new Set([4, 5, 6, 8]); // CL, GC, 6E, ZN start a new group
+const PI = {}; { let k = 0; for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) PI[i + "," + j] = k++; }
+const pidx = (i, j) => i < j ? PI[i + "," + j] : PI[j + "," + i];
+const dates = D.dates;
+const state = { win: "60", t: dates.length - 1, sel: [0, 8] };
+
+const $ = id => document.getElementById(id);
+const fmt = v => (v < 0 ? "−" : v > 0 ? "+" : "") + Math.abs(v).toFixed(2);
+const fmtCell = v => (v < 0 ? "−" : "") + Math.abs(v).toFixed(2);
+const firstValid = w => D.windows[w].findIndex(r => r);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const hex = h => { h = h.replace("#", ""); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+let C = {};
+function readColors() {
+  C = { neg: hex(css("--neg")), mid: hex(css("--mid")), pos: hex(css("--pos")),
+        dark: css("--cell-ink-dark"), light: css("--cell-ink-light") };
+}
+function cellRGB(v) {
+  const t = Math.min(1, Math.abs(v)), p = v < 0 ? C.neg : C.pos;
+  return C.mid.map((x, i) => Math.round(x + (p[i] - x) * t));
+}
+function lum([r, g, b]) {
+  const f = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+  return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+}
+function inkFor(rgb) {
+  const L = lum(rgb), Ld = lum(hex(C.dark)), Ll = lum(hex(C.light));
+  const cd = (L + 0.05) / (Ld + 0.05), cl = (Ll + 0.05) / (L + 0.05);
+  return cd >= cl ? C.dark : C.light;
+}
+function current() {
+  const row = state.win === "full" ? D.full : D.windows[state.win][state.t];
+  return row ? row.map(x => x == null ? null : x / 100) : null;
+}
+
+// ---- matrix ----
+const cells = [];
+function buildMatrix() {
+  const t = $("matrix");
+  let h = "<thead><tr><th></th>";
+  M.forEach((m, j) => h += `<th scope="col" class="${GROUP_START.has(j) ? "gl" : ""}">${m}</th>`);
+  h += "</tr></thead><tbody>";
+  for (let i = 0; i < N; i++) {
+    const gt = GROUP_START.has(i) ? "gt" : "";
+    h += `<tr><th scope="row" class="${gt}">${M[i]}</th>`;
+    for (let j = 0; j < N; j++) {
+      const cls = ["cell", gt, GROUP_START.has(j) ? "gl" : "", i === j ? "diag" : ""].join(" ");
+      h += `<td class="${cls}" data-i="${i}" data-j="${j}" ${i === j ? "" : 'tabindex="0"'}></td>`;
+    }
+    h += "</tr>";
+  }
+  t.innerHTML = h + "</tbody>";
+  t.querySelectorAll("td.cell").forEach(td => {
+    cells.push(td);
+    const i = +td.dataset.i, j = +td.dataset.j;
+    if (i === j) return;
+    td.addEventListener("click", () => { state.sel = [Math.min(i, j), Math.max(i, j)]; render(); });
+    td.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); td.click(); } });
+    td.addEventListener("pointerenter", e => showCellTip(td, e));
+    td.addEventListener("pointermove", e => placeTip(e.clientX, e.clientY));
+    td.addEventListener("pointerleave", hideTip);
+    td.addEventListener("focus", () => { const r = td.getBoundingClientRect(); showCellTip(td, { clientX: r.right, clientY: r.bottom }); });
+    td.addEventListener("blur", hideTip);
+  });
+}
+function renderMatrix(vals) {
+  for (const td of cells) {
+    const i = +td.dataset.i, j = +td.dataset.j;
+    const v = i === j ? 1 : vals && vals[pidx(i, j)];
+    if (v == null) { td.textContent = "–"; td.style.background = `rgb(${C.mid})`; td.style.color = ""; td.classList.add("nodata"); }
+    else {
+      const rgb = cellRGB(v);
+      td.classList.remove("nodata");
+      td.textContent = i === j ? "1" : fmtCell(v);
+      td.style.background = `rgb(${rgb})`;
+      td.style.color = inkFor(rgb);
+    }
+    const [a, b] = state.sel;
+    td.classList.toggle("sel", (i === a && j === b) || (i === b && j === a));
+  }
+}
+function renderSummary(vals) {
+  const el = $("summary");
+  if (!vals) { el.textContent = ""; return; }
+  let hi = null, lo = null, lowAbs = null;
+  for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
+    const v = vals[pidx(i, j)]; if (v == null) continue;
+    const p = { n: `${M[i]}–${M[j]}`, v };
+    if (!hi || v > hi.v) hi = p;
+    if (!lo || v < lo.v) lo = p;
+    if (!lowAbs || Math.abs(v) < Math.abs(lowAbs.v)) lowAbs = p;
+  }
+  el.innerHTML = `<span>Strongest: <b>${hi.n}</b> <span class="num">${fmt(hi.v)}</span></span>` +
+    `<span>Most negative: <b>${lo.n}</b> <span class="num">${fmt(lo.v)}</span></span>` +
+    `<span>Least related: <b>${lowAbs.n}</b> <span class="num">${fmt(lowAbs.v)}</span></span>`;
+}
+
+// ---- tooltip ----
+const tip = $("tip");
+function placeTip(x, y) {
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  let left = x + 14, top = y + 14;
+  if (left + w > innerWidth - 8) left = x - w - 14;
+  if (top + h > innerHeight - 8) top = y - h - 14;
+  tip.style.left = Math.max(8, left) + "px"; tip.style.top = Math.max(8, top) + "px";
+}
+function showCellTip(td, e) {
+  const i = +td.dataset.i, j = +td.dataset.j, vals = current();
+  const v = vals && vals[pidx(i, j)], full = D.full[pidx(i, j)] / 100;
+  const when = state.win === "full" ? `${D.first} to ${D.last}` : `${state.win} sessions to ${dates[state.t]}`;
+  tip.innerHTML = `<div><b>${M[i]} × ${M[j]}</b></div><div class="v">${v == null ? "no data" : fmt(v)}</div>` +
+    `<div class="m">${when}</div>` + (state.win === "full" ? "" : `<div class="m">Full-history average ${fmt(full)}</div>`);
+  tip.hidden = false; placeTip(e.clientX, e.clientY);
+}
+function hideTip() { tip.hidden = true; }
+
+// ---- pair history chart ----
+const svg = $("chart"), NS = "http://www.w3.org/2000/svg";
+let chartGeom = null;
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; }
+function chartWindow() { return state.win === "full" ? "60" : state.win; }
+function renderChart() {
+  const [a, b] = state.sel, p = pidx(a, b), w = chartWindow();
+  const series = D.windows[w].map(r => r && r[p] != null ? r[p] / 100 : null);
+  const full = D.full[p] / 100;
+  const W = svg.clientWidth || 800, H = 260, ml = 40, mr = 14, mt = 12, mb = 26;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.innerHTML = "";
+  const t0 = Date.parse(dates[0]), t1 = Date.parse(dates[dates.length - 1]);
+  const x = i => ml + (Date.parse(dates[i]) - t0) / (t1 - t0) * (W - ml - mr);
+  const y = v => mt + (1 - v) / 2 * (H - mt - mb);
+  chartGeom = { x, y, series, ml, mr, W, H, mt, mb };
+
+  const defs = el("defs", {}, svg);
+  const cpTop = el("clipPath", { id: "above" }, defs); el("rect", { x: 0, y: 0, width: W, height: y(0) }, cpTop);
+  const cpBot = el("clipPath", { id: "below" }, defs); el("rect", { x: 0, y: y(0), width: W, height: H }, cpBot);
+
+  for (const v of [-1, -0.5, 0, 0.5, 1]) {
+    el("line", { x1: ml, x2: W - mr, y1: y(v), y2: y(v), stroke: css("--line"), "stroke-width": v === 0 ? 1.5 : 1 }, svg);
+    const tx = el("text", { x: ml - 6, y: y(v) + 4, "text-anchor": "end" }, svg); tx.textContent = v === 0 ? "0" : fmt(v).replace(".00", ".0").replace("0.50", "0.5");
+  }
+  const y0 = new Date(dates[0]).getUTCFullYear(), y1 = new Date(dates[dates.length - 1]).getUTCFullYear();
+  for (let yr = y0 + 1; yr <= y1; yr++) {
+    const tt = Date.parse(`${yr}-01-01`); if (tt > t1) break;
+    const px = ml + (tt - t0) / (t1 - t0) * (W - ml - mr);
+    el("line", { x1: px, x2: px, y1: mt, y2: H - mb, stroke: css("--line"), "stroke-dasharray": "2 4" }, svg);
+    if (W > 520 || yr % 2 === 0) { const tx = el("text", { x: px, y: H - 8, "text-anchor": "middle" }, svg); tx.textContent = yr; }
+  }
+
+  // contiguous segments (skip nulls)
+  const segs = []; let cur = [];
+  series.forEach((v, i) => { if (v == null) { if (cur.length) segs.push(cur); cur = []; } else cur.push(i); });
+  if (cur.length) segs.push(cur);
+  for (const s of segs) {
+    const line = s.map((i, k) => `${k ? "L" : "M"}${x(i).toFixed(1)},${y(series[i]).toFixed(1)}`).join("");
+    const area = line + `L${x(s[s.length - 1]).toFixed(1)},${y(0)}L${x(s[0]).toFixed(1)},${y(0)}Z`;
+    el("path", { d: area, fill: css("--pos"), "fill-opacity": 0.22, "clip-path": "url(#above)" }, svg);
+    el("path", { d: area, fill: css("--neg"), "fill-opacity": 0.22, "clip-path": "url(#below)" }, svg);
+    el("path", { d: line, fill: "none", stroke: css("--ink"), "stroke-width": 1.5, "stroke-linejoin": "round" }, svg);
+  }
+  // full-history reference line
+  el("line", { x1: ml, x2: W - mr, y1: y(full), y2: y(full), stroke: css("--accent"), "stroke-width": 1.5, "stroke-dasharray": "6 4" }, svg);
+  const fl = el("text", { x: W - mr - 2, y: y(full) + (full > 0.85 ? 14 : -5), "text-anchor": "end", style: `fill:${css("--accent")}` }, svg);
+  fl.textContent = `full history ${fmt(full)}`;
+
+  // selected date marker
+  if (state.win !== "full" && series[state.t] != null) {
+    el("line", { x1: x(state.t), x2: x(state.t), y1: mt, y2: H - mb, stroke: css("--ink-2"), "stroke-width": 1 }, svg);
+    el("circle", { cx: x(state.t), cy: y(series[state.t]), r: 4.5, fill: css("--ink"), stroke: css("--surface"), "stroke-width": 2 }, svg);
+  }
+  // hover layer
+  const hx = el("line", { y1: mt, y2: H - mb, stroke: css("--muted"), "stroke-width": 1, visibility: "hidden" }, svg);
+  const hd = el("circle", { r: 4, fill: css("--accent"), stroke: css("--surface"), "stroke-width": 2, visibility: "hidden" }, svg);
+  const hit = el("rect", { x: ml, y: 0, width: W - ml - mr, height: H, fill: "transparent", style: "cursor:crosshair" }, svg);
+  const nearest = cx => { let best = -1, bd = Infinity; series.forEach((v, i) => { if (v == null) return; const d = Math.abs(x(i) - cx); if (d < bd) { bd = d; best = i; } }); return best; };
+  const toLocal = e => { const r = svg.getBoundingClientRect(); return (e.clientX - r.left) * W / r.width; };
+  hit.addEventListener("pointermove", e => {
+    const i = nearest(toLocal(e)); if (i < 0) return;
+    hx.setAttribute("x1", x(i)); hx.setAttribute("x2", x(i)); hx.setAttribute("visibility", "visible");
+    hd.setAttribute("cx", x(i)); hd.setAttribute("cy", y(series[i])); hd.setAttribute("visibility", "visible");
+    tip.innerHTML = `<div><b>${M[a]} × ${M[b]}</b></div><div class="v">${fmt(series[i])}</div><div class="m">${w} sessions to ${dates[i]}</div><div class="m">Click to show this week in the matrix</div>`;
+    tip.hidden = false; placeTip(e.clientX, e.clientY);
+  });
+  hit.addEventListener("pointerleave", () => { hx.setAttribute("visibility", "hidden"); hd.setAttribute("visibility", "hidden"); hideTip(); });
+  hit.addEventListener("click", e => {
+    const i = nearest(toLocal(e)); if (i < 0) return;
+    if (state.win === "full") state.win = w;
+    state.t = i; render();
+  });
+
+  const vals = series.filter(v => v != null);
+  const now = state.win === "full" ? null : series[state.t];
+  $("pairtitle").textContent = `${M[a]} × ${M[b]}, ${w}-session rolling correlation`;
+  $("pairstat").innerHTML = (now == null ? "" : `At ${dates[state.t]}: <span class="num">${fmt(now)}</span> · `) +
+    `Range <span class="num">${fmt(Math.min(...vals))}</span> to <span class="num">${fmt(Math.max(...vals))}</span> · Full history <span class="num">${fmt(full)}</span>`;
+}
+
+// ---- controls ----
+const slider = $("date");
+function syncControls() {
+  document.querySelectorAll("#winseg button").forEach(btn => btn.setAttribute("aria-pressed", btn.dataset.w === state.win));
+  const isFull = state.win === "full";
+  const lo = isFull ? 0 : firstValid(state.win);
+  if (!isFull && state.t < lo) state.t = lo;
+  slider.min = lo; slider.max = dates.length - 1; slider.value = state.t;
+  slider.disabled = $("prev").disabled = $("next").disabled = isFull;
+  if (!isFull) { $("prev").disabled = state.t <= lo; $("next").disabled = state.t >= dates.length - 1; }
+  $("datelabel").textContent = isFull ? `${D.first.slice(0, 4)}–${D.last.slice(0, 4)}` : dates[state.t];
+}
+function render() {
+  syncControls();
+  const vals = current();
+  renderMatrix(vals); renderSummary(vals); renderChart();
+}
+document.querySelectorAll("#winseg button").forEach(btn => btn.addEventListener("click", () => { state.win = btn.dataset.w; render(); }));
+slider.addEventListener("input", () => { state.t = +slider.value; render(); });
+$("prev").addEventListener("click", () => { state.t--; render(); });
+$("next").addEventListener("click", () => { state.t++; render(); });
+$("span").textContent = `${D.first} to ${D.last}, ${D.bars.toLocaleString()} bars`;
+
+function applyTheme() {
+  readColors();
+  $("legendbar").style.background = `linear-gradient(90deg, rgb(${C.neg}), rgb(${C.mid}), rgb(${C.pos}))`;
+  render();
+}
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(renderChart, 120); });
+
+buildMatrix();
+applyTheme();
+</script>
