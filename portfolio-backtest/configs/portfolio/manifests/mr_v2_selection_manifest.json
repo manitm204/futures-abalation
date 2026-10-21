@@ -1,0 +1,127 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 60,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 2,
+      "config_id": "cfg_8bf5ce8a2763c7d2c5b0",
+      "dev_net_return": 0.4565897082400867,
+      "dev_order": 3,
+      "dev_sharpe": 0.923187025021777,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.5762399069376731,
+      "params": {
+        "cooldown_bars": 8,
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -1.0,
+        "exit_z": 0.5,
+        "max_holding_bars": 8,
+        "mean_lookback": 12,
+        "mean_type": "sma",
+        "stop_atr_multiple": "1.5",
+        "symbol": "SPY",
+        "timeframe": "1h",
+        "trend_filter": "none"
+      }
+    }
+  ],
+  "code_version": "737d995cb21f058147e5d884938b8164f530d592",
+  "config_sha256": "6e0f333c7997432de248274572ba2927ff05d1505d184a495a30ff51f6d9f2a0",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "5min",
+      "15min",
+      "1h"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "mr_v2",
+  "frozen_at": "2026-10-17T02:34:10.305276+00:00",
+  "frozen_manifest_sha256": "022a38e499e227ed78bdf72c329e3956786f5234c8c97f484cf39c998ee17338",
+  "git_diff_sha256": "49954e49c33edefa3ffd238a7d726ba3462fcd9e3ccd2868407143ef2c72cb02",
+  "git_dirty": true,
+  "seed": 20261016,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, representative)",
+      "7 execution stress"
+    ],
+    "ordering": "median neighbor Sharpe desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": true,
+    "commission_minimum": 1.0,
+    "commission_per_share": 0.005,
+    "extended_hours_slippage_multiplier": 2.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 1.0,
+    "slippage_bps_stop": 1.0,
+    "starting_equity": 100000.0
+  },
+  "symbol": "SPY",
+  "validated_at": "2026-10-17T02:34:40.529939+00:00",
+  "validation_summary": [
+    {
+      "config_id": "cfg_57d700e040d279aaaeb5",
+      "reasons": [
+        "sharpe 0.207 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_6c313035f2200ac3acf9",
+      "reasons": [
+        "sharpe 0.205 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_8bf5ce8a2763c7d2c5b0",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_ef97cfb8c9fe4d0826c4",
+      "reasons": [
+        "sharpe 0.091 < 0.3"
+      ],
+      "status": "hard_reject"
+    }
+  ]
+}

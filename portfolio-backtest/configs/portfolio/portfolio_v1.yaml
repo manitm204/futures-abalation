@@ -1,0 +1,41 @@
+# Equal-weight SPY portfolio of the #1 strategy from each family's LATEST funnel.
+#
+# "#1" = candidates[0] of the family's selection manifest: the first frozen
+# representative in DEVELOPMENT order that passed validation (2023-2024). The
+# portfolio never re-picks sleeves on test-window performance.
+#
+# Each sleeve is simulated exactly as its funnel did (same simulator, same costs,
+# $100k whole-share full-equity sizing, continuous 2018+ history so indicators are
+# warm), and its daily mark-to-market returns are taken over the test window.
+# The portfolio gives every sleeve an equal slice of capital on the window's first
+# day and never rebalances (three independent accounts summed).
+
+version: 1
+name: portfolio_v1
+symbol: SPY
+starting_equity: 100000.0
+rebalance: none
+
+sleeves:
+  - name: mean_reversion
+    label: Mean reversion v2
+    weight: 0.3333333333333333
+    manifest: configs/portfolio/manifests/mr_v2_selection_manifest.json
+    funnel_config: configs/funnel/mr_funnel_v2.yaml
+  - name: rsi_divergence
+    label: RSI divergence v3
+    weight: 0.3333333333333333
+    manifest: configs/portfolio/manifests/rsi_v3_selection_manifest.json
+    funnel_config: configs/funnel/rsi_funnel_v3.yaml
+  - name: ma_crossover
+    label: MA crossover v2
+    weight: 0.3333333333333334
+    manifest: configs/portfolio/manifests/ma_v2_selection_manifest.json
+    funnel_config: configs/funnel/ma_funnel_v2.yaml
+
+# Windows the portfolio can be run on. `holdout` is the out-of-sample test and needs
+# --confirm-holdout-access (ledgered). `validation` was used to pick the sleeves, so
+# it is in-sample for the portfolio and shown for context only.
+windows:
+  validation: {start: 2023-01-01, end: 2024-12-31}
+  holdout:    {start: 2025-01-01, end: null}

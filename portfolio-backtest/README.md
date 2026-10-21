@@ -1,0 +1,244 @@
+# SPY multi-strategy portfolio
+
+Copied from `ma-crossover-backtest` (which already carries the mean-reversion, RSI-divergence
+and MA-crossover simulators, byte-identical to their own folders). It trades the **#1 strategy
+from each family's latest funnel** (`candidates[0]` of its selection manifest -- first in
+development order among those that passed 2023-2024 validation):
+
+| Sleeve | Funnel | Config | Timeframe |
+|---|---|---|---|
+| Mean reversion v2 | mr_v2 | cfg_8bf5ce8a2763c7d2c5b0 | 1h |
+| RSI divergence v3 | rsi_v3 | cfg_5b670566dfd725e154ff | 5min |
+| MA crossover v2 | ma_v2 | cfg_d4f739a36463c2aefdec | 15min |
+
+The manifests (with their hashes and validation results) are copied into
+`configs/portfolio/manifests/`; `configs/portfolio/portfolio_v1.yaml` sets the weights.
+Each sleeve is simulated exactly as its funnel did (same simulator, costs and $100k
+whole-share sizing on continuous 2018+ history; its validation numbers reproduce the
+funnel's to the last digit). The portfolio splits capital equally on the window's first day
+and never rebalances. SPY buy-and-hold over the same days is the benchmark.
+
+    PYTHONPATH=. .venv/bin/python scripts/run_portfolio.py --window validation
+    PYTHONPATH=. .venv/bin/python scripts/run_portfolio.py --window holdout --confirm-holdout-access
+
+Outputs go to `runs/portfolio/portfolio_v1_<window>/` (`results.json`, `report.md`,
+`daily_equity.csv`, `trades.csv`); holdout reads are ledgered in
+`runs/portfolio/data_access_ledger.jsonl`. Code: `src/portfolio/`, tests:
+`tests/unit/test_portfolio.py`.
+
+---
+
+# Strategy Ablation Backtest Framework
+
+A reusable, extensible research backtesting framework built on a
+data / feature / engine / experiment / analysis architecture, designed so new
+strategies plug in without touching the data, portfolio, execution, experiment,
+or analytics layers.
+
+**This is a research tool.** Nothing here establishes or implies that any
+strategy is profitable. Its purpose is to determine what does and does not
+survive rigorous, causal, out-of-sample testing.
+
+## Ablation study (primary workflow)
+
+The headline use of this framework is an **ablation study**: take one simple,
+legible **base strategy**, enumerate the **full factorial** of a small set of
+discrete parameter axes (e.g. breakout confirmation = close / wick / typical
+price), backtest **every** variant, and report which settings actually matter —
+out-of-sample, after costs.
+
+The shipped base strategy is a **Donchian channel breakout** (intraday, regular
+trading hours) in `src/strategies/donchian_breakout/`. Its axes (see
+`src/experiments/grid.py`): `timeframe` (15min/1h), `channel_lookback`,
+`breakout_price` (close/wick/typical), `trend_filter`, `direction`, `stop`,
+`target`, `time_exit` — 1,944 variants/symbol.
+
+Each variant is backtested once over 2018–2026 and scored on three
+chronological, non-overlapping splits: **development** (in-sample, 2018–2022),
+**validation** (OOS, 2023–2024), and **holdout** (OOS, 2025–2026).
+
+```bash
+# 1) Run every variant for SPY + QQQ on 15min + 1h (resumable; ~4 min on 10 cores).
+python scripts/run_ablation.py --experiment-id donchian_v1 --n-workers 10
+
+# 2) Build the findings report (leaderboard, per-axis ablation, top-cohort
+#    enrichment, dev->OOS rank stability, cross-symbol check, honest verdict).
+python scripts/build_ablation_report.py --experiment-id donchian_v1 --min-trades-per-year 100
+# -> runs/reports/ablation.md + runs/reports/ablation_summary.json
+```
+
+No data download is needed: cleaned 1-minute SPY/QQQ bars live under `data/clean/`
+and are aggregated to 15min/1h on the fly (`src/data/aggregation.py`).
+
+The whole study runs in **well under an hour** by design: it uses coarse
+timeframes (15min ≈ 6.5k bars/yr, 1h ≈ 1.75k/yr), backtests each variant **once**
+and slices the resulting trades into the three splits, and parallelizes across
+cores with a spawn-based process pool.
+
+## Moving-average crossover screening funnel (this folder)
+
+Same funnel and thresholds as the RSI-divergence, mean-reversion and
+channel-breakout studies, applied to a long-only SPY **MA crossover** base
+strategy (`src/strategies/ma_crossover/`). The entry is the first bar of a bullish
+run (fast MA > slow MA after a real crossover) that meets the confirmation,
+buffer and slope rules; it fills at the next open. The exit is at the next open
+after the fast MA falls back to or below the slow MA (a raw cross), or at an
+optional ATR initial stop. There is no target and no time limit, and each bullish
+run is traded at most once. Grid (`src/experiments/ma_grid.py`, 20,000 variants per
+timeframe, **60,000 per symbol**):
+`timeframe` (5min/15min/1h), `ma_pair` (SMA/SMA, EMA/EMA, EMA/SMA, SMA/EMA; fast
+type first), `fast_length` (5/8/12/16/20), `slow_length` (40/60/80/100/150),
+`confirm_bars` (1-4; 1 = no extra confirmation), `buffer_atr` (0/0.10/0.20/0.35/0.50
+x ATR(14) separation at the signal bar), `stop_atr` (off/1.5/2.0/2.5/3.0 x ATR(14)
+below the entry open), `slope_filter` (off/on: slow MA above its value 5 bars ago).
+
+```bash
+PYTHONPATH=. python scripts/run_ma_funnel.py develop --experiment-id ma_v1 --n-workers 12   # stages 1-7 (+9 diagnostics), 2018-2022 only
+PYTHONPATH=. python scripts/run_ma_funnel.py validate --experiment-id ma_v1                 # stage 8 on 2023-2024
+PYTHONPATH=. python scripts/run_ma_funnel.py final-test --manifest runs/funnel/ma_v1/selection_manifest.json --confirm-holdout-access
+```
+
+Thresholds: `configs/funnel/ma_funnel.yaml` (gates identical to `rsi_funnel*.yaml`).
+
+**v2 space (ma_v2, 248,832 configs on 5min/15min):** v1's axes narrowed
+(`ma_pair` EMA/EMA, SMA/EMA; `fast_length` 5/8/12; `slow_length` 80/100/150/200;
+`confirm_bars` 1/2; `buffer_atr` 0/0.20; `stop_atr` off/2.0; `slope_filter` off/on)
+plus five rules, each "off" = the v1 rule: `max_hold` (off/8/16/32 bars: time exit at
+the next open), `take_profit_atr` (off/2/4 x the entry ATR: limit target),
+`cooldown_bars` (0/4/12: no entry until that many bars after any exit), `min_adx`
+(off/15/25: ADX(14) at the signal bar), `max_extension_atr` (off/1.5/3: close at most
+that many ATRs above the slow MA). Still one entry per bullish run, so a time or
+target exit ends that run's trading. Same gates; `configs/funnel/ma_funnel_v2.yaml`
+selects the space.
+
+```bash
+PYTHONPATH=. python scripts/run_ma_funnel.py develop  --experiment-id ma_v2 --config configs/funnel/ma_funnel_v2.yaml --n-workers 12
+PYTHONPATH=. python scripts/run_ma_funnel.py validate --experiment-id ma_v2 --config configs/funnel/ma_funnel_v2.yaml
+```
+
+## RSI-divergence screening funnel (inherited)
+
+Same funnel and thresholds as the mean-reversion and channel-breakout studies,
+applied to a long-only SPY **RSI divergence** base strategy
+(`src/strategies/rsi_divergence/`): a regular bullish divergence between two
+consecutive confirmed RSI pivot lows (price lower low, RSI higher low) signals
+at the pivot's confirmation close; buy at the next bar's open with a stop at
+`stop_atr` x ATR(14) below (1R), a target at `target_r` x R above, and a time exit
+after `max_hold` bars. Axes (all lengths in bars; the same values on every
+timeframe; 32,768 configs per timeframe, 98,304 total):
+`timeframe` (5min/15min/1h), `rsi_lookback` (7/10/14/21), `pivot_left`
+(3/5/8/12), `pivot_right` (1/3), `max_pivot_gap` (12/24/48/78), `min_rsi_diff`
+(0/3/5/8 RSI points), `stop_atr` (0.75/1/1.5/2), `target_r` (1/1.5/2/3),
+`max_hold` (6/12/24/48). Conventions: `ASSUMPTIONS.md` -> "RSI-divergence strategy".
+
+```bash
+PYTHONPATH=. python scripts/run_rsi_funnel.py develop --experiment-id rsi_v1 --n-workers 12   # stages 1-7 (+9 diagnostics), 2018-2022 only
+PYTHONPATH=. python scripts/run_rsi_funnel.py validate --experiment-id rsi_v1                 # stage 8 on 2023-2024
+PYTHONPATH=. python scripts/run_rsi_funnel.py final-test --manifest runs/funnel/rsi_v1/selection_manifest.json --confirm-holdout-access
+```
+
+Thresholds: `configs/funnel/rsi_funnel.yaml` (identical gates to `mr_funnel.yaml`).
+
+**v2 space (rsi_v2, 69,984 configs on 5min/15min):** narrower values plus three
+filters, each "off" = the v1 rule: `rsi_extreme` (off/40-60/30-70: first pivot's
+RSI <= 40 / 30; long-only, so only the lower threshold applies), `adx_filter`
+(off/lt30/lt20: Wilder ADX(14) at the confirmation close < 30 / < 20) and
+`min_price_div_atr` (0/0.1/0.25/0.5: low_q - low_p >= k x ATR(14) at the second
+pivot). Same gates; `configs/funnel/rsi_funnel_v2.yaml` selects the space.
+
+```bash
+PYTHONPATH=. python scripts/run_rsi_funnel.py develop  --experiment-id rsi_v2 --config configs/funnel/rsi_funnel_v2.yaml --n-workers 12
+PYTHONPATH=. python scripts/run_rsi_funnel.py validate --experiment-id rsi_v2 --config configs/funnel/rsi_funnel_v2.yaml
+```
+
+**v3 space (rsi_v3, 248,832 configs on 5min/15min; not run yet):** v2 narrowed
+(ADX filter fixed off, max hold adds 72) plus three rules, long side only:
+`trend_filter` (off/ema20/ema50/ema200: close at the confirmation bar above
+EMA(n)), `entry_confirmation` (immediate, or breakout: the first close above the
+confirmation bar's high within 3 bars, entering at the next open; no breakout =
+no trade) and `session_window` (full / excl_first30 / excl_last30 /
+excl_first_last30: the entry fill bar may not open 09:30-10:00 / 15:30-16:00 New
+York time; such entries are skipped, not deferred).
+
+```bash
+PYTHONPATH=. python scripts/run_rsi_funnel.py develop  --experiment-id rsi_v3 --config configs/funnel/rsi_funnel_v3.yaml --n-workers 12
+PYTHONPATH=. python scripts/run_rsi_funnel.py validate --experiment-id rsi_v3 --config configs/funnel/rsi_funnel_v3.yaml
+```
+
+## Mean-reversion screening funnel (inherited)
+
+Same funnel as the channel-breakout study, applied to a long-only SPY
+mean-reversion base strategy (`src/strategies/mean_reversion/`): buy at the next
+bar's open when `z = (close - mean) / std` falls to the entry threshold, exit at
+the next open once z recovers past the exit threshold or after a maximum
+holding period. Axes (75,000 variants, all lengths in bars):
+`timeframe` (5min/15min/1h), `mean_type` (SMA/EMA), `mean_lookback`
+(5/10/15/20/40), `std_lookback` (10/15/20/40/60), `entry_z` (-1.0 .. -2.0),
+`exit_z` (-0.5 .. 0.5), `max_hold` (2/3/5/7/10), `trend_filter`
+(none / close above SMA100/150/200).
+
+```bash
+python scripts/run_mr_funnel.py develop --experiment-id mr_v1 --n-workers 12   # stages 1-7 (+9 diagnostics), 2018-2022 only
+python scripts/run_mr_funnel.py validate --experiment-id mr_v1                 # stage 8 on 2023-2024
+python scripts/run_mr_funnel.py final-test --manifest runs/funnel/mr_v1/selection_manifest.json --confirm-holdout-access
+```
+
+Thresholds: `configs/funnel/mr_funnel.yaml` (identical to the channel funnel's).
+
+**v2 parameter space** (`configs/funnel/mr_funnel_v2.yaml`, same thresholds,
+240,000 variants): `timeframe` (5min/15min/1h), `mean_type`, `mean_lookback`
+(8/12/20/32/48; the z-score std uses the same window), `entry_z`, `exit_z`
+(-0.25/0/0.25/0.5), `max_holding_bars` (2/4/8/16), `trend_filter`
+(none / above SMA100), `entry_confirmation` (none / positive bar return),
+`cooldown_bars` (0/1/2/4/8), `stop_atr_multiple` (none/1.0/1.5/2.0/3.0).
+
+```bash
+python scripts/run_mr_funnel.py develop --experiment-id mr_v2 --n-workers 12 --config configs/funnel/mr_funnel_v2.yaml
+python scripts/run_mr_funnel.py validate --experiment-id mr_v2 --config configs/funnel/mr_funnel_v2.yaml
+```
+
+## Status
+
+See `ASSUMPTIONS.md` for verified-vs-assumed FMP API behavior, the Donchian
+base-strategy conventions, and other load-bearing assumptions, isolated behind
+configuration.
+
+## Setup
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+cp .env.example .env   # then fill in FMP_API_KEY
+```
+
+## Adding a new strategy
+
+The engine only depends on the `Strategy` protocol in `src/strategies/base.py`:
+
+`required_data()`, `validate_config()`, `compute_features()`,
+`generate_signals()`, `create_entry_order()`, `update_trade_state()`,
+`create_exit_order()`, `serialize_diagnostics()`.
+
+To add a strategy:
+
+1. Create `src/strategies/<your_strategy>/` with `config.py` (typed config),
+   `features.py`, `signals.py`, `exits.py`, `strategy.py` implementing the protocol.
+2. Register it in `src/strategies/registry.py`.
+3. Add a config YAML under `configs/strategies/`.
+4. Write unit tests under `tests/unit/` mirroring the ICT Silver Bullet tests.
+
+No changes to `src/engine/`, `src/data/`, or `src/experiments/` are required —
+those layers are strategy-agnostic by design.
+
+## Project layout
+
+See the directory tree in the architecture summary; source lives under `src/`,
+one-off orchestration scripts under `scripts/`, tests under `tests/`, and all
+generated artifacts (data, run outputs) under `data/` and `runs/` (gitignored).
+
+## Running tests
+
+```bash
+pytest
+```
