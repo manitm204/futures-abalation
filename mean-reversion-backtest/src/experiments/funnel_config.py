@@ -83,11 +83,25 @@ class PerturbationCfg(_Frozen):
     z_abs: float
 
 
+class LocalPerturbationCfg(_Frozen):
+    """One-setting-at-a-time local moves (stage-4 gate when mode = local_perturbation).
+    Lengths and the holding cap move by x(1 -/+ int_rel), rounded, at least 1 bar;
+    z levels and a numeric ATR stop move by +/- the absolute steps."""
+    int_rel: float
+    entry_z_abs: float
+    exit_z_abs: float
+    stop_atr_abs: float
+
+
 class ParamStabilityCfg(_Frozen):
     neighbor_mode: Literal["single_axis", "single_and_joint"]
     min_frac_profitable: float
     min_median_sharpe: float
     perturbation: PerturbationCfg
+    # grid_neighbors: gate on one-step grid neighbors (original). local_perturbation:
+    # gate on `local` moves; grid neighbors are then reported as a diagnostic only.
+    mode: Literal["grid_neighbors", "local_perturbation"] = "grid_neighbors"
+    local: LocalPerturbationCfg | None = None
 
 
 class TimeStabilityCfg(_Frozen):
@@ -100,6 +114,7 @@ class DedupCfg(_Frozen):
     corr_threshold: float
     return_basis: Literal["monthly"]
     linkage: Literal["complete", "average", "single"]
+    reps_per_cluster: int = 1   # best-k per cluster go forward (a 1-member cluster yields 1)
 
 
 class StressCfg(_Frozen):
@@ -169,7 +184,14 @@ class FunnelConfig(_Frozen):
         return list(range(self.data.development.start.year, self.data.development.end.year + 1))
 
     def config_sha256(self) -> str:
-        return hashlib.sha256(canonical_json(self.model_dump(mode="json")).encode()).hexdigest()
+        d = self.model_dump(mode="json")
+        # Keep the hashes of configs written before these knobs existed.
+        if d["dedup"]["reps_per_cluster"] == 1:
+            del d["dedup"]["reps_per_cluster"]
+        ps = d["parameter_stability"]
+        if ps["mode"] == "grid_neighbors" and ps["local"] is None:
+            del ps["mode"], ps["local"]
+        return hashlib.sha256(canonical_json(d).encode()).hexdigest()
 
 
 def load_funnel_config(path: Path = DEFAULT_FUNNEL_CONFIG) -> FunnelConfig:

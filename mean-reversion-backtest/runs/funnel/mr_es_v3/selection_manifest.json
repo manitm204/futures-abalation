@@ -1,0 +1,193 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 60,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 4,
+      "config_id": "cfg_a26e26dbd24e956d4fd0",
+      "dev_net_return": 0.3760300000000001,
+      "dev_order": 4,
+      "dev_sharpe": 0.9375234582846447,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.6137543453083637,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.5,
+        "exit_z": -0.5,
+        "max_holding_bars": 16,
+        "mean_lookback": 40,
+        "mean_type": "ema",
+        "std_lookback": 20,
+        "stop_atr_multiple": "none",
+        "symbol": "ES",
+        "timeframe": "15min"
+      }
+    }
+  ],
+  "code_version": "3b70ca612d69c7aa81b83b7b09224fd3f8e4655a",
+  "config_sha256": "90075ad01e4f3a1bd0a0c7fa0c498c53958f3d938a654fc2bdfd2e0f3609e0ea",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "5min",
+      "15min",
+      "1h"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "mr_es_v3",
+  "frozen_at": "2026-10-21T21:03:30.904256+00:00",
+  "frozen_manifest_sha256": "74f1e018590b6efba0857e0566c8e5d48fea1d752d20fb2fe0ca379d69ba25aa",
+  "git_diff_sha256": "cd60180b3e439130a965da8691adf7a2d09c333d98967c043d8f74ac5cfad962",
+  "git_dirty": true,
+  "seed": 20261021,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, best 2 per cluster)",
+      "7 execution stress"
+    ],
+    "ordering": "median neighbor Sharpe desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": false,
+    "commission_minimum": 0.0,
+    "commission_per_contract": 2.5,
+    "commission_per_share": 0.0,
+    "extended_hours_slippage_multiplier": 1.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "instrument_type": "futures",
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 0.0,
+    "slippage_bps_stop": 0.0,
+    "slippage_ticks_market": 1.0,
+    "slippage_ticks_stop": 1.0,
+    "starting_equity": 1000000.0
+  },
+  "symbol": "ES",
+  "validated_at": "2026-10-21T21:04:02.215999+00:00",
+  "validation_summary": [
+    {
+      "config_id": "cfg_5d8b684c4e2170642a66",
+      "reasons": [
+        "completed_trades 37 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_7cad6eeb28a9959af1a9",
+      "reasons": [
+        "completed_trades 42 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_cb04ada7360aeb36d032",
+      "reasons": [
+        "net_return -0.0076 <= 0.0",
+        "sharpe -0.067 < 0.3",
+        "completed_trades 54 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_a26e26dbd24e956d4fd0",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_2e9e4302b3a22dd3ab52",
+      "reasons": [
+        "net_return -0.0195 <= 0.0",
+        "sharpe -0.198 < 0.3",
+        "completed_trades 45 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_33d2186341519dfde5f8",
+      "reasons": [
+        "net_return -0.0233 <= 0.0",
+        "sharpe -0.235 < 0.3",
+        "completed_trades 34 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_3e3aadea8855f86945eb",
+      "reasons": [
+        "net_return -0.0048 <= 0.0",
+        "sharpe -0.031 < 0.3",
+        "completed_trades 34 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_982a184d1106e3411eec",
+      "reasons": [
+        "completed_trades 59 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_bed1e4e66e94799717d9",
+      "reasons": [
+        "net_return -0.0087 <= 0.0",
+        "sharpe -0.184 < 0.3",
+        "completed_trades 33 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_8d96fffd1b49b4fd2aa1",
+      "reasons": [
+        "net_return -0.0104 <= 0.0",
+        "sharpe -0.095 < 0.3",
+        "completed_trades 56 < 60"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_e6f549c11e1e18c30bd9",
+      "reasons": [
+        "net_return -0.0120 <= 0.0",
+        "sharpe -0.115 < 0.3",
+        "completed_trades 56 < 60"
+      ],
+      "status": "hard_reject"
+    }
+  ]
+}

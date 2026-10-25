@@ -4,6 +4,7 @@ break-even execution cost, and trade-interval overlap between configs."""
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 from datetime import datetime
 
 import numpy as np
@@ -70,6 +71,68 @@ def perturbations_v2(p: MRParams, *, config_id: str, base_seed: int, pcfg: Pertu
             entry_confirmation=p.entry_confirmation, cooldown_bars=step_int(p.cooldown_bars, 0),
             stop_atr=stop,
         ))
+    return out
+
+
+def perturbations_v3(p: MRParams, *, config_id: str, base_seed: int, pcfg: PerturbationCfg) -> list[MRParams]:
+    """v3 counterpart: mean and std lookbacks move independently (as in v1), the
+    holding cap by a non-zero integer of up to `integer_rel_step` (>= 1 bar), z
+    thresholds by +/- `z_abs`, an ATR stop by up to +/- `integer_rel_step`
+    relative (never below 0.5 ATR); "no stop" stays no stop. Categoricals
+    (timeframe, mean_type, entry_confirmation, symbol) are never perturbed."""
+    rng = np.random.default_rng(derive_seed(base_seed, "perturb", config_id))
+
+    def step_int(v: int, lo: int) -> int:
+        k = max(1, round(pcfg.integer_rel_step * v))
+        d = 0
+        while d == 0:
+            d = int(rng.integers(-k, k + 1))
+        return max(lo, v + d)
+
+    out = []
+    for _ in range(pcfg.n_per_config):
+        stop = p.stop_atr
+        if stop is not None:
+            stop = max(0.5, stop * (1 + float(rng.uniform(-pcfg.integer_rel_step, pcfg.integer_rel_step))))
+        out.append(MRParams(
+            symbol=p.symbol, timeframe=p.timeframe, mean_type=p.mean_type,
+            mean_lookback=step_int(p.mean_lookback, 2), std_lookback=step_int(p.std_lookback, 2),
+            entry_z=p.entry_z + float(rng.uniform(-pcfg.z_abs, pcfg.z_abs)),
+            exit_z=p.exit_z + float(rng.uniform(-pcfg.z_abs, pcfg.z_abs)),
+            max_hold=step_int(p.max_hold, 1), trend_filter=p.trend_filter,
+            entry_confirmation=p.entry_confirmation, cooldown_bars=0, stop_atr=stop,
+        ))
+    return out
+
+
+def local_perturbations(p: MRParams, lcfg) -> list[tuple[str, MRParams]]:
+    """Stage-4 local test: move ONE setting at a time, down and up, everything else
+    held. Mean / std lookbacks and the holding cap go to round(v x (1 -/+ int_rel))
+    (half rounds up), at least one bar away from v (lookbacks never below 2, hold
+    never below 1); entry / exit z by -/+ their absolute steps; a numeric ATR stop by
+    -/+ stop_atr_abs (never below 0.25). "No stop" has no numeric neighbor and is
+    left alone, so those configs get two fewer moves. Categoricals (timeframe,
+    mean_type, entry_confirmation) are never moved. Returns (label, params)."""
+    def ints(v: int, lo: int) -> tuple[int, int]:
+        down = min(math.floor(v * (1 - lcfg.int_rel) + 0.5), v - 1)
+        up = max(math.floor(v * (1 + lcfg.int_rel) + 0.5), v + 1)
+        return max(lo, down), up
+
+    out: list[tuple[str, MRParams]] = []
+
+    def add(name: str, values, field: str) -> None:
+        for v in values:
+            if v != getattr(p, field):
+                out.append((f"{name}={v:g}", replace(p, **{field: v})))
+
+    add("mean_lookback", ints(p.mean_lookback, 2), "mean_lookback")
+    add("std_lookback", ints(p.std_lookback, 2), "std_lookback")
+    add("entry_z", (round(p.entry_z - lcfg.entry_z_abs, 6), round(p.entry_z + lcfg.entry_z_abs, 6)), "entry_z")
+    add("exit_z", (round(p.exit_z - lcfg.exit_z_abs, 6), round(p.exit_z + lcfg.exit_z_abs, 6)), "exit_z")
+    add("max_hold", ints(p.max_hold, 1), "max_hold")
+    if p.stop_atr is not None:
+        add("stop_atr", (max(0.25, round(p.stop_atr - lcfg.stop_atr_abs, 6)),
+                         round(p.stop_atr + lcfg.stop_atr_abs, 6)), "stop_atr")
     return out
 
 

@@ -1,0 +1,233 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 40,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 2,
+      "config_id": "cfg_73706431bda30ea83b4a",
+      "dev_net_return": 0.27327499999999993,
+      "dev_order": 1,
+      "dev_sharpe": 0.8124695559621695,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5688140983578825,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -3.0,
+        "exit_z": 0.0,
+        "max_holding_bars": 5,
+        "mean_lookback": 47,
+        "mean_type": "sma",
+        "std_lookback": 21,
+        "stop_atr_multiple": "none",
+        "symbol": "ES",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.7653765882140507
+    },
+    {
+      "cluster": 2,
+      "config_id": "cfg_ec72455696174442a35a",
+      "dev_net_return": 0.33719750000000004,
+      "dev_order": 2,
+      "dev_sharpe": 0.8808520037285289,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.6356567161373782,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.5,
+        "exit_z": 0.0,
+        "max_holding_bars": 5,
+        "mean_lookback": 42,
+        "mean_type": "sma",
+        "std_lookback": 21,
+        "stop_atr_multiple": "none",
+        "symbol": "ES",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.7513375769263291
+    },
+    {
+      "cluster": 1,
+      "config_id": "cfg_a858117d8e00cd5ba65a",
+      "dev_net_return": 0.27787249999999997,
+      "dev_order": 3,
+      "dev_sharpe": 0.8551133914463939,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5983145950032006,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.5,
+        "exit_z": -1.0,
+        "max_holding_bars": 5,
+        "mean_lookback": 57,
+        "mean_type": "sma",
+        "std_lookback": 21,
+        "stop_atr_multiple": "none",
+        "symbol": "ES",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.6432912857383772
+    },
+    {
+      "cluster": 1,
+      "config_id": "cfg_1fed9fc1805d8d5725aa",
+      "dev_net_return": 0.2759974999999999,
+      "dev_order": 4,
+      "dev_sharpe": 0.8258629517955987,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5077151018217444,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.5,
+        "exit_z": 0.0,
+        "max_holding_bars": 5,
+        "mean_lookback": 57,
+        "mean_type": "sma",
+        "std_lookback": 21,
+        "stop_atr_multiple": "none",
+        "symbol": "ES",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.5818954872025106
+    },
+    {
+      "cluster": 0,
+      "config_id": "cfg_0d08f31530607c807c30",
+      "dev_net_return": 0.11384499999999997,
+      "dev_order": 5,
+      "dev_sharpe": 0.8753716563554768,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.4823546820118447,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.5,
+        "exit_z": 0.0,
+        "max_holding_bars": 5,
+        "mean_lookback": 42,
+        "mean_type": "ema",
+        "std_lookback": 27,
+        "stop_atr_multiple": "none",
+        "symbol": "ES",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.5459645945133343
+    },
+    {
+      "cluster": 0,
+      "config_id": "cfg_2e4823c4dcb4bf44b39e",
+      "dev_net_return": 0.09740499999999996,
+      "dev_order": 6,
+      "dev_sharpe": 0.7833585946062568,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.4669514889232597,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.5,
+        "exit_z": -1.0,
+        "max_holding_bars": 5,
+        "mean_lookback": 42,
+        "mean_type": "ema",
+        "std_lookback": 27,
+        "stop_atr_multiple": "none",
+        "symbol": "ES",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.5416545653736897
+    },
+    {
+      "cluster": 3,
+      "config_id": "cfg_e44addfac6d202695ddb",
+      "dev_net_return": 0.29432499999999995,
+      "dev_order": 7,
+      "dev_sharpe": 0.7758482514702943,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.3920905319713104,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.5,
+        "exit_z": 0.0,
+        "max_holding_bars": 7,
+        "mean_lookback": 42,
+        "mean_type": "ema",
+        "std_lookback": 21,
+        "stop_atr_multiple": "none",
+        "symbol": "ES",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.5035916604094387
+    }
+  ],
+  "code_version": "5342a94cdc844bb5d1f3b0c2c00705f03b157c96",
+  "config_sha256": "b5f9ccf7d718f9d1d73b0e98a87e1bf6568d5ce98f47162b3f83fde7fad1d062",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "5min",
+      "15min",
+      "1h"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "mr_es_v6_15m",
+  "frozen_at": "2026-10-23T19:16:36.506497+00:00",
+  "git_diff_sha256": "6677d242d9846bce98ad36f04386938e44b71ed9009060655826ae928f7d1bab",
+  "git_dirty": true,
+  "seed": 20261021,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, best 2 per cluster)",
+      "7 execution stress"
+    ],
+    "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": false,
+    "commission_minimum": 0.0,
+    "commission_per_contract": 2.5,
+    "commission_per_share": 0.0,
+    "extended_hours_slippage_multiplier": 1.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "instrument_type": "futures",
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 0.0,
+    "slippage_bps_stop": 0.0,
+    "slippage_ticks_market": 1.0,
+    "slippage_ticks_stop": 1.0,
+    "starting_equity": 1000000.0
+  },
+  "symbol": "ES"
+}

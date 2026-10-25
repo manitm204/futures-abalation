@@ -86,7 +86,8 @@ def check_sim_integrity(sim: SimResult, data: MRData, exec_config: ExecutionConf
     if (sim.entry_px < data.open[sim.entry_idx] - _EPS).any():
         issues.append("entry_fill_better_than_open")
     eq_before = exec_config.starting_equity + np.concatenate([[0.0], np.cumsum(sim.realized_pnl)[:-1]])
-    if (sim.quantity * sim.entry_px + sim.entry_commission > eq_before + 1e-6).any():
+    raw_entry = sim.entry_px - data.price_adj[sim.entry_idx]  # back-adjusted futures: real contract price
+    if (sim.quantity * raw_entry + sim.entry_commission > eq_before + 1e-6).any():
         issues.append("position_exceeds_equity")
     if sim.forced_close[:-1].any():
         issues.append("forced_close_not_final_trade")

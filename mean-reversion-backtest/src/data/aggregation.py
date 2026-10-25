@@ -37,7 +37,7 @@ def _interval_minutes(timeframe: str) -> int:
     return AGG_INTERVAL_MINUTES[timeframe]
 
 
-def _session_anchor_offset(minutes: int) -> str:
+def _session_anchor_offset(minutes: int, open_minute: int = SESSION_OPEN_MINUTE_OF_HOUR) -> str:
     """UTC-epoch-anchored buckets of size `minutes` only land exactly on the 09:30 NY
     session open if the offset (in minutes) equals 09:30's minute-of-hour modulo the
     bucket size. E.g. 5/15min buckets need no offset (30 % 5 == 30 % 15 == 0); 60min
@@ -45,8 +45,21 @@ def _session_anchor_offset(minutes: int) -> str:
     exact UTC-hour boundary. This generalizes to any interval without per-timeframe
     special-casing, and this function is the only place that logic lives.
     """
-    offset = SESSION_OPEN_MINUTE_OF_HOUR % minutes
+    offset = open_minute % minutes
     return f"{offset}m"
+
+
+def _session_open_minute(src: pl.DataFrame) -> int:
+    """Minute-of-hour (NY) at which sessions open: the most common minute of each
+    session's first bar (30 for 09:30 equity sessions, 0 for 09:00 crude). Buckets
+    are anchored to it so every session's first bar starts a bucket."""
+    if "bar_open_ts_ny" in src.columns:
+        ny = src["bar_open_ts_ny"]
+    else:
+        ny = src["bar_open_ts"].dt.convert_time_zone("America/New_York")
+    first = (src.with_columns(ny.alias("_ny")).group_by("session_date_ny").agg(pl.col("_ny").min())
+             ["_ny"].dt.minute())
+    return int(first.mode().sort()[0]) if len(first) else SESSION_OPEN_MINUTE_OF_HOUR
 
 
 def aggregate_bars(df_1min: pl.DataFrame, *, timeframe: str) -> pl.DataFrame:
@@ -58,7 +71,6 @@ def aggregate_bars(df_1min: pl.DataFrame, *, timeframe: str) -> pl.DataFrame:
     have been observed from FMP's intraday endpoint to date).
     """
     minutes = _interval_minutes(timeframe)
-    offset = _session_anchor_offset(minutes)
     if df_1min.is_empty():
         return pl.DataFrame(schema=CLEAN_BAR_SCHEMA)
 
@@ -70,6 +82,10 @@ def aggregate_bars(df_1min: pl.DataFrame, *, timeframe: str) -> pl.DataFrame:
     src = df_1min.filter(pl.col("is_regular_session"))
     if src.is_empty():
         return pl.DataFrame(schema=CLEAN_BAR_SCHEMA)
+    offset = _session_anchor_offset(minutes, _session_open_minute(src))
+    # Back-adjusted futures carry price_adjustment (adjusted = raw + adjustment);
+    # rolls happen outside RTH, so it is constant within a bucket.
+    extra = ["price_adjustment"] if "price_adjustment" in src.columns else []
 
     grouped = (
         src.sort("bar_open_ts")
@@ -90,6 +106,7 @@ def aggregate_bars(df_1min: pl.DataFrame, *, timeframe: str) -> pl.DataFrame:
                 pl.col("volume").sum().alias("volume"),
                 pl.len().alias("n_source_bars"),
                 pl.col("adjustment_status").first().alias("adjustment_status"),
+                *[pl.col(c).last().alias(c) for c in extra],
             ]
         )
     )
@@ -116,5 +133,5 @@ def aggregate_bars(df_1min: pl.DataFrame, *, timeframe: str) -> pl.DataFrame:
     expected = minutes
     grouped = grouped.with_columns((pl.col("n_source_bars") < expected).alias("is_partial_bar"))
 
-    return grouped.sort("bar_open_ts").select([*CLEAN_BAR_SCHEMA.keys(), "n_source_bars", "is_partial_bar"])
+    return grouped.sort("bar_open_ts").select([*CLEAN_BAR_SCHEMA.keys(), "n_source_bars", "is_partial_bar", *extra])
 

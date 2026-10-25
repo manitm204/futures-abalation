@@ -60,5 +60,14 @@ class ExecutionConfig(FrozenModel):
 
     intrabar_collision_mode: Literal["stop_first", "target_first", "discard_ambiguous"] = "stop_first"
 
+    # Futures (instrument_type = "futures"): quantity is whole contracts sized so
+    # contract value (raw price x multiplier, from src/data/futures.py) fits in
+    # equity; slippage is in ticks and commission per contract per fill. The
+    # per-share / bps fields above are then unused.
+    instrument_type: Literal["equity", "futures"] = "equity"
+    commission_per_contract: float = Field(default=0.0, ge=0)
+    slippage_ticks_market: float = Field(default=0.0, ge=0)
+    slippage_ticks_stop: float = Field(default=0.0, ge=0)
+
 
 DEFAULT_EXECUTION_CONFIG = ExecutionConfig()

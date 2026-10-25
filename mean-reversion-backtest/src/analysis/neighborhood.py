@@ -59,8 +59,138 @@ class Lattice:
         return {ax: {v: i for i, v in enumerate(vals)} for ax, vals in self.ordered.items()}
 
 
+# v3 lattice (futures grid). Same "none = widest stop" ordering as v2.
+ORDERED_AXES_V3: dict[str, list] = {
+    "timeframe": ["5min", "15min", "1h"],
+    "mean_lookback": [5, 12, 40],
+    "std_lookback": [10, 20, 40, 80],
+    "entry_z": [-1.5, -2.0, -2.5, -3.0],
+    "exit_z": [-1.0, -0.5, 0.0, 0.5],
+    "max_holding_bars": [5, 10, 16, 30],
+    "stop_atr_multiple": ["1.0", "1.5", "2.0", "2.5", "none"],
+}
+FIXED_AXES_V3 = ["symbol", "mean_type", "entry_confirmation"]
+
 LATTICE_V1 = Lattice(ORDERED_AXES, FIXED_AXES)
 LATTICE_V2 = Lattice(ORDERED_AXES_V2, FIXED_AXES_V2)
+LATTICE_V3 = Lattice(ORDERED_AXES_V3, FIXED_AXES_V3)
+LATTICE_V5 = Lattice({
+    "timeframe": ["5min", "15min", "1h"],
+    "mean_lookback": [20, 30, 40, 50, 60, 80],
+    "std_lookback": [10, 15, 20, 25, 30, 40, 60, 80],
+    "entry_z": [-2.0, -2.5, -3.0],
+    "exit_z": [-1.0, -0.5, 0.0, 0.5],
+    "max_holding_bars": [5, 10],
+    "stop_atr_multiple": ["1.0", "2.0", "none"],
+}, FIXED_AXES_V3)
+LATTICE_V7 = Lattice({
+    "timeframe": ["15min", "1h"],
+    "mean_lookback": [20, 30, 40, 50, 80, 100],
+    "std_lookback": [10, 15, 20, 25],
+    "entry_z": [-1.75, -2.0, -2.5, -3.0, -3.5],
+    "exit_z": [-1.0, -0.5, 0.0, 0.5, 1.0],
+    "max_holding_bars": [5, 10, 15],
+    "stop_atr_multiple": ["0.75", "1.0", "1.5", "2.0", "none"],
+}, FIXED_AXES_V3)
+LATTICE_V8 = Lattice({
+    "timeframe": ["15min", "1h"],
+    "mean_lookback": [20, 30, 40, 50, 60, 80, 100],
+    "std_lookback": [10, 15, 20, 60, 80, 100, 120],
+    "entry_z": [-2.5, -3.0, -3.5, -4.0],
+    "exit_z": [-1.25, -1.0, -0.5, 0.0, 0.5, 1.0],
+    "max_holding_bars": [3, 5, 8],
+    "stop_atr_multiple": ["1.0", "2.0", "none"],
+}, FIXED_AXES_V3)
+LATTICE_V9 = Lattice({
+    "timeframe": ["15min"],
+    "mean_lookback": [30, 40, 50, 60, 80, 100],
+    "std_lookback": [10, 15, 20, 25, 30],
+    "entry_z": [-2.0, -2.5, -3.0, -3.5],
+    "exit_z": [-1.0, -0.5, 0.0, 0.5],
+    "max_holding_bars": [3, 5, 8],
+    "stop_atr_multiple": ["1.0", "2.0", "none"],
+}, FIXED_AXES_V3)
+LATTICE_V10 = Lattice({
+    "timeframe": ["15min"],
+    "mean_lookback": [32, 37, 42, 47, 52, 57],
+    "std_lookback": [12, 15, 18, 21, 24, 27],
+    "entry_z": [-2.5, -3.0],
+    "exit_z": [-1.0, 0.0],
+    "max_holding_bars": [3, 5, 7],
+    "stop_atr_multiple": ["none"],
+}, FIXED_AXES_V3)
+LATTICE_V11 = Lattice({
+    "timeframe": ["1h"],
+    "mean_lookback": [28, 34, 40, 46, 80, 90, 100],
+    "std_lookback": [12, 17, 22, 80, 90, 100],
+    "entry_z": [-1.5, -2.0, -2.5],
+    "exit_z": [-1.0, -0.5, 0.0],
+    "max_holding_bars": [3, 5, 8],
+    "stop_atr_multiple": ["1.0", "2.0", "none"],
+}, FIXED_AXES_V3)
+LATTICE_V12 = Lattice({
+    "timeframe": ["15min"],
+    "mean_lookback": [40, 50, 60, 70, 80, 90],
+    "std_lookback": [18, 23, 28, 33, 38, 43, 60, 80],
+    "entry_z": [-2.5, -3.0, -3.5],
+    "exit_z": [-1.0, -0.5],
+    "max_holding_bars": [3, 5],
+    "stop_atr_multiple": ["none"],
+}, FIXED_AXES_V3)
+LATTICE_V13 = Lattice({
+    "timeframe": ["1h"],
+    "mean_lookback": [23, 28, 32, 37],
+    "std_lookback": [6, 9, 12, 15, 20, 30, 50, 70],
+    "entry_z": [-2.0, -2.5, -3.0],
+    "exit_z": [-1.0, 0.0],
+    "max_holding_bars": [5, 8, 12],
+    "stop_atr_multiple": ["1.5", "2.0", "none"],
+}, FIXED_AXES_V3)
+LATTICE_V14 = Lattice({
+    "timeframe": ["15min"],
+    "mean_lookback": [32, 37, 42, 47, 52],
+    "std_lookback": [12, 17, 22, 27, 50, 75],
+    "entry_z": [-2.5, -3.0, -3.5, -4.0],
+    "exit_z": [-1.5, -1.0, 0.0],
+    "max_holding_bars": [3, 5, 8, 12],
+    "stop_atr_multiple": ["1.3", "1.8", "none"],
+}, FIXED_AXES_V3)
+LATTICE_V15 = Lattice({
+    "timeframe": ["1h"],
+    "mean_lookback": [15, 25, 35, 45, 75, 85, 95, 105, 115],
+    "std_lookback": [12, 17, 22, 50, 60, 80],
+    "entry_z": [-1.5, -2.0, -2.5],
+    "exit_z": [-1.0, -0.5, 0.0],
+    "max_holding_bars": [3, 5, 8, 12],
+    "stop_atr_multiple": ["0.75", "1.5", "none"],
+}, FIXED_AXES_V3)
+LATTICE_V16 = Lattice({
+    "timeframe": ["15min"],
+    "mean_lookback": [35, 45, 55, 65, 75, 85, 95, 105, 115],
+    "std_lookback": [15, 55, 65, 75, 85, 95, 105],
+    "entry_z": [-2.0, -2.5, -3.0],
+    "exit_z": [-1.0, 0.0, 1.0],
+    "max_holding_bars": [3, 5, 8],
+    "stop_atr_multiple": ["1.5", "none"],
+}, FIXED_AXES_V3)
+LATTICE_V17 = Lattice({
+    "timeframe": ["1h"],
+    "mean_lookback": [70, 80, 90, 100, 110, 120],
+    "std_lookback": [10, 12, 15, 18, 20],
+    "entry_z": [-2.5, -3.0],
+    "exit_z": [-1.0, 0.0, 1.0],
+    "max_holding_bars": [5, 8, 12],
+    "stop_atr_multiple": ["1.5", "2.0", "2.5", "none"],
+}, FIXED_AXES_V3)
+LATTICE_V6 = Lattice({
+    "timeframe": ["5min", "15min", "1h"],
+    "mean_lookback": [20, 25, 30, 40, 50],
+    "std_lookback": [5, 8, 10, 15, 20, 25],
+    "entry_z": [-2.0, -2.5, -3.0, -3.5],
+    "exit_z": [-1.25, -1.0, -0.5, 0.0, 0.5],
+    "max_holding_bars": [3, 5, 10],
+    "stop_atr_multiple": ["1.5", "none"],
+}, FIXED_AXES_V3)
 
 
 @dataclass(frozen=True)

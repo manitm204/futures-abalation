@@ -23,7 +23,11 @@ Execution assumptions (audited by src/experiments/integrity.py):
     from the entry bar (a touch exits that bar, at the worse of the open and the
     stop; it takes precedence over a z/time exit decided at the same close);
   * sizing: each entry buys as many whole shares as current equity affords
-    (kept identical in v1 and v2 so results are comparable);
+    (kept identical in v1 and v2 so results are comparable). Futures
+    (`instrument_type: futures`): as many whole contracts as equity covers at
+    full contract value (raw price x multiplier, i.e. unlevered), slippage in
+    ticks, commission per contract; `quantity` is then contracts x multiplier,
+    so P&L = quantity x price change everywhere downstream;
   * v2 options: `entry_confirmation = positive_bar_return` also requires the
     signal bar's close > the previous bar's close; `cooldown_bars = N` requires
     the next signal bar to be at least N bars after the previous exit bar;
@@ -43,6 +47,7 @@ import polars as pl
 
 from src.engine.events import EquityPoint, ExitReason, Fill, Trade
 from src.engine.fills import _apply_slippage, _commission
+from src.data.futures import contract_spec
 from src.features.atr import wilder_atr
 from src.utils.config_models import ExecutionConfig
 
@@ -65,6 +70,9 @@ class MRData:
         self.low = df["low"].to_numpy().astype(float)
         self.close = df["close"].to_numpy().astype(float)
         self.n = df.height
+        # Back-adjusted futures: raw traded price = adjusted price - price_adj.
+        self.price_adj = (df["price_adjustment"].to_numpy().astype(float) if "price_adjustment" in df.columns
+                          else np.zeros(self.n))
         if "session_date_ny" in df.columns:
             sd = df["session_date_ny"]
         else:
@@ -77,6 +85,7 @@ class MRData:
         else:
             self.day_end_idx = np.array([], dtype=int)
         self.days = self.session_date[self.day_end_idx]
+        self.bar_open = df["bar_open_ts"].to_numpy()  # datetime64, for ordering trades across bar sizes
         self._df = df
         self._close_s = df["close"]
         self._cache: dict[tuple, np.ndarray] = {}
@@ -190,6 +199,9 @@ def scale_variable_costs(exec_config: ExecutionConfig, multiplier: float) -> Exe
     compound. The per-order commission minimum is fixed and left unchanged."""
     return exec_config.model_copy(update={
         "commission_per_share": exec_config.commission_per_share * multiplier,
+        "commission_per_contract": exec_config.commission_per_contract * multiplier,
+        "slippage_ticks_market": exec_config.slippage_ticks_market * multiplier,
+        "slippage_ticks_stop": exec_config.slippage_ticks_stop * multiplier,
         "slippage_bps_market": exec_config.slippage_bps_market * multiplier,
         "slippage_bps_stop": exec_config.slippage_bps_stop * multiplier,
         "slippage_bps_limit_adverse": exec_config.slippage_bps_limit_adverse * multiplier,
@@ -219,6 +231,51 @@ def _whole_shares(equity: float, px: float, ec: ExecutionConfig) -> int:
     return q
 
 
+@dataclass(frozen=True)
+class CostModel:
+    """Fills, commissions and sizing for one symbol. Equity: bps slippage, per-share
+    commission, whole shares. Futures: tick slippage, per-contract commission,
+    whole contracts; quantities are in price units (contracts x multiplier)."""
+
+    ec: ExecutionConfig
+    multiplier: float = 1.0
+    tick: float = 0.0
+
+    @classmethod
+    def for_symbol(cls, ec: ExecutionConfig, symbol: str) -> "CostModel":
+        if ec.instrument_type == "futures":
+            spec = contract_spec(symbol)
+            return cls(ec, spec.multiplier, spec.tick_size)
+        return cls(ec)
+
+    @property
+    def futures(self) -> bool:
+        return self.ec.instrument_type == "futures"
+
+    def fill(self, px: float, action: str, *, stop: bool = False) -> float:
+        if not self.futures:
+            bps = self.ec.slippage_bps_stop if stop else self.ec.slippage_bps_market
+            return _apply_slippage(px, side="long", action=action, bps=bps, extended_hours=False, config=self.ec)
+        d = (self.ec.slippage_ticks_stop if stop else self.ec.slippage_ticks_market) * self.tick
+        return px + d if action == "buy" else px - d
+
+    def commission(self, qty: float) -> float:
+        if not self.futures:
+            return _commission(qty, self.ec)
+        return round(qty / self.multiplier) * self.ec.commission_per_contract
+
+    def size(self, equity: float, fill_px: float, raw_fill_px: float) -> float:
+        if not self.futures:
+            return _whole_shares(equity, fill_px, self.ec)
+        if not (raw_fill_px > 0 and math.isfinite(raw_fill_px)):
+            return 0
+        per = raw_fill_px * self.multiplier
+        n = math.floor(equity / per)
+        while n > 0 and n * (per + self.ec.commission_per_contract) > equity:
+            n -= 1
+        return n * self.multiplier
+
+
 def simulate_mean_reversion(
     data: MRData,
     cfg,
@@ -242,6 +299,7 @@ def simulate_mean_reversion(
     dip, signal, exit_sig = signal_arrays(data, cfg)
     o, lo, c, ts, n = data.open, data.low, data.close, data.ts, data.n
     ec = exec_config
+    costs = CostModel.for_symbol(ec, cfg.symbol)
     stop_mult = getattr(cfg, "stop_atr", None)
     cooldown = getattr(cfg, "cooldown_bars", 0)
     atr = data.atr if stop_mult is not None else None
@@ -274,8 +332,7 @@ def simulate_mean_reversion(
         if entry_idx >= n:
             break
         entry_px_raw = o[entry_idx]
-        entry_fill_px = _apply_slippage(entry_px_raw, side="long", action="buy", bps=ec.slippage_bps_market,
-                                        extended_hours=False, config=ec)
+        entry_fill_px = costs.fill(entry_px_raw, "buy")
         stop = float("nan")
         if stop_mult is not None:
             a_known = atr[entry_idx - 1]  # last ATR known before the entry fill
@@ -283,14 +340,14 @@ def simulate_mean_reversion(
                 i += 1  # ATR warm-up: no usable stop -> skip this signal
                 continue
             stop = entry_px_raw - stop_mult * a_known
-        qty = _whole_shares(equity, entry_fill_px, ec)
+        qty = costs.size(equity, entry_fill_px, entry_fill_px - data.price_adj[entry_idx])
         if qty <= 0:
             i += 1
             continue
         seq += 1
         entry_fill = Fill(
             order_id=f"e{seq}", symbol=cfg.symbol, side="long", quantity=qty, fill_price=entry_fill_px,
-            fill_ts=ts[entry_idx], commission=_commission(qty, ec),
+            fill_ts=ts[entry_idx], commission=costs.commission(qty),
             slippage_points=abs(entry_fill_px - entry_px_raw), bar_open_ts=ts[entry_idx],
         )
 
@@ -299,8 +356,7 @@ def simulate_mean_reversion(
         for j in range(entry_idx, n - 1):  # z/time exits fill at bar j+1's open
             if lo[j] <= stop:  # stop live from the entry bar; nan stop never triggers
                 base = min(o[j], stop)  # a gap through the stop fills at the worse open
-                exit_px = _apply_slippage(base, side="long", action="sell", bps=ec.slippage_bps_stop,
-                                          extended_hours=False, config=ec)
+                exit_px = costs.fill(base, "sell", stop=True)
                 decision, why, exit_idx = j, STOP_EXIT, j
                 break
             if exit_sig[j]:
@@ -313,17 +369,15 @@ def simulate_mean_reversion(
             pass
         elif decision >= 0:
             exit_idx = decision + 1
-            exit_px = _apply_slippage(o[exit_idx], side="long", action="sell", bps=ec.slippage_bps_market,
-                                      extended_hours=False, config=ec)
+            exit_px = costs.fill(o[exit_idx], "sell")
         else:  # data ended with the position open -> forced close at the last close
             exit_idx = n - 1
-            exit_px = _apply_slippage(c[exit_idx], side="long", action="sell", bps=ec.slippage_bps_market,
-                                      extended_hours=False, config=ec)
+            exit_px = costs.fill(c[exit_idx], "sell")
         forced = decision < 0
 
         exit_fill = Fill(
             order_id=f"x{seq}", symbol=cfg.symbol, side="long", quantity=qty, fill_price=exit_px,
-            fill_ts=ts[exit_idx], commission=_commission(qty, ec), slippage_points=0.0, bar_open_ts=ts[exit_idx],
+            fill_ts=ts[exit_idx], commission=costs.commission(qty), slippage_points=0.0, bar_open_ts=ts[exit_idx],
         )
         commissions = entry_fill.commission + exit_fill.commission
         realized = (exit_px - entry_fill_px) * qty - commissions

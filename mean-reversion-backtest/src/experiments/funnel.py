@@ -6,7 +6,7 @@ Stages (configs/funnel/mr_funnel.yaml holds every threshold):
   3  performance & risk           hard gate
   4  parameter stability          hard gate (+ perturbation diagnostics)
   5  time stability               light hard gate (+ in-sample diagnostics)
-  6  deduplication                representative selection (not a rejection)
+  6  deduplication                best-k representatives per cluster (not a rejection)
   7  execution stress             hard gate (+ diagnostics)
   8  frozen validation            hard gate, separate `validate` command
   9  statistical confidence       diagnostics only (DSR, QQQ transfer)
@@ -200,20 +200,23 @@ def cluster_by_correlation(ids: list[str], series: np.ndarray, *, threshold: flo
 
 
 def representative_key(rec: dict) -> tuple:
-    """Deterministic development-stage ordering: higher median neighbor Sharpe,
+    """Deterministic development-stage ordering: higher median stage-4 stability
+    Sharpe (grid neighbors, or local perturbations when that is the gate),
     more profitable dev years, higher dev Sharpe, then stable config_id."""
     def neg(x):
         return -x if x is not None else float("inf")
-    return (neg(rec.get("neighbor_median_sharpe")), neg(rec.get("n_profitable_years")),
+    stab = rec.get("stability_median_sharpe", rec.get("neighbor_median_sharpe"))
+    return (neg(stab), neg(rec.get("n_profitable_years")),
             neg(rec.get("dev_sharpe")), rec["config_id"])
 
 
-def select_representatives(recs: list[dict], cluster_of: dict[str, int]) -> list[dict]:
-    """One representative per cluster, returned in development ordering."""
+def select_representatives(recs: list[dict], cluster_of: dict[str, int], k: int = 1) -> list[dict]:
+    """The best `k` members of each cluster (all of them if it has fewer), returned
+    in development ordering."""
     by_cluster: dict[int, list[dict]] = {}
     for r in recs:
         by_cluster.setdefault(cluster_of[r["config_id"]], []).append(r)
-    reps = [min(members, key=representative_key) for members in by_cluster.values()]
+    reps = [r for members in by_cluster.values() for r in sorted(members, key=representative_key)[:k]]
     return sorted(reps, key=representative_key)
 
 

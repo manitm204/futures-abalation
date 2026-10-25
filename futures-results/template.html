@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Futures Strategy Funnels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #f4f6f8; --surface: #ffffff; --fg: #16202b; --muted: #5a6774; --line: #d8dfe6;
+  --accent: #2f6fb0; --accent-soft: #e3edf8; --pass: #2d7f52; --pass-soft: #e2f2e8;
+  --fail: #b93b35; --fail-soft: #f8e4e2; --warn: #9a6512; --warn-soft: #f6ecd9;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151b; --surface: #17202a; --fg: #e5ebf1; --muted: #95a3b1; --line: #2a3643;
+    --accent: #6ea9e6; --accent-soft: #1b2b3d; --pass: #5cbf89; --pass-soft: #16301f;
+    --fail: #ef7a71; --fail-soft: #3a1c1a; --warn: #e0a84a; --warn-soft: #33281a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151b; --surface: #17202a; --fg: #e5ebf1; --muted: #95a3b1; --line: #2a3643;
+  --accent: #6ea9e6; --accent-soft: #1b2b3d; --pass: #5cbf89; --pass-soft: #16301f;
+  --fail: #ef7a71; --fail-soft: #3a1c1a; --warn: #e0a84a; --warn-soft: #33281a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+.top { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+.top-inner { max-width: 1240px; margin: 0 auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab, .subtab { text-decoration: none; }
+.tab { font-family: var(--font-mono); font-size: 0.82rem; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--fg); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.tab[aria-current="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.tab.empty:not([aria-current="true"]) { color: var(--muted); }
+.tab .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+.tab.has .dot { background: var(--pass); }
+.subtabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.stable-views, .view-tabs { margin: 4px 0 14px; }
+.luck-chart { width: 100%; height: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 12px; }
+.luck-chart text { font-size: 11px; fill: var(--muted); font-family: var(--font-mono); }
+.luck-chart .grid { stroke: var(--line); stroke-width: 1; }
+.luck-chart .zero { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
+.luck-chart .band { fill: var(--accent-soft); stroke: none; }
+.luck-chart .mean { fill: none; stroke: var(--accent); stroke-width: 2; }
+.luck-chart .dot { fill: var(--muted); stroke: var(--surface); stroke-width: 1.5; }
+.luck-chart .dot.pass { fill: var(--pass); }
+.lk { font-family: var(--font-mono); font-size: 0.8rem; white-space: nowrap; color: var(--muted); display: inline-block; margin-right: 6px; }
+td.lk-cell { white-space: normal; min-width: 320px; }
+.lk.ok { color: var(--pass); font-weight: 600; }
+button.subtab { font: inherit; font-size: 0.85rem; }
+.subtab { font-size: 0.85rem; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.subtab[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); }
+
+.wrap { max-width: 1240px; margin: 0 auto; padding: 36px 16px 72px; display: flex; flex-direction: column; gap: 52px; }
+section, header.run { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(1.9rem, 5vw, 2.7rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.55rem; font-weight: 700; }
+h3 { font-size: 1.05rem; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.12rem; }
+.muted { color: var(--muted); }
+.mono, code { font-family: var(--font-mono); font-size: 0.9em; }
+
+.verdict { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line);
+  border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.verdict div { background: var(--surface); padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; }
+.verdict b { font-family: var(--font-display); font-size: 2.1rem; font-weight: 800; line-height: 1; }
+.verdict span { color: var(--muted); font-size: 0.92rem; }
+.verdict .zero b { color: var(--fail); } .verdict .few b { color: var(--warn); } .verdict .ok b { color: var(--pass); }
+.verdict.v4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 760px) { .verdict.v4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .verdict, .verdict.v4 { grid-template-columns: 1fr; } }
+
+.callout { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.formula { font-family: var(--font-mono); font-size: 0.9rem; background: var(--accent-soft); border-radius: 8px; padding: 10px 14px; overflow-x: auto; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.rule { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.rule .eyebrow { color: var(--accent); }
+.axes { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-family: var(--font-mono); font-size: 0.8rem; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); border: 1px solid var(--line); }
+
+.funnel { display: flex; flex-direction: column; gap: 10px; }
+.stage { display: grid; grid-template-columns: 200px minmax(0, 1fr) 84px; gap: 14px; align-items: center; }
+.stage .label { display: flex; flex-direction: column; line-height: 1.3; }
+.stage .label b { font-family: var(--font-display); font-size: 0.98rem; }
+.stage .label small { color: var(--muted); font-size: 0.82rem; }
+.track { height: 26px; background: var(--accent-soft); border-radius: 4px; }
+.bar { height: 100%; background: var(--accent); border-radius: 4px; min-width: 3px; }
+.stage.dead .bar { background: var(--fail); } .stage.last .bar { background: var(--warn); }
+.stage .count { font-family: var(--font-mono); text-align: right; font-weight: 500; font-variant-numeric: tabular-nums; }
+.stage.dead .count { color: var(--fail); } .stage.last .count { color: var(--warn); }
+.stage .why { grid-column: 2 / 4; font-size: 0.88rem; color: var(--muted); margin-top: -4px; max-width: none; }
+@media (max-width: 640px) {
+  .stage { grid-template-columns: minmax(0, 1fr) 72px; }
+  .stage .label, .stage .why { grid-column: 1 / 3; }
+}
+
+.patterns { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+.pat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.pat-row { display: grid; grid-template-columns: 64px minmax(0, 1fr) 30px; gap: 8px; align-items: center; font-size: 0.85rem; }
+.pat-row span:first-child { font-family: var(--font-mono); color: var(--muted); }
+.pat-row .t { height: 10px; background: var(--accent-soft); border-radius: 3px; }
+.pat-row .t i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.pat-row.zero span:first-child { opacity: 0.55; }
+.pat-row span:last-child { font-family: var(--font-mono); text-align: right; font-variant-numeric: tabular-nums; }
+
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.8rem; }
+th, td { padding: 6px 6px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; font-variant-numeric: tabular-nums; }
+th { font-family: var(--font-mono); font-weight: 500; font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+th.l, td.l { text-align: left; }
+th.grp { text-align: center; color: var(--fg); border-bottom: 2px solid var(--line); }
+td.sep, th.sep { border-left: 2px solid var(--line); }
+tbody tr:last-child td { border-bottom: 0; }
+tr.bench td { background: var(--accent-soft); color: var(--muted); font-style: italic; }
+tr.passrow td { background: var(--pass-soft); }
+td.neg { color: var(--fail); } td.pos { color: var(--pass); }
+.pill { display: inline-block; font-family: var(--font-mono); font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; background: var(--fail-soft); color: var(--fail); }
+.pill.ok { background: var(--pass-soft); color: var(--pass); }
+.pill.near { background: var(--warn-soft); color: var(--warn); }
+.why-cell { white-space: normal; min-width: 150px; text-align: left; color: var(--muted); font-size: 0.8rem; }
+.abl { width: 100%; font-size: 0.82rem; }
+.abl th, .abl td { padding: 3px 4px; border: 0; }
+.abl td.bar-cell { width: 38%; }
+.abl .t { height: 9px; background: var(--accent-soft); border-radius: 3px; }
+.abl .t i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.heat td { text-align: center; min-width: 58px; font-family: var(--font-mono); }
+.heat td.center { outline: 2px solid var(--fg); outline-offset: -2px; font-weight: 600; }
+.heat th.rowh { text-align: right; }
+ul.plain { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 8px; max-width: 72ch; }
+footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+.variants { gap: 10px; }
+.variant-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.variant { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); text-decoration: none; font-size: 0.88rem; }
+.variant b { font-size: 1.05rem; }
+.variant span { color: var(--muted); }
+.variant.on { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.eq-chart { width: 100%; height: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.eq-chart text { font-size: 11px; fill: var(--muted); font-family: var(--font-mono); }
+.eq-chart .grid { stroke: var(--line); } .eq-chart .zero { stroke: var(--muted); stroke-dasharray: 3 3; }
+.eq-chart .valzone { fill: var(--warn-soft); opacity: 0.6; } .eq-chart .zlabel { fill: var(--warn); }
+.eq-chart .band5 { fill: var(--accent-soft); opacity: 0.6; } .eq-chart .band10 { fill: var(--accent-soft); }
+.eq-chart .lmean { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.eq-chart .strat { fill: none; stroke: var(--pass); stroke-width: 2.2; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.8rem; color: var(--muted); margin: 6px 0 10px; }
+.legend .k { display: inline-block; width: 18px; height: 10px; margin-right: 6px; vertical-align: middle; border-radius: 2px; }
+.legend .k.strat { height: 3px; background: var(--pass); } .legend .k.lmean { height: 0; border-top: 2px dashed var(--accent); }
+.legend .k.band10 { background: var(--accent-soft); outline: 1px solid var(--line); } .legend .k.band5 { background: var(--accent-soft); opacity: 0.55; outline: 1px solid var(--line); }
+.period-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.period-bar .subtab { font-size: 0.92rem; padding: 6px 14px; }
+.verdict small { color: var(--muted); }
+.eq-chart .s1 { fill: none; stroke: var(--accent); stroke-width: 1.6; } .eq-chart .s2 { fill: none; stroke: var(--warn); stroke-width: 1.6; }
+.eq-chart .corr { fill: none; stroke: var(--fg); stroke-width: 1.4; }
+.legend .k.s1 { height: 3px; background: var(--accent); } .legend .k.s2 { height: 3px; background: var(--warn); } .legend .k.corr { height: 3px; background: var(--fg); }
+.corr-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .corr-grid { grid-template-columns: 1fr; } }
+.scatter { width: 100%; height: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.scatter text { font-size: 10px; fill: var(--muted); font-family: var(--font-mono); }
+.scatter .grid { stroke: var(--line); } .scatter .zero { stroke: var(--muted); }
+.scatter .pt.both { fill: var(--accent); fill-opacity: 0.55; } .scatter .pt.one { fill: var(--muted); fill-opacity: 0.35; }
+.legend .k.ptboth { width: 10px; border-radius: 50%; background: var(--accent); opacity: 0.6; } .legend .k.ptone { width: 10px; border-radius: 50%; background: var(--muted); opacity: 0.45; }
+.empty-card { background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; padding: 28px; display: flex; flex-direction: column; gap: 10px; }
+</style>
+</head>
+<body>
+<div class="top"><div class="top-inner">
+  <div class="brand">Futures strategy funnels</div>
+  <nav class="tabs" id="markets" aria-label="Markets"></nav>
+  <nav class="subtabs" id="strategies" aria-label="Strategies"></nav>
+</div></div>
+<main class="wrap" id="page"></main>
+
+<script>
+const DATA = /*__DATA__*/null;
+
+const $ = (h) => { const t = document.createElement("template"); t.innerHTML = h.trim(); return t.content; };
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = {
+  n: v => v == null ? "–" : Math.round(v).toLocaleString("en-US"),
+  pct: (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(100 * v).toFixed(d) + "%",
+  pctu: (v, d = 1) => v == null ? "–" : (100 * v).toFixed(d) + "%",
+  x: (v, d = 2) => v == null ? "–" : (v < 0 ? "−" : "") + Math.abs(v).toFixed(d),
+};
+const tone = v => v == null ? "" : v < 0 ? "neg" : v > 0 ? "pos" : "";
+const yr = p => p.slice(0, 4);
+const span = p => `${yr(p[0])}–${yr(p[1])}`;
+
+function route() {
+  const [m, s, v] = decodeURIComponent(location.hash.slice(1)).split("/");
+  const withData = DATA.markets.find(x => DATA.runs.some(r => r.market === x.code));
+  const market = DATA.markets.find(x => x.code === m) || withData || DATA.markets[0];
+  const runs = DATA.runs.filter(r => r.market === market.code);
+  const keys = [...new Set(runs.map(r => r.strategy_key))];
+  const key = keys.includes(s) ? s : keys[keys.length - 1];
+  // Runs sharing a strategy key are variants (e.g. one per bar size) shown side by side.
+  const variants = runs.filter(r => r.strategy_key === key);
+  const run = variants.find(r => r.variant === v) || variants[0] || null;
+  return { market, runs, keys, variants, run };
+}
+
+function renderNav({ market, runs, keys, run }) {
+  const nav = document.getElementById("markets");
+  nav.replaceChildren();
+  DATA.markets.forEach(m => {
+    const has = DATA.runs.some(r => r.market === m.code);
+    const a = document.createElement("a");
+    a.className = "tab" + (has ? " has" : " empty");
+    a.href = "#" + m.code;
+    a.title = m.name + (has ? "" : " · not run yet");
+    a.setAttribute("aria-current", m.code === market.code);
+    a.innerHTML = `<span class="dot"></span>${esc(m.code)}`;
+    nav.appendChild(a);
+  });
+  const sub = document.getElementById("strategies");
+  sub.replaceChildren();
+  keys.forEach(k => {
+    const r = runs.find(x => x.strategy_key === k);
+    const a = document.createElement("a");
+    a.className = "subtab"; a.href = `#${r.market}/${k}`;
+    a.setAttribute("aria-current", run && k === run.strategy_key);
+    a.textContent = r.strategy_name;
+    sub.appendChild(a);
+  });
+}
+
+function renderVariants(variants, run) {
+  if (variants.length < 2) return "";
+  const best = r => Math.max(...r.finalists.filter(f => f.status === "pass").map(f => f.val.sharpe), -Infinity);
+  return `<section class="variants">
+    <span class="eyebrow">This version is ${variants.length} separate runs, each with its own grid</span>
+    <div class="variant-grid">${variants.map(r => {
+      const F = r.funnel, b = best(r);
+      return `<a class="variant${r === run ? " on" : ""}" href="#${esc(r.market)}/${esc(r.strategy_key)}/${esc(r.variant)}" aria-current="${r === run}">
+        <b>${esc(r.variant_label || r.variant)}</b>
+        <span>${F[0].n.toLocaleString("en-US")} versions · ${F[F.length - 2].n} finalists</span>
+        <span><strong>${F[F.length - 1].n}</strong> passed validation${isFinite(b) ? ` · best Sharpe ${fmt.x(b)}` : ""}</span>
+      </a>`;
+    }).join("")}</div>
+  </section>`;
+}
+
+function renderEmpty(market) {
+  return `<section class="empty-card">
+    <span class="eyebrow">${esc(market.code)} · ${esc(market.name)}</span>
+    <h2>Not run yet</h2>
+    <p class="muted">This market will go through the same screening funnel: integrity, enough trades, profit, stable settings, time stability, duplicate removal, cost stress and then validation. Results will appear here once its run is exported.</p>
+  </section>`;
+}
+
+function renderRun(r) {
+  const dev = span(r.periods.dev), val = span(r.periods.val);
+  const F = r.funnel, total = F[0].n, finalists = r.finalists;
+  const nFrozen = F[F.length - 2].n, nPass = F[F.length - 1].n;
+  const passed = finalists.filter(f => f.status === "pass");
+  const verdictCls = nPass === 0 ? "zero" : nPass <= 2 ? "few" : "ok";
+
+  const head = `<header class="run">
+    <span class="eyebrow">${esc(r.market)} · ${esc(r.strategy_name)}${r.variant ? " · " + esc(r.variant_label || r.variant) : ""} · run ${esc(r.run_id)} · ${esc(r.generated_at.slice(0, 10))}</span>
+    <h1>${esc(r.market_name)}: ${nPass} of ${total.toLocaleString("en-US")} versions passed validation</h1>
+    <p class="lede">We tested ${total.toLocaleString("en-US")} versions of the strategy on ${esc(r.market)} with the standard screening funnel. ${nFrozen} looked good on ${dev} data and went forward frozen; ${nPass} of them also passed on ${val}.</p>
+    <div class="verdict">
+      <div><b>${total.toLocaleString("en-US")}</b><span>strategy versions tested</span></div>
+      <div><b>${nFrozen}</b><span>finalists from ${dev}</span></div>
+      <div class="${verdictCls}"><b>${nPass}</b><span>passed on ${val}</span></div>
+    </div>
+  </header>`;
+
+  const notes = r.notes_html ? `<section><span class="eyebrow">What we found</span><div class="callout">${r.notes_html}</div></section>` : "";
+
+  const S = r.strategy;
+  const strat = `<section>
+    <span class="eyebrow">The strategy</span>
+    <h2>What the strategy does</h2>
+    <p>${esc(S.summary)}</p>
+    <div class="formula">${esc(S.formula)}</div>
+    <div class="rules">${S.rules.map(x => `<div class="rule"><span class="eyebrow">${esc(x.label)}</span><p>${esc(x.text)}</p></div>`).join("")}</div>
+    <h3 style="margin-top:8px">The ${S.axes.length} settings we varied</h3>
+    <p class="muted">Every combination was tested: ${S.axes.map(a => a.values.length).join(" × ")} = ${S.grid_size.toLocaleString("en-US")}. All lengths are in bars.</p>
+    <div class="axes">${S.axes.map(a => `<span class="chip">${esc(a.label.toLowerCase())}: ${a.values.map(esc).join(" · ")}</span>`).join("")}</div>
+  </section>`;
+
+  const logW = n => n <= 0 ? 0 : Math.max(0.4, 100 * Math.log10(n) / Math.log10(total));
+  const funnel = `<section>
+    <span class="eyebrow">The screening funnel</span>
+    <h2>How ${total.toLocaleString("en-US")} became ${nPass}</h2>
+    <p>Each stage removes versions that fail one test. Stages 1–7 use only ${dev} data; stage 8 is the first look at ${val}. Bars use a log scale so the small numbers stay visible.</p>
+    <div class="funnel">${F.map((s, k) => `<div class="stage${s.n === 0 ? " dead" : k === F.length - 1 ? " last" : ""}">
+        <div class="label"><b>${esc(s.name)}</b><small>${esc(s.sub)}</small></div>
+        <div class="track"><div class="bar" style="width:${logW(s.n)}%"></div></div>
+        <div class="count">${s.n.toLocaleString("en-US")}</div>
+        <p class="why">${esc(s.why)}</p></div>`).join("")}</div>
+  </section>`;
+
+  const A = r.ablation;
+  const ablation = !A ? "" : `<section>
+    <span class="eyebrow">Ablation · ${dev} only</span>
+    <h2>What each setting did across all ${total.toLocaleString("en-US")} versions</h2>
+    <p>For every value of every setting: the share of versions using it that made money, their median Sharpe, and how many reached the finalists. A setting matters when its values differ a lot. Validation data is not used here.</p>
+    <div class="patterns">${A.map(a => {
+      const max = Math.max(0.01, ...a.values.map(v => v.pct_profitable));
+      return `<div class="pat"><h3>${esc(a.label)}</h3><table class="abl">
+        <thead><tr><th class="l">Value</th><th class="l">% profitable</th><th></th><th>Med SR</th><th>Final</th></tr></thead>
+        <tbody>${a.values.map(v => `<tr><td class="l mono">${esc(v.v)}</td>
+          <td class="bar-cell"><div class="t"><i style="width:${100 * v.pct_profitable / max}%"></i></div></td>
+          <td>${fmt.pctu(v.pct_profitable, 0)}</td><td class="${tone(v.median_sharpe)}">${fmt.x(v.median_sharpe)}</td><td>${v.n_survivors}</td></tr>`).join("")}</tbody>
+      </table></div>`;
+    }).join("")}</div>
+    <p class="muted">"Final" counts versions that made it through stages 1–7 to the frozen finalists.</p>
+  </section>`;
+
+  const LM = r.length_map;
+  const heatBg = v => v == null ? "transparent" : v >= 0.5 ? "var(--pass-soft)" : v > 0 ? "var(--warn-soft)" : "var(--fail-soft)";
+  const lengthMap = !LM ? "" : `<section>
+    <span class="eyebrow">Average length × volatility length</span>
+    <h2>How finalist #${LM.order} behaves around its lengths</h2>
+    <p>${dev} Sharpe for every average and volatility length in the grid, with all other settings fixed at finalist #${LM.order}'s values (${Object.entries(LM.fixed).map(([k, v]) => `${esc(k.toLowerCase())} ${esc(v)}`).join(", ")}). The outlined cell is the finalist. A real edge should show a patch of green around it, not a single green cell. Hover for the trade count.</p>
+    <div class="table-wrap"><table class="heat">
+      <thead><tr><th class="rowh">Avg ↓ · Vol →</th>${LM.cols.map(c => `<th style="text-align:center">${c}</th>`).join("")}</tr></thead>
+      <tbody>${LM.rows.map((m, i) => `<tr><th class="rowh">${m}</th>${LM.cols.map((v, j) => {
+        const x = LM.sharpe[i][j], c = LM.center[0] === m && LM.center[1] === v;
+        return `<td class="${c ? "center" : ""}" style="background:${heatBg(x)}" title="avg ${m}, vol ${v}: ${LM.trades[i][j] ?? 0} trades">${fmt.x(x)}</td>`;
+      }).join("")}</tr>`).join("")}</tbody>
+    </table></div>
+    <p class="muted">Green is Sharpe ≥ 0.5, amber profitable below 0.5, red losing, "–" means no trades.</p>
+  </section>`;
+
+  const st = r.stable;
+  const local = r.stability_mode === "local_perturbation";
+  const cards = axes => `<div class="patterns">${axes.map(a => {
+      const max = Math.max(1, ...a.values.map(v => v.n));
+      return `<div class="pat"><h3>${esc(a.label)}</h3>${a.values.map(v => `<div class="pat-row${v.n ? "" : " zero"}" title="${v.n ? `median ${dev} Sharpe ${fmt.x(v.median_sharpe)}` : "none"}">
+        <span>${esc(v.v)}</span><div class="t"><i style="width:${100 * v.n / max}%"></i></div><span>${v.n}</span></div>`).join("")}</div>`;
+    }).join("")}</div>`;
+  const views = [{key: "all", label: "All bar sizes", n: st.n, axes: st.axes},
+    ...(st.by_timeframe || []).map(t => ({key: t.timeframe, label: t.timeframe, n: t.n, axes: t.axes}))];
+  const multi = views.length > 2;
+  const stable = `<section>
+    <span class="eyebrow">Stable settings</span>
+    <h2>The ${st.n} versions that passed the stable-settings test</h2>
+    <p>${local
+      ? "These cleared the trade-count and profit tests, and still worked when each setting was nudged slightly up and down (see the local-move table further down)."
+      : "These cleared the trade-count and profit tests, and their immediate neighbors (one setting moved one step) also mostly made money."} Each card counts how many of them used each value. Values with 0 never got this far. Hover a row for the median ${dev} Sharpe of those versions.${multi ? " Pick a bar size to see what each one prefers." : ""}</p>
+    ${multi ? `<div class="subtabs stable-views" role="tablist">${views.map((v, i) =>
+      `<button type="button" class="subtab" role="tab" data-stable-view="${esc(v.key)}" aria-current="${i === 0}">${esc(v.label)} <span class="muted">${v.n}</span></button>`).join("")}</div>` : ""}
+    ${views.map((v, i) => `<div class="stable-view" data-stable-panel="${esc(v.key)}"${i === 0 ? "" : " hidden"}>${cards(v.axes)}</div>`).join("")}
+  </section>`;
+
+  const keys = Object.keys(finalists[0]?.settings || {});
+  const statCols = [["net_return", "Return", v => fmt.pct(v), true], ["sharpe", "Sharpe", v => fmt.x(v), true],
+    ["max_drawdown", "Max DD", v => fmt.pct(v), false], ["n_completed_trades", "Trades", v => fmt.n(v), false],
+    ["win_rate", "Win", v => fmt.pctu(v, 0), false], ["profit_factor", "PF", v => fmt.x(v), false],
+    ["exposure", "In mkt", v => fmt.pctu(v), false]];
+  const cells = (m, first) => statCols.map(([k, , f, t], i) =>
+    `<td class="${i === 0 ? "sep " : ""}${t ? tone(m[k]) : ""}">${f(m[k])}</td>`).join("");
+  const pill = f => f.status === "pass" ? `<span class="pill ok">pass</span>`
+    : `<span class="pill${f.val.net_return > 0 ? " near" : ""}" title="${esc(f.reasons.join("; "))}">fail</span>`;
+  const B = r.benchmark;
+  const benchCells = m => statCols.map(([k, , f], i) => `<td class="${i === 0 ? "sep" : ""}">${k in m ? f(m[k]) : ""}</td>`).join("");
+  const luckTone = p => p == null ? "" : p >= 0.95 ? "pos" : p < 0.5 ? "neg" : "";
+  const table = `<section>
+    <span class="eyebrow">The out-of-sample check</span>
+    <h2>The ${finalists.length} finalists on ${dev} vs ${val}</h2>
+    <p class="muted">Ordered by their ${dev} rank; ${val} results were never used to re-rank. "In mkt" is the share of bars with an open position. "Grp" is the duplicate group. Pass marks on ${val}: net &gt; 0, Sharpe ≥ ${(r.validation_rules || {}).min_sharpe ?? 0.3}, drawdown no worse than ${Math.abs(100 * ((r.validation_rules || {}).max_drawdown ?? -0.3))}% and at least ${(r.validation_rules || {}).min_completed_trades ?? 60} trades. The shaded row is simply holding ${esc(r.market)}.</p>
+    <div class="table-wrap wide"><table>
+      <thead>
+        <tr><th colspan="${keys.length + 2}" class="grp l">Settings</th><th colspan="${statCols.length}" class="grp sep">Development ${dev}</th><th colspan="${statCols.length}" class="grp sep">Validation ${val}</th><th colspan="${r.luck ? 2 : 1}" class="grp sep">Result</th></tr>
+        <tr><th>#</th><th>Grp</th>${keys.map(k => `<th class="l">${esc(r.short_labels[k] || k)}</th>`).join("")}
+          ${statCols.map(([, l], i) => `<th class="${i === 0 ? "sep" : ""}">${l}</th>`).join("")}
+          ${statCols.map(([, l], i) => `<th class="${i === 0 ? "sep" : ""}">${l}</th>`).join("")}
+          <th class="sep l">Status</th>${r.luck ? `<th title="Share of random-entry runs (same bar size and time in market) with a lower ${val} Sharpe">Beats luck</th>` : ""}</tr>
+      </thead>
+      <tbody>
+        ${finalists.map(f => `<tr class="${f.status === "pass" ? "passrow" : ""}"><td>${f.order}</td><td>${f.group}</td>
+          ${keys.map(k => `<td class="l">${esc(f.settings[k])}</td>`).join("")}
+          ${cells(f.dev)}${cells(f.val)}
+          <td class="sep l">${pill(f)}</td>${r.luck ? `<td class="${luckTone(f.luck?.luck_pct_sharpe)}">${f.luck ? fmt.pctu(f.luck.luck_pct_sharpe, 0) : "–"}</td>` : ""}</tr>`).join("")}
+        <tr class="bench"><td colspan="${keys.length + 2}" class="l">${esc(B.label)}</td>${benchCells(B.dev)}${benchCells(B.val)}<td class="sep"></td>${r.luck ? "<td></td>" : ""}</tr>
+      </tbody>
+    </table></div>
+    <h3 style="margin-top:8px">Robustness checks on the finalists (${dev})</h3>
+    <p class="muted">${local ? `"Local prof" and "Local SR" are the share of nudged versions that made money and their median Sharpe (the stage-4 gate). ` : ""}"Grid SR" is the median Sharpe of the one-step grid neighbors${local ? " (shown for reference only)" : ""}. "1.5× cost" is the ${dev} return with costs raised 50%. "Break-even" is how many times today's costs it takes to wipe out the profit. "${esc(r.transfer_symbol || "Transfer")} SR" runs the same rules unchanged on ${esc(r.transfer_symbol || "another market")}. "Exits" counts how trades ended: z recovered / max hold / stop.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Status</th>${local ? "<th>Local prof</th><th>Local SR</th>" : ""}<th>Grid SR</th><th>1.5× cost</th><th>Break-even</th><th>${esc(r.transfer_symbol || "Transfer")} SR</th><th class="l">Exits z / time / stop</th><th class="l">Why it failed validation</th></tr></thead>
+      <tbody>${finalists.map(f => `<tr><td>${f.order}</td><td>${pill(f)}</td>${local ? `<td>${fmt.pctu(f.local_frac_profitable, 0)}</td><td>${fmt.x(f.local_median_sharpe)}</td>` : ""}<td>${fmt.x(f.neighbor_median_sharpe)}</td>
+        <td class="${tone(f.stress_1_5x)}">${fmt.pct(f.stress_1_5x)}</td><td>${f.breakeven_cost_x == null ? "–" : f.breakeven_cost_x.toFixed(1) + "×"}</td>
+        <td class="${tone(f.transfer_sharpe)}">${fmt.x(f.transfer_sharpe)}</td>
+        <td class="l mono">${f.exits.z} / ${f.exits.time} / ${f.exits.stop}</td>
+        <td class="why-cell">${esc(f.reasons.join("; ") || "–")}</td></tr>`).join("")}</tbody>
+    </table></div>
+  </section>`;
+
+  const MOVES = [["mean_lookback", "Avg len"], ["std_lookback", "Vol len"], ["entry_z", "Entry z"],
+                 ["exit_z", "Exit z"], ["max_hold", "Max hold"], ["stop_atr", "Stop"]];
+  const heat = v => v == null ? "" : v >= 0.5 ? "var(--pass-soft)" : v > 0 ? "var(--warn-soft)" : "var(--fail-soft)";
+  const localTable = !local ? "" : `<section>
+    <span class="eyebrow">The stable-settings test, up close</span>
+    <h2>Every local nudge for the ${finalists.length} finalists</h2>
+    <p class="muted">${dev} Sharpe of each finalist with one setting nudged down (first) and up (second), everything else unchanged. Hover a cell for the exact value, return and trade count. Green is Sharpe ≥ 0.5, amber is profitable but below 0.5, red lost money. The gate looks at the share that are profitable and the median, so a finalist can pass even when one setting has a cliff on both sides. Look for a red pair in one column.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Status</th><th class="sep">Own SR</th>${MOVES.map(([, l]) => `<th colspan="2" class="sep" style="text-align:center">${l} − / +</th>`).join("")}</tr></thead>
+      <tbody>${finalists.map(f => {
+        const d = f.local_detail || [];
+        return `<tr><td>${f.order}</td><td>${pill(f)}</td><td class="sep">${fmt.x(f.dev.sharpe)}</td>${MOVES.map(([k]) => {
+          const ms = d.filter(m => m.move.startsWith(k + "="));
+          if (!ms.length) return `<td class="sep muted">–</td><td class="muted">–</td>`;
+          return ms.map((m, i) => `<td class="${i === 0 ? "sep" : ""}" style="background:${heat(m.sharpe)}" title="${esc(m.move)}: return ${fmt.pct(m.net_return)}, ${m.trades} trades">${fmt.x(m.sharpe)}</td>`).join("");
+        }).join("")}</tr>`;
+      }).join("")}</tbody>
+    </table></div>
+  </section>`;
+
+  const TF_ORDER = ["5min", "15min", "1h"];
+  const L = r.luck && {...r.luck, curves: [...r.luck.curves].sort((a, b) => TF_ORDER.indexOf(a.timeframe) - TF_ORDER.indexOf(b.timeframe))};
+  const luckChart = (c) => {
+    const W = 720, H = 260, P = {l: 44, r: 12, t: 12, b: 34};
+    const fs = finalists.filter(f => f.luck && f.settings.timeframe === c.timeframe);
+    const xs = c.rows.map(q => q.exposure_pct), ys = [];
+    c.rows.forEach(q => ys.push(q.p10_sharpe, q.p90_sharpe));
+    fs.forEach(f => ys.push(f.val.sharpe));
+    const xlo = Math.min(...xs, ...fs.map(f => 100 * f.val.exposure)) - 0.5, xhi = Math.max(...xs, ...fs.map(f => 100 * f.val.exposure)) + 0.5;
+    const ylo = Math.floor(Math.min(0, ...ys.filter(isFinite)) * 2) / 2, yhi = Math.ceil(Math.max(0.5, ...ys.filter(isFinite)) * 2) / 2;
+    const X = v => P.l + (v - xlo) / (xhi - xlo) * (W - P.l - P.r), Y = v => P.t + (yhi - v) / (yhi - ylo) * (H - P.t - P.b);
+    const band = c.rows.map(q => `${X(q.exposure_pct)},${Y(q.p90_sharpe)}`).concat([...c.rows].reverse().map(q => `${X(q.exposure_pct)},${Y(q.p10_sharpe)}`)).join(" ");
+    const line = c.rows.map(q => `${X(q.exposure_pct)},${Y(q.mean_sharpe)}`).join(" ");
+    const yt = []; for (let v = ylo; v <= yhi + 1e-9; v += 0.5) yt.push(v);
+    const xstep = Math.max(1, Math.ceil(xs.length / 12)), xt = xs.filter((_, i) => i % xstep === 0);
+    return `<svg class="luck-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Random-entry Sharpe band vs finalists, ${esc(c.timeframe)}">
+      ${yt.map(v => `<line x1="${P.l}" x2="${W - P.r}" y1="${Y(v)}" y2="${Y(v)}" class="${v === 0 ? "zero" : "grid"}"/><text x="${P.l - 6}" y="${Y(v) + 4}" text-anchor="end">${fmt.x(v, 1)}</text>`).join("")}
+      ${xt.map(v => `<text x="${X(v)}" y="${H - P.b + 16}" text-anchor="middle">${v}%</text>`).join("")}
+      <text x="${(P.l + W - P.r) / 2}" y="${H - 4}" text-anchor="middle">time in market (${val})</text>
+      <polygon points="${band}" class="band"/><polyline points="${line}" class="mean"/>
+      ${fs.map(f => `<circle cx="${X(100 * f.val.exposure)}" cy="${Y(f.val.sharpe)}" r="5" class="${f.status === "pass" ? "dot pass" : "dot"}"><title>#${f.order} (${f.status === "pass" ? "passed" : "failed"}): ${fmt.pctu(f.val.exposure)} in market, Sharpe ${fmt.x(f.val.sharpe)}, return ${fmt.pct(f.val.net_return)}; beats ${fmt.pctu(f.luck.luck_pct_sharpe, 0)} of random runs</title></circle>`).join("")}
+    </svg>`;
+  };
+  const luckTable = c => {
+    const fs = finalists.filter(f => f.luck && f.settings.timeframe === c.timeframe);
+    return `<div class="table-wrap"><table>
+      <thead><tr><th>Time in mkt</th><th>Trades</th><th class="sep">Avg return</th><th>Return p10 – p90</th><th class="sep">Avg Sharpe</th><th>Sharpe p10 – p90</th><th>% profitable</th><th class="sep l">Finalists here: Sharpe (beats luck)</th></tr></thead>
+      <tbody>${c.rows.map(q => {
+        const here = fs.filter(f => f.luck.exposure_level === q.exposure_pct);
+        return `<tr><td>${q.exposure_pct}%</td><td>${fmt.n(q.mean_trades)}</td><td class="sep ${tone(q.mean_return)}">${fmt.pct(q.mean_return)}</td><td class="mono">${fmt.pct(q.p10_return)} – ${fmt.pct(q.p90_return)}</td>
+          <td class="sep ${tone(q.mean_sharpe)}">${fmt.x(q.mean_sharpe)}</td><td class="mono">${fmt.x(q.p10_sharpe)} – ${fmt.x(q.p90_sharpe)}</td><td>${fmt.pctu(q.frac_profitable, 0)}</td>
+          <td class="sep l lk-cell">${here.map(f => `<span class="lk ${f.status === "pass" ? "ok" : ""}" title="return ${fmt.pct(f.val.net_return)}, beats ${fmt.pctu(f.luck.luck_pct_return, 0)} on return">#${f.order} ${fmt.x(f.val.sharpe)} (${fmt.pctu(f.luck.luck_pct_sharpe, 0)})</span>`).join(" ") || '<span class="muted">–</span>'}</td></tr>`;
+      }).join("")}</tbody>
+    </table></div>`;
+  };
+  const luckMulti = L && L.curves.length > 1;
+  const luckSection = !L ? "" : `<section>
+    <span class="eyebrow">Better than luck?</span>
+    <h2>Finalists vs random entries at the same time in market</h2>
+    <p>For every whole-percent time in market from ${L.levels[0]}% to ${L.levels[L.levels.length - 1]}% (the finalists' ${val} range), ${L.n_sims} random runs buy ${esc(r.market)} at random bars and hold each trade a random ${L.hold_bars[0]}–${L.hold_bars[1]} bars. Trades never overlap, and together they cover exactly that share of bars. They pay the same costs and use the same sizing and Sharpe math as the strategy. The band is the middle 80% of random Sharpes (10th to 90th percentile), the line is their average, and dots are finalists (green passed validation). "Beats luck" is the share of random runs at the finalist's own bar size and time in market that it beat on Sharpe. Around 50% means no better than random entries, and 95%+ starts to look like an edge. With ${finalists.length} finalists, a few will clear 90% by chance alone.</p>
+    ${luckMulti ? `<div class="subtabs view-tabs" role="tablist">${L.curves.map((c, i) => `<button type="button" class="subtab" role="tab" data-view="luck:${esc(c.timeframe)}" aria-current="${i === 0}">${esc(c.timeframe)}</button>`).join("")}</div>` : ""}
+    ${L.curves.map((c, i) => `<div data-panel="luck:${esc(c.timeframe)}"${i === 0 ? "" : " hidden"}>
+      ${luckMulti ? "" : `<h3>${esc(c.timeframe)} bars</h3>`}${luckChart(c)}${luckTable(c)}</div>`).join("")}
+  </section>`;
+
+  const assumptions = `<section>
+    <span class="eyebrow">Read this before trusting the numbers</span>
+    <h2>Assumptions and limits</h2>
+    <ul class="plain">${r.assumptions.map(a => `<li>${esc(a)}</li>`).join("")}
+      <li>Luck check: across ${r.dsr.raw_trials.toLocaleString("en-US")} versions the Deflated Sharpe test estimates about ${Math.round(r.dsr.effective_trials).toLocaleString("en-US")} truly different tries. That calibration has not been reviewed yet, so the finalists' scores are reported in the run folder but not used as a pass mark.</li>
+    </ul>
+  </section>
+  <footer>Source: <span class="mono">${esc(r.source)}</span>. Development ${dev}, validation ${val}. Generated ${esc(r.generated_at)}.</footer>`;
+
+  return head + notes + strat + funnel + ablation + stable + table + luckSection + lengthMap + localTable + assumptions;
+}
+
+
+function renderPortfolio(r, pk) {
+  const PER = r.periods, P = PER[pk] ? pk : Object.keys(PER)[0], [a, b] = PER[P].range;
+  const days = r.days.slice(a, b + 1), n = days.length;
+  const vIdx = P === "all" ? days.findIndex(d => d >= r.validation_start) : -1;
+  const yr = PER[P].label;
+  const rebase = eq => { const s = eq.slice(a, b + 2), z = s[0]; return s.map(v => v / z); };
+  const stg = (o) => `${o.timeframe} ${o.mean_type.toUpperCase()} ${o.mean_lookback}/${o.std_lookback}, entry ${o.entry_z}, exit ${o.exit_z}, hold ${o.max_holding_bars}, ${o.entry_confirmation === "none" ? "no confirmation" : "up bar"}, ${o.stop_atr_multiple === "none" ? "no stop" : o.stop_atr_multiple.replace(".0", "") + "× ATR stop"}`;
+  const W = 760, H = 300, PAD = {l: 52, r: 14, t: 14, b: 28};
+  const X = i => PAD.l + i / Math.max(1, n) * (W - PAD.l - PAD.r);
+  const xTicks = () => { const t = []; days.forEach((d, i) => { const k = n > 600 ? d.slice(0, 4) : d.slice(0, 7); const prev = i ? (n > 600 ? days[i - 1].slice(0, 4) : days[i - 1].slice(0, 7)) : null;
+    if (i === 0 || (k !== prev && (n > 600 || ["01", "04", "07", "10"].includes(d.slice(5, 7))))) t.push([i, n > 600 ? k : (d.slice(5, 7) === "01" ? d.slice(0, 4) : d.slice(0, 7))]); }); return t; };
+  const frame = (lo, hi, Y, fmtY, ys) => {
+    const yt = []; for (let v = Math.ceil(lo / ys) * ys; v <= hi + 1e-9; v += ys) yt.push(+v.toFixed(3));
+    return `${vIdx > 0 ? `<rect x="${X(vIdx)}" y="${PAD.t}" width="${X(n) - X(vIdx)}" height="${H - PAD.t - PAD.b}" class="valzone"/><text x="${X(vIdx) + 6}" y="${PAD.t + 12}" class="zlabel">validation</text>` : ""}
+      ${yt.map(v => `<line x1="${PAD.l}" x2="${W - PAD.r}" y1="${Y(v)}" y2="${Y(v)}" class="${Math.abs(v) < 1e-9 ? "zero" : "grid"}"/><text x="${PAD.l - 6}" y="${Y(v) + 4}" text-anchor="end">${fmtY(v)}</text>`).join("")}
+      ${xTicks().map(([i, y]) => `<text x="${X(i)}" y="${H - 8}" text-anchor="start">${y}</text>`).join("")}`;
+  };
+  const step = Math.max(1, Math.floor(n / 380));
+  const pts = (arr, Y) => arr.map((v, i) => v == null ? null : (i % step === 0 || i === arr.length - 1) ? `${X(i).toFixed(1)},${Y(v).toFixed(1)}` : null).filter(Boolean);
+  const pctY = v => `${v > 0 ? "+" : ""}${Math.round(v * 100)}%`;
+  const range = arr => { const f = arr.filter(v => v != null && isFinite(v)); return [Math.min(...f), Math.max(...f)]; };
+  const ystep = span => span > 1 ? 0.2 : span > 0.4 ? 0.1 : span > 0.15 ? 0.05 : 0.02;
+
+  const eqChart = (block, title) => {
+    const L = block.periods[P].luck, bnd = L.band, eq = rebase(block.equity);
+    let [lo, hi] = range([...eq, ...bnd.p5, ...bnd.p95].map(v => v - 1));
+    const ys = ystep(hi - lo); lo = Math.floor(lo / ys) * ys; hi = Math.ceil(hi / ys) * ys;
+    const Y = v => PAD.t + (hi - v) / (hi - lo) * (H - PAD.t - PAD.b), Yq = v => Y(v - 1);
+    const area = (u, d) => [...pts(u, Yq), ...pts(d, Yq).reverse()].join(" ");
+    return `<svg class="eq-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)} equity vs random entries">
+      ${frame(lo, hi, Y, pctY, ys)}
+      <polygon points="${area(bnd.p95, bnd.p5)}" class="band5"/><polygon points="${area(bnd.p90, bnd.p10)}" class="band10"/>
+      <polyline points="${pts(bnd.mean, Yq).join(" ")}" class="lmean"/><polyline points="${pts(eq, Yq).join(" ")}" class="strat"/>
+    </svg>
+    <div class="legend"><span><i class="k strat"></i>${esc(title)}</span><span><i class="k lmean"></i>random entries, average</span><span><i class="k band10"></i>random, 10th–90th pct</span><span><i class="k band5"></i>random, 5th–95th pct</span></div>`;
+  };
+  const cols = [["net_return", "Return", v => fmt.pct(v), true], ["cagr", "CAGR", v => fmt.pct(v), true], ["sharpe", "Sharpe", v => fmt.x(v), true],
+    ["max_drawdown", "Max DD", v => fmt.pct(v), false], ["n_completed_trades", "Trades", v => fmt.n(v), false],
+    ["profit_factor", "PF", v => fmt.x(v), false], ["win_rate", "Win", v => fmt.pctu(v, 0), false], ["exposure", "In mkt", v => fmt.pctu(v), false]];
+  const row = (label, st, cls = "", luck = null) => `<tr class="${cls}"><td class="l">${label}</td>${cols.map(([k, , f, t]) => `<td class="${t ? tone(st[k]) : ""}">${st[k] == null ? "–" : f(st[k])}</td>`).join("")}
+    <td class="sep ${luck ? (luck.pct_sharpe >= 0.95 ? "pos" : luck.pct_sharpe < 0.5 ? "neg" : "") : ""}">${luck ? fmt.pctu(luck.pct_sharpe, 0) : ""}</td><td>${luck ? fmt.pctu(luck.pct_return, 0) : ""}</td></tr>`;
+  const statTable = block => { const B = block.periods[P]; return `<div class="table-wrap"><table>
+    <thead><tr><th class="l">${esc(yr)}</th>${cols.map(([, l]) => `<th>${l}</th>`).join("")}<th class="sep" title="Share of random-entry runs with a lower Sharpe">Beats luck: Sharpe</th><th title="Share of random-entry runs with a lower return">Return</th></tr></thead>
+    <tbody>${row(esc(block.name), B.stats, "passrow", B.luck)}${row(`Random entries, average of ${r.n_sims}`, B.luck.mean_stats, "bench")}${row(esc(r.hold.name), r.hold.periods[P].stats, "bench")}</tbody>
+  </table></div>`; };
+  const legCard = l => `<section>
+    <span class="eyebrow">Strategy ${esc(l.name)} alone · ${esc(yr)}</span>
+    <h2>${esc(l.name)}: ${fmt.pct(l.periods[P].stats.net_return)}, Sharpe ${fmt.x(l.periods[P].stats.sharpe)}</h2>
+    <p class="muted">${esc(stg(l.settings))}. Full $${fmt.n(r.starting_equity)} account. Random runs are matched to this strategy's ${r.period[0].slice(0, 4)}–${r.period[1].slice(0, 4)} time in market.</p>
+    ${eqChart(l, l.name)}${statTable(l)}
+  </section>`;
+
+  const C = r.combined, CP = C.periods[P], K = C.correlation[P], SZ = C.sizing, SP = SZ.periods[P], mx = v => String(+v.toFixed(2));
+  const [A, Bl] = r.legs;
+  // Correlation: overlay, rolling correlation, daily-return scatter.
+  const overlay = () => {
+    const e1 = rebase(A.equity), e2 = rebase(Bl.equity), ec = rebase(C.equity);
+    let [lo, hi] = range([...e1, ...e2, ...ec].map(v => v - 1)); const ys = ystep(hi - lo); lo = Math.floor(lo / ys) * ys; hi = Math.ceil(hi / ys) * ys;
+    const Y = v => PAD.t + (hi - v) / (hi - lo) * (H - PAD.t - PAD.b), Yq = v => Y(v - 1);
+    return `<svg class="eq-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Both strategies and the combined portfolio">${frame(lo, hi, Y, pctY, ys)}
+      <polyline points="${pts(e1, Yq).join(" ")}" class="s1"/><polyline points="${pts(e2, Yq).join(" ")}" class="s2"/><polyline points="${pts(ec, Yq).join(" ")}" class="strat"/></svg>
+      <div class="legend"><span><i class="k s1"></i>${esc(A.name)} alone</span><span><i class="k s2"></i>${esc(Bl.name)} alone</span><span><i class="k strat"></i>${esc(C.name)} together</span></div>`;
+  };
+  const rolling = () => {
+    const v = C.rolling_corr.values.slice(a, b + 1);
+    const lo = -1, hi = 1, Y = q => PAD.t + (hi - q) / (hi - lo) * (H - PAD.t - PAD.b);
+    const avg = K.daily;
+    return `<svg class="eq-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Rolling correlation">${frame(lo, hi, Y, q => q.toFixed(1), 0.5)}
+      ${avg == null ? "" : `<line x1="${PAD.l}" x2="${W - PAD.r}" y1="${Y(avg)}" y2="${Y(avg)}" class="lmean"/>`}
+      <polyline points="${pts(v, Y).join(" ")}" class="corr"/></svg>
+      <div class="legend"><span><i class="k corr"></i>${C.rolling_corr.window}-day rolling correlation of daily returns</span><span><i class="k lmean"></i>${esc(yr)} average (${fmt.x(avg)})</span></div>`;
+  };
+  const scatter = () => {
+    const r1 = rebase(A.equity), r2 = rebase(Bl.equity), xs = [], ys2 = [];
+    for (let i = 1; i < r1.length; i++) { const x = r1[i] / r1[i - 1] - 1, y = r2[i] / r2[i - 1] - 1; if (x !== 0 || y !== 0) { xs.push(x); ys2.push(y); } }
+    const m = Math.max(0.005, ...xs.map(Math.abs), ...ys2.map(Math.abs)) * 1.05, S = 340, p = 40;
+    const sx = v => p + (v + m) / (2 * m) * (S - p - 10), sy = v => 10 + (m - v) / (2 * m) * (S - p - 10);
+    const tk = [-m / 2, 0, m / 2].map(v => +v.toFixed(4));
+    const q = (x, y) => x !== 0 && y !== 0 ? "both" : "one";
+    return `<svg class="scatter" viewBox="0 0 ${S} ${S}" role="img" aria-label="Daily returns scatter">
+      ${tk.map(v => `<line x1="${sx(v)}" x2="${sx(v)}" y1="10" y2="${S - p}" class="${v === 0 ? "zero" : "grid"}"/><line x1="${p}" x2="${S - 10}" y1="${sy(v)}" y2="${sy(v)}" class="${v === 0 ? "zero" : "grid"}"/>
+        <text x="${sx(v)}" y="${S - p + 14}" text-anchor="middle">${(v * 100).toFixed(1)}%</text><text x="${p - 4}" y="${sy(v) + 4}" text-anchor="end">${(v * 100).toFixed(1)}%</text>`).join("")}
+      ${xs.map((x, i) => `<circle cx="${sx(x).toFixed(1)}" cy="${sy(ys2[i]).toFixed(1)}" r="2.6" class="pt ${q(x, ys2[i])}"/>`).join("")}
+      <text x="${(S + p) / 2}" y="${S - 6}" text-anchor="middle">${esc(A.name)} daily return</text>
+      <text x="12" y="${(S - p) / 2}" text-anchor="middle" transform="rotate(-90 12 ${(S - p) / 2})">${esc(Bl.name)} daily return</text></svg>
+      <div class="legend"><span><i class="k ptboth"></i>both had a P&L that day</span><span><i class="k ptone"></i>only one did (dots on an axis)</span></div>`;
+  };
+  const card = (v, l, sub) => `<div><b>${v}</b><span>${l}${sub ? `<br><small>${sub}</small>` : ""}</span></div>`;
+  const corrSection = `<section>
+    <span class="eyebrow">How the two strategies move together · ${esc(yr)}</span>
+    <h2>Correlation: ${fmt.x(K.daily)} on daily returns</h2>
+    <p class="muted">Low correlation is what makes running both worth it: one's losing days are often the other's flat or winning days, so the combined curve is smoother than either alone.</p>
+    <div class="verdict v4">
+      ${card(fmt.x(K.daily), "daily return correlation", "all trading days")}
+      ${card(fmt.x(K.daily_active), "on days either had a P&L", `${fmt.n(K.active_days)} days`)}
+      ${card(fmt.x(K.monthly), "monthly return correlation")}
+      ${card(fmt.pctu(K.overlap_frac, 0), "in the market at the same time", "share of the time either one is in")}
+    </div>
+    <p class="muted">Both lost money on ${fmt.n(K.both_down_days)} of the ${fmt.n(K.either_down_days)} days when at least one did (${fmt.pctu(K.either_down_days ? K.both_down_days / K.either_down_days : null, 0)}). Both made money on the same day ${fmt.n(K.both_up_days)} times.</p>
+    ${overlay()}
+    <div class="corr-grid"><div>${rolling()}</div><div>${scatter()}</div></div>
+  </section>`;
+
+  const years = Object.keys(C.years).filter(y => days.some(d => d.startsWith(y)));
+  const yrow = (label, ys, cls = "") => `<tr class="${cls}"><td class="l">${label}</td>${years.map(y => `<td class="${tone(ys[y])}">${fmt.pct(ys[y])}</td>`).join("")}</tr>`;
+  const tabs = `<div class="period-bar"><span class="muted">Show:</span>${Object.entries(PER).map(([k, v]) => `<button type="button" class="subtab" data-period="${k}" aria-current="${k === P}">${esc(v.label)}</button>`).join("")}</div>`;
+  const head = `<header class="run">
+    <span class="eyebrow">${esc(r.market)} · ${esc(r.strategy_name)} · from run ${esc(r.run_id)} · ${esc(r.generated_at.slice(0, 10))}</span>
+    <h1>${esc(r.market_name)}: ${r.legs.map(l => esc(l.name)).join(" and ")}, ${esc(yr)}</h1>
+    ${r.holdout
+      ? `<p class="lede">The final test: the same two strategies, unchanged since they were frozen, run on data none of the research has seen (${esc(r.period[0])} to ${esc(r.period[1])}), first alone and then together. Each is compared with ${r.n_sims} random-entry runs at its own holdout time in market, paying the same costs (hold ${r.hold_bars[0]}–${r.hold_bars[1]} ${esc(r.timeframe)} bars, no overlap).</p>`
+      : `<p class="lede">The chosen strategies run unchanged as one continuous backtest from ${r.period[0].slice(0, 4)} to ${r.period[1].slice(0, 4)}, first alone and then together. Each is compared with ${r.n_sims} random-entry runs at the same time in market, paying the same costs (hold ${r.hold_bars[0]}–${r.hold_bars[1]} ${esc(r.timeframe)} bars, no overlap). Pick a period: every chart and table below is recomputed for it, starting from 0%. The holdout (2025 onward) is on its own tab.</p>
+    ${tabs}`}
+    <div class="verdict v4">
+      <div><b>${fmt.pct(CP.stats.net_return)}</b><span>together, ${esc(yr)}</span></div>
+      <div><b>${fmt.x(CP.stats.sharpe)}</b><span>Sharpe together</span></div>
+      <div class="${CP.luck.pct_sharpe >= 0.95 ? "ok" : "few"}"><b>${fmt.pctu(CP.luck.pct_sharpe, 0)}</b><span>of random runs beaten on Sharpe</span></div>
+      <div><b>${fmt.x(K.daily)}</b><span>correlation between the two</span></div>
+    </div>
+  </header>`;
+  const caveat = `<section><div class="callout">
+    ${P === "holdout"
+      ? `<p><b>${r.prior_holdout_accesses ? `Holdout seen ${r.prior_holdout_accesses} time(s) before this run, so not fully untouched.` : "First look at the holdout."}</b> No strategy had been scored on ${esc(r.period[0].slice(0, 4))} onward before this run, and nothing here was tuned or picked with it. Only these two were run, so there's no selection among holdout results. It's still one stretch of under two years: 95%+ against luck would be strong evidence; 50–95% means better than average, not proven.</p>`
+      : P === "val"
+      ? `<p><b>Validation only.</b> These were chosen with 2023–2024 results from earlier ${esc(r.market)} rounds in view, so this stretch isn't fully clean either. But it's the least in-sample part. 95%+ against luck here would be meaningful; between 50% and 95% is better than average but not conclusive.</p>`
+      : `<p><b>${P === "dev" ? "This is" : "Most of this period is"} in-sample.</b> 2018–2022 is the development data these strategies were picked from, out of thousands of versions, so beating 95%+ of random runs there is expected from the best of a big search, not proof of an edge. Switch to Validation for the more honest view; the untouched test is still the 2025+ holdout.</p>`}
+    <p>Together, both strategies trade one $${fmt.n(r.starting_equity)} account. Each trade gets ${mx(SZ.per_trade)}× the account balance, and the open positions together can't go over ${mx(SZ.cap)}×. So a trade that opens while the other strategy is already in gets only what's left (about ${mx(SZ.cap - SZ.per_trade)}×). Sizes are whole ${esc(r.market)} contracts, and a trade that can't afford one is skipped. The solo runs below use the full account (1×), as in the funnel.</p>
+  </div></section>`;
+  const together = `<section>
+    <span class="eyebrow">Both strategies together · ${esc(yr)}</span>
+    <h2>${esc(C.name)}: ${fmt.pct(CP.stats.net_return)}, Sharpe ${fmt.x(CP.stats.sharpe)}</h2>
+    <p class="muted">Random runs: one random trade stream per strategy at that strategy's time in market, sized through the same shared account.</p>
+    ${eqChart(C, C.name)}${statTable(C)}
+    <h3 style="margin-top:8px">How the sizing played out</h3>
+    <div class="table-wrap"><table><thead><tr><th class="l">${esc(yr)}</th><th>Signals</th><th title="Opened with the full ${mx(SZ.per_trade)}× size">Full size</th><th title="Opened while the other was in, so cut to what was left under the ${mx(SZ.cap)}× limit">Cut to what's left</th><th>Skipped</th><th>Avg contracts</th></tr></thead>
+    <tbody>${SP.legs.map(l => `<tr><td class="l">${esc(l.name || "#" + l.order)}</td><td>${fmt.n(l.signals)}</td><td>${fmt.n(l.full)}</td><td>${fmt.n(l.trimmed)}</td><td>${fmt.n(l.skipped)}</td><td>${l.mean_contracts == null ? "–" : l.mean_contracts.toFixed(1)}</td></tr>`).join("")}</tbody></table></div>
+    <div class="table-wrap"><table><thead><tr><th class="l">Compared with splitting the money</th>${cols.map(([, l]) => `<th>${l}</th>`).join("")}<th class="sep"></th><th></th></tr></thead>
+    <tbody>${row(`Shared account (${mx(SZ.per_trade)}× per trade, ${mx(SZ.cap)}× limit)`, CP.stats, "passrow")}${row(`Split 50/50, $${fmt.n(r.starting_equity / r.legs.length)} each`, SP.sleeves, "bench")}</tbody></table></div>
+    <h3 style="margin-top:8px">Year by year</h3>
+    <div class="table-wrap"><table><thead><tr><th class="l"></th>${years.map(y => `<th>${y}${!r.holdout && y >= r.validation_start.slice(0, 4) ? " ·val" : ""}${r.holdout && y === r.period[1].slice(0, 4) ? " (to " + r.period[1].slice(5) + ")" : ""}</th>`).join("")}</tr></thead>
+    <tbody>${r.legs.map(l => yrow(esc(l.name), l.years)).join("")}${yrow(esc(C.name), C.years, "passrow")}${yrow("Random, average (together)", C.random_years_mean, "bench")}${yrow(esc(r.hold.name), r.hold.years, "bench")}</tbody></table></div>
+  </section>`;
+  const foot = `<footer>Source: <span class="mono">${esc(r.source)}</span>. Generated ${esc(r.generated_at)}.</footer>`;
+  return head + caveat + together + corrSection + r.legs.map(legCard).join("") + foot;
+}
+let portfolioPeriod = null;
+
+function render() {
+  const ctx = route();
+  renderNav(ctx);
+  const page = document.getElementById("page");
+  page.replaceChildren($(!ctx.run ? renderEmpty(ctx.market) : ctx.run.kind === "portfolio" ? renderPortfolio(ctx.run, (location.hash.split("/")[2]) || "all") : renderVariants(ctx.variants, ctx.run) + renderRun(ctx.run)));
+  document.title = `${ctx.market.code} · Futures Strategy Funnels`;
+}
+document.addEventListener("click", e => {
+  const pb = e.target.closest("[data-period]");
+  if (pb) {  // portfolio period switch: re-render in place, keep the scroll position
+    const [m, k] = decodeURIComponent(location.hash.slice(1)).split("/");
+    const y = window.scrollY;
+    history.replaceState(null, "", `#${m || "ES"}/${k}/${pb.dataset.period}`);
+    render(); window.scrollTo(0, y);
+    return;
+  }
+  const b = e.target.closest("[data-stable-view], [data-view]");
+  if (!b) return;
+  const sec = b.closest("section");
+  if (b.dataset.view) {
+    sec.querySelectorAll("[data-view]").forEach(x => x.setAttribute("aria-current", String(x === b)));
+    sec.querySelectorAll("[data-panel]").forEach(p => { p.hidden = p.dataset.panel !== b.dataset.view; });
+    return;
+  }
+  sec.querySelectorAll("[data-stable-view]").forEach(x => x.setAttribute("aria-current", String(x === b)));
+  sec.querySelectorAll("[data-stable-panel]").forEach(p => { p.hidden = p.dataset.stablePanel !== b.dataset.stableView; });
+});
+window.addEventListener("hashchange", () => { render(); window.scrollTo(0, 0); });
+render();
+</script>
+</body>
+</html>

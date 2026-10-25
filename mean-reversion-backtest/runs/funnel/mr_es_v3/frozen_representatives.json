@@ -1,0 +1,310 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 60,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 0,
+      "config_id": "cfg_5d8b684c4e2170642a66",
+      "dev_net_return": 0.3622903669994353,
+      "dev_order": 1,
+      "dev_sharpe": 0.9328199709057968,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.658126317575776,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -3.0,
+        "exit_z": -0.5,
+        "max_holding_bars": 5,
+        "mean_lookback": 40,
+        "mean_type": "sma",
+        "std_lookback": 10,
+        "stop_atr_multiple": "2.0",
+        "symbol": "ES",
+        "timeframe": "1h"
+      }
+    },
+    {
+      "cluster": 0,
+      "config_id": "cfg_7cad6eeb28a9959af1a9",
+      "dev_net_return": 0.35957732854594804,
+      "dev_order": 2,
+      "dev_sharpe": 0.9249668957690202,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.6411604009212237,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -3.0,
+        "exit_z": -0.5,
+        "max_holding_bars": 5,
+        "mean_lookback": 40,
+        "mean_type": "sma",
+        "std_lookback": 10,
+        "stop_atr_multiple": "1.5",
+        "symbol": "ES",
+        "timeframe": "1h"
+      }
+    },
+    {
+      "cluster": 1,
+      "config_id": "cfg_cb04ada7360aeb36d032",
+      "dev_net_return": 0.28310884303025996,
+      "dev_order": 3,
+      "dev_sharpe": 0.7913151464216819,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.6367796384513233,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.0,
+        "exit_z": -0.5,
+        "max_holding_bars": 10,
+        "mean_lookback": 40,
+        "mean_type": "sma",
+        "std_lookback": 80,
+        "stop_atr_multiple": "1.0",
+        "symbol": "ES",
+        "timeframe": "1h"
+      }
+    },
+    {
+      "cluster": 4,
+      "config_id": "cfg_a26e26dbd24e956d4fd0",
+      "dev_net_return": 0.3760300000000001,
+      "dev_order": 4,
+      "dev_sharpe": 0.9375234582846447,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.6137543453083637,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.5,
+        "exit_z": -0.5,
+        "max_holding_bars": 16,
+        "mean_lookback": 40,
+        "mean_type": "ema",
+        "std_lookback": 20,
+        "stop_atr_multiple": "none",
+        "symbol": "ES",
+        "timeframe": "15min"
+      }
+    },
+    {
+      "cluster": 1,
+      "config_id": "cfg_2e9e4302b3a22dd3ab52",
+      "dev_net_return": 0.34601634691853533,
+      "dev_order": 5,
+      "dev_sharpe": 0.8522988268317723,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.5780362483679975,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.0,
+        "exit_z": -0.5,
+        "max_holding_bars": 10,
+        "mean_lookback": 40,
+        "mean_type": "sma",
+        "std_lookback": 80,
+        "stop_atr_multiple": "1.5",
+        "symbol": "ES",
+        "timeframe": "1h"
+      }
+    },
+    {
+      "cluster": 2,
+      "config_id": "cfg_33d2186341519dfde5f8",
+      "dev_net_return": 0.35299945112379105,
+      "dev_order": 6,
+      "dev_sharpe": 0.9106969878598391,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5680846375789981,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.0,
+        "exit_z": -1.0,
+        "max_holding_bars": 16,
+        "mean_lookback": 40,
+        "mean_type": "sma",
+        "std_lookback": 80,
+        "stop_atr_multiple": "2.5",
+        "symbol": "ES",
+        "timeframe": "1h"
+      }
+    },
+    {
+      "cluster": 2,
+      "config_id": "cfg_3e3aadea8855f86945eb",
+      "dev_net_return": 0.32579662253465824,
+      "dev_order": 7,
+      "dev_sharpe": 0.8715684076704041,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5294735886391547,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.0,
+        "exit_z": -1.0,
+        "max_holding_bars": 10,
+        "mean_lookback": 40,
+        "mean_type": "sma",
+        "std_lookback": 80,
+        "stop_atr_multiple": "2.5",
+        "symbol": "ES",
+        "timeframe": "1h"
+      }
+    },
+    {
+      "cluster": 4,
+      "config_id": "cfg_982a184d1106e3411eec",
+      "dev_net_return": 0.3498650000000001,
+      "dev_order": 8,
+      "dev_sharpe": 0.8876579279224714,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.520648879951254,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.5,
+        "exit_z": 0.0,
+        "max_holding_bars": 16,
+        "mean_lookback": 40,
+        "mean_type": "ema",
+        "std_lookback": 20,
+        "stop_atr_multiple": "none",
+        "symbol": "ES",
+        "timeframe": "15min"
+      }
+    },
+    {
+      "cluster": 5,
+      "config_id": "cfg_bed1e4e66e94799717d9",
+      "dev_net_return": 0.19895568171593747,
+      "dev_order": 9,
+      "dev_sharpe": 0.8358570006636916,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.40993573172863795,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.0,
+        "exit_z": -1.0,
+        "max_holding_bars": 5,
+        "mean_lookback": 40,
+        "mean_type": "sma",
+        "std_lookback": 80,
+        "stop_atr_multiple": "2.0",
+        "symbol": "ES",
+        "timeframe": "1h"
+      }
+    },
+    {
+      "cluster": 3,
+      "config_id": "cfg_8d96fffd1b49b4fd2aa1",
+      "dev_net_return": 0.27202369723424247,
+      "dev_order": 10,
+      "dev_sharpe": 0.791524537736108,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.39339283207031345,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.0,
+        "exit_z": -1.0,
+        "max_holding_bars": 16,
+        "mean_lookback": 40,
+        "mean_type": "sma",
+        "std_lookback": 80,
+        "stop_atr_multiple": "1.0",
+        "symbol": "ES",
+        "timeframe": "1h"
+      }
+    },
+    {
+      "cluster": 3,
+      "config_id": "cfg_e6f549c11e1e18c30bd9",
+      "dev_net_return": 0.2949248534258855,
+      "dev_order": 11,
+      "dev_sharpe": 0.8614864539149062,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.34729361822308885,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.0,
+        "exit_z": -1.0,
+        "max_holding_bars": 10,
+        "mean_lookback": 40,
+        "mean_type": "sma",
+        "std_lookback": 80,
+        "stop_atr_multiple": "1.0",
+        "symbol": "ES",
+        "timeframe": "1h"
+      }
+    }
+  ],
+  "code_version": "3b70ca612d69c7aa81b83b7b09224fd3f8e4655a",
+  "config_sha256": "90075ad01e4f3a1bd0a0c7fa0c498c53958f3d938a654fc2bdfd2e0f3609e0ea",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "5min",
+      "15min",
+      "1h"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "mr_es_v3",
+  "frozen_at": "2026-10-21T21:03:30.904256+00:00",
+  "git_diff_sha256": "cd60180b3e439130a965da8691adf7a2d09c333d98967c043d8f74ac5cfad962",
+  "git_dirty": true,
+  "seed": 20261021,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, best 2 per cluster)",
+      "7 execution stress"
+    ],
+    "ordering": "median neighbor Sharpe desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": false,
+    "commission_minimum": 0.0,
+    "commission_per_contract": 2.5,
+    "commission_per_share": 0.0,
+    "extended_hours_slippage_multiplier": 1.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "instrument_type": "futures",
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 0.0,
+    "slippage_bps_stop": 0.0,
+    "slippage_ticks_market": 1.0,
+    "slippage_ticks_stop": 1.0,
+    "starting_equity": 1000000.0
+  },
+  "symbol": "ES"
+}

@@ -36,7 +36,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.analysis.neighborhood import LATTICE_V1, LATTICE_V2, neighborhood_stats
+from src.analysis.neighborhood import LATTICE_V1, LATTICE_V2, LATTICE_V3, LATTICE_V5, LATTICE_V6, LATTICE_V7, LATTICE_V8, LATTICE_V9, LATTICE_V10, LATTICE_V11, LATTICE_V12, LATTICE_V13, LATTICE_V14, LATTICE_V15, LATTICE_V16, LATTICE_V17, NeighborhoodStats, neighborhood_stats
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.data.aggregation import AGG_INTERVAL_MINUTES, aggregate_bars
 from src.experiments.data_access import (
@@ -77,14 +77,16 @@ from src.experiments.funnel_prep import Job, build_dev_records, run_jobs
 from src.experiments.funnel_robustness import (
     breakeven_multiplier,
     interval_overlap,
+    local_perturbations,
     perturbations,
     perturbations_v2,
+    perturbations_v3,
     quantile,
 )
 from src.experiments.integrity import CHECKS, truncation_invariance
-from src.experiments.mr_grid import mr_grid, mr_grid_v2
+from src.experiments.mr_grid import mr_grid, mr_grid_v2, mr_grid_v3, mr_grid_v5, mr_grid_v6, mr_grid_v7, mr_grid_v8, mr_grid_v9, mr_grid_v10, mr_grid_v11, mr_grid_v12, mr_grid_v13, mr_grid_v14, mr_grid_v15, mr_grid_v16, mr_grid_v17
 from src.strategies.mean_reversion.backtest import MRParams
-from src.strategies.mean_reversion.config import MeanReversionConfig, MeanReversionV2Config
+from src.strategies.mean_reversion.config import MeanReversionConfig, MeanReversionV2Config, MeanReversionV3Config, MeanReversionV5Config, MeanReversionV6Config, MeanReversionV7Config, MeanReversionV8Config, MeanReversionV9Config, MeanReversionV10Config, MeanReversionV11Config, MeanReversionV12Config, MeanReversionV13Config, MeanReversionV14Config, MeanReversionV15Config, MeanReversionV16Config, MeanReversionV17Config
 from src.utils.hashing import canonical_json
 from src.utils.logging import configure_logging, get_logger
 from src.utils.seeds import derive_seed
@@ -105,6 +107,74 @@ SPACES = {
         "grid": mr_grid_v2, "cls": MeanReversionV2Config, "lattice": LATTICE_V2, "perturb": perturbations_v2,
         "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "entry_z", "exit_z", "max_holding_bars",
                  "trend_filter", "entry_confirmation", "cooldown_bars", "stop_atr_multiple"),
+    },
+    "mean_reversion_v3": {
+        "grid": mr_grid_v3, "cls": MeanReversionV3Config, "lattice": LATTICE_V3, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v5": {
+        "grid": mr_grid_v5, "cls": MeanReversionV5Config, "lattice": LATTICE_V5, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },    "mean_reversion_v6": {
+        "grid": mr_grid_v6, "cls": MeanReversionV6Config, "lattice": LATTICE_V6, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },    "mean_reversion_v7": {
+        "grid": mr_grid_v7, "cls": MeanReversionV7Config, "lattice": LATTICE_V7, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v8": {
+        "grid": mr_grid_v8, "cls": MeanReversionV8Config, "lattice": LATTICE_V8, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v10": {
+        "grid": mr_grid_v10, "cls": MeanReversionV10Config, "lattice": LATTICE_V10, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v11": {
+        "grid": mr_grid_v11, "cls": MeanReversionV11Config, "lattice": LATTICE_V11, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v12": {
+        "grid": mr_grid_v12, "cls": MeanReversionV12Config, "lattice": LATTICE_V12, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v13": {
+        "grid": mr_grid_v13, "cls": MeanReversionV13Config, "lattice": LATTICE_V13, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v14": {
+        "grid": mr_grid_v14, "cls": MeanReversionV14Config, "lattice": LATTICE_V14, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v15": {
+        "grid": mr_grid_v15, "cls": MeanReversionV15Config, "lattice": LATTICE_V15, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v16": {
+        "grid": mr_grid_v16, "cls": MeanReversionV16Config, "lattice": LATTICE_V16, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v17": {
+        "grid": mr_grid_v17, "cls": MeanReversionV17Config, "lattice": LATTICE_V17, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v9": {
+        "grid": mr_grid_v9, "cls": MeanReversionV9Config, "lattice": LATTICE_V9, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
     },
 }
 SPACE = SPACES["mean_reversion"]
@@ -277,10 +347,40 @@ def develop(
                                 include_joint=ps.neighbor_mode == "single_and_joint",
                                 only_ids={r["config_id"] for r in s3})
 
+    # Grid-neighbor stats are always recorded; they gate only in grid_neighbors mode.
+    for r in s3:
+        ns = nstats[r["config_id"]]
+        r.update({"neighbor_n_neighbors": ns.n_neighbors, "neighbor_n_possible_neighbors": ns.n_possible,
+                  "neighbor_frac_profitable": ns.frac_profitable, "neighbor_median_sharpe": ns.median_sharpe,
+                  "neighbor_center_minus_median_sharpe": (r["dev_sharpe"] - ns.median_sharpe
+                                                          if ns.median_sharpe is not None else None),
+                  "neighbor_n_sharpe_undefined": ns.n_sharpe_undefined,
+                  "neighbor_boundary_axes": ",".join(ns.boundary_axes)})
+    if ps.mode == "local_perturbation":
+        lmoves = {r["config_id"]: local_perturbations(_params(r), ps.local) for r in s3}
+        lres = run_jobs([Job(f"{c}|loc|{lab}", p, dev.start, dev.end) for c, mv in lmoves.items() for lab, p in mv],
+                        frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
+        stab = {}
+        for c, mv in lmoves.items():
+            ms = [(lab, lres[f"{c}|loc|{lab}"]["metrics"]) for lab, _ in mv]
+            sh = [m["sharpe"] for _, m in ms if m["sharpe"] is not None]
+            stab[c] = NeighborhoodStats(
+                n_neighbors=len(ms), n_possible=len(ms),
+                frac_profitable=float(np.mean([(m["net_return"] or 0) > 0 for _, m in ms])) if ms else None,
+                median_sharpe=float(np.median(sh)) if sh else None, n_sharpe_undefined=len(ms) - len(sh))
+            by_id[c]["local_detail"] = json.dumps([{"move": lab, "sharpe": m["sharpe"], "net_return": m["net_return"],
+                                                    "trades": m["n_completed_trades"]} for lab, m in ms])
+        prefix = "local"
+    else:
+        stab, prefix = nstats, "neighbor"
+
     def _s4(r):
-        out = stage4_parameter_stability(nstats[r["config_id"]], r.get("dev_sharpe"), fcfg)
+        out = stage4_parameter_stability(stab[r["config_id"]], r.get("dev_sharpe"), fcfg)
         for k, v in out.diagnostics.items():
-            r[f"neighbor_{k}"] = v
+            r[f"{prefix}_{k}"] = v
+        r["stability_median_sharpe"] = out.diagnostics["median_sharpe"]
+        if prefix == "local":  # reasons name the local test, not grid neighbors
+            out.reasons = [x.replace("neighbor_", "local_") for x in out.reasons]
         return out
     s4 = gate(4, "4 parameter stability", s3, _s4)
 
@@ -311,8 +411,11 @@ def develop(
     rows5 = [row[c] for c in ids5]
     M5 = monthly_returns(R[rows5], days) if ids5 else np.zeros((0, 0))
     cluster_of = cluster_by_correlation(ids5, M5, threshold=dd.corr_threshold, method=dd.linkage)
-    reps = select_representatives(s5, cluster_of)
-    rep_of = {cluster_of[r["config_id"]]: r["config_id"] for r in reps}
+    reps = select_representatives(s5, cluster_of, dd.reps_per_cluster)
+    rep_ids = {r["config_id"] for r in reps}
+    rep_of = {}  # cluster -> its best representative
+    for r in reps:
+        rep_of.setdefault(cluster_of[r["config_id"]], r["config_id"])
     ijobs = [Job(f"{c}|iv", _params(by_id[c]), dev.start, dev.end, return_series=True) for c in ids5]
     ivs = {k.split("|")[0]: v["intervals"] for k, v in
            run_jobs(ijobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers).items()}
@@ -328,7 +431,8 @@ def develop(
         others = [c for c in members if c != rep]
         dcorr = [float(Cd[pos5[rep], pos5[c]]) for c in others]
         ovl = [interval_overlap(ivs[rep], ivs[c]) for c in others]
-        clusters.append({"cluster": k, "representative": rep, "size": len(members), "members": members,
+        clusters.append({"cluster": k, "representative": rep, "representatives": [c for c in members if c in rep_ids],
+                         "size": len(members), "members": members,
                          "min_pairwise_monthly_corr": float(sub.min()) if len(members) > 1 else None,
                          "rep_daily_corr_min": min(dcorr) if dcorr else None,
                          "rep_daily_corr_median": quantile(dcorr, 0.5),
@@ -338,12 +442,13 @@ def develop(
         k = cluster_of[r["config_id"]]
         r["dedup_cluster"] = k
         r["dedup_representative"] = rep_of[k]
-        if rep_of[k] == r["config_id"]:
+        if r["config_id"] in rep_ids:
             _set(r, 6, Outcome(PASS))
         else:
             _set(r, 6, Outcome(DEDUPLICATED, [f"represented_by {rep_of[k]} (cluster {k})"]))
     table.append({"stage": "6 deduplication", "kind": "dedup", "evaluated": len(s5), "passed": len(reps),
-                  "deduplicated": len(s5) - len(reps), "n_clusters": len(reps)})
+                  "deduplicated": len(s5) - len(reps), "n_clusters": len(rep_of),
+                  "note": f"best {dd.reps_per_cluster} per cluster"})
 
     # ---- Stage 7: execution stress on representatives (development data) ----
     st = fcfg.execution_stress
@@ -475,6 +580,7 @@ def develop(
         "frozen_manifest_sha256": frozen_sha, "n_frozen_candidates": len(s7),
         "dsr": dsr_meta, "integrity": {k: v for k, v in integrity_run.items() if k != "audit_notes"},
         "elapsed_s": round(time.time() - t0, 1),
+        "instrument_type": ec.instrument_type, "transfer_symbol": fcfg.confidence.transfer_symbol,
     }
     atomic_write_json(exp / "summary.json", summary)
     (exp / "report.md").write_text(_report(summary, fcfg, reps, clusters, s7, by_id))
@@ -498,8 +604,8 @@ def _manifest(fcfg, ec, prov, experiment_id, cands, by_id, cluster_of) -> dict:
         "data_windows": fcfg.data.model_dump(mode="json"),
         "selection_rules": {
             "gates": ["1 integrity", "2 trade count", "3 performance & risk", "4 parameter stability",
-                      "5 time stability", "6 dedup (complete linkage, representative)", "7 execution stress"],
-            "ordering": "median neighbor Sharpe desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+                      "5 time stability", f"6 dedup (complete linkage, best {fcfg.dedup.reps_per_cluster} per cluster)", "7 execution stress"],
+            "ordering": f"median stage-4 Sharpe ({fcfg.parameter_stability.mode}) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
             "validation_is_not_used_for_ranking": True,
         },
         "sizing_and_costs": ec.model_dump(mode="json"),
@@ -510,6 +616,7 @@ def _manifest(fcfg, ec, prov, experiment_id, cands, by_id, cluster_of) -> dict:
                         "cluster": cluster_of[r["config_id"]],
                         "dev_sharpe": r["dev_sharpe"], "dev_net_return": r["dev_net_return"],
                         "neighbor_median_sharpe": r.get("neighbor_median_sharpe"),
+                        "stability_median_sharpe": r.get("stability_median_sharpe"),
                         "n_profitable_years": r.get("dev_n_profitable_years")} for i, r in enumerate(cands)],
     }
 
@@ -520,7 +627,8 @@ SLIM_KEYS = ["config_id", "dedup_cluster", "full_n_z_exits", "full_n_time_exits"
              "dev_best_year", "dev_best_year_contribution", "dev_top_k_trades_contribution",
              "dev_top_frac_trades_contribution", "neighbor_n_neighbors", "neighbor_n_possible_neighbors",
              "neighbor_frac_profitable", "neighbor_median_sharpe", "neighbor_center_minus_median_sharpe",
-             "neighbor_boundary_axes", "perturb_median_sharpe", "perturb_p10_sharpe", "perturb_frac_profitable",
+             "neighbor_boundary_axes", "local_n_neighbors", "local_frac_profitable", "local_median_sharpe",
+             "local_detail", "stability_median_sharpe", "perturb_median_sharpe", "perturb_p10_sharpe", "perturb_frac_profitable",
              "stress_cost_1.5x_net_return", "stress_cost_2.0x_net_return", "stress_delay_label",
              "stress_delay_net_return", "stress_missed_median_net_return", "stress_missed_p10_net_return",
              "breakeven_cost_multiplier", "breakeven_status", "s7_status", "s7_reasons", "s7_warnings",
@@ -585,7 +693,7 @@ def _report(summary, fcfg, reps, clusters, s7, by_id) -> str:
     L += [f"| {k} | {v} |" for k, v in summary["rejection_reason_counts"].items()]
     L += ["", "## Representatives (development ordering)", "",
           "Annual figures are **in-sample diagnostics**, not out-of-sample tests.", "",
-          "| # | config | settings | z/time/stop exits | trades | net ret | CAGR | Sharpe | maxDD | DD days | PF | expo | turn/yr | nbr n/possible | nbr prof | nbr med SR | ctr-med | prof yrs | ex-best ret | best-yr contrib | top-k contrib | stress 1.5x | 2x | delay | miss med/p10 | BE mult | s7 | DSR (label) | QQQ dev SR |",
+          "| # | config | settings | z/time/stop exits | trades | net ret | CAGR | Sharpe | maxDD | DD days | PF | expo | turn/yr | nbr n/possible | nbr prof | nbr med SR | ctr-med | prof yrs | ex-best ret | best-yr contrib | top-k contrib | stress 1.5x | 2x | delay | miss med/p10 | BE mult | s7 | DSR (label) | " + f"{summary.get('transfer_symbol') or 'transfer'} dev SR |",
           "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|---:|"]
     for i, r in enumerate(reps, 1):
         L.append(
@@ -627,11 +735,15 @@ def _report(summary, fcfg, reps, clusters, s7, by_id) -> str:
           f"- Calibration verified: **{d['calibration_verified']}** -> labels are `unverified` until reviewed", "",
           "Unresolved:"] + [f"- {x}" for x in d["unresolved"]]
     L += ["", "A candidate can be a research survivor (passes stages 1-7) without passing DSR; the two are reported separately.",
-          "QQQ results are unchanged rules on the development period: supporting evidence, not an independent replication.",
+          f"{summary.get('transfer_symbol')} results are unchanged rules on the development period: supporting evidence, not an independent replication.",
           "", "## Integrity audit", ""] + [f"- {x}" for x in AUDIT_NOTES]
     L += [f"- Look-ahead truncation test: {summary['integrity']['truncation_sample']} sampled configs x "
           f"{len(summary['integrity']['cut_fractions'])} cut points, failures: {len(summary['integrity']['failures'])}"]
-    L += ["", "## Unresolved assumptions", ""] + [f"- {x}" for x in UNRESOLVED]
+    if summary.get("instrument_type") == "futures":
+        L += ["", "## Futures data and execution", ""] + [f"- {x}" for x in FUTURES_NOTES]
+        L += ["", "## Unresolved assumptions", ""] + [f"- {x}" for x in UNRESOLVED_FUTURES]
+    else:
+        L += ["", "## Unresolved assumptions", ""] + [f"- {x}" for x in UNRESOLVED]
     return "\n".join(L) + "\n"
 
 
@@ -644,6 +756,26 @@ UNRESOLVED = [
     "Prices are split-adjusted but NOT dividend-adjusted: SPY's ~1.5%/yr dividend is not credited while long, and each ex-dividend drop slightly lowers z (a small bias toward entries on ex-div dates).",
     "Neighbor lattice: v1 orders timeframe, mean/std lookback, entry/exit z and max hold; v2 orders timeframe, mean lookback, entry/exit z, max holding bars, cooldown and ATR stop (1.0 < 1.5 < 2.0 < 3.0 < none). mean_type, trend_filter (and v2 entry_confirmation) are held fixed (categorical).",
     "All lookbacks, trend SMAs and holding periods are counted in bars of the config's timeframe (e.g. sma200 on 5min bars spans ~2.6 sessions), not in trading days.",
+]
+
+FUTURES_NOTES = [
+    "Data: Databento GLBX.MDP3 ohlcv-1m continuous front month by volume (<ROOT>.v.0), built by scripts/build_futures_data.py.",
+    "Rolls: difference back-adjusted at each instrument change (Databento rolls at 00:00 UTC; the 1-minute step there is taken as the roll spread). Point moves are preserved; pre-roll price levels are not real traded prices.",
+    "Session: each root's day session only (src/data/futures.py SESSIONS: NYSE 09:30-16:00 NY for equity indexes, 09:00-14:30 NY for crude, 08:20-13:30 NY for gold, 08:20-15:00 NY for FX; sessions under 5% of normal volume are skipped), on NYSE trading days; overnight Globex bars are not traded or used in indicators.",
+    "Sizing: whole contracts, as many as equity covers at full contract value (unadjusted price x multiplier) -- unlevered, compounding. Quantities in the trade log are contracts x multiplier.",
+    "Costs: slippage in ticks per side (stops too) plus commission per contract per side, from the execution YAML; cost stress scales both.",
+    "Positions that straddle a roll are treated as if rolled for free at the adjusted spread (no extra roll commission/slippage).",
+]
+
+UNRESOLVED_FUTURES = [
+    "Drawdown limit -30% is reused from the SPY funnels; it was not separately approved for unlevered futures sizing.",
+    "Drawdown is measured on daily session-close mark-to-market; intraday drawdown is deeper.",
+    "rf = 0 and idle cash earns 0. Unlevered futures sit mostly in cash (T-bill interest in reality), so returns vs. a real account are understated in high-rate years while Sharpe vs. cash is unaffected by that choice.",
+    "Variable cost stress scales per-contract commission and slippage ticks together.",
+    "Trades are attributed to the year/window of their entry session; a position open at the development end is force-closed and excluded from completed-trade counts.",
+    "Whole-contract granularity: at ~$1M equity the position is a handful of ES contracts, so position size steps with price; results are sensitive to starting equity at small sizes.",
+    "All lookbacks and holding periods are counted in bars of the config's timeframe (RTH bars only), not in trading days.",
+    "entry_confirmation = positive_bar_return means the signal bar closed above the previous bar's close (the 'directional bar' option).",
 ]
 
 
