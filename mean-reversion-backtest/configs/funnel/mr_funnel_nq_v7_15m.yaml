@@ -1,0 +1,182 @@
+# NQ futures mean-reversion screening funnel, run mr_nq_v7_15m -- the ONE place
+# every threshold lives. NQ final round: two separate runs, one per bar size, shown
+# side by side as NQ v7. Identical to mr_funnel_nq_v6.yaml (data, costs, every gate
+# incl. the local-perturbation stage 4, 40-trade validation minimum, ES transfer)
+# EXCEPT the grid: mean_reversion_v12 (1,152 configs), 15min only: SMA/EMA, averages 40-90, volatility 18-43 (steps of 5) and 60/80,
+# entry -2.5/-3/-3.5, exit -1/-0.5, hold 3/5, up-bar confirmation, no stop.
+# Specified by the user after reading the NQ v5/v6 results (development AND validation).
+#
+# Differences of the v3/v4 funnels from the SPY funnels:
+#   * data: Databento continuous ES (back-adjusted, NYSE RTH), see src/data/futures.py
+#   * execution: futures costs/sizing (configs/execution/futures.yaml)
+#   * trade_count.min_completed_trades 100 (was 150)
+#   * dedup keeps the best 2 per correlation cluster (was 1)
+#   * transfer check on NQ instead of QQQ
+#
+# Thresholds are fixed for the duration of a run and are hashed into every run's
+# outputs. They are NEVER adjusted automatically to hit a survivor count; zero
+# survivors is a valid outcome. Changing a value here is a new research trial
+# and should be recorded under `research_history` below.
+
+version: 1
+strategy: mean_reversion_v12
+symbol: NQ
+seed: 20261021
+
+data:
+  clean_root: data/clean
+  development: {start: 2018-01-01, end: 2022-12-31}
+  validation:  {start: 2023-01-01, end: 2024-12-31}
+  # end: null -> the actual available endpoint, recorded at access time.
+  holdout:     {start: 2025-01-01, end: null}
+  timeframes: ["5min", "15min", "1h"]
+
+data_history:
+  validation_previously_used_for_selection: true
+  validation_note: >-
+    mr_nq_v5 gated 93 NQ candidates on 2023-2024 (38 passed), mr_nq_v6 was narrowed
+    around those survivors, and this v7 grid was chosen after reading both, so NQ
+    2023-2024 is largely in-sample for v7.
+    The grid, the stage-4 test and the 40-trade rule were also shaped by ES
+    2023-2024 (mr_es_v3..v5).
+  holdout_previously_inspected: false
+  holdout_note: >-
+    No NQ strategy metrics have been computed on 2025+. The futures correlation
+    matrix (test-dabento/correlation.py) used 2025-2026 returns (no selection), and
+    two ES strategies (mr_es_v6_1h #8, #15; a correlated index) were scored on the
+    ES 2025+ holdout on 2026-10-24.
+    The holdout is the only untouched test for this run.
+
+metrics:
+  return_frequency: daily          # mark-to-market equity at each session close
+  periods_per_year: 252            # Sharpe = mean/std(daily) * sqrt(252)
+  risk_free_rate_annual: 0.0
+  cash_treatment: >-
+    Idle cash earns 0% and the Sharpe excess return is measured against a 0%
+    risk-free rate, so the two assumptions are consistent.
+  drawdown_basis: daily session-close mark-to-market (understates intraday DD)
+
+execution:
+  baseline: configs/execution/futures.yaml   # $2.50/contract/side + 1 tick/side slippage, unlevered whole contracts
+
+integrity:            # stage 1
+  truncation_check_sample: 40
+  truncation_points: 3
+
+trade_count:          # stage 2 -- hard gate
+  min_completed_trades: 100
+  min_trades_per_year: 10
+  min_years_meeting_floor: 4
+
+performance:          # stage 3 -- hard gate
+  min_net_return: 0.0               # strictly greater than
+  min_sharpe: 0.75                  # annualized, daily MTM returns incl. flat days
+  max_drawdown: -0.30
+  max_drawdown_source: src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct
+
+parameter_stability:  # stage 4 -- hard gate
+  mode: local_perturbation          # gate on `local` moves below; grid neighbors are diagnostic only
+  local:
+    int_rel: 0.20                   # avg length, vol length, max hold: x0.8 / x1.2, rounded, >= 1 bar away
+    entry_z_abs: 0.25               # entry z -/+ 0.25
+    exit_z_abs: 0.25                # exit z -/+ 0.25
+    stop_atr_abs: 0.25              # numeric ATR stop -/+ 0.25 ("none" stays none)
+  neighbor_mode: single_axis        # grid-neighbor diagnostic
+  min_frac_profitable: 0.70         # of the local moves, share with dev net return > 0
+  min_median_sharpe: 0.50           # median dev Sharpe of the local moves
+  perturbation:                     # diagnostic only, never a gate
+    n_per_config: 20
+    integer_rel_step: 0.15
+    z_abs: 0.10
+
+time_stability:       # stage 5 -- light hard gate + diagnostics
+  min_profitable_years: 3
+  top_trades_k: 5
+  top_trades_frac: 0.05
+
+dedup:                # stage 6
+  corr_threshold: 0.80
+  return_basis: monthly
+  linkage: complete
+  reps_per_cluster: 2               # best 2 per cluster; a single-member cluster keeps its 1
+
+execution_stress:     # stage 7
+  gate_cost_multiplier: 1.5         # hard gate: positive dev net return
+  diagnostic_cost_multipliers: [2.0]
+  entry_delay_bars: 1
+  missed_entry_frac: 0.10
+  missed_entry_sims: 100
+  breakeven_max_multiplier: 25.0
+
+validation:           # stage 8 -- hard gate (frozen representatives only)
+  min_net_return: 0.0
+  min_sharpe: 0.30
+  max_drawdown: -0.30
+  min_completed_trades: 40          # project default from 2026-10-22 (was 60)
+
+confidence:           # stage 9 -- diagnostics only
+  dsr_threshold: 0.95
+  dsr_calibration_verified: false
+  effective_trials_method: li_ji
+  serial_dependence: lag1_effective_n
+  transfer_symbol: ES               # unchanged rules, development period only
+
+holdout:              # stage 10 -- explicit `final-test` command only
+  acceptance:
+    min_net_return: 0.0
+    min_sharpe: 0.0
+    max_drawdown: -0.30
+    min_completed_trades: null
+
+# Earlier trials on the same index (SPY). ES is a different instrument but the
+# same underlying, so these count toward the DSR "known prior" sensitivity.
+research_history:
+  - name: mean_reversion NQ v6 (mr_nq_v6)
+    n_configs: 21600
+    note: "Narrowed v5 grid on NQ; this v7 round was specified after reading its results."
+  - name: mean_reversion ES v6 15m/1h (mr_es_v6_15m, mr_es_v6_1h)
+    n_configs: 7668
+    note: "ES final round, split by bar size; 1 of 46 passed 2023-2024."
+  - name: mean_reversion YM v6, RTY v6, CL v5/v6, GC v5, 6E v5
+    n_configs: null
+    note: "Same strategy family on the other futures."
+  - name: ict_silver_bullet_search (SPY)
+    n_configs: null
+    note: "Earlier ICT Silver Bullet search on SPY; trial count not recorded."
+  - name: donchian_ablation (donchian_v1, SPY/QQQ)
+    n_configs: 3888
+    note: "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+  - name: channel_breakout grid (funnel_v1..v4, SPY)
+    n_configs: 24576
+    note: "Channel-breakout grid; four funnel variants with changed thresholds/methods."
+  - name: mean_reversion v1 grid (mr_v1, SPY)
+    n_configs: 75000
+    note: "Same strategy family; 15 frozen candidates, 0 passed validation."
+  - name: mean_reversion v2 grid (mr_v2, SPY)
+    n_configs: 240000
+    note: "Same strategy family, earlier parameter space on SPY."
+  - name: mean_reversion NQ v5 (mr_nq_v5)
+    n_configs: 41472
+    note: "Same strategy on NQ; 38 of 93 frozen candidates passed 2023-2024. v6 zooms in on those."
+  - name: mean_reversion YM v5 (mr_ym_v5)
+    n_configs: 41472
+    note: "Same v5 grid on YM; 9 of 61 passed 2023-2024."
+  - name: mean_reversion RTY v5 (mr_rty_v5)
+    n_configs: 41472
+    note: "Same v5 grid on RTY; 5 of 27 passed 2023-2024."
+  - name: mean_reversion ES v5 (mr_es_v5)
+    n_configs: 41472
+    note: "Same v5 grid on ES (correlated index); NQ 2018-2022 was used there as a transfer diagnostic."
+  - name: mean_reversion ES v4 (mr_es_v4)
+    n_configs: null
+    note: >-
+      Same grid as v3 with the local-perturbation stage 4; 3 of 18 frozen candidates
+      passed 2023-2024. The v5 grid was designed after reading v3/v4 development and
+      validation results (finer lengths around the survivors' region).
+  - name: mean_reversion ES v3 (mr_es_v3)
+    n_configs: 46080
+    note: >-
+      Same 46,080-config ES grid with the grid-neighbor stage-4 gate; 1 of 11 frozen
+      candidates passed 2023-2024 validation. v4 changes only the stage-4 test after
+      reading those development AND validation results, so ES 2023-2024 has now
+      influenced the method (not counted as new configs).

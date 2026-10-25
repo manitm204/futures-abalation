@@ -1,0 +1,114 @@
+[
+  {
+    "evaluated": 3456,
+    "kind": "universe",
+    "passed": 3456,
+    "pct_of_previous": 100.0,
+    "pct_of_universe": 100.0,
+    "stage": "0 universe"
+  },
+  {
+    "evaluated": 3456,
+    "hard_reject": 0,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 3456,
+    "pct_of_previous": 100.0,
+    "pct_of_universe": 100.0,
+    "stage": "1 backtest integrity",
+    "with_warnings": 0
+  },
+  {
+    "evaluated": 3456,
+    "hard_reject": 2555,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 901,
+    "pct_of_previous": 26.07060185185185,
+    "pct_of_universe": 26.07060185185185,
+    "stage": "2 trade count & coverage",
+    "with_warnings": 1239
+  },
+  {
+    "evaluated": 901,
+    "hard_reject": 687,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 214,
+    "pct_of_previous": 23.751387347391788,
+    "pct_of_universe": 6.19212962962963,
+    "stage": "3 performance & risk",
+    "with_warnings": 0
+  },
+  {
+    "evaluated": 214,
+    "hard_reject": 0,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 214,
+    "pct_of_previous": 100.0,
+    "pct_of_universe": 6.19212962962963,
+    "stage": "4 parameter stability",
+    "with_warnings": 0
+  },
+  {
+    "evaluated": 214,
+    "hard_reject": 0,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 214,
+    "pct_of_previous": 100.0,
+    "pct_of_universe": 6.19212962962963,
+    "stage": "5 time stability",
+    "with_warnings": 202
+  },
+  {
+    "deduplicated": 61,
+    "evaluated": 214,
+    "kind": "dedup",
+    "n_clusters": 83,
+    "note": "best 2 per cluster",
+    "passed": 153,
+    "pct_of_previous": 71.49532710280374,
+    "pct_of_universe": 4.427083333333333,
+    "stage": "6 deduplication"
+  },
+  {
+    "evaluated": 153,
+    "hard_reject": 0,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 153,
+    "pct_of_previous": 100.0,
+    "pct_of_universe": 4.427083333333333,
+    "stage": "7 execution stress",
+    "with_warnings": 4
+  },
+  {
+    "evaluated": null,
+    "kind": "hard_gate",
+    "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+    "passed": null,
+    "pct_of_previous": null,
+    "pct_of_universe": null,
+    "stage": "8 frozen validation"
+  },
+  {
+    "evaluated": 153,
+    "kind": "diagnostic_only",
+    "note": "diagnostic only: unverified: 153",
+    "passed": null,
+    "pct_of_previous": null,
+    "pct_of_universe": null,
+    "stage": "9 DSR / transfer"
+  },
+  {
+    "evaluated": null,
+    "kind": "explicit_command",
+    "note": "not run; `final-test` command only",
+    "passed": null,
+    "pct_of_previous": null,
+    "pct_of_universe": null,
+    "stage": "10 final holdout"
+  }
+]
