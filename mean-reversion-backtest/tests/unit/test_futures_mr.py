@@ -134,6 +134,15 @@ def test_v16_v17_grid_sizes():
     assert {e.config.exit_z for e in mr_grid_v16(("RTY",))} == {-1.0, 0.0, 1.0}
     assert {e.config.stop_atr_value for e in mr_grid_v17(("RTY",))} == {None, 1.5, 2.0, 2.5}
 
+
+def test_v21_grid_size():
+    from src.experiments.mr_grid import mr_grid_v21
+    grid = mr_grid_v21(("6E",))
+    assert len(grid) == 24_000
+    assert {e.config.entry_z for e in grid} == {-1.5, -1.75, -2.0, -2.25, -2.5}
+    assert {e.config.stop_atr_value for e in grid} == {None, 1.5, 2.0, 2.5}
+
+
 def test_random_intervals_hit_target_exposure_without_overlap():
     import numpy as np
     from src.experiments.random_entry import random_intervals

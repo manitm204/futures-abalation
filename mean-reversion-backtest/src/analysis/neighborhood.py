@@ -182,6 +182,15 @@ LATTICE_V17 = Lattice({
     "max_holding_bars": [5, 8, 12],
     "stop_atr_multiple": ["1.5", "2.0", "2.5", "none"],
 }, FIXED_AXES_V3)
+LATTICE_V21 = Lattice({
+    "timeframe": ["1h"],
+    "mean_lookback": [60, 70, 80, 90, 100, 120],
+    "std_lookback": [6, 8, 10, 12, 15],
+    "entry_z": [-2.5, -2.25, -2.0, -1.75, -1.5],
+    "exit_z": [-1.0, -0.5, 0.0, 0.5],
+    "max_holding_bars": [3, 4, 5, 6, 8],
+    "stop_atr_multiple": ["1.5", "2.0", "2.5", "none"],
+}, FIXED_AXES_V3)
 LATTICE_V6 = Lattice({
     "timeframe": ["5min", "15min", "1h"],
     "mean_lookback": [20, 25, 30, 40, 50],

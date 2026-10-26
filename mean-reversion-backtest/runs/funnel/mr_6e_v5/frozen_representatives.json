@@ -1,0 +1,123 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 40,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 0,
+      "config_id": "cfg_f92e4fde258ce1ed6acb",
+      "dev_net_return": 0.1009424999999664,
+      "dev_order": 1,
+      "dev_sharpe": 1.0141985141269412,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5937180359445581,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.0,
+        "exit_z": -1.0,
+        "max_holding_bars": 5,
+        "mean_lookback": 80,
+        "mean_type": "sma",
+        "std_lookback": 10,
+        "stop_atr_multiple": "none",
+        "symbol": "6E",
+        "timeframe": "1h"
+      },
+      "stability_median_sharpe": 0.921110400171838
+    },
+    {
+      "cluster": 0,
+      "config_id": "cfg_50a2bae259297b144498",
+      "dev_net_return": 0.11043874999996617,
+      "dev_order": 2,
+      "dev_sharpe": 1.077981568414783,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.654919721249565,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.0,
+        "exit_z": -0.5,
+        "max_holding_bars": 5,
+        "mean_lookback": 80,
+        "mean_type": "sma",
+        "std_lookback": 10,
+        "stop_atr_multiple": "none",
+        "symbol": "6E",
+        "timeframe": "1h"
+      },
+      "stability_median_sharpe": 0.9194556219551764
+    }
+  ],
+  "code_version": "5342a94cdc844bb5d1f3b0c2c00705f03b157c96",
+  "config_sha256": "fc73a66369f3d22d5852177eba1c950ed445cfd61239231e82936952e7656947",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "5min",
+      "15min",
+      "1h"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "mr_6e_v5",
+  "frozen_at": "2026-10-23T04:19:29.055214+00:00",
+  "git_diff_sha256": "f260d7aaca04438a56bef21ee67087152d316ae90c85e6f64458a112ab10b57a",
+  "git_dirty": true,
+  "seed": 20261021,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, best 2 per cluster)",
+      "7 execution stress"
+    ],
+    "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": false,
+    "commission_minimum": 0.0,
+    "commission_per_contract": 2.5,
+    "commission_per_share": 0.0,
+    "extended_hours_slippage_multiplier": 1.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "instrument_type": "futures",
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 0.0,
+    "slippage_bps_stop": 0.0,
+    "slippage_ticks_market": 1.0,
+    "slippage_ticks_stop": 1.0,
+    "starting_equity": 1000000.0
+  },
+  "symbol": "6E"
+}

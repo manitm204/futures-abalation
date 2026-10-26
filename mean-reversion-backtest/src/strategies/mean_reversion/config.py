@@ -433,3 +433,29 @@ class MeanReversionV17Config(MeanReversionV3Config):
     max_holding_bars: Literal[5, 8, 12] = 5
     entry_confirmation: Literal["none", "positive_bar_return"] = "none"
     stop_atr_multiple: Literal["none", "1.5", "2.0", "2.5"] = "none"
+
+
+# --- v21 parameter space (6E round 2, 1h (24,000 variants per symbol)) -------------------------
+# 1h only, specified by the user after reading 6E v5: SMA/EMA, averages 60/70/80/90/100/120,
+# volatility 6/8/10/12/15, entry -1.5/-1.75/-2/-2.25/-2.5, exit -1/-0.5/0/+0.5,
+# hold 3/4/5/6/8, no confirmation, stop none/1.5/2/2.5 x ATR.
+V21_TIMEFRAMES: tuple[str, ...] = ("1h",)
+V21_MEAN_TYPES: tuple[str, ...] = ("sma", "ema")
+V21_MEAN_LOOKBACKS: tuple[int, ...] = (60, 70, 80, 90, 100, 120)
+V21_STD_LOOKBACKS: tuple[int, ...] = (6, 8, 10, 12, 15)
+V21_ENTRY_ZS: tuple[float, ...] = (-1.5, -1.75, -2.0, -2.25, -2.5)
+V21_EXIT_ZS: tuple[float, ...] = (-1.0, -0.5, 0.0, 0.5)
+V21_MAX_HOLDS: tuple[int, ...] = (3, 4, 5, 6, 8)
+V21_ENTRY_CONFIRMATIONS: tuple[str, ...] = ("none",)
+V21_STOP_ATRS: tuple[str, ...] = ("none", "1.5", "2.0", "2.5")
+
+
+class MeanReversionV21Config(MeanReversionV3Config):
+    timeframe: Literal["1h"] = "1h"
+    mean_lookback: Literal[60, 70, 80, 90, 100, 120] = 60
+    std_lookback: Literal[6, 8, 10, 12, 15] = 6
+    entry_z: Literal[-1.5, -1.75, -2.0, -2.25, -2.5] = -2.0
+    exit_z: Literal[-1.0, -0.5, 0.0, 0.5] = -1.0
+    max_holding_bars: Literal[3, 4, 5, 6, 8] = 5
+    entry_confirmation: Literal["none"] = "none"
+    stop_atr_multiple: Literal["none", "1.5", "2.0", "2.5"] = "none"

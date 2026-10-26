@@ -1,0 +1,10 @@
+<p><b>Same test as the other markets, on the euro.</b> Same 41,472-version v5 grid and funnel, with validation needing ≥ 40 trades. Differences:</p>
+<ul><li><b>Session:</b> the old CME FX pit hours, 08:20–15:00 New York.</li>
+<li><b>No cross-market check,</b> since the yen (6J) isn't built yet.</li>
+<li><b>One stale day skipped</b> (2023-06-16, an expiry day with 382 contracts traded), by the same under-5%-of-normal-volume rule used for gold.</li></ul>
+<p>6E rolls quarterly (35 rolls, back-adjusted).</p>
+<p><b>Mean reversion doesn't work on the euro.</b> Only 4.9% of the 41,472 versions made money on 2018–2022, against 28% on gold. The median Sharpe was −0.88, and no bar size had a positive median (5-minute: −1.66, 1-hour: −0.58). Only 39 versions reached Sharpe 0.75, and just 6 also cleared the drawdown and return tests.</p>
+<p><b>The 2 finalists both failed 2023–2024.</b> All 6 survivors were the same setting with tiny differences: 1-hour SMA 80, volatility 10, entry −2, hold 5, no confirmation, no stop. Dedup kept 2 (exit −1 and −0.5). On 2018–2022 they made about +10% (Sharpe 1.0–1.1, drawdown −3%), and on 2023–2024 they lost about 2% (Sharpe −0.54 and −0.59) over 63–65 trades.</p>
+<p><b>A lone survivor at the edge of the grid</b> (average 80 is the largest tested, volatility 10 the smallest) on a market where almost nothing works looks like noise, and validation agreed.</p>
+<p><b>Holding the euro lost money too:</b> −19% over 2018–2022 and −6.6% over 2023–2024 (rolled, unlevered).</p>
+<p>The 2025+ holdout has not been run.</p>
