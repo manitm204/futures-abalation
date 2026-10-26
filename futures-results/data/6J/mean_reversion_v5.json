@@ -1,0 +1,958 @@
+{
+ "market": "6J",
+ "market_name": "Japanese yen",
+ "strategy_key": "mean_reversion_v5",
+ "strategy_name": "Mean reversion \u00b7 v5 finer lengths",
+ "variant": null,
+ "variant_label": null,
+ "stability_mode": "local_perturbation",
+ "validation_rules": {
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3,
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40
+ },
+ "run_id": "mr_6j_v5",
+ "generated_at": "2026-10-25T15:09:43+00:00",
+ "periods": {
+  "dev": [
+   "2018-01-01",
+   "2022-12-31"
+  ],
+  "val": [
+   "2023-01-01",
+   "2024-12-31"
+  ]
+ },
+ "strategy": {
+  "summary": "Buy a sharp dip and sell when the price snaps back. Each bar the strategy measures how far the close sits below its moving average, in units of recent volatility (a z-score). When that z-score falls to the entry level it buys at the next bar's open, and it sells once the z-score recovers to the exit level, after a maximum number of bars, or at an optional stop.",
+  "formula": "z = (close \u2212 average of the last N closes) \u00f7 standard deviation of the last M closes",
+  "rules": [
+   {
+    "label": "Buy",
+    "text": "When z closes at or below the entry level (\u22122 to \u22123). With confirmation on, the signal bar must also close above the previous bar's close. The order fills at the next bar's open."
+   },
+   {
+    "label": "Sell",
+    "text": "At the next open after z closes at or above the exit level, or once the position has been held the max number of bars. An optional stop sits k \u00d7 ATR(14) below the entry and fills the moment it is touched."
+   },
+   {
+    "label": "Size",
+    "text": "Long only, one position at a time. As many whole 6J contracts as the account covers at full contract value (no leverage), starting from $1,000,000."
+   }
+  ],
+  "axes": [
+   {
+    "label": "Bar size",
+    "values": [
+     "5min",
+     "15min",
+     "1h"
+    ]
+   },
+   {
+    "label": "Average type",
+    "values": [
+     "SMA",
+     "EMA"
+    ]
+   },
+   {
+    "label": "Average length",
+    "values": [
+     "20",
+     "30",
+     "40",
+     "50",
+     "60",
+     "80"
+    ]
+   },
+   {
+    "label": "Volatility length",
+    "values": [
+     "10",
+     "15",
+     "20",
+     "25",
+     "30",
+     "40",
+     "60",
+     "80"
+    ]
+   },
+   {
+    "label": "Entry z",
+    "values": [
+     "-2",
+     "-2.5",
+     "-3"
+    ]
+   },
+   {
+    "label": "Exit z",
+    "values": [
+     "-1",
+     "-0.5",
+     "0",
+     "0.5"
+    ]
+   },
+   {
+    "label": "Max hold (bars)",
+    "values": [
+     "5",
+     "10"
+    ]
+   },
+   {
+    "label": "Confirmation",
+    "values": [
+     "none",
+     "up bar"
+    ]
+   },
+   {
+    "label": "Stop (\u00d7 ATR)",
+    "values": [
+     "none",
+     "1",
+     "2"
+    ]
+   }
+  ],
+  "grid_size": 41472
+ },
+ "funnel": [
+  {
+   "name": "Start",
+   "sub": "every combination",
+   "n": 41472,
+   "why": "All 41,472 versions backtested once on 2018\u20132022 data."
+  },
+  {
+   "name": "1 \u00b7 Integrity",
+   "sub": "no cheating",
+   "n": 41472,
+   "why": "Per-trade checks for look-ahead and impossible fills on every version, plus 40 random versions re-run on cut-off data. 0 failed."
+  },
+  {
+   "name": "2 \u00b7 Enough trades",
+   "sub": "\u2265100 trades, spread out",
+   "n": 32801,
+   "why": "Needs \u2265100 completed trades and \u226510 a year in \u22654 of the 5 years. Removed 8,671 (184 on 5min, 1,772 on 15min, 6,715 on 1h)."
+  },
+  {
+   "name": "3 \u00b7 Profit",
+   "sub": "net > 0, Sharpe \u2265 0.75",
+   "n": 0,
+   "why": "Needs a net profit, Sharpe \u2265 0.75 and drawdown no worse than 30%. Removed 32,801 (13,640 on 5min, 12,052 on 15min, 7,109 on 1h); 32,362 of them lost money."
+  },
+  {
+   "name": "4 \u00b7 Stable settings",
+   "sub": "neighbors also work",
+   "n": 0,
+   "why": "Each setting is nudged one at a time, down and up: average length, volatility length and max hold by \u00b120% (rounded), entry and exit z by \u00b10.25, a numeric ATR stop by \u00b10.25. At least 70% of the 10\u201312 nudged versions must be profitable, with median Sharpe \u2265 0.5. Removed 0."
+  },
+  {
+   "name": "5 \u00b7 Time stability",
+   "sub": "\u22653 profitable years",
+   "n": 0,
+   "why": "Removed 0."
+  },
+  {
+   "name": "6 \u00b7 Remove duplicates",
+   "sub": "best 2 per group",
+   "n": 0,
+   "why": "Versions whose monthly returns correlate \u2265 0.8 form a group; the best 2 of each go on (a group of one keeps its one). 0 versions formed 0 groups."
+  },
+  {
+   "name": "7 \u00b7 Cost stress",
+   "sub": "profitable at 1.5\u00d7 costs",
+   "n": 0,
+   "why": "Removed 0."
+  },
+  {
+   "name": "8 \u00b7 Validation",
+   "sub": "2023\u20132024, new data",
+   "n": 0,
+   "why": "Frozen finalists run once on unseen data: needs net > 0, Sharpe \u2265 0.3, drawdown no worse than 30% and \u226540 trades."
+  }
+ ],
+ "stable": {
+  "n": 0,
+  "axes": [
+   {
+    "axis": "timeframe",
+    "label": "Bar size",
+    "values": [
+     {
+      "v": "5min",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "15min",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "1h",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "mean_type",
+    "label": "Average type",
+    "values": [
+     {
+      "v": "SMA",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "EMA",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "mean_lookback",
+    "label": "Average length",
+    "values": [
+     {
+      "v": "20",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "30",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "40",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "50",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "60",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "80",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "std_lookback",
+    "label": "Volatility length",
+    "values": [
+     {
+      "v": "10",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "15",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "20",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "25",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "30",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "40",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "60",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "80",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "entry_z",
+    "label": "Entry z",
+    "values": [
+     {
+      "v": "-2",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "-2.5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "-3",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "exit_z",
+    "label": "Exit z",
+    "values": [
+     {
+      "v": "-1",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "-0.5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "0",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "0.5",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "max_holding_bars",
+    "label": "Max hold (bars)",
+    "values": [
+     {
+      "v": "5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "10",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "entry_confirmation",
+    "label": "Confirmation",
+    "values": [
+     {
+      "v": "none",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "up bar",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "stop_atr_multiple",
+    "label": "Stop (\u00d7 ATR)",
+    "values": [
+     {
+      "v": "none",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "1",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "2",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   }
+  ],
+  "by_timeframe": []
+ },
+ "ablation": [
+  {
+   "axis": "timeframe",
+   "label": "Bar size",
+   "values": [
+    {
+     "v": "5min",
+     "n": 13824,
+     "pct_profitable": 0.002170138888888889,
+     "median_sharpe": -2.337629258191074,
+     "p90_sharpe": -1.3047403675532772,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "15min",
+     "n": 13824,
+     "pct_profitable": 0.016493055555555556,
+     "median_sharpe": -1.3093106459833546,
+     "p90_sharpe": -0.5576544435683788,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "1h",
+     "n": 13824,
+     "pct_profitable": 0.21100983796296297,
+     "median_sharpe": -0.4050981724355874,
+     "p90_sharpe": 0.3352117026405738,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "mean_type",
+   "label": "Average type",
+   "values": [
+    {
+     "v": "SMA",
+     "n": 20736,
+     "pct_profitable": 0.07629243827160494,
+     "median_sharpe": -1.2400270517007876,
+     "p90_sharpe": -0.08972890599177863,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "EMA",
+     "n": 20736,
+     "pct_profitable": 0.07682291666666667,
+     "median_sharpe": -1.2350096225478582,
+     "p90_sharpe": -0.10875060102316329,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "mean_lookback",
+   "label": "Average length",
+   "values": [
+    {
+     "v": "20",
+     "n": 6912,
+     "pct_profitable": 0.13440393518518517,
+     "median_sharpe": -1.110648743809167,
+     "p90_sharpe": 0.18115757584422007,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "30",
+     "n": 6912,
+     "pct_profitable": 0.09505208333333333,
+     "median_sharpe": -1.1984247518550515,
+     "p90_sharpe": -0.015931602428278627,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "40",
+     "n": 6912,
+     "pct_profitable": 0.08579282407407407,
+     "median_sharpe": -1.2445784378168907,
+     "p90_sharpe": -0.05073378244577944,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "50",
+     "n": 6912,
+     "pct_profitable": 0.059027777777777776,
+     "median_sharpe": -1.267014644635726,
+     "p90_sharpe": -0.15976546033853473,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "60",
+     "n": 6912,
+     "pct_profitable": 0.06177662037037037,
+     "median_sharpe": -1.3270006541782935,
+     "p90_sharpe": -0.17309268875974698,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "80",
+     "n": 6912,
+     "pct_profitable": 0.023292824074074073,
+     "median_sharpe": -1.3116939016091664,
+     "p90_sharpe": -0.4037430523904498,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "std_lookback",
+   "label": "Volatility length",
+   "values": [
+    {
+     "v": "10",
+     "n": 5184,
+     "pct_profitable": 0.017554012345679014,
+     "median_sharpe": -1.5521499974263315,
+     "p90_sharpe": -0.3665191850702945,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "15",
+     "n": 5184,
+     "pct_profitable": 0.05401234567901234,
+     "median_sharpe": -1.5671534943472027,
+     "p90_sharpe": -0.23775036979822328,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "20",
+     "n": 5184,
+     "pct_profitable": 0.03568672839506173,
+     "median_sharpe": -1.3036246416691775,
+     "p90_sharpe": -0.22851753561971797,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "25",
+     "n": 5184,
+     "pct_profitable": 0.08584104938271606,
+     "median_sharpe": -1.1276848076568882,
+     "p90_sharpe": -0.07144444464313936,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "30",
+     "n": 5184,
+     "pct_profitable": 0.12384259259259259,
+     "median_sharpe": -1.3707687526191157,
+     "p90_sharpe": 0.11955029828778345,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "40",
+     "n": 5184,
+     "pct_profitable": 0.15393518518518517,
+     "median_sharpe": -1.3532108762676534,
+     "p90_sharpe": 0.25762335477266934,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "60",
+     "n": 5184,
+     "pct_profitable": 0.10667438271604938,
+     "median_sharpe": -1.0661431885732298,
+     "p90_sharpe": 0.027687092420338347,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "80",
+     "n": 5184,
+     "pct_profitable": 0.034915123456790126,
+     "median_sharpe": -0.9410267728884115,
+     "p90_sharpe": -0.22173516444398866,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "entry_z",
+   "label": "Entry z",
+   "values": [
+    {
+     "v": "-2",
+     "n": 13824,
+     "pct_profitable": 0.05244502314814815,
+     "median_sharpe": -1.3986458834628634,
+     "p90_sharpe": -0.24267660099248772,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "-2.5",
+     "n": 13824,
+     "pct_profitable": 0.08000578703703703,
+     "median_sharpe": -1.2397566870046675,
+     "p90_sharpe": -0.08372366263646891,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "-3",
+     "n": 13824,
+     "pct_profitable": 0.09722222222222222,
+     "median_sharpe": -1.072154612986438,
+     "p90_sharpe": 0.005032341011130521,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "exit_z",
+   "label": "Exit z",
+   "values": [
+    {
+     "v": "-1",
+     "n": 10368,
+     "pct_profitable": 0.07137345679012345,
+     "median_sharpe": -1.2876053715133393,
+     "p90_sharpe": -0.12718481949256746,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "-0.5",
+     "n": 10368,
+     "pct_profitable": 0.07600308641975309,
+     "median_sharpe": -1.2550571492580191,
+     "p90_sharpe": -0.10453771134928723,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "0",
+     "n": 10368,
+     "pct_profitable": 0.0779320987654321,
+     "median_sharpe": -1.2299211845186293,
+     "p90_sharpe": -0.09281765535806873,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "0.5",
+     "n": 10368,
+     "pct_profitable": 0.08092206790123457,
+     "median_sharpe": -1.1799078340701643,
+     "p90_sharpe": -0.06723105061135595,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "max_holding_bars",
+   "label": "Max hold (bars)",
+   "values": [
+    {
+     "v": "5",
+     "n": 20736,
+     "pct_profitable": 0.06862461419753087,
+     "median_sharpe": -1.3291084265103201,
+     "p90_sharpe": -0.15860129556498914,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "10",
+     "n": 20736,
+     "pct_profitable": 0.08449074074074074,
+     "median_sharpe": -1.132609021517274,
+     "p90_sharpe": -0.04921991511162211,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "entry_confirmation",
+   "label": "Confirmation",
+   "values": [
+    {
+     "v": "none",
+     "n": 20736,
+     "pct_profitable": 0.029176311728395063,
+     "median_sharpe": -1.397801418752063,
+     "p90_sharpe": -0.3427534636248703,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "up bar",
+     "n": 20736,
+     "pct_profitable": 0.12393904320987655,
+     "median_sharpe": -1.086578247201784,
+     "p90_sharpe": 0.12369890467525028,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "stop_atr_multiple",
+   "label": "Stop (\u00d7 ATR)",
+   "values": [
+    {
+     "v": "none",
+     "n": 13824,
+     "pct_profitable": 0.08000578703703703,
+     "median_sharpe": -1.1313216545669604,
+     "p90_sharpe": -0.07333797992700013,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "1",
+     "n": 13824,
+     "pct_profitable": 0.07450810185185185,
+     "median_sharpe": -1.4041609731399498,
+     "p90_sharpe": -0.12450952638063911,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "2",
+     "n": 13824,
+     "pct_profitable": 0.07515914351851852,
+     "median_sharpe": -1.2211626915564173,
+     "p90_sharpe": -0.10029294705343786,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  }
+ ],
+ "length_map": {
+  "order": null,
+  "fixed": {
+   "Bar size": "1h",
+   "Average type": "SMA",
+   "Entry z": "-2.5",
+   "Exit z": "-1",
+   "Max hold (bars)": "10",
+   "Confirmation": "up bar",
+   "Stop (\u00d7 ATR)": "none"
+  },
+  "center": [
+   20,
+   30
+  ],
+  "rows": [
+   20,
+   30,
+   40,
+   50,
+   60,
+   80
+  ],
+  "cols": [
+   10,
+   15,
+   20,
+   25,
+   30,
+   40,
+   60,
+   80
+  ],
+  "sharpe": [
+   [
+    -0.4107810502520084,
+    0.05649137786095046,
+    0.2988934626552797,
+    0.1736880215736637,
+    0.9774099436364576,
+    0.020265205564905003,
+    0.8182293003111984,
+    0.2486149080908824
+   ],
+   [
+    -0.31340497006392687,
+    -0.15556337778974144,
+    -0.3942415267700021,
+    0.46763139588260016,
+    0.7321713534537713,
+    0.5300774825334233,
+    0.35149852820796906,
+    -0.045570663266375676
+   ],
+   [
+    -0.2029829836252706,
+    -0.6412370399619204,
+    -0.6773136383836477,
+    -0.05750918914173297,
+    0.26540949743944425,
+    0.5709101838535566,
+    -0.2790019749136514,
+    -0.5113133053897057
+   ],
+   [
+    -0.46461317315781,
+    -0.34812904040377957,
+    -0.24069438344015578,
+    -0.5519359511523827,
+    0.46129386764122,
+    0.21770312273847903,
+    0.02158474355981484,
+    -0.8337109716473085
+   ],
+   [
+    -0.59360512924809,
+    -0.030727586833244676,
+    0.3510260357335241,
+    -0.17707643984398,
+    -0.06271794375074155,
+    0.17090938903007857,
+    0.2537340002589072,
+    -0.6262436196770258
+   ],
+   [
+    -0.0071629125717956885,
+    -0.2106168422387618,
+    -1.0460523068461087,
+    -0.6521030509413163,
+    -0.4636769106513506,
+    -0.6093346360486027,
+    -0.6014096042311887,
+    -0.6629163099275427
+   ]
+  ],
+  "trades": [
+   [
+    119,
+    30,
+    8,
+    8,
+    10,
+    8,
+    9,
+    3
+   ],
+   [
+    141,
+    100,
+    63,
+    28,
+    17,
+    15,
+    12,
+    10
+   ],
+   [
+    131,
+    112,
+    103,
+    75,
+    36,
+    16,
+    18,
+    17
+   ],
+   [
+    139,
+    113,
+    105,
+    98,
+    77,
+    38,
+    21,
+    15
+   ],
+   [
+    131,
+    117,
+    106,
+    108,
+    89,
+    57,
+    23,
+    18
+   ],
+   [
+    121,
+    103,
+    104,
+    105,
+    93,
+    80,
+    42,
+    23
+   ]
+  ]
+ },
+ "luck": null,
+ "finalists": [],
+ "short_labels": {
+  "timeframe": "Bar",
+  "mean_type": "Avg",
+  "mean_lookback": "Len",
+  "std_lookback": "Vol",
+  "entry_z": "Entry",
+  "exit_z": "Exit",
+  "max_holding_bars": "Hold",
+  "entry_confirmation": "Conf",
+  "stop_atr_multiple": "Stop"
+ },
+ "benchmark": {
+  "label": "Holding 6J (rolled, unlevered)",
+  "dev": {
+   "net_return": -0.21565801056300105,
+   "sharpe": -0.5383970992332623,
+   "max_drawdown": -0.3538334451684404
+  },
+  "val": {
+   "net_return": -0.2520779680444519,
+   "sharpe": -1.3585908755145197,
+   "max_drawdown": -0.27099079111855506
+  }
+ },
+ "transfer_symbol": "6E",
+ "dsr": {
+  "effective_trials": 1427.9999999999916,
+  "raw_trials": 41472.0
+ },
+ "assumptions": [
+  "Data: Databento CME continuous front month (6J.v.0), 1-minute bars aggregated to 5/15/60 minutes. Rolls are back-adjusted so the roll gap is not treated as a price move.",
+  "Day session only: CME FX day session 08:20-15:00 NY (former pit hours) on NYSE trading days (ending no later than the NYSE close). Overnight Globex trading is not used; positions can be held overnight.",
+  "Costs: 1 tick slippage per side and $2.50 commission per contract per side. Positions that span a roll are assumed to roll for free.",
+  "Lengths and holding periods are counted in bars of the chosen bar size.",
+  "Sharpe uses daily mark-to-market returns (\u221a252), with idle cash earning 0%. Time in market is the share of bars with an open position.",
+  "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead."
+ ],
+ "source": "mean-reversion-backtest/runs/funnel/mr_6j_v5/ \u00b7 configs/funnel/mr_funnel_6j_v5.yaml"
+}

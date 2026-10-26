@@ -1,0 +1,41 @@
+{
+  "audit_notes": [
+    "z = (close - mean) / std with mean = SMA/EMA of the last N closes and std = rolling sample std of the last M closes (bars of the config's timeframe), both INCLUDING the signal bar's close; the signal is decided at that close and the entry fills at the NEXT bar's open.",
+    "Exits are decided at a close on or after the entry bar (z >= exit_z, or held max_hold bars) and fill at the next bar's open, so a time exit fills exactly max_hold bars after entry.",
+    "Trend filter compares the signal bar's close to the SMA(100/150/200 bars) of closes up to that bar; warm-up bars (SMA undefined) never signal.",
+    "No profit target exists. v1 has no stop; v2's optional ATR stop is entry fill - k x ATR(14) using the ATR known before the fill, live from the entry bar, filled at the worse of open and stop. Sizing (v1 and v2): as many whole shares as current equity affords (no leverage).",
+    "v2 only: the z-score std uses the same window as the mean; positive_bar_return requires the signal bar's close above the previous close; cooldown_bars = N requires the next signal bar to be >= N bars after the previous exit.",
+    "After a time exit the setup re-arms only once z closes above entry_z, so the holding cap cannot be undone by an immediate re-entry.",
+    "Missed-entry stress skips a whole signal episode (contiguous signal bars), never re-entering one bar later.",
+    "Adverse slippage + commission on every fill; a fill at a session's first bar bears the full overnight gap.",
+    "Development backtests run on data physically truncated at the development end; open positions are force-closed at the last development bar and flagged (not counted as completed).",
+    "Sharpe: daily session-close mark-to-market returns over every trading day (flat days = 0), sqrt(252) annualization, rf = 0, idle cash earns 0.",
+    "Positions are held overnight (no session-end flattening), as in the channel family; rolling windows run continuously across sessions over RTH bars only."
+  ],
+  "checks_per_config": [
+    "entry_signal_condition_not_met",
+    "entry_not_after_signal_bar",
+    "exit_before_entry",
+    "exit_decided_before_entry",
+    "exit_not_next_open_after_decision",
+    "overlapping_positions",
+    "entry_fill_better_than_open",
+    "exit_fill_better_than_open",
+    "holding_period_exceeds_max_hold",
+    "position_exceeds_equity",
+    "forced_close_not_final_trade",
+    "commission_below_minimum",
+    "unexpected_stop_or_target",
+    "stop_not_from_atr_known_before_entry",
+    "stop_exit_without_touch",
+    "stop_fill_better_than_min_open_stop",
+    "cooldown_violated"
+  ],
+  "cut_fractions": [
+    0.3,
+    0.6000000000000001,
+    0.9
+  ],
+  "failures": {},
+  "truncation_sample": 40
+}

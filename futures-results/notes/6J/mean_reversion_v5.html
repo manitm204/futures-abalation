@@ -1,0 +1,12 @@
+<p><b>Same test as the other markets, on the yen.</b> Same 41,472-version v5 grid and funnel as 6E. Differences:</p>
+<ul><li><b>Session:</b> the old CME FX pit hours, 08:20–15:00 New York, as for 6E.</li>
+<li><b>Cross-market check on 6E</b> (2018–2022 only, diagnostic), though with no finalists it had nothing to check.</li>
+<li><b>Five stale expiry days skipped</b> (2021-03-12, 2021-09-10, 2023-06-16, 2025-06-13, 2025-09-12) by the under-5%-of-normal-volume rule.</li></ul>
+<p>6J rolls quarterly (35 rolls, back-adjusted). One contract was worth about $77–124k over the period.</p>
+<p><b>Nothing passed: 0 of 41,472 versions reached the finalists.</b> Mean reversion fails on the yen even more clearly than on the euro.</p>
+<ul><li>Only 7.7% of versions made money on 2018–2022, and the median Sharpe was −1.24. Every bar size had a negative median (5-minute −2.34, 15-minute −1.31, 1-hour −0.41).</li>
+<li>Of the 32,801 versions with enough trades (≥100), only 439 made money and none reached Sharpe 0.75. The best was 1-hour SMA 50/30, entry −2.5, hold 10, up bar, 1× ATR stop: Sharpe 0.62, +7.8% over five years on 101 trades.</li>
+<li>132 versions did reach Sharpe 0.75, but all on 8–39 trades in five years, far too few to mean anything.</li>
+<li>The least-bad corner was 1-hour bars with up-bar confirmation, and even there only a third of versions made money (median Sharpe −0.20).</li></ul>
+<p><b>No validation run.</b> With no finalists there was nothing to score on 2023–2024 (the validate step opened the data and logged it, but tested no strategy), so 6J 2023–2024 is effectively still fresh and the 2025+ holdout is untouched.</p>
+<p><b>Holding the yen lost money too:</b> −21.6% over 2018–2022 and −25.2% over 2023–2024, as the yen fell against the dollar.</p>

@@ -228,13 +228,17 @@ def main(
                                 for r in abl["axes"] if r["axis"] == a]} for a in axes]
 
     # ---- average x volatility length map around the top finalist (validation passer if any) ----
-    top = next((f for f in val["results"] if f["status"] == "pass"), val["results"][0])
-    c = by_id[top["config_id"]]
+    # (no finalists: the version with the best development Sharpe)
+    top = next((f for f in val["results"] if f["status"] == "pass"), val["results"][0] if val["results"] else None)
+    if top is not None:
+        c, top_order = by_id[top["config_id"]], top["dev_order"]
+    else:
+        c, top_order = df.sort("dev_sharpe", descending=True, nulls_last=True).row(0, named=True), None
     others = [a for a in axes if a not in ("mean_lookback", "std_lookback")]
     sub = df.filter(pl.all_horizontal([pl.col(a) == c[a] for a in others]))
     cell = {(r["mean_lookback"], r["std_lookback"]): r for r in sub.iter_rows(named=True)}
     length_map = {
-        "order": top["dev_order"], "fixed": {LABELS[a]: _val(a, c[a]) for a in others},
+        "order": top_order, "fixed": {LABELS[a]: _val(a, c[a]) for a in others},
         "center": [c["mean_lookback"], c["std_lookback"]],
         "rows": list(axes["mean_lookback"]), "cols": list(axes["std_lookback"]),
         "sharpe": [[_num(cell[(m, v)]["dev_sharpe"]) if (m, v) in cell else None for v in axes["std_lookback"]]
