@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from src.experiments.shared_account import share_account
+from src.experiments.shared_account import share_account, share_account_multi
 from src.strategies.mean_reversion.backtest import STOP_EXIT, TIME_EXIT, CostModel, SimResult
 from src.utils.config_models import ExecutionConfig
 
@@ -66,3 +66,31 @@ def test_trade_skipped_when_less_than_one_contract_left():
     b = _sim([12], [18], [7400.0], [7400.0])
     r = share_account([a, b], DATA, costs, 1_000_000)
     assert r.contracts[1].tolist() == [0] and len(r.sims[1].entry_idx) == 0
+
+
+def test_market_and_group_caps_across_markets():
+    es = CostModel.for_symbol(FUT, "ES")    # 4000 x $50 = $200k
+    nq = CostModel.for_symbol(FUT, "NQ")    # 10000 x $20 = $200k
+    gc = CostModel.for_symbol(FUT, "GC")    # 2000 x $100 = $200k
+    es1 = _sim([10], [40], [4000.0], [4000.0])
+    es2 = _sim([12], [40], [4000.0], [4000.0])
+    nq1 = _sim([14], [40], [10000.0], [10000.0])
+    gc1 = _sim([16], [40], [2000.0], [2000.0])
+    r = share_account_multi([es1, es2, nq1, gc1], DATA, [es, es, nq, gc], 1_000_000, per_trade=0.25, total_cap=1.0,
+                            market=["ES", "ES", "NQ", "GC"], market_cap=0.41, group=["idx", "idx", "idx", None],
+                            group_cap=0.6)
+    # ES #1: $250k budget -> 1 ($200k). ES #2: market room $410k - $200k = $210k -> 1 (not trimmed: it wanted 1).
+    # NQ: group room $600k - $400k = $200k, not enough for $200k + commission -> 0, bound by the group cap. GC: own budget $250k -> 1.
+    assert [c.tolist() for c in r.contracts] == [[1], [1], [0], [1]]
+    assert r.bound[2].tolist() == ["group"] and r.trimmed[2].tolist() == [True]
+    assert abs(r.peak["group"] - 0.4) < 1e-9 and abs(r.peak["total"] - 0.6) < 1e-9
+
+
+def test_micro_contract_costs_per_strategy():
+    import dataclasses
+    es = CostModel.for_symbol(FUT, "ES")
+    mes = dataclasses.replace(es, ec=FUT.model_copy(update={"commission_per_contract": 1.0}), multiplier=es.multiplier / 10)
+    a = _sim([10], [20], [4000.0], [4010.0])
+    r = share_account_multi([a], DATA, [mes], 1_000_000, per_trade=0.25)
+    assert r.contracts[0].tolist() == [12]                     # $250k / $20k per micro
+    assert r.sims[0].realized_pnl[0] == 10 * 12 * 5 - 2 * 12 * 1.0
