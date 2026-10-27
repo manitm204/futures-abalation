@@ -435,6 +435,81 @@ class MeanReversionV17Config(MeanReversionV3Config):
     stop_atr_multiple: Literal["none", "1.5", "2.0", "2.5"] = "none"
 
 
+# --- v18 parameter space (CL round 3, 15min (16,128 variants per symbol)) --------------------------
+# 15min only, specified by the user: SMA/EMA, averages 30 and 40-60 in steps of 5 plus 70/80, volatility
+# 15/18/20/22/25/30/75, entry -2 to -3.5, exit -1/0/+0.5, hold 3/5/8, up-bar confirmation, stop none/1/1.5/2 x ATR.
+V18_TIMEFRAMES: tuple[str, ...] = ("15min",)
+V18_MEAN_TYPES: tuple[str, ...] = ("sma", "ema")
+V18_MEAN_LOOKBACKS: tuple[int, ...] = (30, 40, 45, 50, 55, 60, 70, 80)
+V18_STD_LOOKBACKS: tuple[int, ...] = (15, 18, 20, 22, 25, 30, 75)
+V18_ENTRY_ZS: tuple[float, ...] = (-2.0, -2.5, -3.0, -3.5)
+V18_EXIT_ZS: tuple[float, ...] = (-1.0, 0.0, 0.5)
+V18_MAX_HOLDS: tuple[int, ...] = (3, 5, 8)
+V18_ENTRY_CONFIRMATIONS: tuple[str, ...] = ("positive_bar_return",)
+V18_STOP_ATRS: tuple[str, ...] = ("none", "1.0", "1.5", "2.0")
+
+
+class MeanReversionV18Config(MeanReversionV3Config):
+    timeframe: Literal["15min"] = "15min"
+    mean_lookback: Literal[30, 40, 45, 50, 55, 60, 70, 80] = 30
+    std_lookback: Literal[15, 18, 20, 22, 25, 30, 75] = 15
+    entry_z: Literal[-2.0, -2.5, -3.0, -3.5] = -2.0
+    exit_z: Literal[-1.0, 0.0, 0.5] = -1.0
+    max_holding_bars: Literal[3, 5, 8] = 3
+    entry_confirmation: Literal["positive_bar_return"] = "positive_bar_return"
+    stop_atr_multiple: Literal["none", "1.0", "1.5", "2.0"] = "none"
+
+
+# --- v19 parameter space (GC round 2, 15min (21,504 variants per symbol)) -------------------------
+# 15min only, specified by the user: SMA/EMA, averages 12/16/20/25/30/40/50, volatility 6/8/10/12/15/18,
+# entry -2 to -3.5, exit -1/-0.5/0/+0.5, hold 5/8/10/14, up-bar confirmation, stop none/1/1.5/2 x ATR.
+V19_TIMEFRAMES: tuple[str, ...] = ("15min",)
+V19_MEAN_TYPES: tuple[str, ...] = ("sma", "ema")
+V19_MEAN_LOOKBACKS: tuple[int, ...] = (12, 16, 20, 25, 30, 40, 50)
+V19_STD_LOOKBACKS: tuple[int, ...] = (6, 8, 10, 12, 15, 18)
+V19_ENTRY_ZS: tuple[float, ...] = (-2.0, -2.5, -3.0, -3.5)
+V19_EXIT_ZS: tuple[float, ...] = (-1.0, -0.5, 0.0, 0.5)
+V19_MAX_HOLDS: tuple[int, ...] = (5, 8, 10, 14)
+V19_ENTRY_CONFIRMATIONS: tuple[str, ...] = ("positive_bar_return",)
+V19_STOP_ATRS: tuple[str, ...] = ("none", "1.0", "1.5", "2.0")
+
+
+class MeanReversionV19Config(MeanReversionV3Config):
+    timeframe: Literal["15min"] = "15min"
+    mean_lookback: Literal[12, 16, 20, 25, 30, 40, 50] = 12
+    std_lookback: Literal[6, 8, 10, 12, 15, 18] = 6
+    entry_z: Literal[-2.0, -2.5, -3.0, -3.5] = -2.0
+    exit_z: Literal[-1.0, -0.5, 0.0, 0.5] = -1.0
+    max_holding_bars: Literal[5, 8, 10, 14] = 5
+    entry_confirmation: Literal["positive_bar_return"] = "positive_bar_return"
+    stop_atr_multiple: Literal["none", "1.0", "1.5", "2.0"] = "none"
+
+
+# --- v20 parameter space (GC round 2, 1h (17,280 variants per symbol)) -------------------------
+# 1h only, specified by the user: SMA/EMA, averages 30/40/50/60/80, volatility 12/15/18/20/22/25,
+# entry -2/-2.5/-3, exit -0.5/0/+0.5, hold 5/8/10/14, confirmation none/up, stop none/1/1.5/2 x ATR.
+V20_TIMEFRAMES: tuple[str, ...] = ("1h",)
+V20_MEAN_TYPES: tuple[str, ...] = ("sma", "ema")
+V20_MEAN_LOOKBACKS: tuple[int, ...] = (30, 40, 50, 60, 80)
+V20_STD_LOOKBACKS: tuple[int, ...] = (12, 15, 18, 20, 22, 25)
+V20_ENTRY_ZS: tuple[float, ...] = (-2.0, -2.5, -3.0)
+V20_EXIT_ZS: tuple[float, ...] = (-0.5, 0.0, 0.5)
+V20_MAX_HOLDS: tuple[int, ...] = (5, 8, 10, 14)
+V20_ENTRY_CONFIRMATIONS: tuple[str, ...] = ("none", "positive_bar_return")
+V20_STOP_ATRS: tuple[str, ...] = ("none", "1.0", "1.5", "2.0")
+
+
+class MeanReversionV20Config(MeanReversionV3Config):
+    timeframe: Literal["1h"] = "1h"
+    mean_lookback: Literal[30, 40, 50, 60, 80] = 30
+    std_lookback: Literal[12, 15, 18, 20, 22, 25] = 12
+    entry_z: Literal[-2.0, -2.5, -3.0] = -2.0
+    exit_z: Literal[-0.5, 0.0, 0.5] = -0.5
+    max_holding_bars: Literal[5, 8, 10, 14] = 5
+    entry_confirmation: Literal["none", "positive_bar_return"] = "none"
+    stop_atr_multiple: Literal["none", "1.0", "1.5", "2.0"] = "none"
+
+
 # --- v21 parameter space (6E round 2, 1h (24,000 variants per symbol)) -------------------------
 # 1h only, specified by the user after reading 6E v5: SMA/EMA, averages 60/70/80/90/100/120,
 # volatility 6/8/10/12/15, entry -1.5/-1.75/-2/-2.25/-2.5, exit -1/-0.5/0/+0.5,

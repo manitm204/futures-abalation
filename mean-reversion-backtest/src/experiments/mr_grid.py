@@ -44,6 +44,9 @@ from src.strategies.mean_reversion.config import (
     MeanReversionV15Config,
     MeanReversionV16Config,
     MeanReversionV17Config,
+    MeanReversionV18Config,
+    MeanReversionV19Config,
+    MeanReversionV20Config,
     MeanReversionV21Config,
     V11_ENTRY_CONFIRMATIONS,
     V11_ENTRY_ZS,
@@ -108,6 +111,33 @@ from src.strategies.mean_reversion.config import (
     V17_MAX_HOLDS,
     V17_ENTRY_CONFIRMATIONS,
     V17_STOP_ATRS,
+    V18_TIMEFRAMES,
+    V18_MEAN_TYPES,
+    V18_MEAN_LOOKBACKS,
+    V18_STD_LOOKBACKS,
+    V18_ENTRY_ZS,
+    V18_EXIT_ZS,
+    V18_MAX_HOLDS,
+    V18_ENTRY_CONFIRMATIONS,
+    V18_STOP_ATRS,
+    V19_TIMEFRAMES,
+    V19_MEAN_TYPES,
+    V19_MEAN_LOOKBACKS,
+    V19_STD_LOOKBACKS,
+    V19_ENTRY_ZS,
+    V19_EXIT_ZS,
+    V19_MAX_HOLDS,
+    V19_ENTRY_CONFIRMATIONS,
+    V19_STOP_ATRS,
+    V20_TIMEFRAMES,
+    V20_MEAN_TYPES,
+    V20_MEAN_LOOKBACKS,
+    V20_STD_LOOKBACKS,
+    V20_ENTRY_ZS,
+    V20_EXIT_ZS,
+    V20_MAX_HOLDS,
+    V20_ENTRY_CONFIRMATIONS,
+    V20_STOP_ATRS,
     V21_TIMEFRAMES,
     V21_MEAN_TYPES,
     V21_MEAN_LOOKBACKS,
@@ -453,6 +483,49 @@ def mr_grid_v17(symbols: tuple[str, ...]) -> list[ConfigEntry]:
     return _grid(symbols, AXES_V17, MeanReversionV17Config)
 
 
+AXES_V18: dict[str, tuple] = {
+    "timeframe": V18_TIMEFRAMES,
+    "mean_type": V18_MEAN_TYPES,
+    "mean_lookback": V18_MEAN_LOOKBACKS,
+    "std_lookback": V18_STD_LOOKBACKS,
+    "entry_z": V18_ENTRY_ZS,
+    "exit_z": V18_EXIT_ZS,
+    "max_holding_bars": V18_MAX_HOLDS,
+    "entry_confirmation": V18_ENTRY_CONFIRMATIONS,
+    "stop_atr_multiple": V18_STOP_ATRS,
+}
+
+
+def mr_grid_v18(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_V18, MeanReversionV18Config)
+
+
+AXES_V19: dict[str, tuple] = {
+    "timeframe": V19_TIMEFRAMES,
+    "mean_type": V19_MEAN_TYPES,
+    "mean_lookback": V19_MEAN_LOOKBACKS,
+    "std_lookback": V19_STD_LOOKBACKS,
+    "entry_z": V19_ENTRY_ZS,
+    "exit_z": V19_EXIT_ZS,
+    "max_holding_bars": V19_MAX_HOLDS,
+    "entry_confirmation": V19_ENTRY_CONFIRMATIONS,
+    "stop_atr_multiple": V19_STOP_ATRS,
+}
+
+
+AXES_V20: dict[str, tuple] = {
+    "timeframe": V20_TIMEFRAMES,
+    "mean_type": V20_MEAN_TYPES,
+    "mean_lookback": V20_MEAN_LOOKBACKS,
+    "std_lookback": V20_STD_LOOKBACKS,
+    "entry_z": V20_ENTRY_ZS,
+    "exit_z": V20_EXIT_ZS,
+    "max_holding_bars": V20_MAX_HOLDS,
+    "entry_confirmation": V20_ENTRY_CONFIRMATIONS,
+    "stop_atr_multiple": V20_STOP_ATRS,
+}
+
+
 AXES_V21: dict[str, tuple] = {
     "timeframe": V21_TIMEFRAMES,
     "mean_type": V21_MEAN_TYPES,
@@ -464,6 +537,14 @@ AXES_V21: dict[str, tuple] = {
     "entry_confirmation": V21_ENTRY_CONFIRMATIONS,
     "stop_atr_multiple": V21_STOP_ATRS,
 }
+
+
+def mr_grid_v19(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_V19, MeanReversionV19Config)
+
+
+def mr_grid_v20(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_V20, MeanReversionV20Config)
 
 
 def mr_grid_v21(symbols: tuple[str, ...]) -> list[ConfigEntry]:

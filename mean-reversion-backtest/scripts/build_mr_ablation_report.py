@@ -29,11 +29,11 @@ import polars as pl
 import typer
 
 from src.experiments.funnel_config import load_funnel_config
-from src.experiments.mr_grid import AXES, AXES_V2, AXES_V3, AXES_V5, AXES_V6, AXES_V7, AXES_V8, AXES_V9, AXES_V10, AXES_V11, AXES_V12, AXES_V13, AXES_V14, AXES_V15, AXES_V16, AXES_V17, AXES_V21
+from src.experiments.mr_grid import AXES, AXES_V2, AXES_V3, AXES_V5, AXES_V6, AXES_V7, AXES_V8, AXES_V9, AXES_V10, AXES_V11, AXES_V12, AXES_V13, AXES_V14, AXES_V15, AXES_V16, AXES_V17, AXES_V18, AXES_V19, AXES_V20, AXES_V21
 from src.utils.serialization import atomic_write_json
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-AXES_BY_STRATEGY = {"mean_reversion": AXES, "mean_reversion_v2": AXES_V2, "mean_reversion_v3": AXES_V3, "mean_reversion_v5": AXES_V5, "mean_reversion_v6": AXES_V6, "mean_reversion_v7": AXES_V7, "mean_reversion_v8": AXES_V8, "mean_reversion_v9": AXES_V9, "mean_reversion_v10": AXES_V10, "mean_reversion_v11": AXES_V11, "mean_reversion_v12": AXES_V12, "mean_reversion_v13": AXES_V13, "mean_reversion_v14": AXES_V14, "mean_reversion_v15": AXES_V15, "mean_reversion_v16": AXES_V16, "mean_reversion_v17": AXES_V17, "mean_reversion_v21": AXES_V21}
+AXES_BY_STRATEGY = {"mean_reversion": AXES, "mean_reversion_v2": AXES_V2, "mean_reversion_v3": AXES_V3, "mean_reversion_v5": AXES_V5, "mean_reversion_v6": AXES_V6, "mean_reversion_v7": AXES_V7, "mean_reversion_v8": AXES_V8, "mean_reversion_v9": AXES_V9, "mean_reversion_v10": AXES_V10, "mean_reversion_v11": AXES_V11, "mean_reversion_v12": AXES_V12, "mean_reversion_v13": AXES_V13, "mean_reversion_v14": AXES_V14, "mean_reversion_v15": AXES_V15, "mean_reversion_v16": AXES_V16, "mean_reversion_v17": AXES_V17, "mean_reversion_v18": AXES_V18, "mean_reversion_v19": AXES_V19, "mean_reversion_v20": AXES_V20, "mean_reversion_v21": AXES_V21}
 app = typer.Typer(add_completion=False)
 
 

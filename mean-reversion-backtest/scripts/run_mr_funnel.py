@@ -36,7 +36,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.analysis.neighborhood import LATTICE_V1, LATTICE_V2, LATTICE_V3, LATTICE_V5, LATTICE_V6, LATTICE_V7, LATTICE_V8, LATTICE_V9, LATTICE_V10, LATTICE_V11, LATTICE_V12, LATTICE_V13, LATTICE_V14, LATTICE_V15, LATTICE_V16, LATTICE_V17, LATTICE_V21, NeighborhoodStats, neighborhood_stats
+from src.analysis.neighborhood import LATTICE_V1, LATTICE_V2, LATTICE_V3, LATTICE_V5, LATTICE_V6, LATTICE_V7, LATTICE_V8, LATTICE_V9, LATTICE_V10, LATTICE_V11, LATTICE_V12, LATTICE_V13, LATTICE_V14, LATTICE_V15, LATTICE_V16, LATTICE_V17, LATTICE_V18, LATTICE_V19, LATTICE_V20, LATTICE_V21, NeighborhoodStats, neighborhood_stats
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.data.aggregation import AGG_INTERVAL_MINUTES, aggregate_bars
 from src.experiments.data_access import (
@@ -84,9 +84,9 @@ from src.experiments.funnel_robustness import (
     quantile,
 )
 from src.experiments.integrity import CHECKS, truncation_invariance
-from src.experiments.mr_grid import mr_grid, mr_grid_v2, mr_grid_v3, mr_grid_v5, mr_grid_v6, mr_grid_v7, mr_grid_v8, mr_grid_v9, mr_grid_v10, mr_grid_v11, mr_grid_v12, mr_grid_v13, mr_grid_v14, mr_grid_v15, mr_grid_v16, mr_grid_v17, mr_grid_v21
+from src.experiments.mr_grid import mr_grid, mr_grid_v2, mr_grid_v3, mr_grid_v5, mr_grid_v6, mr_grid_v7, mr_grid_v8, mr_grid_v9, mr_grid_v10, mr_grid_v11, mr_grid_v12, mr_grid_v13, mr_grid_v14, mr_grid_v15, mr_grid_v16, mr_grid_v17, mr_grid_v18, mr_grid_v19, mr_grid_v20, mr_grid_v21
 from src.strategies.mean_reversion.backtest import MRParams
-from src.strategies.mean_reversion.config import MeanReversionConfig, MeanReversionV2Config, MeanReversionV3Config, MeanReversionV5Config, MeanReversionV6Config, MeanReversionV7Config, MeanReversionV8Config, MeanReversionV9Config, MeanReversionV10Config, MeanReversionV11Config, MeanReversionV12Config, MeanReversionV13Config, MeanReversionV14Config, MeanReversionV15Config, MeanReversionV16Config, MeanReversionV17Config, MeanReversionV21Config
+from src.strategies.mean_reversion.config import MeanReversionConfig, MeanReversionV2Config, MeanReversionV3Config, MeanReversionV5Config, MeanReversionV6Config, MeanReversionV7Config, MeanReversionV8Config, MeanReversionV9Config, MeanReversionV10Config, MeanReversionV11Config, MeanReversionV12Config, MeanReversionV13Config, MeanReversionV14Config, MeanReversionV15Config, MeanReversionV16Config, MeanReversionV17Config, MeanReversionV18Config, MeanReversionV19Config, MeanReversionV20Config, MeanReversionV21Config
 from src.utils.hashing import canonical_json
 from src.utils.logging import configure_logging, get_logger
 from src.utils.seeds import derive_seed
@@ -168,6 +168,21 @@ SPACES = {
     },
     "mean_reversion_v17": {
         "grid": mr_grid_v17, "cls": MeanReversionV17Config, "lattice": LATTICE_V17, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v18": {
+        "grid": mr_grid_v18, "cls": MeanReversionV18Config, "lattice": LATTICE_V18, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v19": {
+        "grid": mr_grid_v19, "cls": MeanReversionV19Config, "lattice": LATTICE_V19, "perturb": perturbations_v3,
+        "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
+                 "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
+    },
+    "mean_reversion_v20": {
+        "grid": mr_grid_v20, "cls": MeanReversionV20Config, "lattice": LATTICE_V20, "perturb": perturbations_v3,
         "keys": ("symbol", "timeframe", "mean_type", "mean_lookback", "std_lookback", "entry_z", "exit_z",
                  "max_holding_bars", "entry_confirmation", "stop_atr_multiple"),
     },

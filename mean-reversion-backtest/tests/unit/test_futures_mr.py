@@ -135,6 +135,21 @@ def test_v16_v17_grid_sizes():
     assert {e.config.stop_atr_value for e in mr_grid_v17(("RTY",))} == {None, 1.5, 2.0, 2.5}
 
 
+def test_v18_grid_size():
+    from src.experiments.mr_grid import mr_grid_v18
+    grid = mr_grid_v18(("CL",))
+    assert len(grid) == 16_128
+    assert {e.config.entry_confirmation for e in grid} == {"positive_bar_return"}
+    assert {e.config.stop_atr_value for e in grid} == {None, 1.0, 1.5, 2.0}
+
+
+def test_v19_v20_grid_sizes():
+    from src.experiments.mr_grid import mr_grid_v19, mr_grid_v20
+    assert len(mr_grid_v19(("GC",))) == 21_504
+    assert len(mr_grid_v20(("GC",))) == 17_280
+    assert {e.config.max_holding_bars for e in mr_grid_v19(("GC",))} == {5, 8, 10, 14}
+    assert {e.config.entry_confirmation for e in mr_grid_v20(("GC",))} == {"none", "positive_bar_return"}
+
 def test_v21_grid_size():
     from src.experiments.mr_grid import mr_grid_v21
     grid = mr_grid_v21(("6E",))

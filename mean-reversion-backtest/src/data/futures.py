@@ -73,6 +73,8 @@ SESSIONS: dict[str, SessionSpec] = {
     "GC": SessionSpec(time(8, 20), time(13, 30), "COMEX gold day session 08:20-13:30 NY (open outcry hours, settlement 13:30)"),
     "6E": SessionSpec(time(8, 20), time(15, 0), "CME FX day session 08:20-15:00 NY (former pit hours)"),
     "6J": SessionSpec(time(8, 20), time(15, 0), "CME FX day session 08:20-15:00 NY (former pit hours)"),
+    "ZN": SessionSpec(time(8, 20), time(15, 0), "CBOT Treasury day session 08:20-15:00 NY (former pit hours)"),
+    "ZB": SessionSpec(time(8, 20), time(15, 0), "CBOT Treasury day session 08:20-15:00 NY (former pit hours)"),
 }
 
 
