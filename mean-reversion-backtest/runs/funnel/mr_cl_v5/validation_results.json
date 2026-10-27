@@ -1,0 +1,4473 @@
+{
+  "data_access": {
+    "actual_last_session": "2024-12-31",
+    "command": "validate",
+    "experiment_id": "mr_cl_v5",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 84,
+    "partition_fingerprint": "1f8ba155c0d1c133",
+    "phase": "validation",
+    "phase_end": "2024-12-31",
+    "rows": 2455045,
+    "symbol": "CL"
+  },
+  "experiment_id": "mr_cl_v5",
+  "note": "Ordering is the frozen development ordering; validation results are never used to re-rank.",
+  "results": [
+    {
+      "config_id": "cfg_2258644d8a28105c7054",
+      "dev_order": 1,
+      "metrics": {
+        "autocorr_lag1": 0.04173376489691635,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.09516310387105964,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2378011.4726612438,
+        "excess_kurtosis": 12.140854516493995,
+        "excl_best_year_return": -0.09915477531806427,
+        "excl_best_year_sharpe": -1.0306531345914283,
+        "exposure": 0.08353005266025058,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 452,
+        "max_drawdown": -0.2595864813852603,
+        "n_completed_trades": 164,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 164,
+        "net_pnl": -524197.3816859955,
+        "net_return": -0.18062014417080852,
+        "profit_factor": 0.7235402452682381,
+        "same_session_trade_frac": 0.6402439024390244,
+        "sharpe": -1.0891525562342377,
+        "sharpe_per_period": -0.06861016199062106,
+        "skew": -0.7297802649750025,
+        "start_equity": 2902208.8543472392,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 108.77486760347168,
+        "win_rate": 0.29878048780487804,
+        "year_pnl": {
+          "2023": -287767.86687889695,
+          "2024": -236429.51480709855
+        },
+        "year_return": {
+          "2023": -0.09915477531806416,
+          "2024": -0.09043214818783951
+        },
+        "year_sharpe": {
+          "2023": -1.0306531345914283,
+          "2024": -1.1739590897196641
+        },
+        "year_trades": {
+          "2023": 78,
+          "2024": 86
+        }
+      },
+      "reasons": [
+        "net_return -0.1806 <= 0.0",
+        "sharpe -1.089 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_f9a8da893d66653b1814",
+      "dev_order": 2,
+      "metrics": {
+        "autocorr_lag1": 0.0086112702462993,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.08719877036463441,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2148505.728009729,
+        "excess_kurtosis": 16.234692558612632,
+        "excl_best_year_return": -0.09233345362657375,
+        "excl_best_year_sharpe": -1.0040741311329813,
+        "exposure": 0.07390593789722172,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.250384894286235,
+        "n_completed_trades": 147,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 147,
+        "net_pnl": -428228.3935318892,
+        "net_return": -0.16619036863441972,
+        "profit_factor": 0.737840226338976,
+        "same_session_trade_frac": 0.564625850340136,
+        "sharpe": -1.0858349999081987,
+        "sharpe_per_period": -0.06840117558587942,
+        "skew": -1.0931536310096237,
+        "start_equity": 2576734.1215416184,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 96.94178674315359,
+        "win_rate": 0.2925170068027211,
+        "year_pnl": {
+          "2023": -237918.76051937323,
+          "2024": -190309.63301251596
+        },
+        "year_return": {
+          "2023": -0.09233345362657375,
+          "2024": -0.08137009709451193
+        },
+        "year_sharpe": {
+          "2023": -1.0040741311329813,
+          "2024": -1.2283768839406672
+        },
+        "year_trades": {
+          "2023": 77,
+          "2024": 70
+        }
+      },
+      "reasons": [
+        "net_return -0.1662 <= 0.0",
+        "sharpe -1.086 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_acfed54aed663a354ed5",
+      "dev_order": 3,
+      "metrics": {
+        "autocorr_lag1": 0.009911272603593493,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.08576636109671198,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2139378.1861986634,
+        "excess_kurtosis": 16.065059474514463,
+        "excl_best_year_return": -0.09837858909527553,
+        "excl_best_year_sharpe": -1.0903193351440446,
+        "exposure": 0.07681133103323043,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.2469230669569643,
+        "n_completed_trades": 147,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 147,
+        "net_pnl": -418407.18694849545,
+        "net_return": -0.16358182017190814,
+        "profit_factor": 0.7402790100764031,
+        "same_session_trade_frac": 0.564625850340136,
+        "sharpe": -1.070285587769152,
+        "sharpe_per_period": -0.06742165469175641,
+        "skew": -1.0989243303732674,
+        "start_equity": 2557785.373147159,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 96.6886300203363,
+        "win_rate": 0.2925170068027211,
+        "year_pnl": {
+          "2023": -251631.31621875055,
+          "2024": -166775.8707297449
+        },
+        "year_return": {
+          "2023": -0.09837858909527564,
+          "2024": -0.07231774921050826
+        },
+        "year_sharpe": {
+          "2023": -1.0903193351440446,
+          "2024": -1.0686824362416985
+        },
+        "year_trades": {
+          "2023": 77,
+          "2024": 70
+        }
+      },
+      "reasons": [
+        "net_return -0.1636 <= 0.0",
+        "sharpe -1.070 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_103b0b33c0dc7e2ee6ee",
+      "dev_order": 4,
+      "metrics": {
+        "autocorr_lag1": 0.04476783620717228,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.09942727652910643,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2441242.9989282163,
+        "excess_kurtosis": 12.247934716065329,
+        "excl_best_year_return": -0.10577864985360963,
+        "excl_best_year_sharpe": -1.1261153144514195,
+        "exposure": 0.08534592337025604,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 452,
+        "max_drawdown": -0.262372921544721,
+        "n_completed_trades": 164,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 164,
+        "net_pnl": -566304.3337347796,
+        "net_return": -0.18829440440870882,
+        "profit_factor": 0.7093914473826456,
+        "same_session_trade_frac": 0.6402439024390244,
+        "sharpe": -1.1549177113657356,
+        "sharpe_per_period": -0.07275297735756217,
+        "skew": -0.8946147471682677,
+        "start_equity": 3007547.332662996,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 108.75697675181799,
+        "win_rate": 0.29878048780487804,
+        "year_pnl": {
+          "2023": -318134.2962199161,
+          "2024": -248170.03751486354
+        },
+        "year_return": {
+          "2023": -0.10577864985360941,
+          "2024": -0.09227665447888367
+        },
+        "year_sharpe": {
+          "2023": -1.1261153144514195,
+          "2024": -1.2010728877039119
+        },
+        "year_trades": {
+          "2023": 78,
+          "2024": 86
+        }
+      },
+      "reasons": [
+        "net_return -0.1883 <= 0.0",
+        "sharpe -1.155 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_c64cbcc2b189c04214b1",
+      "dev_order": 5,
+      "metrics": {
+        "autocorr_lag1": 0.05529557349463197,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.027318261357842544,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1456402.625627591,
+        "excess_kurtosis": 35.60956021308564,
+        "excl_best_year_return": -0.041363437963209626,
+        "excl_best_year_sharpe": -0.4101283948423299,
+        "exposure": 0.0433993099691302,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 453,
+        "max_drawdown": -0.12224746539841203,
+        "n_completed_trades": 111,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 111,
+        "net_pnl": -82618.06405261694,
+        "net_return": -0.05368223091905544,
+        "profit_factor": 0.8673405414800486,
+        "same_session_trade_frac": 0.5945945945945946,
+        "sharpe": -0.3501798069191026,
+        "sharpe_per_period": -0.022059254363441926,
+        "skew": -0.576605497609621,
+        "start_equity": 1539020.689680208,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 72.52587203925455,
+        "win_rate": 0.38738738738738737,
+        "year_pnl": {
+          "2023": -63659.186821683776,
+          "2024": -18958.87723093317
+        },
+        "year_return": {
+          "2023": -0.04136343796320985,
+          "2024": -0.012850326644825771
+        },
+        "year_sharpe": {
+          "2023": -0.4101283948423299,
+          "2024": -0.29828544362932524
+        },
+        "year_trades": {
+          "2023": 69,
+          "2024": 42
+        }
+      },
+      "reasons": [
+        "net_return -0.0537 <= 0.0",
+        "sharpe -0.350 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_fff2d0b5e1af30b024cd",
+      "dev_order": 6,
+      "metrics": {
+        "autocorr_lag1": 0.05529557349463197,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.027318261357842544,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1456402.625627591,
+        "excess_kurtosis": 35.60956021308564,
+        "excl_best_year_return": -0.041363437963209626,
+        "excl_best_year_sharpe": -0.4101283948423299,
+        "exposure": 0.0433993099691302,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 453,
+        "max_drawdown": -0.12224746539841203,
+        "n_completed_trades": 111,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 111,
+        "net_pnl": -82618.06405261694,
+        "net_return": -0.05368223091905544,
+        "profit_factor": 0.8673405414800486,
+        "same_session_trade_frac": 0.5945945945945946,
+        "sharpe": -0.3501798069191026,
+        "sharpe_per_period": -0.022059254363441926,
+        "skew": -0.576605497609621,
+        "start_equity": 1539020.689680208,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 72.52587203925455,
+        "win_rate": 0.38738738738738737,
+        "year_pnl": {
+          "2023": -63659.186821683776,
+          "2024": -18958.87723093317
+        },
+        "year_return": {
+          "2023": -0.04136343796320985,
+          "2024": -0.012850326644825771
+        },
+        "year_sharpe": {
+          "2023": -0.4101283948423299,
+          "2024": -0.29828544362932524
+        },
+        "year_trades": {
+          "2023": 69,
+          "2024": 42
+        }
+      },
+      "reasons": [
+        "net_return -0.0537 <= 0.0",
+        "sharpe -0.350 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_39eeee8320b6c9de84af",
+      "dev_order": 7,
+      "metrics": {
+        "autocorr_lag1": -0.12318551174969765,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.02567920956324976,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2423688.8709261566,
+        "excess_kurtosis": 19.601917713148538,
+        "excl_best_year_return": -0.0424101810164248,
+        "excl_best_year_sharpe": -0.48082790621217913,
+        "exposure": 0.05102596695115308,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 401,
+        "max_drawdown": -0.12064806883735657,
+        "n_completed_trades": 107,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 107,
+        "net_pnl": -128914.05182586145,
+        "net_return": -0.05050297900892331,
+        "profit_factor": 0.8957515531058484,
+        "same_session_trade_frac": 0.34579439252336447,
+        "sharpe": -0.297809220796709,
+        "sharpe_per_period": -0.01876021753261945,
+        "skew": -0.6661692649420945,
+        "start_equity": 2552602.922752018,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 70.6910543915231,
+        "win_rate": 0.48598130841121495,
+        "year_pnl": {
+          "2023": -108256.35201696679,
+          "2024": -20657.699808894657
+        },
+        "year_return": {
+          "2023": -0.04241018101642424,
+          "2024": -0.008451215574836635
+        },
+        "year_sharpe": {
+          "2023": -0.48082790621217913,
+          "2024": -0.08479861992925812
+        },
+        "year_trades": {
+          "2023": 59,
+          "2024": 48
+        }
+      },
+      "reasons": [
+        "net_return -0.0505 <= 0.0",
+        "sharpe -0.298 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5bc08f67c4b6e522ec75",
+      "dev_order": 8,
+      "metrics": {
+        "autocorr_lag1": -0.12334662167764884,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.029595190342286748,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2399470.499571454,
+        "excess_kurtosis": 19.443116664000822,
+        "excl_best_year_return": -0.055618687212473206,
+        "excl_best_year_sharpe": -0.6693776388788885,
+        "exposure": 0.050027238060650084,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 401,
+        "max_drawdown": -0.12323189885083863,
+        "n_completed_trades": 107,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 107,
+        "net_pnl": -147981.36185219092,
+        "net_return": -0.05808995415893414,
+        "profit_factor": 0.8793118289494796,
+        "same_session_trade_frac": 0.34579439252336447,
+        "sharpe": -0.35262438432231336,
+        "sharpe_per_period": -0.022213248265097726,
+        "skew": -0.7446733226590545,
+        "start_equity": 2547451.8614236447,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 70.77410070742147,
+        "win_rate": 0.48598130841121495,
+        "year_pnl": {
+          "2023": -141685.9282693537,
+          "2024": -6295.433582837228
+        },
+        "year_return": {
+          "2023": -0.055618687212472984,
+          "2024": -0.002616810511811951
+        },
+        "year_sharpe": {
+          "2023": -0.6693776388788885,
+          "2024": -0.0002014023038565569
+        },
+        "year_trades": {
+          "2023": 59,
+          "2024": 48
+        }
+      },
+      "reasons": [
+        "net_return -0.0581 <= 0.0",
+        "sharpe -0.353 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2a9c8be42f9e4f00a34b",
+      "dev_order": 9,
+      "metrics": {
+        "autocorr_lag1": 0.01526767955932105,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.04344641463992216,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2264356.368222827,
+        "excess_kurtosis": 14.092154611712676,
+        "excl_best_year_return": -0.07627645689815987,
+        "excl_best_year_sharpe": -1.198682550395081,
+        "exposure": 0.06491737788269475,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.17291828013805677,
+        "n_completed_trades": 131,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 131,
+        "net_pnl": -209491.95941284485,
+        "net_return": -0.08468262062495246,
+        "profit_factor": 0.8467435107593916,
+        "same_session_trade_frac": 0.5419847328244275,
+        "sharpe": -0.550187458664573,
+        "sharpe_per_period": -0.03465855214507355,
+        "skew": 0.17962450201523403,
+        "start_equity": 2473848.327635672,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 86.4607720395821,
+        "win_rate": 0.29770992366412213,
+        "year_pnl": {
+          "2023": -22512.768276455812,
+          "2024": -186979.19113638904
+        },
+        "year_return": {
+          "2023": -0.009100302562999874,
+          "2024": -0.07627645689815954
+        },
+        "year_sharpe": {
+          "2023": -0.06554788237250465,
+          "2024": -1.198682550395081
+        },
+        "year_trades": {
+          "2023": 67,
+          "2024": 64
+        }
+      },
+      "reasons": [
+        "net_return -0.0847 <= 0.0",
+        "sharpe -0.550 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_7b3b85ad27211e240717",
+      "dev_order": 10,
+      "metrics": {
+        "autocorr_lag1": 0.015359835326143961,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.044669784974684545,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2306702.9953000383,
+        "excess_kurtosis": 13.419164332512587,
+        "excl_best_year_return": -0.08242912684916726,
+        "excl_best_year_sharpe": -1.3303298775551982,
+        "exposure": 0.06255674595968767,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.16846693012291103,
+        "n_completed_trades": 131,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 131,
+        "net_pnl": -219842.60067240195,
+        "net_return": -0.0870131142785836,
+        "profit_factor": 0.8425345840599086,
+        "same_session_trade_frac": 0.5419847328244275,
+        "sharpe": -0.5763861990279241,
+        "sharpe_per_period": -0.03630891766089681,
+        "skew": -0.07004886959915675,
+        "start_equity": 2526545.59597244,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 86.50495624070098,
+        "win_rate": 0.3053435114503817,
+        "year_pnl": {
+          "2023": -12622.080310828052,
+          "2024": -207220.5203615739
+        },
+        "year_return": {
+          "2023": -0.004995785681029763,
+          "2024": -0.08242912684916659
+        },
+        "year_sharpe": {
+          "2023": -0.017853984385124214,
+          "2024": -1.3303298775551982
+        },
+        "year_trades": {
+          "2023": 67,
+          "2024": 64
+        }
+      },
+      "reasons": [
+        "net_return -0.0870 <= 0.0",
+        "sharpe -0.576 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_cb6eac082c045b84d510",
+      "dev_order": 11,
+      "metrics": {
+        "autocorr_lag1": 0.022224622675674592,
+        "best_year": 2023,
+        "best_year_contribution": 78.56128428339359,
+        "cagr": 0.0003089165271163985,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1286906.7978765676,
+        "excess_kurtosis": 64.72144072459042,
+        "excl_best_year_return": -0.04553533082843009,
+        "excl_best_year_sharpe": -1.606102736320177,
+        "exposure": 0.016615216996549845,
+        "flags": [],
+        "max_dd_duration_days": 347,
+        "max_drawdown": -0.0851835366278807,
+        "n_completed_trades": 46,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 46,
+        "net_pnl": 791.5725811754819,
+        "net_return": 0.0006154756320482235,
+        "profit_factor": 1.0041259235856514,
+        "same_session_trade_frac": 0.32608695652173914,
+        "sharpe": 0.02726516279015831,
+        "sharpe_per_period": 0.0017175438142488294,
+        "skew": 5.508742812519798,
+        "start_equity": 1286115.225295392,
+        "top_frac_trades_contribution": 111.63221428005825,
+        "top_k_trades_contribution": 151.56538118316064,
+        "turnover_annual": 30.292121624839474,
+        "win_rate": 0.391304347826087,
+        "year_pnl": {
+          "2023": 62186.95858066669,
+          "2024": -61395.385999491205
+        },
+        "year_return": {
+          "2023": 0.04835255609883915,
+          "2024": -0.0455353308284302
+        },
+        "year_sharpe": {
+          "2023": 1.0292344044863095,
+          "2024": -1.606102736320177
+        },
+        "year_trades": {
+          "2023": 19,
+          "2024": 27
+        }
+      },
+      "reasons": [
+        "sharpe 0.027 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_430b30ddbc1d7d847f0a",
+      "dev_order": 12,
+      "metrics": {
+        "autocorr_lag1": 0.10459335221690402,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.04053541663815352,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1257851.9598584152,
+        "excess_kurtosis": 42.12987045756998,
+        "excl_best_year_return": -0.04990504622060987,
+        "excl_best_year_sharpe": -0.6416583042273217,
+        "exposure": 0.028418376611585257,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 453,
+        "max_drawdown": -0.15432268998341359,
+        "n_completed_trades": 75,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 75,
+        "net_pnl": -108079.81160474289,
+        "net_return": -0.07912533690388501,
+        "profit_factor": 0.7363037554222386,
+        "same_session_trade_frac": 0.5333333333333333,
+        "sharpe": -0.6484381325405233,
+        "sharpe_per_period": -0.04084776284079439,
+        "skew": -2.5341250346725808,
+        "start_equity": 1365931.771463158,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 48.68330863582724,
+        "win_rate": 0.37333333333333335,
+        "year_pnl": {
+          "2023": -68166.88818906876,
+          "2024": -39912.92341567413
+        },
+        "year_return": {
+          "2023": -0.049905046220610094,
+          "2024": -0.030755126702904034
+        },
+        "year_sharpe": {
+          "2023": -0.6416583042273217,
+          "2024": -0.738256918205958
+        },
+        "year_trades": {
+          "2023": 42,
+          "2024": 33
+        }
+      },
+      "reasons": [
+        "net_return -0.0791 <= 0.0",
+        "sharpe -0.648 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_809645889364f5e00583",
+      "dev_order": 13,
+      "metrics": {
+        "autocorr_lag1": 0.10329266731677524,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.03772462160454371,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1266536.3292888738,
+        "excess_kurtosis": 40.21306327426793,
+        "excl_best_year_return": -0.04429971640283248,
+        "excl_best_year_sharpe": -0.54758149913609,
+        "exposure": 0.0285999636825858,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 453,
+        "max_drawdown": -0.1494010652588985,
+        "n_completed_trades": 75,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 75,
+        "net_pnl": -100834.65383812203,
+        "net_return": -0.07374345008223482,
+        "profit_factor": 0.756231746110485,
+        "same_session_trade_frac": 0.5333333333333333,
+        "sharpe": -0.5881623022775943,
+        "sharpe_per_period": -0.03705074243737412,
+        "skew": -2.1924502048093264,
+        "start_equity": 1367370.9831269959,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 48.839361954175686,
+        "win_rate": 0.37333333333333335,
+        "year_pnl": {
+          "2023": -60574.14676998905,
+          "2024": -40260.50706813298
+        },
+        "year_return": {
+          "2023": -0.044299716402833145,
+          "2024": -0.03080854341549244
+        },
+        "year_sharpe": {
+          "2023": -0.54758149913609,
+          "2024": -0.7426741658895057
+        },
+        "year_trades": {
+          "2023": 42,
+          "2024": 33
+        }
+      },
+      "reasons": [
+        "net_return -0.0737 <= 0.0",
+        "sharpe -0.588 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_e686d73207bb90183b7b",
+      "dev_order": 14,
+      "metrics": {
+        "autocorr_lag1": 0.022225989348859703,
+        "best_year": 2023,
+        "best_year_contribution": 78.56128428339359,
+        "cagr": 0.0003087353151598471,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1287661.7978765676,
+        "excess_kurtosis": 64.71969160108542,
+        "excl_best_year_return": -0.04550984697556926,
+        "excl_best_year_sharpe": -1.6060997658620584,
+        "exposure": 0.016615216996549845,
+        "flags": [],
+        "max_dd_duration_days": 347,
+        "max_drawdown": -0.08513776572852894,
+        "n_completed_trades": 46,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 46,
+        "net_pnl": 791.5725811754819,
+        "net_return": 0.0006151145357284893,
+        "profit_factor": 1.0041259235856514,
+        "same_session_trade_frac": 0.32608695652173914,
+        "sharpe": 0.02725410908327877,
+        "sharpe_per_period": 0.0017168474961662423,
+        "skew": 5.508632823520128,
+        "start_equity": 1286870.225295392,
+        "top_frac_trades_contribution": 111.63221428005825,
+        "top_k_trades_contribution": 151.56538118316064,
+        "turnover_annual": 30.275174651798977,
+        "win_rate": 0.391304347826087,
+        "year_pnl": {
+          "2023": 62186.95858066669,
+          "2024": -61395.385999491205
+        },
+        "year_return": {
+          "2023": 0.04832418790821902,
+          "2024": -0.04550984697556881
+        },
+        "year_sharpe": {
+          "2023": 1.0292164956966654,
+          "2024": -1.6060997658620584
+        },
+        "year_trades": {
+          "2023": 19,
+          "2024": 27
+        }
+      },
+      "reasons": [
+        "sharpe 0.027 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_92a1c084995118867774",
+      "dev_order": 15,
+      "metrics": {
+        "autocorr_lag1": 0.002321906824196358,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.03782652252601271,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1870247.304321033,
+        "excess_kurtosis": 15.87028642439299,
+        "excl_best_year_return": -0.053730569856719534,
+        "excl_best_year_sharpe": -1.093740039794075,
+        "exposure": 0.052387869983657166,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.18096807999120457,
+        "n_completed_trades": 129,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 129,
+        "net_pnl": -149324.80864660465,
+        "net_return": -0.0739388347104778,
+        "profit_factor": 0.8590251072735586,
+        "same_session_trade_frac": 0.3953488372093023,
+        "sharpe": -0.5326215988005728,
+        "sharpe_per_period": -0.03355200698399843,
+        "skew": 0.15781350037410286,
+        "start_equity": 2019572.1129676376,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 85.21616321183733,
+        "win_rate": 0.3488372093023256,
+        "year_pnl": {
+          "2023": -43129.41626354051,
+          "2024": -106195.39238306414
+        },
+        "year_return": {
+          "2023": -0.02135571985105522,
+          "2024": -0.05373056985672031
+        },
+        "year_sharpe": {
+          "2023": -0.2215085235047879,
+          "2024": -1.093740039794075
+        },
+        "year_trades": {
+          "2023": 61,
+          "2024": 68
+        }
+      },
+      "reasons": [
+        "net_return -0.0739 <= 0.0",
+        "sharpe -0.533 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_b8e82d0b52bd3e23d20c",
+      "dev_order": 16,
+      "metrics": {
+        "autocorr_lag1": -0.025484628138439044,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.0014437923606310799,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2286888.029928199,
+        "excess_kurtosis": 26.88218636622715,
+        "excl_best_year_return": -0.04377382190100143,
+        "excl_best_year_sharpe": -0.8437028643904432,
+        "exposure": 0.03613582712910841,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 158,
+        "max_drawdown": -0.08712061740147303,
+        "n_completed_trades": 79,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 79,
+        "net_pnl": -6591.612452983856,
+        "net_return": -0.0028740662577411147,
+        "profit_factor": 0.9910873162536594,
+        "same_session_trade_frac": 0.3037974683544304,
+        "sharpe": 0.008900342075737795,
+        "sharpe_per_period": 0.0005606688503763478,
+        "skew": -0.2948505647366894,
+        "start_equity": 2293479.642381183,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 52.502339878535736,
+        "win_rate": 0.4430379746835443,
+        "year_pnl": {
+          "2023": 98096.83011676604,
+          "2024": -104688.4425697499
+        },
+        "year_return": {
+          "2023": 0.04277205182205934,
+          "2024": -0.04377382190100121
+        },
+        "year_sharpe": {
+          "2023": 0.6108666438842292,
+          "2024": -0.8437028643904432
+        },
+        "year_trades": {
+          "2023": 42,
+          "2024": 37
+        }
+      },
+      "reasons": [
+        "net_return -0.0029 <= 0.0",
+        "sharpe 0.009 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_116640ddf63a9189da52",
+      "dev_order": 17,
+      "metrics": {
+        "autocorr_lag1": 0.07016828264645414,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.10729843504416214,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1801102.120443489,
+        "excess_kurtosis": 11.984231560081948,
+        "excl_best_year_return": -0.12962565044476937,
+        "excl_best_year_sharpe": -1.2917833981047884,
+        "exposure": 0.09578717995278736,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 454,
+        "max_drawdown": -0.29197033504236514,
+        "n_completed_trades": 260,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 260,
+        "net_pnl": -456952.9288459481,
+        "net_return": -0.2023657168985945,
+        "profit_factor": 0.7778404133597783,
+        "same_session_trade_frac": 0.6538461538461539,
+        "sharpe": -1.1195078129245686,
+        "sharpe_per_period": -0.07052236342362452,
+        "skew": -1.4403637665582163,
+        "start_equity": 2258055.049289437,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 172.6920976955234,
+        "win_rate": 0.38076923076923075,
+        "year_pnl": {
+          "2023": -292701.8545042393,
+          "2024": -164251.0743417088
+        },
+        "year_return": {
+          "2023": -0.12962565044476948,
+          "2024": -0.08357331128955703
+        },
+        "year_sharpe": {
+          "2023": -1.2917833981047884,
+          "2024": -0.9259266017764499
+        },
+        "year_trades": {
+          "2023": 134,
+          "2024": 126
+        }
+      },
+      "reasons": [
+        "net_return -0.2024 <= 0.0",
+        "sharpe -1.120 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_8a27efd77e64da05368c",
+      "dev_order": 18,
+      "metrics": {
+        "autocorr_lag1": 0.07216595134726199,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.10835024285199213,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1801127.0192445563,
+        "excess_kurtosis": 12.192671558432439,
+        "excl_best_year_return": -0.12858355071889238,
+        "excl_best_year_sharpe": -1.2864503680934678,
+        "exposure": 0.09669511530779008,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 454,
+        "max_drawdown": -0.28900546928601045,
+        "n_completed_trades": 260,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 260,
+        "net_pnl": -462268.57736903895,
+        "net_return": -0.20423675740143143,
+        "profit_factor": 0.7760297988124959,
+        "same_session_trade_frac": 0.6538461538461539,
+        "sharpe": -1.1336037407784882,
+        "sharpe_per_period": -0.07141032341410498,
+        "skew": -1.4119720695637676,
+        "start_equity": 2263395.5966135953,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 172.56096278703689,
+        "win_rate": 0.38076923076923075,
+        "year_pnl": {
+          "2023": -291035.4424940832,
+          "2024": -171233.13487495575
+        },
+        "year_return": {
+          "2023": -0.12858355071889294,
+          "2024": -0.08681636288246586
+        },
+        "year_sharpe": {
+          "2023": -1.2864503680934678,
+          "2024": -0.9629368627113444
+        },
+        "year_trades": {
+          "2023": 134,
+          "2024": 126
+        }
+      },
+      "reasons": [
+        "net_return -0.2042 <= 0.0",
+        "sharpe -1.134 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_60d4cf9e8504e3b77a52",
+      "dev_order": 19,
+      "metrics": {
+        "autocorr_lag1": -0.013973128630964173,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.021257654771014267,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1622426.6305810926,
+        "excess_kurtosis": 13.477837900791837,
+        "excl_best_year_return": -0.021570559323236926,
+        "excl_best_year_sharpe": -0.4222326932064921,
+        "exposure": 0.044761213001634284,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.12892289967400472,
+        "n_completed_trades": 129,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 129,
+        "net_pnl": -70952.67812529113,
+        "net_return": -0.04190005024892718,
+        "profit_factor": 0.9139375718504601,
+        "same_session_trade_frac": 0.3953488372093023,
+        "sharpe": -0.3056846244804676,
+        "sharpe_per_period": -0.01925632133313058,
+        "skew": -0.5089766553679956,
+        "start_equity": 1693379.3087063837,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 85.190783623513,
+        "win_rate": 0.4108527131782946,
+        "year_pnl": {
+          "2023": -35184.48838404566,
+          "2024": -35768.18974124547
+        },
+        "year_return": {
+          "2023": -0.020777677040901166,
+          "2024": -0.021570559323235927
+        },
+        "year_sharpe": {
+          "2023": -0.24122530965753028,
+          "2024": -0.4222326932064921
+        },
+        "year_trades": {
+          "2023": 61,
+          "2024": 68
+        }
+      },
+      "reasons": [
+        "net_return -0.0419 <= 0.0",
+        "sharpe -0.306 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_4a55cb7f5d23e6e7d777",
+      "dev_order": 20,
+      "metrics": {
+        "autocorr_lag1": 0.1335858015612756,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.14315133724503315,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1884125.682016692,
+        "excess_kurtosis": 10.729585296619486,
+        "excl_best_year_return": -0.1697491767863777,
+        "excl_best_year_sharpe": -1.3106880869460198,
+        "exposure": 0.144997276193935,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 431,
+        "max_drawdown": -0.3722201029149296,
+        "n_completed_trades": 263,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 263,
+        "net_pnl": -678995.359083934,
+        "net_return": -0.2649095958388168,
+        "profit_factor": 0.7541689219526365,
+        "same_session_trade_frac": 0.688212927756654,
+        "sharpe": -1.1750920060383636,
+        "sharpe_per_period": -0.07402383846660762,
+        "skew": -1.321781680776043,
+        "start_equity": 2563121.041100626,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 173.20782158796027,
+        "win_rate": 0.3269961977186312,
+        "year_pnl": {
+          "2023": -435087.68673067447,
+          "2024": -243907.67235325952
+        },
+        "year_return": {
+          "2023": -0.1697491767863777,
+          "2024": -0.114616470579463
+        },
+        "year_sharpe": {
+          "2023": -1.3106880869460198,
+          "2024": -1.021866470675283
+        },
+        "year_trades": {
+          "2023": 133,
+          "2024": 130
+        }
+      },
+      "reasons": [
+        "net_return -0.2649 <= 0.0",
+        "sharpe -1.175 < 0.3",
+        "max_drawdown -0.372 < -0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_3fcb7607706837b0c9e8",
+      "dev_order": 21,
+      "metrics": {
+        "autocorr_lag1": 0.0029252740768319387,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.0501084230326414,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1709890.3591277697,
+        "excess_kurtosis": 20.00883295586888,
+        "excl_best_year_return": -0.058799032034112075,
+        "excl_best_year_sharpe": -0.636478955796012,
+        "exposure": 0.061285636462683854,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.1842353331881934,
+        "n_completed_trades": 182,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 182,
+        "net_pnl": -184384.52105989656,
+        "net_return": -0.09733778502179657,
+        "profit_factor": 0.846648401686571,
+        "same_session_trade_frac": 0.5879120879120879,
+        "sharpe": -0.5985171615009788,
+        "sharpe_per_period": -0.037703037255615995,
+        "skew": -2.3530995993332633,
+        "start_equity": 1894274.8801876663,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 119.67961470066952,
+        "win_rate": 0.41208791208791207,
+        "year_pnl": {
+          "2023": -111381.5293615677,
+          "2024": -73002.99169832887
+        },
+        "year_return": {
+          "2023": -0.05879903203411174,
+          "2024": -0.04094635927858681
+        },
+        "year_sharpe": {
+          "2023": -0.636478955796012,
+          "2024": -0.559012164826853
+        },
+        "year_trades": {
+          "2023": 90,
+          "2024": 92
+        }
+      },
+      "reasons": [
+        "net_return -0.0973 <= 0.0",
+        "sharpe -0.599 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5a0838e06d2a2078a855",
+      "dev_order": 22,
+      "metrics": {
+        "autocorr_lag1": -0.048781207804484146,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.07039220339144958,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2019775.1393309608,
+        "excess_kurtosis": 12.252598844559989,
+        "excl_best_year_return": -0.08021902501767275,
+        "excl_best_year_sharpe": -0.6595578091693621,
+        "exposure": 0.0979662248047939,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 452,
+        "max_drawdown": -0.23629409117701095,
+        "n_completed_trades": 187,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 187,
+        "net_pnl": -316112.33641494904,
+        "net_return": -0.1353285805490293,
+        "profit_factor": 0.825963575515996,
+        "same_session_trade_frac": 0.5989304812834224,
+        "sharpe": -0.6746634231647094,
+        "sharpe_per_period": -0.04249980086584177,
+        "skew": -0.47245825648997497,
+        "start_equity": 2335887.47574591,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 123.10076405931432,
+        "win_rate": 0.31016042780748665,
+        "year_pnl": {
+          "2023": -187382.61585532874,
+          "2024": -128729.7205596203
+        },
+        "year_return": {
+          "2023": -0.08021902501767242,
+          "2024": -0.05991595502659286
+        },
+        "year_sharpe": {
+          "2023": -0.6595578091693621,
+          "2024": -0.7221445035975768
+        },
+        "year_trades": {
+          "2023": 91,
+          "2024": 96
+        }
+      },
+      "reasons": [
+        "net_return -0.1353 <= 0.0",
+        "sharpe -0.675 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_3590d848430cd0262cf5",
+      "dev_order": 23,
+      "metrics": {
+        "autocorr_lag1": 0.02263763253396616,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.044981360526216596,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1887204.8481705133,
+        "excess_kurtosis": 18.759598326464964,
+        "excl_best_year_return": -0.06108259736248878,
+        "excl_best_year_sharpe": -0.613732401326911,
+        "exposure": 0.06473579081169421,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.19575019038275954,
+        "n_completed_trades": 180,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 180,
+        "net_pnl": -181205.5459756488,
+        "net_return": -0.08760618612654492,
+        "profit_factor": 0.8655890333825119,
+        "same_session_trade_frac": 0.5777777777777777,
+        "sharpe": -0.49360767827882324,
+        "sharpe_per_period": -0.03109436099899393,
+        "skew": -1.6467283769827281,
+        "start_equity": 2068410.394146162,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 118.64659113980852,
+        "win_rate": 0.39444444444444443,
+        "year_pnl": {
+          "2023": -126343.87928601494,
+          "2024": -54861.66668963386
+        },
+        "year_return": {
+          "2023": -0.06108259736248789,
+          "2024": -0.028249118281916563
+        },
+        "year_sharpe": {
+          "2023": -0.613732401326911,
+          "2024": -0.34782940582176086
+        },
+        "year_trades": {
+          "2023": 89,
+          "2024": 91
+        }
+      },
+      "reasons": [
+        "net_return -0.0876 <= 0.0",
+        "sharpe -0.494 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_722361082e0b05e9c01c",
+      "dev_order": 24,
+      "metrics": {
+        "autocorr_lag1": 0.017370791202640956,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.03700645912049949,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1225678.8946783736,
+        "excess_kurtosis": 28.93831495024498,
+        "excl_best_year_return": -0.046895368939712134,
+        "excl_best_year_sharpe": -0.7554988737703231,
+        "exposure": 0.030960595605592882,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.12011198751556085,
+        "n_completed_trades": 88,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 88,
+        "net_pnl": -95616.69797012769,
+        "net_return": -0.07236586461207106,
+        "profit_factor": 0.7808774271093958,
+        "same_session_trade_frac": 0.5568181818181818,
+        "sharpe": -0.6643792779799417,
+        "sharpe_per_period": -0.041851960613323254,
+        "skew": 0.07631910877404609,
+        "start_equity": 1321295.5926485013,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 57.46914135139766,
+        "win_rate": 0.3522727272727273,
+        "year_pnl": {
+          "2023": -61962.644295667065,
+          "2024": -33654.05367446062
+        },
+        "year_return": {
+          "2023": -0.046895368939712134,
+          "2024": -0.02672371410474017
+        },
+        "year_sharpe": {
+          "2023": -0.7554988737703231,
+          "2024": -0.5581467404094576
+        },
+        "year_trades": {
+          "2023": 43,
+          "2024": 45
+        }
+      },
+      "reasons": [
+        "net_return -0.0724 <= 0.0",
+        "sharpe -0.664 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_cd10a6752e0fc0f4fa48",
+      "dev_order": 25,
+      "metrics": {
+        "autocorr_lag1": -0.0337699153233417,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.06997428396710859,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1929453.5138749764,
+        "excess_kurtosis": 12.879376816522594,
+        "excl_best_year_return": -0.07430537718639663,
+        "excl_best_year_sharpe": -0.6253595301099921,
+        "exposure": 0.0927001997457781,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 452,
+        "max_drawdown": -0.23487917505822076,
+        "n_completed_trades": 188,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 188,
+        "net_pnl": -299979.1763418806,
+        "net_return": -0.13455404043290564,
+        "profit_factor": 0.8258743482103663,
+        "same_session_trade_frac": 0.5957446808510638,
+        "sharpe": -0.6941547789177241,
+        "sharpe_per_period": -0.04372764086674571,
+        "skew": -0.7333225969744798,
+        "start_equity": 2229432.690216857,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 123.36007934472556,
+        "win_rate": 0.324468085106383,
+        "year_pnl": {
+          "2023": -165658.83695824584,
+          "2024": -134320.33938363474
+        },
+        "year_return": {
+          "2023": -0.0743053771863963,
+          "2024": -0.06508481497211949
+        },
+        "year_sharpe": {
+          "2023": -0.6253595301099921,
+          "2024": -0.8212417845886464
+        },
+        "year_trades": {
+          "2023": 92,
+          "2024": 96
+        }
+      },
+      "reasons": [
+        "net_return -0.1346 <= 0.0",
+        "sharpe -0.694 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_ce65ddac18d786cb994d",
+      "dev_order": 26,
+      "metrics": {
+        "autocorr_lag1": -0.007518261626259058,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.008872329668939916,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1380925.5174548863,
+        "excess_kurtosis": 32.18436524646155,
+        "excl_best_year_return": -0.01236084478955135,
+        "excl_best_year_sharpe": -0.1359103320632803,
+        "exposure": 0.03876883965861631,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 431,
+        "max_drawdown": -0.10064774677647192,
+        "n_completed_trades": 107,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 107,
+        "net_pnl": -24734.640783126466,
+        "net_return": -0.017596458602149756,
+        "profit_factor": 0.9505667691777465,
+        "same_session_trade_frac": 0.38317757009345793,
+        "sharpe": -0.11463803438864383,
+        "sharpe_per_period": -0.007221517375752905,
+        "skew": 3.1140194479486754,
+        "start_equity": 1405660.1582380128,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 70.70106046933218,
+        "win_rate": 0.38317757009345793,
+        "year_pnl": {
+          "2023": -17375.147042837227,
+          "2024": -7359.493740289239
+        },
+        "year_return": {
+          "2023": -0.012360844789552017,
+          "2024": -0.005301140386118175
+        },
+        "year_sharpe": {
+          "2023": -0.1359103320632803,
+          "2024": -0.08833033024264514
+        },
+        "year_trades": {
+          "2023": 50,
+          "2024": 57
+        }
+      },
+      "reasons": [
+        "net_return -0.0176 <= 0.0",
+        "sharpe -0.115 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_fd859a63d15b48ab8289",
+      "dev_order": 27,
+      "metrics": {
+        "autocorr_lag1": 0.003346853350368018,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.0015329996647240884,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1411686.4241626223,
+        "excess_kurtosis": 32.86904545769276,
+        "excl_best_year_return": -0.0065104296777048765,
+        "excl_best_year_sharpe": -0.11364739940983606,
+        "exposure": 0.039404394407118216,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 431,
+        "max_drawdown": -0.09961551678942326,
+        "n_completed_trades": 107,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 107,
+        "net_pnl": -4320.961364335148,
+        "net_return": -0.0030515104712728336,
+        "profit_factor": 0.991533684924424,
+        "same_session_trade_frac": 0.38317757009345793,
+        "sharpe": 0.006895546166438855,
+        "sharpe_per_period": 0.0004343785788181431,
+        "skew": 3.3055824578292237,
+        "start_equity": 1416007.3855269575,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 70.67122059983994,
+        "win_rate": 0.38317757009345793,
+        "year_pnl": {
+          "2023": 4929.9512431328185,
+          "2024": -9250.912607467966
+        },
+        "year_return": {
+          "2023": 0.00348158582612057,
+          "2024": -0.006510429677705654
+        },
+        "year_sharpe": {
+          "2023": 0.08352922029066183,
+          "2024": -0.11364739940983606
+        },
+        "year_trades": {
+          "2023": 50,
+          "2024": 57
+        }
+      },
+      "reasons": [
+        "net_return -0.0031 <= 0.0",
+        "sharpe 0.007 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5c1e5d40a5dc98ab6c62",
+      "dev_order": 28,
+      "metrics": {
+        "autocorr_lag1": 0.013989218220494986,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.09486356615572733,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2166326.1729839994,
+        "excess_kurtosis": 14.96048636287053,
+        "excl_best_year_return": -0.11591274517552153,
+        "excl_best_year_sharpe": -1.1968531300238558,
+        "exposure": 0.09424368984928273,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 459,
+        "max_drawdown": -0.25495662300160427,
+        "n_completed_trades": 195,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 195,
+        "net_pnl": -475791.85409236234,
+        "net_return": -0.1800797122673775,
+        "profit_factor": 0.779062347305773,
+        "same_session_trade_frac": 0.6205128205128205,
+        "sharpe": -0.9672094148542466,
+        "sharpe_per_period": -0.06092846612915805,
+        "skew": -2.1484173103477224,
+        "start_equity": 2642118.0270763617,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 128.81674442072693,
+        "win_rate": 0.36923076923076925,
+        "year_pnl": {
+          "2023": -306255.1535961549,
+          "2024": -169536.70049620746
+        },
+        "year_return": {
+          "2023": -0.11591274517552186,
+          "2024": -0.07257990287915073
+        },
+        "year_sharpe": {
+          "2023": -1.1968531300238558,
+          "2024": -0.7309538767498072
+        },
+        "year_trades": {
+          "2023": 97,
+          "2024": 98
+        }
+      },
+      "reasons": [
+        "net_return -0.1801 <= 0.0",
+        "sharpe -0.967 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0a515b58efd567ad78bf",
+      "dev_order": 29,
+      "metrics": {
+        "autocorr_lag1": -0.027187182281714184,
+        "best_year": 2023,
+        "best_year_contribution": 1.005116658930003,
+        "cagr": 0.03222113898780532,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2127845.9044624027,
+        "excess_kurtosis": 8.871040952592088,
+        "excl_best_year_return": -0.00031314397745452194,
+        "excl_best_year_sharpe": 0.032368394881077116,
+        "exposure": 0.06918467405120755,
+        "flags": [],
+        "max_dd_duration_days": 270,
+        "max_drawdown": -0.09358425212294208,
+        "n_completed_trades": 193,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 193,
+        "net_pnl": 130266.81261591567,
+        "net_return": 0.06521234285422062,
+        "profit_factor": 1.093064794878098,
+        "same_session_trade_frac": 0.41450777202072536,
+        "sharpe": 0.41762830906441645,
+        "sharpe_per_period": 0.026308110624877805,
+        "skew": 0.303910783736322,
+        "start_equity": 1997579.091846487,
+        "top_frac_trades_contribution": 3.548678214481165,
+        "top_k_trades_contribution": 2.0750872349737186,
+        "turnover_annual": 127.94444824041668,
+        "win_rate": 0.42487046632124353,
+        "year_pnl": {
+          "2023": 130933.3434659699,
+          "2024": -666.5308500542305
+        },
+        "year_return": {
+          "2023": 0.06554601217063194,
+          "2024": -0.00031314397745407785
+        },
+        "year_sharpe": {
+          "2023": 0.724945520061241,
+          "2024": 0.032368394881077116
+        },
+        "year_trades": {
+          "2023": 99,
+          "2024": 94
+        }
+      },
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_22be43d0087180aaf11c",
+      "dev_order": 30,
+      "metrics": {
+        "autocorr_lag1": 0.015854239911675706,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.03695328981112789,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1229594.4266316022,
+        "excess_kurtosis": 28.764403087214106,
+        "excl_best_year_return": -0.04724661319026646,
+        "excl_best_year_sharpe": -0.762310160757411,
+        "exposure": 0.030960595605592882,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.11956924874000929,
+        "n_completed_trades": 88,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 88,
+        "net_pnl": -95776.3759982048,
+        "net_return": -0.07226383424786853,
+        "profit_factor": 0.7813131905070169,
+        "same_session_trade_frac": 0.5568181818181818,
+        "sharpe": -0.6641287476875042,
+        "sharpe_per_period": -0.04183617868833092,
+        "skew": 0.07541090651328256,
+        "start_equity": 1325370.802629807,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 57.60865197786476,
+        "win_rate": 0.3522727272727273,
+        "year_pnl": {
+          "2023": -62619.28164552408,
+          "2024": -33157.094352680724
+        },
+        "year_return": {
+          "2023": -0.047246613190266906,
+          "2024": -0.026257813830891763
+        },
+        "year_sharpe": {
+          "2023": -0.762310160757411,
+          "2024": -0.5486355321425359
+        },
+        "year_trades": {
+          "2023": 43,
+          "2024": 45
+        }
+      },
+      "reasons": [
+        "net_return -0.0723 <= 0.0",
+        "sharpe -0.664 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_508a2fa9915e740fa0ce",
+      "dev_order": 31,
+      "metrics": {
+        "autocorr_lag1": 0.026877256216747643,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.015732512579438862,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1691739.3526562173,
+        "excess_kurtosis": 34.150199782052916,
+        "excl_best_year_return": -0.05499078837146354,
+        "excl_best_year_sharpe": -1.0920434551609879,
+        "exposure": 0.0259669511530779,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 424,
+        "max_drawdown": -0.09529785643107691,
+        "n_completed_trades": 75,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 75,
+        "net_pnl": -54293.9182205298,
+        "net_return": -0.031095580551719237,
+        "profit_factor": 0.883233591689893,
+        "same_session_trade_frac": 0.13333333333333333,
+        "sharpe": -0.28151257418889547,
+        "sharpe_per_period": -0.017733625291462808,
+        "skew": 0.13210617207340541,
+        "start_equity": 1746033.270876747,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 50.23080359267575,
+        "win_rate": 0.4,
+        "year_pnl": {
+          "2023": 44149.652039782144,
+          "2024": -98443.57026031194
+        },
+        "year_return": {
+          "2023": 0.025285687722097716,
+          "2024": -0.054990788371464094
+        },
+        "year_sharpe": {
+          "2023": 0.5049487616877044,
+          "2024": -1.0920434551609879
+        },
+        "year_trades": {
+          "2023": 31,
+          "2024": 44
+        }
+      },
+      "reasons": [
+        "net_return -0.0311 <= 0.0",
+        "sharpe -0.282 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_9cd1eda8d9480c8bc8c9",
+      "dev_order": 32,
+      "metrics": {
+        "autocorr_lag1": -0.027958549154533427,
+        "best_year": 2023,
+        "best_year_contribution": 1.1459431087984338,
+        "cagr": 0.02796657577741435,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2155518.047581561,
+        "excess_kurtosis": 8.870356236741634,
+        "excl_best_year_return": -0.00774230805716436,
+        "excl_best_year_sharpe": -0.07105972329465404,
+        "exposure": 0.06827673869620483,
+        "flags": [],
+        "max_dd_duration_days": 257,
+        "max_drawdown": -0.09431012702918107,
+        "n_completed_trades": 193,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 193,
+        "net_pnl": 115242.86418906483,
+        "net_return": 0.056483980752754626,
+        "profit_factor": 1.0811479668573851,
+        "same_session_trade_frac": 0.41450777202072536,
+        "sharpe": 0.3715349548571821,
+        "sharpe_per_period": 0.02340450223618364,
+        "skew": 0.3137804647807778,
+        "start_equity": 2040275.183392496,
+        "top_frac_trades_contribution": 4.020075370913599,
+        "top_k_trades_contribution": 2.379713502695315,
+        "turnover_annual": 127.61223270699003,
+        "win_rate": 0.42487046632124353,
+        "year_pnl": {
+          "2023": 132061.76605565264,
+          "2024": -16818.90186658781
+        },
+        "year_return": {
+          "2023": 0.06472742850112256,
+          "2024": -0.007742308057164138
+        },
+        "year_sharpe": {
+          "2023": 0.7218502290901515,
+          "2024": -0.07105972329465404
+        },
+        "year_trades": {
+          "2023": 99,
+          "2024": 94
+        }
+      },
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_e42413050e0c9db036d8",
+      "dev_order": 33,
+      "metrics": {
+        "autocorr_lag1": 0.05756104253114789,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.13289471402456954,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1638280.7273942556,
+        "excess_kurtosis": 8.603256263908339,
+        "excl_best_year_return": -0.1576560293914998,
+        "excl_best_year_sharpe": -1.342759152058104,
+        "exposure": 0.12892682041038678,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 454,
+        "max_drawdown": -0.328595127944044,
+        "n_completed_trades": 251,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 251,
+        "net_pnl": -538191.6585920283,
+        "net_return": -0.247277044293003,
+        "profit_factor": 0.7483847217834345,
+        "same_session_trade_frac": 0.6294820717131474,
+        "sharpe": -1.2588544815124836,
+        "sharpe_per_period": -0.0793003784500283,
+        "skew": -0.798678757610007,
+        "start_equity": 2176472.385986284,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 165.94518606031676,
+        "win_rate": 0.3187250996015936,
+        "year_pnl": {
+          "2023": -343133.99445484066,
+          "2024": -195057.66413718765
+        },
+        "year_return": {
+          "2023": -0.15765602939149947,
+          "2024": -0.10639479598430823
+        },
+        "year_sharpe": {
+          "2023": -1.342759152058104,
+          "2024": -1.1753406408084666
+        },
+        "year_trades": {
+          "2023": 131,
+          "2024": 120
+        }
+      },
+      "reasons": [
+        "net_return -0.2473 <= 0.0",
+        "sharpe -1.259 < 0.3",
+        "max_drawdown -0.329 < -0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0f0142ff4058d605d323",
+      "dev_order": 34,
+      "metrics": {
+        "autocorr_lag1": 0.13035536274631654,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.1322448933343925,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1899606.244326886,
+        "excess_kurtosis": 10.931677824937317,
+        "excl_best_year_return": -0.150599333390381,
+        "excl_best_year_sharpe": -1.1386137484059065,
+        "exposure": 0.13945887052841838,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 450,
+        "max_drawdown": -0.36296538203900774,
+        "n_completed_trades": 264,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 264,
+        "net_pnl": -620276.4325536133,
+        "net_return": -0.24615290157932568,
+        "profit_factor": 0.7755919795094199,
+        "same_session_trade_frac": 0.6931818181818182,
+        "sharpe": -1.0754361609345693,
+        "sharpe_per_period": -0.0677461103037835,
+        "skew": -1.3071089319923301,
+        "start_equity": 2519882.6768804993,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 174.1745435935963,
+        "win_rate": 0.3333333333333333,
+        "year_pnl": {
+          "2023": -379492.65136017185,
+          "2024": -240783.78119344148
+        },
+        "year_return": {
+          "2023": -0.1505993333903809,
+          "2024": -0.11249528278609278
+        },
+        "year_sharpe": {
+          "2023": -1.1386137484059065,
+          "2024": -1.0082351563736007
+        },
+        "year_trades": {
+          "2023": 133,
+          "2024": 131
+        }
+      },
+      "reasons": [
+        "net_return -0.2462 <= 0.0",
+        "sharpe -1.075 < 0.3",
+        "max_drawdown -0.363 < -0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_429ca3ca3618e41c801f",
+      "dev_order": 35,
+      "metrics": {
+        "autocorr_lag1": 0.06190456494607233,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.006621197505507048,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1279376.4178154087,
+        "excess_kurtosis": 47.685902339783176,
+        "excl_best_year_return": -0.015081304677018958,
+        "excl_best_year_sharpe": -0.17010788195300816,
+        "exposure": 0.027601234792082804,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 453,
+        "max_drawdown": -0.10027275189010343,
+        "n_completed_trades": 53,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 53,
+        "net_pnl": -17043.416192696197,
+        "net_return": -0.013146525335086534,
+        "profit_factor": 0.9463450301532216,
+        "same_session_trade_frac": 0.11320754716981132,
+        "sharpe": -0.0830502596521194,
+        "sharpe_per_period": -0.005231674603782132,
+        "skew": -1.8491588260384635,
+        "start_equity": 1296419.8340081049,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 34.45115300624712,
+        "win_rate": 0.5283018867924528,
+        "year_pnl": {
+          "2023": -19551.702506006462,
+          "2024": 2508.2863133102655
+        },
+        "year_return": {
+          "2023": -0.015081304677018847,
+          "2024": 0.0019644051342713187
+        },
+        "year_sharpe": {
+          "2023": -0.17010788195300816,
+          "2024": 0.06971963645868524
+        },
+        "year_trades": {
+          "2023": 31,
+          "2024": 22
+        }
+      },
+      "reasons": [
+        "net_return -0.0131 <= 0.0",
+        "sharpe -0.083 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_89b992fcc3c5e55090c9",
+      "dev_order": 36,
+      "metrics": {
+        "autocorr_lag1": 0.06190530613275351,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.0066227351164172,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1279076.4178154087,
+        "excess_kurtosis": 47.68473700493861,
+        "excl_best_year_return": -0.015084795397000916,
+        "excl_best_year_sharpe": -0.17010184160946118,
+        "exposure": 0.027601234792082804,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 453,
+        "max_drawdown": -0.100294409152485,
+        "n_completed_trades": 53,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 53,
+        "net_pnl": -17043.41619269643,
+        "net_return": -0.013149568230887754,
+        "profit_factor": 0.9463450301532216,
+        "same_session_trade_frac": 0.11320754716981132,
+        "sharpe": -0.08304444951758974,
+        "sharpe_per_period": -0.00523130859970953,
+        "skew": -1.8490786343158108,
+        "start_equity": 1296119.834008105,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 34.45909444157478,
+        "win_rate": 0.5283018867924528,
+        "year_pnl": {
+          "2023": -19551.702506006695,
+          "2024": 2508.2863133102655
+        },
+        "year_return": {
+          "2023": -0.015084795397000583,
+          "2024": 0.0019648667794633923
+        },
+        "year_sharpe": {
+          "2023": -0.17010184160946118,
+          "2024": 0.06972416741993973
+        },
+        "year_trades": {
+          "2023": 31,
+          "2024": 22
+        }
+      },
+      "reasons": [
+        "net_return -0.0131 <= 0.0",
+        "sharpe -0.083 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0729364b73958c3f33fc",
+      "dev_order": 37,
+      "metrics": {
+        "autocorr_lag1": -0.03912881751639655,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.0024103977652519815,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1351475.9415623646,
+        "excess_kurtosis": 32.818419514413186,
+        "excl_best_year_return": -0.002793747149439252,
+        "excl_best_year_sharpe": -0.03407061969511702,
+        "exposure": 0.029598692573088795,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 393,
+        "max_drawdown": -0.10305879565178055,
+        "n_completed_trades": 83,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 83,
+        "net_pnl": -6512.811285232427,
+        "net_return": -0.00479592431938447,
+        "profit_factor": 0.984633174261002,
+        "same_session_trade_frac": 0.2891566265060241,
+        "sharpe": -0.008915291559154328,
+        "sharpe_per_period": -0.0005616105793132295,
+        "skew": 0.48777812858813435,
+        "start_equity": 1357988.752847597,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 54.690589008021504,
+        "win_rate": 0.39759036144578314,
+        "year_pnl": {
+          "2023": -2726.551373120863,
+          "2024": -3786.2599121115636
+        },
+        "year_return": {
+          "2023": -0.0020077864175263027,
+          "2024": -0.0027937471494389188
+        },
+        "year_sharpe": {
+          "2023": 0.007763088862245588,
+          "2024": -0.03407061969511702
+        },
+        "year_trades": {
+          "2023": 35,
+          "2024": 48
+        }
+      },
+      "reasons": [
+        "net_return -0.0048 <= 0.0",
+        "sharpe -0.009 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_087a6754c6b59d56d1ec",
+      "dev_order": 38,
+      "metrics": {
+        "autocorr_lag1": 0.02971484721669555,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.013744848598760573,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1624530.5200890065,
+        "excess_kurtosis": 36.08628379894947,
+        "excl_best_year_return": -0.057246068711714226,
+        "excl_best_year_sharpe": -1.1806640535747661,
+        "exposure": 0.025059015798075176,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 182,
+        "max_drawdown": -0.09334532549911556,
+        "n_completed_trades": 75,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 75,
+        "net_pnl": -45412.30242630001,
+        "net_return": -0.02719392653090902,
+        "profit_factor": 0.896424719287825,
+        "same_session_trade_frac": 0.13333333333333333,
+        "sharpe": -0.24752481007455523,
+        "sharpe_per_period": -0.015592597399423053,
+        "skew": -0.2683240252592123,
+        "start_equity": 1669942.8225153065,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 50.06528712988845,
+        "win_rate": 0.4266666666666667,
+        "year_pnl": {
+          "2023": 53232.72327007563,
+          "2024": -98645.02569637564
+        },
+        "year_return": {
+          "2023": 0.031876973601943526,
+          "2024": -0.057246068711714226
+        },
+        "year_sharpe": {
+          "2023": 0.6293634492670254,
+          "2024": -1.1806640535747661
+        },
+        "year_trades": {
+          "2023": 31,
+          "2024": 44
+        }
+      },
+      "reasons": [
+        "net_return -0.0272 <= 0.0",
+        "sharpe -0.248 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_53ccc2a6733a679d1413",
+      "dev_order": 39,
+      "metrics": {
+        "autocorr_lag1": -0.08995515635354161,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.000890517012014036,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2020863.3771303457,
+        "excess_kurtosis": 15.304000583538492,
+        "excl_best_year_return": -0.028243051719880174,
+        "excl_best_year_sharpe": -0.3487436137120442,
+        "exposure": 0.054203740693662614,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 278,
+        "max_drawdown": -0.11089086876930898,
+        "n_completed_trades": 120,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 120,
+        "net_pnl": -3589.7254655584693,
+        "net_return": -0.0017731828220448609,
+        "profit_factor": 0.9967775232164029,
+        "same_session_trade_frac": 0.35,
+        "sharpe": 0.03233019450144141,
+        "sharpe_per_period": 0.0020366108211705195,
+        "skew": -0.16098827250655687,
+        "start_equity": 2024453.1025959041,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 79.09489662875704,
+        "win_rate": 0.5083333333333333,
+        "year_pnl": {
+          "2023": 55144.45593661093,
+          "2024": -58734.1814021694
+        },
+        "year_return": {
+          "2023": 0.027239186655349412,
+          "2024": -0.02824305171987973
+        },
+        "year_sharpe": {
+          "2023": 0.3304567178016804,
+          "2024": -0.3487436137120442
+        },
+        "year_trades": {
+          "2023": 62,
+          "2024": 58
+        }
+      },
+      "reasons": [
+        "net_return -0.0018 <= 0.0",
+        "sharpe 0.032 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_12d78ccabf0688fdc199",
+      "dev_order": 40,
+      "metrics": {
+        "autocorr_lag1": -0.08470426481346474,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.023013184856576108,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1894222.0609227004,
+        "excess_kurtosis": 14.350204554959987,
+        "excl_best_year_return": -0.05291065744833201,
+        "excl_best_year_sharpe": -0.4990071226187682,
+        "exposure": 0.08244053023424733,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.10490811368551378,
+        "n_completed_trades": 113,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 113,
+        "net_pnl": -89922.15979307331,
+        "net_return": -0.045320374826701926,
+        "profit_factor": 0.9223572144361937,
+        "same_session_trade_frac": 0.3805309734513274,
+        "sharpe": -0.21839781436079436,
+        "sharpe_per_period": -0.013757769135207445,
+        "skew": -0.06638868771146769,
+        "start_equity": 1984144.2207157738,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 74.43938943524017,
+        "win_rate": 0.4690265486725664,
+        "year_pnl": {
+          "2023": -104982.37519038166,
+          "2024": 15060.215397308348
+        },
+        "year_return": {
+          "2023": -0.0529106574483329,
+          "2024": 0.008014325872552908
+        },
+        "year_sharpe": {
+          "2023": -0.4990071226187682,
+          "2024": 0.14283941290954227
+        },
+        "year_trades": {
+          "2023": 60,
+          "2024": 53
+        }
+      },
+      "reasons": [
+        "net_return -0.0453 <= 0.0",
+        "sharpe -0.218 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_869a6dd85b9f491ab177",
+      "dev_order": 41,
+      "metrics": {
+        "autocorr_lag1": -0.05929954011468222,
+        "best_year": 2024,
+        "best_year_contribution": 0.5266625873883395,
+        "cagr": 0.022498110109720804,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1502588.4742421287,
+        "excess_kurtosis": 20.077711821404282,
+        "excl_best_year_return": 0.02145060513964747,
+        "excl_best_year_sharpe": 0.30149178333255233,
+        "exposure": 0.0598329398946795,
+        "flags": [],
+        "max_dd_duration_days": 169,
+        "max_drawdown": -0.0737346725306387,
+        "n_completed_trades": 153,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 2,
+        "n_trades": 153,
+        "net_pnl": 65141.90095960046,
+        "net_return": 0.04531778931500985,
+        "profit_factor": 1.0955491739744914,
+        "same_session_trade_frac": 0.48366013071895425,
+        "sharpe": 0.352006371619834,
+        "sharpe_per_period": 0.02217431712419679,
+        "skew": 2.287726207997772,
+        "start_equity": 1437446.5732825282,
+        "top_frac_trades_contribution": 3.961505516396335,
+        "top_k_trades_contribution": 2.9339794691980505,
+        "turnover_annual": 100.87784877704681,
+        "win_rate": 0.40522875816993464,
+        "year_pnl": {
+          "2023": 30834.098852822324,
+          "2024": 34307.80210677814
+        },
+        "year_return": {
+          "2023": 0.021450605139647028,
+          "2024": 0.023365969979624923
+        },
+        "year_sharpe": {
+          "2023": 0.30149178333255233,
+          "2024": 0.43916159898392204
+        },
+        "year_trades": {
+          "2023": 75,
+          "2024": 78
+        }
+      },
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_23cabee83f4a77ed0eb6",
+      "dev_order": 42,
+      "metrics": {
+        "autocorr_lag1": 0.04668062689984511,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.1302354284943592,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1636043.4653778232,
+        "excess_kurtosis": 8.243249298812975,
+        "excl_best_year_return": -0.1543050242473476,
+        "excl_best_year_sharpe": -1.2850600598530373,
+        "exposure": 0.13382967132740148,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 454,
+        "max_drawdown": -0.3243975781705116,
+        "n_completed_trades": 251,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 251,
+        "net_pnl": -524238.65893258364,
+        "net_return": -0.24267138677543243,
+        "profit_factor": 0.7545467796133077,
+        "same_session_trade_frac": 0.6294820717131474,
+        "sharpe": -1.2099736168413988,
+        "sharpe_per_period": -0.07622117340742132,
+        "skew": -0.6726069538776454,
+        "start_equity": 2160282.124310407,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 165.9848968420372,
+        "win_rate": 0.3187250996015936,
+        "year_pnl": {
+          "2023": -333342.38557282835,
+          "2024": -190896.2733597553
+        },
+        "year_return": {
+          "2023": -0.15430502424734738,
+          "2024": -0.10448963877246731
+        },
+        "year_sharpe": {
+          "2023": -1.2850600598530373,
+          "2024": -1.1377314923454742
+        },
+        "year_trades": {
+          "2023": 131,
+          "2024": 120
+        }
+      },
+      "reasons": [
+        "net_return -0.2427 <= 0.0",
+        "sharpe -1.210 < 0.3",
+        "max_drawdown -0.324 < -0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_7b29b3bff77080293cd4",
+      "dev_order": 43,
+      "metrics": {
+        "autocorr_lag1": -0.08671704536164675,
+        "best_year": 2023,
+        "best_year_contribution": 0.5969965790538431,
+        "cagr": 0.055636184175224423,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": true,
+        "end_equity": 1980133.7288104035,
+        "excess_kurtosis": 18.58279959432186,
+        "excl_best_year_return": 0.042975682230665946,
+        "excl_best_year_sharpe": 0.5785840595346226,
+        "exposure": 0.09327115256495669,
+        "flags": [],
+        "max_dd_duration_days": 227,
+        "max_drawdown": -0.07855958635010563,
+        "n_completed_trades": 63,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 2,
+        "n_trades": 63,
+        "net_pnl": 202457.7405792526,
+        "net_return": 0.11388899997502078,
+        "profit_factor": 1.3314647167396492,
+        "same_session_trade_frac": 0.06349206349206349,
+        "sharpe": 0.6463673286336231,
+        "sharpe_per_period": 0.04071731445623156,
+        "skew": 2.7512320785555704,
+        "start_equity": 1777675.988231151,
+        "top_frac_trades_contribution": 1.355418662753375,
+        "top_k_trades_contribution": 1.5843059350671742,
+        "turnover_annual": 41.593375801659455,
+        "win_rate": 0.47619047619047616,
+        "year_pnl": {
+          "2023": 120866.57852878422,
+          "2024": 81591.16205046838
+        },
+        "year_return": {
+          "2023": 0.06799134337695056,
+          "2024": 0.04297568223066617
+        },
+        "year_sharpe": {
+          "2023": 0.707469470005883,
+          "2024": 0.5785840595346226
+        },
+        "year_trades": {
+          "2023": 31,
+          "2024": 32
+        }
+      },
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_107bc82ebe11794826c5",
+      "dev_order": 44,
+      "metrics": {
+        "autocorr_lag1": 0.0009788907451085082,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.020233908317767058,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1862420.5627586097,
+        "excess_kurtosis": 18.542292190581147,
+        "excl_best_year_return": -0.02176174695349975,
+        "excl_best_year_sharpe": -0.28603269803790843,
+        "exposure": 0.05275104412565825,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 454,
+        "max_drawdown": -0.14515967134846608,
+        "n_completed_trades": 150,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 150,
+        "net_pnl": -77404.16319452366,
+        "net_return": -0.03990265829635253,
+        "profit_factor": 0.9279142622173415,
+        "same_session_trade_frac": 0.5466666666666666,
+        "sharpe": -0.21887223506625555,
+        "sharpe_per_period": -0.013787654830528163,
+        "skew": -0.46678831924094405,
+        "start_equity": 1939824.7259531333,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 98.91918861723276,
+        "win_rate": 0.41333333333333333,
+        "year_pnl": {
+          "2023": -35973.024224515306,
+          "2024": -41431.13897000835
+        },
+        "year_return": {
+          "2023": -0.018544471437665577,
+          "2024": -0.02176174695349986
+        },
+        "year_sharpe": {
+          "2023": -0.16905668163861393,
+          "2024": -0.28603269803790843
+        },
+        "year_trades": {
+          "2023": 76,
+          "2024": 74
+        }
+      },
+      "reasons": [
+        "net_return -0.0399 <= 0.0",
+        "sharpe -0.219 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_801a9e583c0ca16caedd",
+      "dev_order": 45,
+      "metrics": {
+        "autocorr_lag1": -0.05359502865507151,
+        "best_year": 2024,
+        "best_year_contribution": 0.5302466002431208,
+        "cagr": 0.03441111481462644,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1539252.0065635028,
+        "excess_kurtosis": 20.65989088130797,
+        "excl_best_year_return": 0.03275077736150278,
+        "excl_best_year_sharpe": 0.4266122549336985,
+        "exposure": 0.060377701107681134,
+        "flags": [],
+        "max_dd_duration_days": 169,
+        "max_drawdown": -0.07242926091350366,
+        "n_completed_trades": 153,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 2,
+        "n_trades": 153,
+        "net_pnl": 100320.9566521314,
+        "net_return": 0.06971908532956506,
+        "profit_factor": 1.14577528895853,
+        "same_session_trade_frac": 0.48366013071895425,
+        "sharpe": 0.4998882696593378,
+        "sharpe_per_period": 0.03149000106754768,
+        "skew": 2.5839243909579506,
+        "start_equity": 1438931.0499113714,
+        "top_frac_trades_contribution": 2.871384101717303,
+        "top_k_trades_contribution": 2.094876354984749,
+        "turnover_annual": 101.07695373848371,
+        "win_rate": 0.40522875816993464,
+        "year_pnl": {
+          "2023": 47126.11045420123,
+          "2024": 53194.846197930165
+        },
+        "year_return": {
+          "2023": 0.032750777361503,
+          "2024": 0.035795962373913026
+        },
+        "year_sharpe": {
+          "2023": 0.4266122549336985,
+          "2024": 0.6190059107504852
+        },
+        "year_trades": {
+          "2023": 75,
+          "2024": 78
+        }
+      },
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_0e4dbdc3514c4e295d85",
+      "dev_order": 46,
+      "metrics": {
+        "autocorr_lag1": -0.08301282404788417,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.017867435338309257,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1897172.2465169225,
+        "excess_kurtosis": 13.904734616370629,
+        "excl_best_year_return": -0.05373282396276702,
+        "excl_best_year_sharpe": -0.5125271717210165,
+        "exposure": 0.08543671690575631,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.09709534907254003,
+        "n_completed_trades": 113,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 113,
+        "net_pnl": -69375.0612297901,
+        "net_return": -0.03527759589433965,
+        "profit_factor": 0.9394313249829253,
+        "same_session_trade_frac": 0.3805309734513274,
+        "sharpe": -0.15892397628568788,
+        "sharpe_per_period": -0.010011269490891823,
+        "skew": 0.0018215450677675467,
+        "start_equity": 1966547.3077467126,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 74.41257858903,
+        "win_rate": 0.4690265486725664,
+        "year_pnl": {
+          "2023": -105668.14030160871,
+          "2024": 36293.07907181862
+        },
+        "year_return": {
+          "2023": -0.05373282396276757,
+          "2024": 0.01950318951748331
+        },
+        "year_sharpe": {
+          "2023": -0.5125271717210165,
+          "2024": 0.28859727878584335
+        },
+        "year_trades": {
+          "2023": 60,
+          "2024": 53
+        }
+      },
+      "reasons": [
+        "net_return -0.0353 <= 0.0",
+        "sharpe -0.159 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_bde6d9d452337eeccd86",
+      "dev_order": 47,
+      "metrics": {
+        "autocorr_lag1": 0.009583020061672779,
+        "best_year": 2023,
+        "best_year_contribution": 1.1487281986224445,
+        "cagr": 0.011180468575402003,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1256782.474958681,
+        "excess_kurtosis": 47.88925211215849,
+        "excl_best_year_return": -0.0032473320513113357,
+        "excl_best_year_sharpe": -0.08285255091666978,
+        "exposure": 0.016887597603050662,
+        "flags": [],
+        "max_dd_duration_days": 357,
+        "max_drawdown": -0.05332546445856878,
+        "n_completed_trades": 48,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 48,
+        "net_pnl": 27529.99233872071,
+        "net_return": 0.022395718314959012,
+        "profit_factor": 1.144294728409446,
+        "same_session_trade_frac": 0.125,
+        "sharpe": 0.29124535738659485,
+        "sharpe_per_period": 0.018346733003501394,
+        "skew": 3.854178729568093,
+        "start_equity": 1229252.4826199603,
+        "top_frac_trades_contribution": 2.912459945992345,
+        "top_k_trades_contribution": 3.9961870910245483,
+        "turnover_annual": 31.745663161980662,
+        "win_rate": 0.4583333333333333,
+        "year_pnl": {
+          "2023": 31624.478507348336,
+          "2024": -4094.486168627627
+        },
+        "year_return": {
+          "2023": 0.025726593156798483,
+          "2024": -0.0032473320513104476
+        },
+        "year_sharpe": {
+          "2023": 0.5572059961453389,
+          "2024": -0.08285255091666978
+        },
+        "year_trades": {
+          "2023": 22,
+          "2024": 26
+        }
+      },
+      "reasons": [
+        "sharpe 0.291 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5484d8b73edae26ce31d",
+      "dev_order": 48,
+      "metrics": {
+        "autocorr_lag1": 0.06718749758166868,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.09255696914247524,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1674615.0378117433,
+        "excess_kurtosis": 11.40611741638472,
+        "excl_best_year_return": -0.09708487554504208,
+        "excl_best_year_sharpe": -0.8574091842958331,
+        "exposure": 0.09878336662429635,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 454,
+        "max_drawdown": -0.2350102595950868,
+        "n_completed_trades": 195,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 195,
+        "net_pnl": -357468.1400291694,
+        "net_return": -0.17591215946631633,
+        "profit_factor": 0.7761470380620156,
+        "same_session_trade_frac": 0.7025641025641025,
+        "sharpe": -0.9055456547116933,
+        "sharpe_per_period": -0.057044014361483465,
+        "skew": 0.04550531882718999,
+        "start_equity": 2032083.1778409127,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 128.29945724180402,
+        "win_rate": 0.3076923076923077,
+        "year_pnl": {
+          "2023": -197284.54241785756,
+          "2024": -160183.59761131182
+        },
+        "year_return": {
+          "2023": -0.09708487554504153,
+          "2024": -0.08730309393018365
+        },
+        "year_sharpe": {
+          "2023": -0.8574091842958331,
+          "2024": -0.9772539310639669
+        },
+        "year_trades": {
+          "2023": 99,
+          "2024": 96
+        }
+      },
+      "reasons": [
+        "net_return -0.1759 <= 0.0",
+        "sharpe -0.906 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_c606dd4499922ceef557",
+      "dev_order": 49,
+      "metrics": {
+        "autocorr_lag1": -0.04442797546839332,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.007726391389803022,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1323115.5100869234,
+        "excess_kurtosis": 36.65439414102542,
+        "excl_best_year_return": -0.008304443983261245,
+        "excl_best_year_sharpe": -0.0814543155450629,
+        "exposure": 0.02814599600508444,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 393,
+        "max_drawdown": -0.10776517341578062,
+        "n_completed_trades": 83,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 83,
+        "net_pnl": -20602.519987029256,
+        "net_return": -0.015332472680965159,
+        "profit_factor": 0.9506121333071748,
+        "same_session_trade_frac": 0.2891566265060241,
+        "sharpe": -0.09754924556793265,
+        "sharpe_per_period": -0.00614502486558856,
+        "skew": 0.4227430533918831,
+        "start_equity": 1343718.0300739526,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 54.72699031625199,
+        "win_rate": 0.39759036144578314,
+        "year_pnl": {
+          "2023": -11158.83111004671,
+          "2024": -9443.688876982545
+        },
+        "year_return": {
+          "2023": -0.0083044439832608,
+          "2024": -0.007086881306530457
+        },
+        "year_sharpe": {
+          "2023": -0.0814543155450629,
+          "2024": -0.12654182398143904
+        },
+        "year_trades": {
+          "2023": 35,
+          "2024": 48
+        }
+      },
+      "reasons": [
+        "net_return -0.0153 <= 0.0",
+        "sharpe -0.098 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_8990fe7a8bd2ad6434f5",
+      "dev_order": 50,
+      "metrics": {
+        "autocorr_lag1": 0.010259969086026482,
+        "best_year": 2023,
+        "best_year_contribution": 7.4220274389678424,
+        "cagr": 0.001670684495780561,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1225236.3017763207,
+        "excess_kurtosis": 50.00545262524638,
+        "excl_best_year_return": -0.02087485937335587,
+        "excl_best_year_sharpe": -0.6578265458256952,
+        "exposure": 0.01752315235155257,
+        "flags": [],
+        "max_dd_duration_days": 357,
+        "max_drawdown": -0.07069291616785922,
+        "n_completed_trades": 48,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 48,
+        "net_pnl": 4067.551454855129,
+        "net_return": 0.003330867624793399,
+        "profit_factor": 1.020541897667244,
+        "same_session_trade_frac": 0.125,
+        "sharpe": 0.061226487028418874,
+        "sharpe_per_period": 0.0038569061506504377,
+        "skew": 3.8056116866713707,
+        "start_equity": 1221168.7503214655,
+        "top_frac_trades_contribution": 18.75821384113699,
+        "top_k_trades_contribution": 25.945584504906837,
+        "turnover_annual": 31.773384875203924,
+        "win_rate": 0.4375,
+        "year_pnl": {
+          "2023": 30189.478507348336,
+          "2024": -26121.927052493207
+        },
+        "year_return": {
+          "2023": 0.024721790906785834,
+          "2024": -0.02087485937335587
+        },
+        "year_sharpe": {
+          "2023": 0.5338496289452533,
+          "2024": -0.6578265458256952
+        },
+        "year_trades": {
+          "2023": 22,
+          "2024": 26
+        }
+      },
+      "reasons": [
+        "sharpe 0.061 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_e5151b31a790f6e797f1",
+      "dev_order": 51,
+      "metrics": {
+        "autocorr_lag1": -0.15829372228551353,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.05703334016952799,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1774134.9999999995,
+        "excess_kurtosis": 17.354191740598345,
+        "excl_best_year_return": -0.10156921834924815,
+        "excl_best_year_sharpe": -1.086625202188755,
+        "exposure": 0.04948247684764845,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 424,
+        "max_drawdown": -0.17518495625257324,
+        "n_completed_trades": 92,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 92,
+        "net_pnl": -220169.99999999395,
+        "net_return": -0.11039936218381574,
+        "profit_factor": 0.7615698250515816,
+        "same_session_trade_frac": 0.21739130434782608,
+        "sharpe": -0.661632982675596,
+        "sharpe_per_period": -0.04167896027041747,
+        "skew": -1.1689261880418458,
+        "start_equity": 1994304.9999999935,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 60.392874014608594,
+        "win_rate": 0.43478260869565216,
+        "year_pnl": {
+          "2023": -202559.9999999972,
+          "2024": -17609.99999999674
+        },
+        "year_return": {
+          "2023": -0.10156921834924837,
+          "2024": -0.009828407502181835
+        },
+        "year_sharpe": {
+          "2023": -1.086625202188755,
+          "2024": -0.10612982462089661
+        },
+        "year_trades": {
+          "2023": 50,
+          "2024": 42
+        }
+      },
+      "reasons": [
+        "net_return -0.1104 <= 0.0",
+        "sharpe -0.662 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_08e5cdb6e655f6c013fc",
+      "dev_order": 52,
+      "metrics": {
+        "autocorr_lag1": -0.15619250339390495,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.05368160538403988,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1772210.0,
+        "excess_kurtosis": 17.12509537445096,
+        "excl_best_year_return": -0.09897831768708332,
+        "excl_best_year_sharpe": -1.0480425745552338,
+        "exposure": 0.04902850917014709,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 401,
+        "max_drawdown": -0.17051312047585176,
+        "n_completed_trades": 92,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 92,
+        "net_pnl": -205899.99999999348,
+        "net_return": -0.10408925691695314,
+        "profit_factor": 0.7763913097778643,
+        "same_session_trade_frac": 0.21739130434782608,
+        "sharpe": -0.6122839805682344,
+        "sharpe_per_period": -0.0385702653412441,
+        "skew": -1.095008829928649,
+        "start_equity": 1978109.9999999935,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 60.46750222196925,
+        "win_rate": 0.43478260869565216,
+        "year_pnl": {
+          "2023": -195789.99999999674,
+          "2024": -10109.99999999674
+        },
+        "year_return": {
+          "2023": -0.09897831768708387,
+          "2024": -0.005672382063825143
+        },
+        "year_sharpe": {
+          "2023": -1.0480425745552338,
+          "2024": -0.044630513074138595
+        },
+        "year_trades": {
+          "2023": 50,
+          "2024": 42
+        }
+      },
+      "reasons": [
+        "net_return -0.1041 <= 0.0",
+        "sharpe -0.612 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_094c2f7d938a518ea9e0",
+      "dev_order": 53,
+      "metrics": {
+        "autocorr_lag1": -0.0789371744438533,
+        "best_year": 2023,
+        "best_year_contribution": 1.034358205596068,
+        "cagr": 0.07067271640885475,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2304455.91415737,
+        "excess_kurtosis": 8.372607293586407,
+        "excl_best_year_return": -0.004350856563648531,
+        "excl_best_year_sharpe": -0.01661560625072309,
+        "exposure": 0.08343925912475032,
+        "flags": [],
+        "max_dd_duration_days": 148,
+        "max_drawdown": -0.10131253878192514,
+        "n_completed_trades": 172,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 172,
+        "net_pnl": 293093.624497592,
+        "net_return": 0.14571896172278787,
+        "profit_factor": 1.2013550018949513,
+        "same_session_trade_frac": 0.29069767441860467,
+        "sharpe": 0.800145554737954,
+        "sharpe_per_period": 0.050404432154534426,
+        "skew": 0.43374101415574207,
+        "start_equity": 2011362.2896597781,
+        "top_frac_trades_contribution": 1.5731150781268126,
+        "top_k_trades_contribution": 0.9765480245113685,
+        "turnover_annual": 113.96282549832306,
+        "win_rate": 0.5465116279069767,
+        "year_pnl": {
+          "2023": 303163.795506977,
+          "2024": -10070.171009385027
+        },
+        "year_return": {
+          "2023": 0.15072560376890487,
+          "2024": -0.004350856563649197
+        },
+        "year_sharpe": {
+          "2023": 1.4493565771434853,
+          "2024": -0.01661560625072309
+        },
+        "year_trades": {
+          "2023": 90,
+          "2024": 82
+        }
+      },
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_d99859c95d4c6c3da4a7",
+      "dev_order": 54,
+      "metrics": {
+        "autocorr_lag1": 0.0964229915587357,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.11068735746032521,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1876054.2891021892,
+        "excess_kurtosis": 14.87274492337336,
+        "excl_best_year_return": -0.12956904183555207,
+        "excl_best_year_sharpe": -1.4031763089565046,
+        "exposure": 0.09914654076629743,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 459,
+        "max_drawdown": -0.25834201635876874,
+        "n_completed_trades": 187,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 187,
+        "net_pnl": -493857.2716821749,
+        "net_return": -0.20838637181833242,
+        "profit_factor": 0.7405867475015243,
+        "same_session_trade_frac": 0.5935828877005348,
+        "sharpe": -1.1631902510462744,
+        "sharpe_per_period": -0.07327409837436263,
+        "skew": -1.9781670342969289,
+        "start_equity": 2369911.560784364,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 123.34311820597189,
+        "win_rate": 0.3315508021390374,
+        "year_pnl": {
+          "2023": -214594.96559065953,
+          "2024": -279262.30609151535
+        },
+        "year_return": {
+          "2023": -0.09054977795020991,
+          "2024": -0.1295690418355533
+        },
+        "year_sharpe": {
+          "2023": -0.9256394989622426,
+          "2024": -1.4031763089565046
+        },
+        "year_trades": {
+          "2023": 95,
+          "2024": 92
+        }
+      },
+      "reasons": [
+        "net_return -0.2084 <= 0.0",
+        "sharpe -1.163 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_a03f8ec12daf38822df5",
+      "dev_order": 55,
+      "metrics": {
+        "autocorr_lag1": -0.07139038599074614,
+        "best_year": 2023,
+        "best_year_contribution": 1.4070691828244752,
+        "cagr": 0.04711228169229664,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2005229.6649119873,
+        "excess_kurtosis": 9.061803924186986,
+        "excl_best_year_return": -0.03444191028869603,
+        "excl_best_year_sharpe": -0.439776191240777,
+        "exposure": 0.07962593063373888,
+        "flags": [],
+        "max_dd_duration_days": 115,
+        "max_drawdown": -0.11107759471404599,
+        "n_completed_trades": 172,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 172,
+        "net_pnl": 175713.33427169663,
+        "net_return": 0.09604359979131805,
+        "profit_factor": 1.1370451357220734,
+        "same_session_trade_frac": 0.29069767441860467,
+        "sharpe": 0.5821464328147078,
+        "sharpe_per_period": 0.036671778282168756,
+        "skew": 0.11884514926558128,
+        "start_equity": 1829516.3306402906,
+        "top_frac_trades_contribution": 2.1316822741570087,
+        "top_k_trades_contribution": 1.3494422661934216,
+        "turnover_annual": 113.75404260989426,
+        "win_rate": 0.5406976744186046,
+        "year_pnl": {
+          "2023": 247240.81766504003,
+          "2024": -71527.4833933434
+        },
+        "year_return": {
+          "2023": 0.13513998947389072,
+          "2024": -0.034441910288697475
+        },
+        "year_sharpe": {
+          "2023": 1.3841035540639939,
+          "2024": -0.439776191240777
+        },
+        "year_trades": {
+          "2023": 90,
+          "2024": 82
+        }
+      },
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_63e43751bbd903002a94",
+      "dev_order": 56,
+      "metrics": {
+        "autocorr_lag1": 0.16396710917422053,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.13588948845001225,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1638881.7583991252,
+        "excess_kurtosis": 10.021883138235362,
+        "excl_best_year_return": -0.21269554120971268,
+        "excl_best_year_sharpe": -1.8081571817634805,
+        "exposure": 0.12157254403486471,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 470,
+        "max_drawdown": -0.33670497716153724,
+        "n_completed_trades": 229,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 229,
+        "net_pnl": -553446.7262446042,
+        "net_return": -0.2524469896373871,
+        "profit_factor": 0.7138755497127807,
+        "same_session_trade_frac": 0.6768558951965066,
+        "sharpe": -1.205205937574809,
+        "sharpe_per_period": -0.07592083784384238,
+        "skew": -0.8447823464990698,
+        "start_equity": 2192328.4846437294,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 151.12701894066885,
+        "win_rate": 0.29694323144104806,
+        "year_pnl": {
+          "2023": -466298.4935507672,
+          "2024": -87148.23269383702
+        },
+        "year_return": {
+          "2023": -0.21269554120971268,
+          "2024": -0.05049056687517506
+        },
+        "year_sharpe": {
+          "2023": -1.8081571817634805,
+          "2024": -0.4629543014164141
+        },
+        "year_trades": {
+          "2023": 122,
+          "2024": 107
+        }
+      },
+      "reasons": [
+        "net_return -0.2524 <= 0.0",
+        "sharpe -1.205 < 0.3",
+        "max_drawdown -0.337 < -0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_dcd205b16ae9262a7eea",
+      "dev_order": 57,
+      "metrics": {
+        "autocorr_lag1": 0.10287212341038783,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.11322883506886716,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1679287.8468644074,
+        "excess_kurtosis": 13.748745976375705,
+        "excl_best_year_return": -0.12362534461980923,
+        "excl_best_year_sharpe": -1.3302653712838644,
+        "exposure": 0.10205193390230616,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.26956862052347774,
+        "n_completed_trades": 186,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 186,
+        "net_pnl": -454188.46647200966,
+        "net_return": -0.21288657560098767,
+        "profit_factor": 0.737808628772592,
+        "same_session_trade_frac": 0.5967741935483871,
+        "sharpe": -1.1660009090358556,
+        "sharpe_per_period": -0.07345115318533617,
+        "skew": -1.6534039924959778,
+        "start_equity": 2133476.313336417,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 122.26425132743262,
+        "win_rate": 0.3172043010752688,
+        "year_pnl": {
+          "2023": -217300.58123939903,
+          "2024": -236887.88523261063
+        },
+        "year_return": {
+          "2023": -0.10185282108877769,
+          "2024": -0.12362534461981001
+        },
+        "year_sharpe": {
+          "2023": -1.0096775105863955,
+          "2024": -1.3302653712838644
+        },
+        "year_trades": {
+          "2023": 95,
+          "2024": 91
+        }
+      },
+      "reasons": [
+        "net_return -0.2129 <= 0.0",
+        "sharpe -1.166 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_d1939e396ce9cd245d6c",
+      "dev_order": 58,
+      "metrics": {
+        "autocorr_lag1": 0.021437599285228922,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.044211960536193584,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1277450.392276688,
+        "excess_kurtosis": 20.835428588219333,
+        "excl_best_year_return": -0.050397035667686274,
+        "excl_best_year_sharpe": -0.9587017648294586,
+        "exposure": 0.04285454875612856,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 428,
+        "max_drawdown": -0.1640718005582923,
+        "n_completed_trades": 91,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 91,
+        "net_pnl": -120413.86566967145,
+        "net_return": -0.08614131521366375,
+        "profit_factor": 0.7824928877827623,
+        "same_session_trade_frac": 0.5824175824175825,
+        "sharpe": -0.6887336134418718,
+        "sharpe_per_period": -0.04338613954138298,
+        "skew": 0.6419320863907231,
+        "start_equity": 1397864.2579463595,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 59.26270772071063,
+        "win_rate": 0.2857142857142857,
+        "year_pnl": {
+          "2023": -52617.412413509795,
+          "2024": -67796.45325616165
+        },
+        "year_return": {
+          "2023": -0.037641288926588246,
+          "2024": -0.050397035667686385
+        },
+        "year_sharpe": {
+          "2023": -0.5029253390142152,
+          "2024": -0.9587017648294586
+        },
+        "year_trades": {
+          "2023": 45,
+          "2024": 46
+        }
+      },
+      "reasons": [
+        "net_return -0.0861 <= 0.0",
+        "sharpe -0.689 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_19614d439319aea549e3",
+      "dev_order": 59,
+      "metrics": {
+        "autocorr_lag1": -0.0438824650132545,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.054454859719940796,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1870442.9874191808,
+        "excess_kurtosis": 9.245214695120636,
+        "excl_best_year_return": -0.08480723429545967,
+        "excl_best_year_sharpe": -0.9498745112852162,
+        "exposure": 0.10568367532231705,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 454,
+        "max_drawdown": -0.21282102663908364,
+        "n_completed_trades": 146,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 146,
+        "net_pnl": -220715.47366728005,
+        "net_return": -0.10554698640704985,
+        "profit_factor": 0.8596837177696874,
+        "same_session_trade_frac": 0.4383561643835616,
+        "sharpe": -0.5049916159430337,
+        "sharpe_per_period": -0.031811481665664464,
+        "skew": -0.10835113443583481,
+        "start_equity": 2091158.4610864609,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 96.13746665486308,
+        "win_rate": 0.4589041095890411,
+        "year_pnl": {
+          "2023": -47389.041668834165,
+          "2024": -173326.43199844589
+        },
+        "year_return": {
+          "2023": -0.022661621560813305,
+          "2024": -0.08480723429545944
+        },
+        "year_sharpe": {
+          "2023": -0.15162914331322644,
+          "2024": -0.9498745112852162
+        },
+        "year_trades": {
+          "2023": 70,
+          "2024": 76
+        }
+      },
+      "reasons": [
+        "net_return -0.1055 <= 0.0",
+        "sharpe -0.505 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_efc3814210cd93ff823b",
+      "dev_order": 60,
+      "metrics": {
+        "autocorr_lag1": 0.08722154277795612,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.1045253280207431,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1595832.1513558086,
+        "excess_kurtosis": 12.771419664055488,
+        "excl_best_year_return": -0.1371294872312353,
+        "excl_best_year_sharpe": -1.3742674490823992,
+        "exposure": 0.10976938441982931,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 459,
+        "max_drawdown": -0.285705991136458,
+        "n_completed_trades": 194,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 194,
+        "net_pnl": -392550.9709812766,
+        "net_return": -0.19742220026484836,
+        "profit_factor": 0.7609604561695564,
+        "same_session_trade_frac": 0.6185567010309279,
+        "sharpe": -1.0102164542506853,
+        "sharpe_per_period": -0.06363765495935172,
+        "skew": -1.5933579112095726,
+        "start_equity": 1988383.1223370852,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 127.2817639178942,
+        "win_rate": 0.32989690721649484,
+        "year_pnl": {
+          "2023": -272665.9579853269,
+          "2024": -119885.01299594971
+        },
+        "year_return": {
+          "2023": -0.1371294872312352,
+          "2024": -0.0698745780988006
+        },
+        "year_sharpe": {
+          "2023": -1.3742674490823992,
+          "2024": -0.6459919375129409
+        },
+        "year_trades": {
+          "2023": 96,
+          "2024": 98
+        }
+      },
+      "reasons": [
+        "net_return -0.1974 <= 0.0",
+        "sharpe -1.010 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2c9423174183bf20a524",
+      "dev_order": 61,
+      "metrics": {
+        "autocorr_lag1": -0.0036386997164121714,
+        "best_year": 2023,
+        "best_year_contribution": 6.672799134166843,
+        "cagr": 0.0030776234244125344,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1242898.3120177437,
+        "excess_kurtosis": 45.871899961431815,
+        "excl_best_year_return": -0.03346103853128879,
+        "excl_best_year_sharpe": -0.9218649641250523,
+        "exposure": 0.02179044852006537,
+        "flags": [],
+        "max_dd_duration_days": 288,
+        "max_drawdown": -0.06605090879189346,
+        "n_completed_trades": 46,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 46,
+        "net_pnl": 7585.046418741113,
+        "net_return": 0.006140180495077141,
+        "profit_factor": 1.0305780888840683,
+        "same_session_trade_frac": 0.3695652173913043,
+        "sharpe": 0.08613763185382907,
+        "sharpe_per_period": 0.005426160771649221,
+        "skew": 0.996540723583423,
+        "start_equity": 1235313.2655990026,
+        "top_frac_trades_contribution": 12.114625926739015,
+        "top_k_trades_contribution": 17.02626363378725,
+        "turnover_annual": 30.202002700186995,
+        "win_rate": 0.5,
+        "year_pnl": {
+          "2023": 50613.491175591014,
+          "2024": -43028.4447568499
+        },
+        "year_return": {
+          "2023": 0.04097219109117933,
+          "2024": -0.03346103853128879
+        },
+        "year_sharpe": {
+          "2023": 0.6905841586071524,
+          "2024": -0.9218649641250523
+        },
+        "year_trades": {
+          "2023": 22,
+          "2024": 24
+        }
+      },
+      "reasons": [
+        "sharpe 0.086 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_a4938a88f8b052ae1562",
+      "dev_order": 62,
+      "metrics": {
+        "autocorr_lag1": 0.05659572845027514,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.1040312098019579,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1598720.6082667778,
+        "excess_kurtosis": 13.957445762142353,
+        "excl_best_year_return": -0.13551083536047404,
+        "excl_best_year_sharpe": -1.4449947253930606,
+        "exposure": 0.09905574723079717,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 459,
+        "max_drawdown": -0.26777182897786156,
+        "n_completed_trades": 194,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 194,
+        "net_pnl": -391073.6876401156,
+        "net_return": -0.19653975712191651,
+        "profit_factor": 0.7554205322715657,
+        "same_session_trade_frac": 0.6185567010309279,
+        "sharpe": -1.0491811754105078,
+        "sharpe_per_period": -0.06609220167587236,
+        "skew": -1.9982655259610942,
+        "start_equity": 1989794.2959068934,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 127.3248117485577,
+        "win_rate": 0.35051546391752575,
+        "year_pnl": {
+          "2023": -269638.6872338501,
+          "2024": -121435.00040626549
+        },
+        "year_return": {
+          "2023": -0.13551083536047437,
+          "2024": -0.07059535764903413
+        },
+        "year_sharpe": {
+          "2023": -1.4449947253930606,
+          "2024": -0.6687584419894025
+        },
+        "year_trades": {
+          "2023": 96,
+          "2024": 98
+        }
+      },
+      "reasons": [
+        "net_return -0.1965 <= 0.0",
+        "sharpe -1.049 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_cc63a529452b2751419c",
+      "dev_order": 63,
+      "metrics": {
+        "autocorr_lag1": -0.041030499162302454,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.0659011825830691,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 2108704.404051597,
+        "excess_kurtosis": 7.5455042383662505,
+        "excl_best_year_return": -0.1210496987027373,
+        "excl_best_year_sharpe": -1.249053576265181,
+        "exposure": 0.10777192663882332,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 148,
+        "max_drawdown": -0.21037231039133064,
+        "n_completed_trades": 296,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 296,
+        "net_pnl": -306729.08288740274,
+        "net_return": -0.1269871783040114,
+        "profit_factor": 0.8764050899018615,
+        "same_session_trade_frac": 0.6959459459459459,
+        "sharpe": -0.5703985608308898,
+        "sharpe_per_period": -0.03593173190827815,
+        "skew": -0.5819426058546084,
+        "start_equity": 2415433.486939,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 197.53731610118183,
+        "win_rate": 0.3952702702702703,
+        "year_pnl": {
+          "2023": -16316.721247800626,
+          "2024": -290412.3616396021
+        },
+        "year_return": {
+          "2023": -0.006755193772062129,
+          "2024": -0.12104969870273596
+        },
+        "year_sharpe": {
+          "2023": 0.0011202426464866455,
+          "2024": -1.249053576265181
+        },
+        "year_trades": {
+          "2023": 153,
+          "2024": 143
+        }
+      },
+      "reasons": [
+        "net_return -0.1270 <= 0.0",
+        "sharpe -0.570 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_1c51d41469a6b24cf780",
+      "dev_order": 64,
+      "metrics": {
+        "autocorr_lag1": -0.06248712622865793,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.031230533447370368,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1282614.9999999988,
+        "excess_kurtosis": 21.88417939865256,
+        "excl_best_year_return": -0.07076044792505265,
+        "excl_best_year_sharpe": -1.5134126636119714,
+        "exposure": 0.020700926094062103,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 453,
+        "max_drawdown": -0.0922361111612423,
+        "n_completed_trades": 68,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 68,
+        "net_pnl": -83684.99999999558,
+        "net_return": -0.06124935958427569,
+        "profit_factor": 0.7184361489157806,
+        "same_session_trade_frac": 0.0,
+        "sharpe": -0.7444978126810196,
+        "sharpe_per_period": -0.04689895390441732,
+        "skew": 0.2213732892107791,
+        "start_equity": 1366299.9999999944,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 44.34363343885313,
+        "win_rate": 0.4411764705882353,
+        "year_pnl": {
+          "2023": -96679.9999999979,
+          "2024": 12995.000000002328
+        },
+        "year_return": {
+          "2023": -0.07076044792505187,
+          "2024": 0.010235346009043855
+        },
+        "year_sharpe": {
+          "2023": -1.5134126636119714,
+          "2024": 0.32078770855937855
+        },
+        "year_trades": {
+          "2023": 31,
+          "2024": 37
+        }
+      },
+      "reasons": [
+        "net_return -0.0612 <= 0.0",
+        "sharpe -0.744 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_ed835da771bbe55a2249",
+      "dev_order": 65,
+      "metrics": {
+        "autocorr_lag1": -0.0040974706765890545,
+        "best_year": 2023,
+        "best_year_contribution": 4.206540916835698,
+        "cagr": 0.005190012035202862,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1249411.110692154,
+        "excess_kurtosis": 44.44057084838735,
+        "excl_best_year_return": -0.03184855544999121,
+        "excl_best_year_sharpe": -0.8660170728150899,
+        "exposure": 0.021972035591065916,
+        "flags": [],
+        "max_dd_duration_days": 298,
+        "max_drawdown": -0.064970774464427,
+        "n_completed_trades": 46,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 46,
+        "net_pnl": 12817.845093150856,
+        "net_return": 0.010365449537639071,
+        "profit_factor": 1.0513027458644861,
+        "same_session_trade_frac": 0.3695652173913043,
+        "sharpe": 0.12743082152224453,
+        "sharpe_per_period": 0.008027387216964674,
+        "skew": 1.035962126471779,
+        "start_equity": 1236593.265599003,
+        "top_frac_trades_contribution": 7.16891172675358,
+        "top_k_trades_contribution": 10.148351696769025,
+        "turnover_annual": 30.33957075352087,
+        "win_rate": 0.5,
+        "year_pnl": {
+          "2023": 53918.78985000076,
+          "2024": -41100.9447568499
+        },
+        "year_return": {
+          "2023": 0.04360268760147479,
+          "2024": -0.03184855544999132
+        },
+        "year_sharpe": {
+          "2023": 0.7285687066740466,
+          "2024": -0.8660170728150899
+        },
+        "year_trades": {
+          "2023": 22,
+          "2024": 24
+        }
+      },
+      "reasons": [
+        "sharpe 0.127 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_6d7ccf6788e63e948522",
+      "dev_order": 66,
+      "metrics": {
+        "autocorr_lag1": 0.15049108104643114,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.09747542148102961,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1596954.1383955437,
+        "excess_kurtosis": 9.555930186965151,
+        "excl_best_year_return": -0.1040231178786093,
+        "excl_best_year_sharpe": -0.915909356681711,
+        "exposure": 0.14309061194842926,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 451,
+        "max_drawdown": -0.30537215614788893,
+        "n_completed_trades": 274,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 274,
+        "net_pnl": -361984.66346418275,
+        "net_return": -0.18478610108724747,
+        "profit_factor": 0.8370058611395453,
+        "same_session_trade_frac": 0.6861313868613139,
+        "sharpe": -0.774090898023544,
+        "sharpe_per_period": -0.048763143055451375,
+        "skew": -1.077437170514556,
+        "start_equity": 1958938.8018597264,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 180.99906118690734,
+        "win_rate": 0.3686131386861314,
+        "year_pnl": {
+          "2023": -176577.92820140114,
+          "2024": -185406.7352627816
+        },
+        "year_return": {
+          "2023": -0.0901395837551261,
+          "2024": -0.10402311787860963
+        },
+        "year_sharpe": {
+          "2023": -0.6548668420335737,
+          "2024": -0.915909356681711
+        },
+        "year_trades": {
+          "2023": 136,
+          "2024": 138
+        }
+      },
+      "reasons": [
+        "net_return -0.1848 <= 0.0",
+        "sharpe -0.774 < 0.3",
+        "max_drawdown -0.305 < -0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_374efd254ec6142fb71b",
+      "dev_order": 67,
+      "metrics": {
+        "autocorr_lag1": 0.1733274456342208,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.13935088668738327,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1569815.1341414964,
+        "excess_kurtosis": 10.178358730395503,
+        "excl_best_year_return": -0.22288313175404517,
+        "excl_best_year_sharpe": -1.915718464790805,
+        "exposure": 0.12583984020337752,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 470,
+        "max_drawdown": -0.34925188830863985,
+        "n_completed_trades": 229,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 229,
+        "net_pnl": -546980.8717794055,
+        "net_return": -0.258400370299945,
+        "profit_factor": 0.7037815956056855,
+        "same_session_trade_frac": 0.6768558951965066,
+        "sharpe": -1.2353622823876118,
+        "sharpe_per_period": -0.07782050900635164,
+        "skew": -0.7625329543849636,
+        "start_equity": 2116796.005920902,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 150.7617627476553,
+        "win_rate": 0.2925764192139738,
+        "year_pnl": {
+          "2023": -471798.1230841032,
+          "2024": -75182.74869530229
+        },
+        "year_return": {
+          "2023": -0.2228831317540444,
+          "2024": -0.04570385742117167
+        },
+        "year_sharpe": {
+          "2023": -1.915718464790805,
+          "2024": -0.40678693498648627
+        },
+        "year_trades": {
+          "2023": 122,
+          "2024": 107
+        }
+      },
+      "reasons": [
+        "net_return -0.2584 <= 0.0",
+        "sharpe -1.235 < 0.3",
+        "max_drawdown -0.349 < -0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_bb108f7098954437b401",
+      "dev_order": 68,
+      "metrics": {
+        "autocorr_lag1": 0.1592863016265004,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.09361181063827051,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1696628.3313131002,
+        "excess_kurtosis": 8.28809122631086,
+        "excl_best_year_return": -0.1149786837544059,
+        "excl_best_year_sharpe": -0.9832057997486299,
+        "exposure": 0.1531686943889595,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 469,
+        "max_drawdown": -0.32420629571102144,
+        "n_completed_trades": 271,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 271,
+        "net_pnl": -366942.89337876905,
+        "net_return": -0.17781934976998948,
+        "profit_factor": 0.8481540985038312,
+        "same_session_trade_frac": 0.6752767527675276,
+        "sharpe": -0.6915612476461637,
+        "sharpe_per_period": -0.04356426375336432,
+        "skew": -0.570336003671605,
+        "start_equity": 2063571.2246918692,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 178.38750897523826,
+        "win_rate": 0.34686346863468637,
+        "year_pnl": {
+          "2023": -146523.23932754202,
+          "2024": -220419.65405122703
+        },
+        "year_return": {
+          "2023": -0.0710046920476034,
+          "2024": -0.11497868375440645
+        },
+        "year_sharpe": {
+          "2023": -0.45302443391830055,
+          "2024": -0.9832057997486299
+        },
+        "year_trades": {
+          "2023": 136,
+          "2024": 135
+        }
+      },
+      "reasons": [
+        "net_return -0.1778 <= 0.0",
+        "sharpe -0.692 < 0.3",
+        "max_drawdown -0.324 < -0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0b1eaa52a19f33aa64aa",
+      "dev_order": 69,
+      "metrics": {
+        "autocorr_lag1": -0.05434687283194914,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.05367576533321694,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1901444.8632207112,
+        "excess_kurtosis": 9.727860795364988,
+        "excl_best_year_return": -0.08790732163151616,
+        "excl_best_year_sharpe": -0.9789801595071856,
+        "exposure": 0.1101325585618304,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 454,
+        "max_drawdown": -0.2185860703743211,
+        "n_completed_trades": 146,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 146,
+        "net_pnl": -220888.75352486316,
+        "net_return": -0.10407824282761824,
+        "profit_factor": 0.861979789201752,
+        "same_session_trade_frac": 0.4383561643835616,
+        "sharpe": -0.4904047554643925,
+        "sharpe_per_period": -0.030892595826719674,
+        "skew": -0.008057319580524845,
+        "start_equity": 2122333.6167455744,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 96.30357056391901,
+        "win_rate": 0.4520547945205479,
+        "year_pnl": {
+          "2023": -37627.8534870178,
+          "2024": -183260.90003784536
+        },
+        "year_return": {
+          "2023": -0.017729471554390752,
+          "2024": -0.08790732163151616
+        },
+        "year_sharpe": {
+          "2023": -0.10350924273194373,
+          "2024": -0.9789801595071856
+        },
+        "year_trades": {
+          "2023": 70,
+          "2024": 76
+        }
+      },
+      "reasons": [
+        "net_return -0.1041 <= 0.0",
+        "sharpe -0.490 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_bd13f56535d4b3e544e7",
+      "dev_order": 70,
+      "metrics": {
+        "autocorr_lag1": -0.05288726103181012,
+        "best_year": 2023,
+        "best_year_contribution": 0.9566009276998696,
+        "cagr": 0.01570368846718795,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1738805.589286929,
+        "excess_kurtosis": 11.287225653082302,
+        "excl_best_year_return": 0.00132816207217612,
+        "excl_best_year_sharpe": 0.051835285737604556,
+        "exposure": 0.06945705465770838,
+        "flags": [],
+        "max_dd_duration_days": 419,
+        "max_drawdown": -0.10816511960842057,
+        "n_completed_trades": 111,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 2,
+        "n_trades": 111,
+        "net_pnl": 53142.89689909527,
+        "net_return": 0.03152641221703467,
+        "profit_factor": 1.0609201382243032,
+        "same_session_trade_frac": 0.23423423423423423,
+        "sharpe": 0.23965197378301778,
+        "sharpe_per_period": 0.015096655329419909,
+        "skew": -0.13180171748013222,
+        "start_equity": 1685662.6923878337,
+        "top_frac_trades_contribution": 3.967134128956179,
+        "top_k_trades_contribution": 3.419647979391471,
+        "turnover_annual": 73.2686683150229,
+        "win_rate": 0.5225225225225225,
+        "year_pnl": {
+          "2023": 50836.54447433306,
+          "2024": 2306.3524247622117
+        },
+        "year_return": {
+          "2023": 0.030158195173863867,
+          "2024": 0.001328162072175676
+        },
+        "year_sharpe": {
+          "2023": 0.3695094010548912,
+          "2024": 0.051835285737604556
+        },
+        "year_trades": {
+          "2023": 53,
+          "2024": 58
+        }
+      },
+      "reasons": [
+        "sharpe 0.240 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_d7da669936b2b4d9715b",
+      "dev_order": 71,
+      "metrics": {
+        "autocorr_lag1": -0.04934476274064427,
+        "best_year": 2023,
+        "best_year_contribution": null,
+        "cagr": -0.089274286599484,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1620847.1719323373,
+        "excess_kurtosis": 9.426625165048662,
+        "excl_best_year_return": -0.1275163741990789,
+        "excl_best_year_sharpe": -1.4266375646134417,
+        "exposure": 0.10232431450880697,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 178,
+        "max_drawdown": -0.21700435251724637,
+        "n_completed_trades": 301,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 301,
+        "net_pnl": -331893.40031902585,
+        "net_return": -0.16996287424723178,
+        "profit_factor": 0.8332904704015434,
+        "same_session_trade_frac": 0.7009966777408638,
+        "sharpe": -0.8152526156932659,
+        "sharpe_per_period": -0.051356087543316546,
+        "skew": -1.0932388290618102,
+        "start_equity": 1952740.5722513632,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 199.58420697252052,
+        "win_rate": 0.3953488372093023,
+        "year_pnl": {
+          "2023": -95001.21302335057,
+          "2024": -236892.18729567528
+        },
+        "year_return": {
+          "2023": -0.04865019674058457,
+          "2024": -0.12751637419907835
+        },
+        "year_sharpe": {
+          "2023": -0.35517127036181984,
+          "2024": -1.4266375646134417
+        },
+        "year_trades": {
+          "2023": 158,
+          "2024": 143
+        }
+      },
+      "reasons": [
+        "net_return -0.1700 <= 0.0",
+        "sharpe -0.815 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_8b4a7c1ccd9898784508",
+      "dev_order": 72,
+      "metrics": {
+        "autocorr_lag1": -0.005733560259743345,
+        "best_year": 2023,
+        "best_year_contribution": 3.462914774443394,
+        "cagr": 0.006994519901229346,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1350171.989642097,
+        "excess_kurtosis": 44.954705268201494,
+        "excl_best_year_return": -0.03284582265996838,
+        "excl_best_year_sharpe": -0.9565271581719408,
+        "exposure": 0.025240602869075722,
+        "flags": [],
+        "max_dd_duration_days": 393,
+        "max_drawdown": -0.09717364069953638,
+        "n_completed_trades": 48,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 48,
+        "net_pnl": 18617.619142078795,
+        "net_return": 0.01398186927589573,
+        "profit_factor": 1.0765220697256535,
+        "same_session_trade_frac": 0.125,
+        "sharpe": 0.1709575547335126,
+        "sharpe_per_period": 0.010769313680299701,
+        "skew": 4.335890935894257,
+        "start_equity": 1331554.3705000181,
+        "top_frac_trades_contribution": 5.176279483674079,
+        "top_k_trades_contribution": 7.47544564844184,
+        "turnover_annual": 31.928437233349182,
+        "win_rate": 0.375,
+        "year_pnl": {
+          "2023": 64471.228392064804,
+          "2024": -45853.60924998601
+        },
+        "year_return": {
+          "2023": 0.04841802168983533,
+          "2024": -0.032845822659968715
+        },
+        "year_sharpe": {
+          "2023": 0.8594463184300265,
+          "2024": -0.9565271581719408
+        },
+        "year_trades": {
+          "2023": 22,
+          "2024": 26
+        }
+      },
+      "reasons": [
+        "sharpe 0.171 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_1ec35e0a22d238a1c043",
+      "dev_order": 73,
+      "metrics": {
+        "autocorr_lag1": 0.13148231771260432,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.07119262903790757,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1345812.169927364,
+        "excess_kurtosis": 8.968105328952724,
+        "excl_best_year_return": -0.07685429819845169,
+        "excl_best_year_sharpe": -0.5117572265063086,
+        "exposure": 0.1403668058834211,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 451,
+        "max_drawdown": -0.2572718268370531,
+        "n_completed_trades": 265,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 265,
+        "net_pnl": -213304.39717299538,
+        "net_return": -0.1368110644669105,
+        "profit_factor": 0.8737701438222278,
+        "same_session_trade_frac": 0.7396226415094339,
+        "sharpe": -0.5319279312976596,
+        "sharpe_per_period": -0.03350831003863472,
+        "skew": -0.3386809375546777,
+        "start_equity": 1559116.5671003594,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 173.8367831917323,
+        "win_rate": 0.35471698113207545,
+        "year_pnl": {
+          "2023": -119824.80957407621,
+          "2024": -93479.58759891917
+        },
+        "year_return": {
+          "2023": -0.07685429819845102,
+          "2024": -0.06494832413935514
+        },
+        "year_sharpe": {
+          "2023": -0.5117572265063086,
+          "2024": -0.5654301749390424
+        },
+        "year_trades": {
+          "2023": 144,
+          "2024": 121
+        }
+      },
+      "reasons": [
+        "net_return -0.1368 <= 0.0",
+        "sharpe -0.532 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5a811f450137c241c5ca",
+      "dev_order": 74,
+      "metrics": {
+        "autocorr_lag1": -0.1687104126790463,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.01853004366819766,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1301559.9999999988,
+        "excess_kurtosis": 45.10225560648323,
+        "excl_best_year_return": -0.018941945416995676,
+        "excl_best_year_sharpe": -0.3897737931593149,
+        "exposure": 0.013013740088372375,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 353,
+        "max_drawdown": -0.046584716487093836,
+        "n_completed_trades": 72,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 72,
+        "net_pnl": -49409.999999996275,
+        "net_return": -0.03657372110409296,
+        "profit_factor": 0.7972132728653356,
+        "same_session_trade_frac": 0.2777777777777778,
+        "sharpe": -0.46620542175071633,
+        "sharpe_per_period": -0.029368181091009003,
+        "skew": 2.7371467070341047,
+        "start_equity": 1350969.999999995,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 47.29252079288322,
+        "win_rate": 0.4583333333333333,
+        "year_pnl": {
+          "2023": -25589.999999998836,
+          "2024": -23819.99999999744
+        },
+        "year_return": {
+          "2023": -0.018941945416995898,
+          "2024": -0.017972204198039465
+        },
+        "year_sharpe": {
+          "2023": -0.3897737931593149,
+          "2024": -0.6263943214711781
+        },
+        "year_trades": {
+          "2023": 30,
+          "2024": 42
+        }
+      },
+      "reasons": [
+        "net_return -0.0366 <= 0.0",
+        "sharpe -0.466 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_11263b8ae880577b8c83",
+      "dev_order": 75,
+      "metrics": {
+        "autocorr_lag1": -0.17599359037348544,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.020931310449387786,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1293229.9999999988,
+        "excess_kurtosis": 47.902462483235304,
+        "excl_best_year_return": -0.023667608181540456,
+        "excl_best_year_sharpe": -0.5018878237286482,
+        "exposure": 0.012953211064705527,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 353,
+        "max_drawdown": -0.04665756155180578,
+        "n_completed_trades": 72,
+        "n_days": 502,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 72,
+        "net_pnl": -55659.999999996275,
+        "net_return": -0.041263557443525056,
+        "profit_factor": 0.7702658081558669,
+        "same_session_trade_frac": 0.2777777777777778,
+        "sharpe": -0.5362756392052476,
+        "sharpe_per_period": -0.033782189893316314,
+        "skew": 2.779329499083381,
+        "start_equity": 1348889.999999995,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 47.316318866101724,
+        "win_rate": 0.4583333333333333,
+        "year_pnl": {
+          "2023": -31924.999999998603,
+          "2024": -23734.99999999767
+        },
+        "year_return": {
+          "2023": -0.0236676081815409,
+          "2024": -0.018022498699659995
+        },
+        "year_sharpe": {
+          "2023": -0.5018878237286482,
+          "2024": -0.630310246779379
+        },
+        "year_trades": {
+          "2023": 30,
+          "2024": 42
+        }
+      },
+      "reasons": [
+        "net_return -0.0413 <= 0.0",
+        "sharpe -0.536 < 0.3"
+      ],
+      "status": "hard_reject"
+    }
+  ],
+  "validation_previously_used_for_selection": false,
+  "validation_window": [
+    "2023-01-01",
+    "2024-12-31"
+  ]
+}

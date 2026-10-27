@@ -1,0 +1,17 @@
+<p><b>Round 2 on crude, with a grid you specified after v5.</b> Grid v9, 17,280 versions:</p>
+<ul><li>15-minute bars only; SMA and EMA; averages 30–100; volatility 10–30.</li>
+<li>Entry −2 to −3.5; exit −1 to +0.5; hold 3/5/8.</li>
+<li>Confirmation none/up bar; stop none/1×/2× ATR.</li></ul>
+<p>Every rule is the same as CL v5, and so is the data. <b>CL 2023–2024 is partly in-sample here,</b> because this grid was chosen after seeing v5's validation results.</p>
+<p><b>The grid looked much better on 2018–2022.</b> 47% of versions made money (median Sharpe 0.05), against 27% across v5. The strongest settings:</p>
+<ul><li>Volatility 20: 68% profitable, and 13% reached Sharpe 0.75. Volatility 10 almost never worked.</li>
+<li>A 1 × ATR stop: 59% profitable, against 32% with no stop.</li>
+<li>Up-bar confirmation: 55% against 39% without.</li></ul>
+<p>Deeper entries (−3, −3.5) scored slightly better than −2, and averages 40–60 beat 100.</p>
+<p><b>That didn't carry into 2023–2024.</b> Only 4 of 82 finalists passed (2 groups). The median finalist's Sharpe was −0.47, about the same as v5's −0.53. Only 13 of 82 made money, and 4 broke the −30% drawdown limit. The 2018–2022 ranking had no predictive value (rank correlation −0.03).</p>
+<p><b>The passers are v5's family again,</b> all SMA with entry −2, up-bar confirmation and a 1 × ATR stop:</p>
+<ul><li>#32 and #37: SMA 30, volatility 20, exit +0.5, hold 8 or 5. Sharpe 0.50 and 0.42, +8.9% and +6.5%, about 190 trades, drawdown around −10%.</li>
+<li>#49 and #46: SMA 40, volatility 30, hold 5. Sharpe 0.50 and 0.35, +7.0% and +4.5%, 153 trades.</li></ul>
+<p>Every new value you added failed to produce a passer: hold 3, the deeper entries, averages 50–100 and the 2 × ATR stop. v5's best (SMA 30/20 with a 2 × ATR stop: Sharpe 0.80) was stronger than anything here.</p>
+<p><b>Patchy stability.</b> Around #32 (SMA 30/20), volatility 20 holds up at every average length (Sharpe 0.29–0.89), but the cells next to it are uneven: at average 30, volatility 25 gives 0.18 and volatility 30 gives −0.19.</p>
+<p>Holding CL made −0.4% over 2023–2024 (Sharpe 0.15). The passers beat that, but only because crude went nowhere. The 2025+ holdout has not been run.</p>

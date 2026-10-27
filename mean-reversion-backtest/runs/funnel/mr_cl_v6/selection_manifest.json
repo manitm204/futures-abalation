@@ -1,0 +1,810 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 40,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 10,
+      "config_id": "cfg_e30bc666228eca4055d2",
+      "dev_net_return": 1.2118923764361709,
+      "dev_order": 32,
+      "dev_sharpe": 0.8913110241090333,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.7706449706494684,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.0,
+        "exit_z": 0.5,
+        "max_holding_bars": 8,
+        "mean_lookback": 30,
+        "mean_type": "sma",
+        "std_lookback": 20,
+        "stop_atr_multiple": "1.0",
+        "symbol": "CL",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.8339194066977934
+    },
+    {
+      "cluster": 10,
+      "config_id": "cfg_0a515b58efd567ad78bf",
+      "dev_net_return": 0.9975790918464871,
+      "dev_order": 37,
+      "dev_sharpe": 0.8424904148427255,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.8114483414983774,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.0,
+        "exit_z": 0.5,
+        "max_holding_bars": 5,
+        "mean_lookback": 30,
+        "mean_type": "sma",
+        "std_lookback": 20,
+        "stop_atr_multiple": "1.0",
+        "symbol": "CL",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.8102683232703685
+    },
+    {
+      "cluster": 38,
+      "config_id": "cfg_869a6dd85b9f491ab177",
+      "dev_net_return": 0.4374465732825281,
+      "dev_order": 46,
+      "dev_sharpe": 0.8535108391745846,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.7022976237932655,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.0,
+        "exit_z": 0.0,
+        "max_holding_bars": 5,
+        "mean_lookback": 40,
+        "mean_type": "sma",
+        "std_lookback": 30,
+        "stop_atr_multiple": "1.0",
+        "symbol": "CL",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.7824619288433217
+    },
+    {
+      "cluster": 38,
+      "config_id": "cfg_801a9e583c0ca16caedd",
+      "dev_net_return": 0.43893104991137144,
+      "dev_order": 49,
+      "dev_sharpe": 0.8516457396728907,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.6651523465173357,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.0,
+        "exit_z": 0.5,
+        "max_holding_bars": 5,
+        "mean_lookback": 40,
+        "mean_type": "sma",
+        "std_lookback": 30,
+        "stop_atr_multiple": "1.0",
+        "symbol": "CL",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.7770502083374575
+    }
+  ],
+  "code_version": "5342a94cdc844bb5d1f3b0c2c00705f03b157c96",
+  "config_sha256": "958ac99497cbe231a0b926a44d1feedbb7b79cefc2f3bbc2efcc3498895a40bc",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "5min",
+      "15min",
+      "1h"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "mr_cl_v6",
+  "frozen_at": "2026-10-23T15:48:52.457578+00:00",
+  "frozen_manifest_sha256": "fb798fb2c27be597eb6e80ba354b1af04d8c75b8a7b36a6a2d553a93747c311d",
+  "git_diff_sha256": "6a1ad0bc76ed80b8df6950a3b0c1d1a065df97e7a5a40a78a6c20f5ed615f1ef",
+  "git_dirty": true,
+  "seed": 20261021,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, best 2 per cluster)",
+      "7 execution stress"
+    ],
+    "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": false,
+    "commission_minimum": 0.0,
+    "commission_per_contract": 2.5,
+    "commission_per_share": 0.0,
+    "extended_hours_slippage_multiplier": 1.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "instrument_type": "futures",
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 0.0,
+    "slippage_bps_stop": 0.0,
+    "slippage_ticks_market": 1.0,
+    "slippage_ticks_stop": 1.0,
+    "starting_equity": 1000000.0
+  },
+  "symbol": "CL",
+  "validated_at": "2026-10-23T15:49:03.477192+00:00",
+  "validation_summary": [
+    {
+      "config_id": "cfg_f1d8eec4b85907a5bf0c",
+      "reasons": [
+        "net_return -0.0987 <= 0.0",
+        "sharpe -0.665 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_a4b4f1feb05a41e9e423",
+      "reasons": [
+        "net_return -0.1014 <= 0.0",
+        "sharpe -0.691 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_b3df1def941b6ed78f30",
+      "reasons": [
+        "net_return -0.2435 <= 0.0",
+        "sharpe -1.839 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_ba6efff35fc9b76b0770",
+      "reasons": [
+        "net_return -0.2374 <= 0.0",
+        "sharpe -1.774 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_39eeee8320b6c9de84af",
+      "reasons": [
+        "net_return -0.0505 <= 0.0",
+        "sharpe -0.298 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5bc08f67c4b6e522ec75",
+      "reasons": [
+        "net_return -0.0581 <= 0.0",
+        "sharpe -0.353 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_baf964449594fc4219a0",
+      "reasons": [
+        "net_return -0.1508 <= 0.0",
+        "sharpe -1.173 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_df3c1d04c4551f3e700c",
+      "reasons": [
+        "net_return -0.1439 <= 0.0",
+        "sharpe -1.110 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_bb70253204538a55fb9d",
+      "reasons": [
+        "net_return -0.0421 <= 0.0",
+        "sharpe -0.164 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_7388f9bfd708c134321a",
+      "reasons": [
+        "net_return -0.0381 <= 0.0",
+        "sharpe -0.154 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_8b8151295897eadd6492",
+      "reasons": [
+        "net_return -0.0229 <= 0.0",
+        "sharpe -0.160 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_b062f9c57fc110780505",
+      "reasons": [
+        "net_return -0.0363 <= 0.0",
+        "sharpe -0.280 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_fa042ec80e5fb14c10b1",
+      "reasons": [
+        "net_return -0.0472 <= 0.0",
+        "sharpe -0.301 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_9384dbd273c40c6235c3",
+      "reasons": [
+        "net_return -0.0503 <= 0.0",
+        "sharpe -0.326 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_fe553bd1da77d00e07fc",
+      "reasons": [
+        "net_return -0.0697 <= 0.0",
+        "sharpe -0.765 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_cb6eac082c045b84d510",
+      "reasons": [
+        "sharpe 0.027 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2f257c46a51463abf9f3",
+      "reasons": [
+        "net_return -0.0697 <= 0.0",
+        "sharpe -0.765 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_e686d73207bb90183b7b",
+      "reasons": [
+        "sharpe 0.027 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5f93b17df24a8a6c57d0",
+      "reasons": [
+        "net_return -0.0842 <= 0.0",
+        "sharpe -0.413 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_f8ad722b3a7fb9bfd624",
+      "reasons": [
+        "net_return -0.0848 <= 0.0",
+        "sharpe -0.420 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0055d6abf6f4eaa16681",
+      "reasons": [
+        "net_return -0.2386 <= 0.0",
+        "sharpe -1.256 < 0.3",
+        "max_drawdown -0.323 < -0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_116640ddf63a9189da52",
+      "reasons": [
+        "net_return -0.2024 <= 0.0",
+        "sharpe -1.120 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_8a27efd77e64da05368c",
+      "reasons": [
+        "net_return -0.2042 <= 0.0",
+        "sharpe -1.134 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_7f8d8a0bc360491d82ef",
+      "reasons": [
+        "net_return -0.0450 <= 0.0",
+        "sharpe -0.473 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_b3979a698b0880a1f785",
+      "reasons": [
+        "net_return -0.0846 <= 0.0",
+        "sharpe -0.609 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5255dd901fa1cab0ad31",
+      "reasons": [
+        "net_return -0.0460 <= 0.0",
+        "sharpe -0.483 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_07b009a0db5e2a0f4c7c",
+      "reasons": [
+        "net_return -0.0631 <= 0.0",
+        "sharpe -0.474 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_8f062f424f033683d2cf",
+      "reasons": [
+        "net_return -0.2346 <= 0.0",
+        "sharpe -1.212 < 0.3",
+        "max_drawdown -0.321 < -0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2ca6d01451c35e0c5f72",
+      "reasons": [
+        "net_return -0.1507 <= 0.0",
+        "sharpe -1.308 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_18c94d4d2bae09dbde6e",
+      "reasons": [
+        "net_return -0.1577 <= 0.0",
+        "sharpe -1.384 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_3fcb7607706837b0c9e8",
+      "reasons": [
+        "net_return -0.0973 <= 0.0",
+        "sharpe -0.599 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_e30bc666228eca4055d2",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_3590d848430cd0262cf5",
+      "reasons": [
+        "net_return -0.0876 <= 0.0",
+        "sharpe -0.494 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_722361082e0b05e9c01c",
+      "reasons": [
+        "net_return -0.0724 <= 0.0",
+        "sharpe -0.664 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_ce65ddac18d786cb994d",
+      "reasons": [
+        "net_return -0.0176 <= 0.0",
+        "sharpe -0.115 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_fd859a63d15b48ab8289",
+      "reasons": [
+        "net_return -0.0031 <= 0.0",
+        "sharpe 0.007 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0a515b58efd567ad78bf",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_22be43d0087180aaf11c",
+      "reasons": [
+        "net_return -0.0723 <= 0.0",
+        "sharpe -0.664 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_45098ef598c1bd999f36",
+      "reasons": [
+        "net_return -0.1561 <= 0.0",
+        "sharpe -0.798 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_a8cca792beb5fd7dd824",
+      "reasons": [
+        "net_return -0.0470 <= 0.0",
+        "sharpe -0.525 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0729364b73958c3f33fc",
+      "reasons": [
+        "net_return -0.0048 <= 0.0",
+        "sharpe -0.009 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_9db18571656ae2229a83",
+      "reasons": [
+        "net_return -0.0792 <= 0.0",
+        "sharpe -0.714 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_22b50d765b669f93ea81",
+      "reasons": [
+        "net_return -0.1164 <= 0.0",
+        "sharpe -0.608 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_7a280e37da32a94155a7",
+      "reasons": [
+        "net_return -0.0766 <= 0.0",
+        "sharpe -0.695 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_b50e501718ddaf7d0ee1",
+      "reasons": [
+        "net_return -0.1589 <= 0.0",
+        "sharpe -0.807 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_869a6dd85b9f491ab177",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_0149d0ce7e33341c19e1",
+      "reasons": [
+        "net_return -0.0663 <= 0.0",
+        "sharpe -0.346 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_7fd10e9288f8cebbe80e",
+      "reasons": [
+        "net_return -0.0615 <= 0.0",
+        "sharpe -0.314 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_801a9e583c0ca16caedd",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_7c5b3a0dffbe8ffcbcf0",
+      "reasons": [
+        "net_return -0.1391 <= 0.0",
+        "sharpe -1.121 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_bde6d9d452337eeccd86",
+      "reasons": [
+        "sharpe 0.291 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_f251276a5de317b35909",
+      "reasons": [
+        "net_return -0.1453 <= 0.0",
+        "sharpe -1.190 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_b4f07543c5c1d4ea2301",
+      "reasons": [
+        "net_return -0.0611 <= 0.0",
+        "sharpe -0.708 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_c606dd4499922ceef557",
+      "reasons": [
+        "net_return -0.0153 <= 0.0",
+        "sharpe -0.098 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_8990fe7a8bd2ad6434f5",
+      "reasons": [
+        "sharpe 0.061 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_c0df30754d3e9ea77f34",
+      "reasons": [
+        "net_return -0.1078 <= 0.0",
+        "sharpe -0.540 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_e9f1d068e57a684b26b0",
+      "reasons": [
+        "net_return -0.0752 <= 0.0",
+        "sharpe -0.339 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_9513969e98ca2154954f",
+      "reasons": [
+        "net_return -0.1327 <= 0.0",
+        "sharpe -0.592 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_e1d32743c04ee006bd5e",
+      "reasons": [
+        "net_return -0.0570 <= 0.0",
+        "sharpe -0.237 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_6df88e9aaa809663c5dc",
+      "reasons": [
+        "net_return -0.1345 <= 0.0",
+        "sharpe -0.602 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_c4876b5b16579cad082c",
+      "reasons": [
+        "sharpe 0.041 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_3748bb7818feaea449b7",
+      "reasons": [
+        "net_return -0.0706 <= 0.0",
+        "sharpe -0.651 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2a7b3f99fd3198f00125",
+      "reasons": [
+        "net_return -0.0100 <= 0.0",
+        "sharpe -0.039 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_9a3257256bfaffbe0435",
+      "reasons": [
+        "net_return -0.0937 <= 0.0",
+        "sharpe -0.475 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_653d4b72845a3f52ec0e",
+      "reasons": [
+        "net_return -0.2638 <= 0.0",
+        "sharpe -1.170 < 0.3",
+        "max_drawdown -0.354 < -0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_e0c0ed2768cb0bd3fff9",
+      "reasons": [
+        "net_return -0.0878 <= 0.0",
+        "sharpe -0.401 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_55f7be73976c09a6787b",
+      "reasons": [
+        "net_return -0.0163 <= 0.0",
+        "sharpe -0.050 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_4fa79899a5412da58c10",
+      "reasons": [
+        "net_return -0.0821 <= 0.0",
+        "sharpe -0.510 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_54e8979946440891e127",
+      "reasons": [
+        "net_return -0.1321 <= 0.0",
+        "sharpe -0.792 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2c9423174183bf20a524",
+      "reasons": [
+        "sharpe 0.086 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_d575cee9f9d024c3a7aa",
+      "reasons": [
+        "net_return -0.0491 <= 0.0",
+        "sharpe -0.135 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_f02688d8260e25f07739",
+      "reasons": [
+        "net_return -0.0674 <= 0.0",
+        "sharpe -0.323 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_8f4d1f1fdded01ae722a",
+      "reasons": [
+        "net_return -0.0293 <= 0.0",
+        "sharpe -0.130 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_cc63a529452b2751419c",
+      "reasons": [
+        "net_return -0.1270 <= 0.0",
+        "sharpe -0.570 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_6646b9b3b43d8f2c3fb8",
+      "reasons": [
+        "net_return -0.0609 <= 0.0",
+        "sharpe -0.259 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_031e5a3509d0c5ee6f45",
+      "reasons": [
+        "net_return -0.2541 <= 0.0",
+        "sharpe -1.132 < 0.3",
+        "max_drawdown -0.345 < -0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_ed835da771bbe55a2249",
+      "reasons": [
+        "sharpe 0.127 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_253d536b5d1dcaf6b331",
+      "reasons": [
+        "net_return -0.1032 <= 0.0",
+        "sharpe -0.391 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_6ec6814c7bae3bba83ab",
+      "reasons": [
+        "sharpe 0.136 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0ec33faf33d0736aa470",
+      "reasons": [
+        "sharpe 0.120 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2c0ca1080a190889247d",
+      "reasons": [
+        "net_return -0.1077 <= 0.0",
+        "sharpe -0.449 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_b28f0998dfb1e524e5a6",
+      "reasons": [
+        "net_return -0.1101 <= 0.0",
+        "sharpe -0.470 < 0.3"
+      ],
+      "status": "hard_reject"
+    }
+  ]
+}
