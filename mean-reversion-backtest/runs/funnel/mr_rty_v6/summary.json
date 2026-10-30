@@ -1,0 +1,493 @@
+{
+  "data_access": {
+    "actual_last_session": "2022-12-30",
+    "command": "develop",
+    "experiment_id": "mr_rty_v6",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 60,
+    "partition_fingerprint": "3a742f2c8e9ad631",
+    "phase": "development",
+    "phase_end": "2022-12-31",
+    "rows": 1658680,
+    "symbol": "RTY"
+  },
+  "data_history": {
+    "holdout_note": "No RTY strategy metrics have been computed on 2025+. The futures correlation matrix (test-dabento/correlation.py) used 2025-2026 returns (no selection). The holdout is the only untouched test for this run.",
+    "holdout_previously_inspected": false,
+    "validation_note": "mr_rty_v5 gated 27 RTY candidates on 2023-2024 (5 passed) and this grid was written after reading those results, so RTY 2023-2024 is partly in-sample here. The stage-4 test and 40-trade rule were also shaped by ES 2023-2024.",
+    "validation_previously_used_for_selection": true
+  },
+  "dsr": {
+    "calibration_verified": false,
+    "effective_trials": {
+      "li_ji": 1063.0000000000214,
+      "n_components_95": 202,
+      "n_series": 78894,
+      "participation_ratio": 30.049438652148982,
+      "rank_bound_T": 1259
+    },
+    "n_configs_with_defined_sharpe": 78894,
+    "primary_method": "li_ji",
+    "research_history": [
+      {
+        "n_configs": null,
+        "name": "ict_silver_bullet_search (SPY)",
+        "note": "Earlier ICT Silver Bullet search on SPY; trial count not recorded."
+      },
+      {
+        "n_configs": 3888,
+        "name": "donchian_ablation (donchian_v1, SPY/QQQ)",
+        "note": "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+      },
+      {
+        "n_configs": 24576,
+        "name": "channel_breakout grid (funnel_v1..v4, SPY)",
+        "note": "Channel-breakout grid; four funnel variants with changed thresholds/methods."
+      },
+      {
+        "n_configs": 75000,
+        "name": "mean_reversion v1 grid (mr_v1, SPY)",
+        "note": "Same strategy family; 15 frozen candidates, 0 passed validation."
+      },
+      {
+        "n_configs": 240000,
+        "name": "mean_reversion v2 grid (mr_v2, SPY)",
+        "note": "Same strategy family, earlier parameter space on SPY."
+      },
+      {
+        "n_configs": 196416,
+        "name": "mean_reversion YM v6 (mr_ym_v6), CL / GC / 6E v5",
+        "note": "YM round-2 grid (72,000; 41 of 267 passed) and the v5 grid on CL, GC, 6E (3 x 41,472)."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion YM v5 (mr_ym_v5)",
+        "note": "Same strategy on YM; 9 of 61 frozen candidates passed 2023-2024."
+      },
+      {
+        "n_configs": 21600,
+        "name": "mean_reversion NQ v6 (mr_nq_v6)",
+        "note": "NQ zoom grid; 161 of 201 passed 2023-2024 (grid built around NQ v5 survivors)."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion RTY v5 (mr_rty_v5)",
+        "note": "Same v5 grid on RTY; 5 of 27 passed 2023-2024."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion NQ v5 (mr_nq_v5)",
+        "note": "Same v5 grid on NQ (correlated index); 38 of 93 frozen candidates passed 2023-2024."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion ES v5 (mr_es_v5)",
+        "note": "Same v5 grid on ES (correlated index); NQ 2018-2022 was used there as a transfer diagnostic."
+      },
+      {
+        "n_configs": null,
+        "name": "mean_reversion ES v4 (mr_es_v4)",
+        "note": "Same grid as v3 with the local-perturbation stage 4; 3 of 18 frozen candidates passed 2023-2024. The v5 grid was designed after reading v3/v4 development and validation results (finer lengths around the survivors' region)."
+      },
+      {
+        "n_configs": 46080,
+        "name": "mean_reversion ES v3 (mr_es_v3)",
+        "note": "Same 46,080-config ES grid with the grid-neighbor stage-4 gate; 1 of 11 frozen candidates passed 2023-2024 validation. v4 changes only the stage-4 test after reading those development AND validation results, so ES 2023-2024 has now influenced the method (not counted as new configs)."
+      }
+    ],
+    "serial_dependence": "lag1_effective_n",
+    "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+    "trial_count_options": {
+      "li_ji": 1063.0000000000214,
+      "participation_ratio": 30.049438652148982,
+      "raw": 84672.0,
+      "raw_plus_known_prior": 858120.0
+    },
+    "unresolved": [
+      "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+      "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+      "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+      "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+    ],
+    "variance_of_trial_sharpes_per_period": 0.0007518820137281673
+  },
+  "elapsed_s": 282.5,
+  "experiment_id": "mr_rty_v6",
+  "frozen_manifest_sha256": "f9ff35ff3ac74eb40579c4f3d402edb2ba9340918b1cf615afa2321a3eb3d8da",
+  "instrument_type": "futures",
+  "integrity": {
+    "checks_per_config": [
+      "entry_signal_condition_not_met",
+      "entry_not_after_signal_bar",
+      "exit_before_entry",
+      "exit_decided_before_entry",
+      "exit_not_next_open_after_decision",
+      "overlapping_positions",
+      "entry_fill_better_than_open",
+      "exit_fill_better_than_open",
+      "holding_period_exceeds_max_hold",
+      "position_exceeds_equity",
+      "forced_close_not_final_trade",
+      "commission_below_minimum",
+      "unexpected_stop_or_target",
+      "stop_not_from_atr_known_before_entry",
+      "stop_exit_without_touch",
+      "stop_fill_better_than_min_open_stop",
+      "cooldown_violated"
+    ],
+    "cut_fractions": [
+      0.3,
+      0.6000000000000001,
+      0.9
+    ],
+    "failures": {},
+    "truncation_sample": 40
+  },
+  "mode": "development_only",
+  "n_configs": 84672,
+  "n_frozen_candidates": 108,
+  "provenance": {
+    "available_data_endpoint_per_manifest": {
+      "ES": "2026-10-16",
+      "RTY": "2026-10-16"
+    },
+    "config_path": "configs/funnel/mr_funnel_rty_v6.yaml",
+    "config_sha256": "19079a94cf5daf90c7a2035e466b21d4547b2a12f9e297ffb18aa840b7d38435",
+    "created_at": "2026-10-23T13:41:36.009496+00:00",
+    "data_manifests": {
+      "ES": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3099325,
+        "schema_version": "1.0.0"
+      },
+      "RTY": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 2959762,
+        "schema_version": "1.0.0"
+      }
+    },
+    "git_commit": "5342a94cdc844bb5d1f3b0c2c00705f03b157c96",
+    "git_diff_sha256": "8c4bf865eb35af966c4053ca20f2e895494b49a9bcdf846869d6f3cfdcae94a2",
+    "git_dirty": true,
+    "seed": 20261021
+  },
+  "rejection_reason_counts": {
+    "s2:hard_reject:completed_trades": 55389,
+    "s2:hard_reject:years_with_>=10_trades": 47923,
+    "s3:hard_reject:max_drawdown": 3376,
+    "s3:hard_reject:net_return": 19325,
+    "s3:hard_reject:sharpe": 28806,
+    "s4:hard_reject:local_median_sharpe": 44,
+    "s5:hard_reject:profitable_years": 23
+  },
+  "survivor_table": [
+    {
+      "evaluated": 84672,
+      "kind": "universe",
+      "passed": 84672,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "0 universe"
+    },
+    {
+      "evaluated": 84672,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 84672,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "1 backtest integrity",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 84672,
+      "hard_reject": 55389,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 29283,
+      "pct_of_previous": 34.58404195011338,
+      "pct_of_universe": 34.58404195011338,
+      "stage": "2 trade count & coverage",
+      "with_warnings": 48584
+    },
+    {
+      "evaluated": 29283,
+      "hard_reject": 28806,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 477,
+      "pct_of_previous": 1.628931461940375,
+      "pct_of_universe": 0.5633503401360545,
+      "stage": "3 performance & risk",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 477,
+      "hard_reject": 44,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 433,
+      "pct_of_previous": 90.77568134171908,
+      "pct_of_universe": 0.5113851095993953,
+      "stage": "4 parameter stability",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 433,
+      "hard_reject": 23,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 410,
+      "pct_of_previous": 94.68822170900692,
+      "pct_of_universe": 0.4842214663643235,
+      "stage": "5 time stability",
+      "with_warnings": 415
+    },
+    {
+      "deduplicated": 302,
+      "evaluated": 410,
+      "kind": "dedup",
+      "n_clusters": 57,
+      "note": "best 2 per cluster",
+      "passed": 108,
+      "pct_of_previous": 26.341463414634145,
+      "pct_of_universe": 0.12755102040816327,
+      "stage": "6 deduplication"
+    },
+    {
+      "evaluated": 108,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 108,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 0.12755102040816327,
+      "stage": "7 execution stress",
+      "with_warnings": 20
+    },
+    {
+      "evaluated": null,
+      "kind": "hard_gate",
+      "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "8 frozen validation"
+    },
+    {
+      "evaluated": 108,
+      "kind": "diagnostic_only",
+      "note": "diagnostic only: unverified: 108",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "9 DSR / transfer"
+    },
+    {
+      "evaluated": null,
+      "kind": "explicit_command",
+      "note": "not run; `final-test` command only",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "10 final holdout"
+    }
+  ],
+  "symbol": "RTY",
+  "thresholds": {
+    "confidence": {
+      "dsr_calibration_verified": false,
+      "dsr_threshold": 0.95,
+      "effective_trials_method": "li_ji",
+      "serial_dependence": "lag1_effective_n",
+      "transfer_symbol": "ES"
+    },
+    "data": {
+      "clean_root": "data/clean",
+      "development": {
+        "end": "2022-12-31",
+        "start": "2018-01-01"
+      },
+      "holdout": {
+        "end": null,
+        "start": "2025-01-01"
+      },
+      "timeframes": [
+        "5min",
+        "15min",
+        "1h"
+      ],
+      "validation": {
+        "end": "2024-12-31",
+        "start": "2023-01-01"
+      }
+    },
+    "data_history": {
+      "holdout_note": "No RTY strategy metrics have been computed on 2025+. The futures correlation matrix (test-dabento/correlation.py) used 2025-2026 returns (no selection). The holdout is the only untouched test for this run.",
+      "holdout_previously_inspected": false,
+      "validation_note": "mr_rty_v5 gated 27 RTY candidates on 2023-2024 (5 passed) and this grid was written after reading those results, so RTY 2023-2024 is partly in-sample here. The stage-4 test and 40-trade rule were also shaped by ES 2023-2024.",
+      "validation_previously_used_for_selection": true
+    },
+    "dedup": {
+      "corr_threshold": 0.8,
+      "linkage": "complete",
+      "reps_per_cluster": 2,
+      "return_basis": "monthly"
+    },
+    "execution": {
+      "baseline": "configs/execution/futures.yaml"
+    },
+    "execution_stress": {
+      "breakeven_max_multiplier": 25.0,
+      "diagnostic_cost_multipliers": [
+        2.0
+      ],
+      "entry_delay_bars": 1,
+      "gate_cost_multiplier": 1.5,
+      "missed_entry_frac": 0.1,
+      "missed_entry_sims": 100
+    },
+    "holdout": {
+      "acceptance": {
+        "max_drawdown": -0.3,
+        "min_completed_trades": null,
+        "min_net_return": 0.0,
+        "min_sharpe": 0.0
+      }
+    },
+    "integrity": {
+      "truncation_check_sample": 40,
+      "truncation_points": 3
+    },
+    "metrics": {
+      "cash_treatment": "Idle cash earns 0% and the Sharpe excess return is measured against a 0% risk-free rate, so the two assumptions are consistent.",
+      "drawdown_basis": "daily session-close mark-to-market (understates intraday DD)",
+      "periods_per_year": 252,
+      "return_frequency": "daily",
+      "risk_free_rate_annual": 0.0
+    },
+    "parameter_stability": {
+      "local": {
+        "entry_z_abs": 0.25,
+        "exit_z_abs": 0.25,
+        "int_rel": 0.2,
+        "stop_atr_abs": 0.25
+      },
+      "min_frac_profitable": 0.7,
+      "min_median_sharpe": 0.5,
+      "mode": "local_perturbation",
+      "neighbor_mode": "single_axis",
+      "perturbation": {
+        "integer_rel_step": 0.15,
+        "n_per_config": 20,
+        "z_abs": 0.1
+      }
+    },
+    "performance": {
+      "max_drawdown": -0.3,
+      "max_drawdown_source": "src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct",
+      "min_net_return": 0.0,
+      "min_sharpe": 0.75
+    },
+    "research_history": [
+      {
+        "n_configs": null,
+        "name": "ict_silver_bullet_search (SPY)",
+        "note": "Earlier ICT Silver Bullet search on SPY; trial count not recorded."
+      },
+      {
+        "n_configs": 3888,
+        "name": "donchian_ablation (donchian_v1, SPY/QQQ)",
+        "note": "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+      },
+      {
+        "n_configs": 24576,
+        "name": "channel_breakout grid (funnel_v1..v4, SPY)",
+        "note": "Channel-breakout grid; four funnel variants with changed thresholds/methods."
+      },
+      {
+        "n_configs": 75000,
+        "name": "mean_reversion v1 grid (mr_v1, SPY)",
+        "note": "Same strategy family; 15 frozen candidates, 0 passed validation."
+      },
+      {
+        "n_configs": 240000,
+        "name": "mean_reversion v2 grid (mr_v2, SPY)",
+        "note": "Same strategy family, earlier parameter space on SPY."
+      },
+      {
+        "n_configs": 196416,
+        "name": "mean_reversion YM v6 (mr_ym_v6), CL / GC / 6E v5",
+        "note": "YM round-2 grid (72,000; 41 of 267 passed) and the v5 grid on CL, GC, 6E (3 x 41,472)."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion YM v5 (mr_ym_v5)",
+        "note": "Same strategy on YM; 9 of 61 frozen candidates passed 2023-2024."
+      },
+      {
+        "n_configs": 21600,
+        "name": "mean_reversion NQ v6 (mr_nq_v6)",
+        "note": "NQ zoom grid; 161 of 201 passed 2023-2024 (grid built around NQ v5 survivors)."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion RTY v5 (mr_rty_v5)",
+        "note": "Same v5 grid on RTY; 5 of 27 passed 2023-2024."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion NQ v5 (mr_nq_v5)",
+        "note": "Same v5 grid on NQ (correlated index); 38 of 93 frozen candidates passed 2023-2024."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion ES v5 (mr_es_v5)",
+        "note": "Same v5 grid on ES (correlated index); NQ 2018-2022 was used there as a transfer diagnostic."
+      },
+      {
+        "n_configs": null,
+        "name": "mean_reversion ES v4 (mr_es_v4)",
+        "note": "Same grid as v3 with the local-perturbation stage 4; 3 of 18 frozen candidates passed 2023-2024. The v5 grid was designed after reading v3/v4 development and validation results (finer lengths around the survivors' region)."
+      },
+      {
+        "n_configs": 46080,
+        "name": "mean_reversion ES v3 (mr_es_v3)",
+        "note": "Same 46,080-config ES grid with the grid-neighbor stage-4 gate; 1 of 11 frozen candidates passed 2023-2024 validation. v4 changes only the stage-4 test after reading those development AND validation results, so ES 2023-2024 has now influenced the method (not counted as new configs)."
+      }
+    ],
+    "seed": 20261021,
+    "strategy": "mean_reversion_v8",
+    "symbol": "RTY",
+    "time_stability": {
+      "min_profitable_years": 3,
+      "top_trades_frac": 0.05,
+      "top_trades_k": 5
+    },
+    "trade_count": {
+      "min_completed_trades": 100,
+      "min_trades_per_year": 10,
+      "min_years_meeting_floor": 4
+    },
+    "validation": {
+      "max_drawdown": -0.3,
+      "min_completed_trades": 40,
+      "min_net_return": 0.0,
+      "min_sharpe": 0.3
+    },
+    "version": 1
+  },
+  "transfer_symbol": "ES"
+}

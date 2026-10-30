@@ -1,0 +1,18 @@
+<p><b>Round 2 on the Russell, with a grid you specified after v5.</b> Grid v8, 84,672 versions:</p>
+<ul><li>15-minute and 1-hour bars; SMA and EMA; averages 20–100.</li>
+<li>Volatility 10/15/20 and 60–120; entry −2.5 to −4; exit −1.25 to +1.</li>
+<li>Hold 3/5/8; confirmation none/up bar; stop none/1×/2× ATR.</li></ul>
+<p>Every rule is the same as RTY v5 (stable-settings test, best 2 per group, validation ≥ 40 trades, ES cross-check). <b>RTY 2023–2024 is partly in-sample here,</b> because this grid was chosen after seeing v5's validation results.</p>
+<p><b>The long volatility lengths were the big change.</b> On 2018–2022:</p>
+<ul><li>Volatility 60–120 made money in 40–45% of versions, against 26–33% for 10–20.</li>
+<li>Volatility 80 reached Sharpe 0.75 most often (7.6% of versions).</li>
+<li>Unlike v5, <b>no confirmation</b> beat up-bar confirmation (52% profitable against 24%), and no stop beat a 1 × ATR stop.</li>
+<li>Exit level barely mattered.</li></ul>
+<p>Deep entries trade rarely: only 35% of versions had enough trades to qualify.</p>
+<p><b>19 of 108 finalists passed 2023–2024</b> (12 groups). The median finalist was slightly negative (Sharpe −0.08), and 40 of 108 made money. 26 failed on trade count alone. As on most markets, the 2018–2022 ranking pointed the wrong way (rank correlation −0.25).</p>
+<p><b>Average 100, the longest tested, again dominates.</b> 15 of the 19 passers use it. In v5 the passers sat at average 80, also the grid edge, so the edge has moved out with the grid, which is a warning sign. The passers split into two families:</p>
+<ul><li><b>1-hour SMA 100, short volatility (10–15), hold 8.</b> The best was #60 (volatility 15, entry −3, exit +0.5, no stop): Sharpe 1.27, +16.6%, drawdown −4.2%, 47 trades. #62 (exit +1) is nearly identical. Both are flat on ES (Sharpe 0.0), so the edge doesn't transfer.</li>
+<li><b>15-minute EMA/SMA 100, long volatility (60–100), short holds.</b> Smoother but tiny, since they're in the market only 1–5% of the time. #20 (EMA 100/80, entry −3, hold 3, 1 × ATR stop) made Sharpe 0.84 but only +3.6%. This family does transfer to ES (Sharpe 0.44–0.47).</li></ul>
+<p><b>Stability looks good, but only on 2018–2022.</b> Around #3 (15-minute EMA 100/80), volatility 60–100 scores Sharpe 0.6–1.4 at almost every average length, a broad plateau. Volatility 10–20 is mostly negative.</p>
+<p><b>Compared with holding RTY:</b> holding made +16.8% over 2023–2024 (Sharpe 0.48, drawdown −20%). #60 matched the return with a Sharpe of 1.27 and a fifth of the drawdown. The 15-minute family made far less.</p>
+<p>The 2025+ holdout has not been run.</p>
