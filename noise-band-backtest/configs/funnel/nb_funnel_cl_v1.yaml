@@ -1,0 +1,145 @@
+# CL futures noise-band breakout (intraday momentum) screening funnel, run nb_cl_v1 --
+# the ONE place every threshold lives. First noise-band round on CL: the v1 grid
+# (noise_band, 6,480 configs): 5min/15min bars, band lookback 7/10/14/20/30 sessions,
+# band multiple 0.75/1/1.25/1.5, check every 15/30/60 min, anchor open / open+prior close,
+# trailing exit band / VWAP / tighter of both, long / short / both, stop none / 1 / 2 x ATR.
+# After Zarattini, Aziz & Barbon (2024); see src/strategies/noise_band/config.py.
+#
+# Every gate, threshold, data split and cost is identical to the latest mean-reversion
+# round (mean-reversion-backtest/configs/funnel/mr_funnel_ym_v7_15m.yaml) EXCEPT:
+#   * strategy / grid, and timeframes 5min/15min (the noise band needs intraday check times)
+#   * stage-4 local moves are the noise band's: band lookback x0.8/x1.2, band multiple
+#     -/+ 0.25, numeric ATR stop -/+ 0.25 (check interval and categoricals are held)
+#   * perturbation diagnostics move the band multiple / stop by a relative step
+#
+# Thresholds are fixed for the duration of a run and are hashed into every run's
+# outputs. They are NEVER adjusted automatically to hit a survivor count; zero
+# survivors is a valid outcome. Changing a value here is a new research trial
+# and should be recorded under `research_history` below.
+
+version: 1
+strategy: noise_band
+symbol: CL
+seed: 20261030
+
+data:
+  clean_root: data/clean
+  development: {start: 2018-01-01, end: 2022-12-31}
+  validation:  {start: 2023-01-01, end: 2024-12-31}
+  # end: null -> the actual available endpoint, recorded at access time.
+  holdout:     {start: 2025-01-01, end: null}
+  timeframes: ["5min", "15min"]
+
+data_history:
+  validation_previously_used_for_selection: false
+  validation_note: >-
+    No noise-band strategy has been selected or scored on CL 2023-2024. The mean-reversion family was validated there (mr_cl_v7, mr_cl_v6, mr_cl_v5), so the period has been looked at by the researcher, but not for this strategy.
+  holdout_previously_inspected: false
+  holdout_note: >-
+    No noise-band metrics have been computed on CL 2025+. CL 2025+ bars were read for mean-reversion holdout scoring (combined_v1 via combined_portfolio_holdout on 2026-10-25; mr_cl_v7 via portfolio_holdout on 2026-10-25; trades_v1 via trade_distribution on 2026-10-25) per the mean-reversion data-access ledger: a different strategy family, so this is still the first test of this strategy, but the researcher has seen how that period treated mean reversion.
+
+metrics:
+  return_frequency: daily          # mark-to-market equity at each session close
+  periods_per_year: 252            # Sharpe = mean/std(daily) * sqrt(252)
+  risk_free_rate_annual: 0.0
+  cash_treatment: >-
+    Idle cash earns 0% and the Sharpe excess return is measured against a 0%
+    risk-free rate, so the two assumptions are consistent.
+  drawdown_basis: daily session-close mark-to-market (understates intraday DD)
+
+execution:
+  baseline: configs/execution/futures.yaml   # $2.50/contract/side + 1 tick/side slippage, unlevered whole contracts
+
+integrity:            # stage 1
+  truncation_check_sample: 40
+  truncation_points: 3
+
+trade_count:          # stage 2 -- hard gate
+  min_completed_trades: 100
+  min_trades_per_year: 10
+  min_years_meeting_floor: 4
+
+performance:          # stage 3 -- hard gate
+  min_net_return: 0.0               # strictly greater than
+  min_sharpe: 0.75                  # annualized, daily MTM returns incl. flat days
+  max_drawdown: -0.30
+  max_drawdown_source: src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct
+
+parameter_stability:  # stage 4 -- hard gate
+  mode: local_perturbation          # gate on `local` moves below; grid neighbors are diagnostic only
+  local:
+    int_rel: 0.20                   # band lookback: x0.8 / x1.2, rounded, >= 1 session away
+    band_mult_abs: 0.25             # band multiple -/+ 0.25
+    stop_atr_abs: 0.25              # numeric ATR stop -/+ 0.25 ("none" stays none)
+  neighbor_mode: single_axis        # grid-neighbor diagnostic
+  min_frac_profitable: 0.70         # of the local moves, share with dev net return > 0
+  min_median_sharpe: 0.50           # median dev Sharpe of the local moves
+  perturbation:                     # diagnostic only, never a gate
+    n_per_config: 20
+    integer_rel_step: 0.15          # band lookback
+    float_rel_step: 0.10            # band multiple, ATR stop (relative)
+
+time_stability:       # stage 5 -- light hard gate + diagnostics
+  min_profitable_years: 3
+  top_trades_k: 5
+  top_trades_frac: 0.05
+
+dedup:                # stage 6
+  corr_threshold: 0.80
+  return_basis: monthly
+  linkage: complete
+  reps_per_cluster: 2               # best 2 per cluster; a single-member cluster keeps its 1
+
+execution_stress:     # stage 7
+  gate_cost_multiplier: 1.5         # hard gate: positive dev net return
+  diagnostic_cost_multipliers: [2.0]
+  entry_delay_bars: 1
+  missed_entry_frac: 0.10
+  missed_entry_sims: 100
+  breakeven_max_multiplier: 25.0
+
+validation:           # stage 8 -- hard gate (frozen representatives only)
+  min_net_return: 0.0
+  min_sharpe: 0.30
+  max_drawdown: -0.30
+  min_completed_trades: 40          # project default from 2026-10-22
+
+confidence:           # stage 9 -- diagnostics only
+  dsr_threshold: 0.95
+  dsr_calibration_verified: false
+  effective_trials_method: li_ji
+  serial_dependence: lag1_effective_n
+  transfer_symbol: null             # no related market built yet (e.g. Brent)
+
+holdout:              # stage 10 -- explicit `final-test` command only
+  acceptance:
+    min_net_return: 0.0
+    min_sharpe: 0.0
+    max_drawdown: -0.30
+    min_completed_trades: null
+
+# Earlier trials: the mean-reversion family on this market, and the SPY momentum /
+# breakout studies (the closest prior search to this family). These count toward the
+# DSR "known prior" sensitivity only.
+research_history:
+  - name: "mean_reversion CL (mr_cl_v7)"
+    n_configs: 16128
+    note: "Different (mean-reversion) family on CL; 150 frozen candidates, 11 passed 2023-2024."
+  - name: "mean_reversion CL (mr_cl_v6)"
+    n_configs: 17280
+    note: "Different (mean-reversion) family on CL; 82 frozen candidates, 4 passed 2023-2024."
+  - name: "mean_reversion CL (mr_cl_v5)"
+    n_configs: 41472
+    note: "Different (mean-reversion) family on CL; 75 frozen candidates, 7 passed 2023-2024."
+  - name: "ma_crossover v2 grid (ma_v2, SPY)"
+    n_configs: 248832
+    note: "Long-only trend-following MA crossover, 5min/15min, SPY."
+  - name: "ma_crossover v1 grid (ma_v1, SPY)"
+    n_configs: 60000
+    note: "Long-only trend-following MA crossover, 5min/15min/1h, SPY."
+  - name: "channel_breakout grid (funnel_v1..v4, SPY)"
+    n_configs: 24576
+    note: "Channel-breakout grid; four funnel variants with changed thresholds/methods."
+  - name: "donchian_ablation (donchian_v1, SPY/QQQ)"
+    n_configs: 3888
+    note: "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
