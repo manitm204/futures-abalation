@@ -1,0 +1,16 @@
+<p><b>Same test as the other markets, on gold.</b> Same 41,472-version v5 grid and funnel, with validation needing ≥ 40 trades. Differences:</p>
+<ul><li><b>Session:</b> the COMEX day session, 08:20–13:30 New York (the 13:30 settlement), so a 1-hour day is 5 bars plus a 10-minute stub.</li>
+<li><b>No cross-market check,</b> since no related market (such as silver) is in the data yet.</li>
+<li><b>35 stale days skipped.</b> At some month-ends Databento's front-month series stays on the expiring contract for a day or two, trading about 1% of normal volume (e.g. 208 contracts on 2018-01-31 against ~120,000 normally). Days with under 5% of the previous 20 days' median volume are not traded. The same rule removes nothing on ES, NQ, YM or RTY.</li></ul>
+<p>GC rolls about every two months (44 rolls, back-adjusted).</p>
+<p><b>1-hour bars dominate.</b> On 2018–2022, 61% of 1-hour versions made money, against 17% of 15-minute and 6% of 5-minute ones. Bar size mattered far more than any other setting. Up-bar confirmation helped across the grid, but most 1-hour finalists use no confirmation and a 2 × ATR stop.</p>
+<p><b>Most stable development results so far.</b> 177 versions cleared the profit test, and 162 of them (92%) also held up when each setting was nudged. Drawdowns were small: the 89 finalists' median 2018–2022 drawdown was −5.7%, for a median +21% and Sharpe 0.84.</p>
+<p><b>24 of 89 finalists passed 2023–2024</b> (15 groups). The median finalist was flat (Sharpe 0.00), and 44 of 89 made money. 12 more fell short only on trade count (under 40 trades). <b>For the first time, the 2018–2022 ranking pointed the right way,</b> although weakly (rank correlation +0.24; it was negative on CL, YM and NQ v6).</p>
+<p><b>The passers are mostly one family:</b> 1-hour bars, average 50–60, volatility 15–20, entry −2.5 to −3, no confirmation, 2 × ATR stop. The best:</p>
+<ul><li>#23: SMA 60/15, entry −3, exit 0, hold 10. Sharpe 1.29, +14.2%, drawdown −5.1%, 61 trades.</li>
+<li>#41 and #20: EMA 60/20, entry −2.5, hold 10. Sharpe 1.16–1.19, +11–12%, drawdown −4.9%.</li>
+<li>#7 and #64: SMA 60/15, entry −3, exit 0.5, with or without the stop. Sharpe 1.12–1.13, +12%.</li></ul>
+<p>A smaller 15-minute EMA 20–40 / volatility 15 family with up-bar confirmation also passed, but more weakly (Sharpe 0.38–0.80, +1–3%).</p>
+<p><b>Holding gold did better in raw return.</b> Gold rallied in 2023–2024: holding GC (rolled, unlevered) made +29.7% (Sharpe 1.00, drawdown −13%). The best passers made about half that, but with a third of the drawdown and in the market only 15–20% of the time. Their Sharpe (up to 1.29) matches or beats holding.</p>
+<p><b>Fairly broad plateau.</b> Around #3 (1-hour EMA 50, volatility 20), volatility 15–20 with average 40–80 scores Sharpe 0.45–1.16. Volatility 25 and above falls off quickly.</p>
+<p><b>Fresh data.</b> No strategy had been tested on gold before; the grid and rules were tuned on stock indexes. The 2025+ holdout has not been run.</p>
