@@ -188,6 +188,19 @@ def test_stop_is_from_atr_before_entry_and_side_aware():
     assert check_sim_integrity(sim, data, EC, p) == []
 
 
+def test_first_entry_minutes_blocks_early_signals_only():
+    bars = _walk(seed=12, n_days=60)
+    data = NBData(bars)
+    since_open = data.tod + data.tf_minutes - data.open_minute
+    for fe in (15, 30, 60, 120):
+        _, sim = _sim(bars, _p(check_minutes=15, first_entry_minutes=fe))
+        assert len(sim.entry_idx) and since_open[sim.signal_idx].min() >= fe
+    # Below the first check time the setting is a no-op (check 30: first entry 15 == 30).
+    _, a = _sim(bars, _p(check_minutes=30, first_entry_minutes=15))
+    _, b = _sim(bars, _p(check_minutes=30, first_entry_minutes=30))
+    assert np.array_equal(a.entry_idx, b.entry_idx)
+
+
 def test_stress_knobs_delay_and_missed_entries():
     bars = _walk(seed=9, n_days=60)
     data, base = _sim(bars)
@@ -220,10 +233,9 @@ def test_daily_equity_marks_open_short_against_close():
 # --- grid, lattice, perturbations, funnel plumbing --------------------------------------
 
 def test_grid_size_and_config_mapping():
-    assert variants_per_symbol(AXES_V1) == 6480 == len(nb_grid(("ES",)))
-    p = NBParams.from_config(NoiseBandConfig(symbol="ES", stop_atr_multiple="2.0", band_mult=1.25))
-    assert (p.stop_atr, p.band_mult) == (2.0, 1.25)
-    assert NBParams.from_config(NoiseBandConfig(symbol="ES")).stop_atr is None
+    assert variants_per_symbol(AXES_V1) == 8100 == len(nb_grid(("ES",)))
+    p = NBParams.from_config(NoiseBandConfig(symbol="ES", band_mult=2.0, first_entry_minutes=60))
+    assert (p.stop_atr, p.band_mult, p.first_entry_minutes) == (None, 2.0, 60)
 
 
 def test_lattice_neighbors_hold_categoricals():
@@ -231,9 +243,9 @@ def test_lattice_neighbors_hold_categoricals():
     nb = neighbor_ids(recs, lattice=LATTICE_NB_V1)
     by = {r["config_id"]: r for r in recs}
     c = next(r for r in recs if r["band_lookback"] == 14 and r["band_mult"] == 1.0 and r["check_minutes"] == 30
-             and r["stop_atr_multiple"] == "2.0" and r["timeframe"] == "5min")
+             and r["first_entry_minutes"] == 30 and r["timeframe"] == "5min")
     ns = [by[i] for i in nb[c["config_id"]]]
-    assert len(ns) == 2 * 5 - 1  # 5 ordered axes; timeframe 5min is a boundary
+    assert len(ns) == 2 * 5 - 1  # 5 ordered axes with >1 value; timeframe 5min is a boundary
     assert all((n["anchor"], n["trail"], n["direction"]) == (c["anchor"], c["trail"], c["direction"]) for n in ns)
 
 

@@ -1,4 +1,4 @@
-"""Full-factorial grids for the noise-band breakout strategy: v1 (6,480 variants per symbol).
+"""Full-factorial grids for the noise-band breakout strategy: v1 (8,100 variants per symbol).
 
 Later rounds (narrowed or market-specific grids, like the mean-reversion v5..v21) add
 an AXES_V<n> dict, a NoiseBandV<n>Config in src/strategies/noise_band/config.py, a
@@ -14,6 +14,7 @@ from src.strategies.noise_band.config import (
     BAND_MULTS,
     CHECK_MINUTES,
     DIRECTIONS,
+    FIRST_ENTRY_MINUTES,
     STOP_ATRS,
     TIMEFRAMES,
     TRAILS,
@@ -25,6 +26,7 @@ AXES_V1: dict[str, tuple] = {
     "band_lookback": BAND_LOOKBACKS,
     "band_mult": BAND_MULTS,
     "check_minutes": CHECK_MINUTES,
+    "first_entry_minutes": FIRST_ENTRY_MINUTES,
     "anchor": ANCHORS,
     "trail": TRAILS,
     "direction": DIRECTIONS,

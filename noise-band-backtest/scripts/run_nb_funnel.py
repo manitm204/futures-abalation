@@ -3,7 +3,7 @@
 Same stages, thresholds and commands as the mean-reversion funnel
 (../mean-reversion-backtest/scripts/run_mr_funnel.py); only the base strategy
 (src/strategies/noise_band/) and its grid (src/experiments/nb_grid.py) differ. The
-YAML's `strategy` picks the parameter space (`noise_band` = v1, 6,480 configs).
+YAML's `strategy` picks the parameter space (`noise_band` = v1, 8,100 configs).
 All thresholds live in the YAML (hashed into every output).
 
 Commands (each is a separate, explicit step):
@@ -97,8 +97,8 @@ logger = get_logger(__name__)
 OUT_ROOT = PROJECT_ROOT / "runs" / "funnel"
 PREP_SOURCES = ["src/strategies/noise_band/backtest.py", "src/strategies/mean_reversion/backtest.py",
                 "src/analysis/daily_performance.py", "src/experiments/funnel_prep.py", "src/experiments/nb_integrity.py"]
-NB_KEYS = ("symbol", "timeframe", "band_lookback", "band_mult", "check_minutes", "anchor", "trail", "direction",
-           "stop_atr_multiple")
+NB_KEYS = ("symbol", "timeframe", "band_lookback", "band_mult", "check_minutes", "first_entry_minutes", "anchor",
+           "trail", "direction", "stop_atr_multiple")
 SPACES = {
     "noise_band": {
         "grid": nb_grid, "cls": NoiseBandConfig, "lattice": LATTICE_NB_V1, "perturb": perturbations_nb,
@@ -576,7 +576,7 @@ def _slim(r: dict) -> dict:
 AUDIT_NOTES = [
     "Noise sigma at bar k = mean of |close - session open| / raw session open at the SAME time of day (bar-open minute, NY) over the previous band_lookback sessions that have a bar at that time; today's own move is never included, so sigma is known before the session starts.",
     "Bands: upper = hi + band_mult x sigma x raw open, lower = lo - band_mult x sigma x raw open, with hi = lo = session open (anchor=open) or hi/lo = max/min(open, previous session's last close) (anchor=open_prev_close). Session VWAP uses typical price x volume of the session's bars through bar k.",
-    "Signals and trailing exits are evaluated only at check-bar closes (bar close a multiple of check_minutes after the session open); an entry is decided at that close and fills at the NEXT bar's open in the same session; the session's last bar never signals.",
+    "Signals and trailing exits are evaluated only at check-bar closes (bar close a multiple of check_minutes after the session open) at least first_entry_minutes after the open; an entry is decided at that close and fills at the NEXT bar's open in the same session; the session's last bar never signals.",
     "Trailing exit (decided at a check close, filled at the next open): long below the upper band / VWAP / max of the two (trail = band / vwap / band_vwap), short above the lower band / VWAP / min of the two.",
     "Every position is closed at the session's last bar CLOSE (market-on-close with the same slippage); nothing is held overnight. This takes precedence over a trailing exit decided at the same close.",
     "Optional protective stop = entry-bar open -/+ k x ATR(14) using the ATR known before the fill, live from the entry bar, filled at the worse of open and stop; it takes precedence over close-based exits of the same bar.",
@@ -704,7 +704,8 @@ UNRESOLVED_FUTURES = [
     "band_lookback counts SESSIONS (per time-of-day slot); ATR(14) counts bars of the config's timeframe and runs across sessions (RTH bars only).",
     "The paper sizes by volatility targeting with up to 4x leverage; here sizing is unlevered full-equity whole contracts, identical to the mean-reversion funnel so results are comparable.",
     "Session VWAP is built from the aggregated bars' typical price, not tick data; a session's first bar opens at the day-session open (RTH only), so the paper's 'move from the open' is measured from that open, not the overnight Globex session.",
-    "5min and 15min bars with the same check interval decide at the same clock times; they differ only in the protective stop and ATR, so near-duplicates are expected and left to stage 6.",
+    "5min and 15min bars with the same check interval decide at the same clock times (v1 has no stop), so they differ only in fill timing granularity; near-duplicates are expected and left to stage 6.",
+    "first_entry_minutes below the first check time changes nothing (check 30: first entry 15 = 30; check 60: 15 = 30 = 60), so 2,700 of the 8,100 v1 configs repeat another config's backtest exactly; they count in the raw trial total and collapse in stage 6.",
 ]
 
 

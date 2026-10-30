@@ -62,10 +62,11 @@ An optional ATR stop is live intrabar, and everything is closed at the session's
 close (nothing is held overnight). Long and short; unlevered whole contracts, the same
 sizing as mean reversion.
 
-**v1 grid** (`noise_band`, 6,480 configs per market): `timeframe` (5min/15min),
-`band_lookback` (7/10/14/20/30 sessions), `band_mult` (0.75/1/1.25/1.5), `check_minutes`
-(15/30/60), `anchor` (open / open + prior close gap adjustment), `trail` (band / vwap /
-band_vwap), `direction` (long/short/both), `stop_atr_multiple` (none/1/2).
+**v1 grid** (`noise_band`, 8,100 configs per market): `timeframe` (5min/15min),
+`band_lookback` (7/10/14/20/30 sessions), `band_mult` (0.75/1/1.25/1.5/2), `check_minutes`
+(15/30/60), `first_entry_minutes` (15/30/60 after the open), `anchor` (open / open + prior
+close gap adjustment), `trail` (band / vwap / band_vwap), `direction` (long/short/both),
+`stop_atr_multiple` (none; stops are supported for later rounds).
 
 One funnel YAML per market: `configs/funnel/nb_funnel_<market>_v1.yaml` (ES, NQ, YM,
 RTY, CL, GC, 6E, 6J, ZN). Run ids follow the mean-reversion naming: `nb_<market>_v<n>`.

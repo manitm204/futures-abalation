@@ -3,7 +3,7 @@ format the shared results site renders (../futures-results/).
 
 One file per (market, strategy): futures-results/data/<MARKET>/<strategy>.json.
 Re-running overwrites that file only, so markets and strategies accumulate.
-Then rebuild the page:  python ../futures-results/build.py
+Then rebuild the pages:  python ../futures-results/build.py  (writes futures-results/mean reversion/index.html)
 
 Reads only development and validation outputs; holdout data is never touched.
 

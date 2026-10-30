@@ -1,15 +1,16 @@
 # CL futures noise-band breakout (intraday momentum) screening funnel, run nb_cl_v1 --
 # the ONE place every threshold lives. First noise-band round on CL: the v1 grid
-# (noise_band, 6,480 configs): 5min/15min bars, band lookback 7/10/14/20/30 sessions,
-# band multiple 0.75/1/1.25/1.5, check every 15/30/60 min, anchor open / open+prior close,
-# trailing exit band / VWAP / tighter of both, long / short / both, stop none / 1 / 2 x ATR.
+# (noise_band, 8,100 configs): 5min/15min bars, band lookback 7/10/14/20/30 sessions,
+# band multiple 0.75/1/1.25/1.5/2, check every 15/30/60 min, first entry 15/30/60 min after
+# the open, anchor open / open+prior close, trailing exit band / VWAP / tighter of both,
+# long / short / both, no protective stop.
 # After Zarattini, Aziz & Barbon (2024); see src/strategies/noise_band/config.py.
 #
 # Every gate, threshold, data split and cost is identical to the latest mean-reversion
 # round (mean-reversion-backtest/configs/funnel/mr_funnel_ym_v7_15m.yaml) EXCEPT:
 #   * strategy / grid, and timeframes 5min/15min (the noise band needs intraday check times)
-#   * stage-4 local moves are the noise band's: band lookback x0.8/x1.2, band multiple
-#     -/+ 0.25, numeric ATR stop -/+ 0.25 (check interval and categoricals are held)
+#   * stage-4 local moves are the noise band's: band lookback x0.8/x1.2 and band multiple
+#     -/+ 0.25 (v1 has no stop; check interval, first entry and categoricals are held)
 #   * perturbation diagnostics move the band multiple / stop by a relative step
 #
 # Thresholds are fixed for the duration of a run and are hashed into every run's

@@ -22,8 +22,8 @@ close are live on every bar.
 Execution assumptions (audited by src/experiments/nb_integrity.py):
   * long and/or short (`direction`), one position at a time, compounding equity, no
     leverage; every position is closed by the session's last bar (no overnight risk);
-  * entry: at a check-bar close above upper (long) / below lower (short), never on the
-    session's last bar; filled at the NEXT bar's open (bar k+1+delay), which must be
+  * entry: at a check-bar close above upper (long) / below lower (short), at least
+    `first_entry_minutes` after the session open, never on the session's last bar; filled at the NEXT bar's open (bar k+1+delay), which must be
     in the same session (otherwise the signal is skipped);
   * trailing exit at a check-bar close j: long when close_j < level_j, short when
     close_j > level_j, with level = upper/lower (trail=band), VWAP (vwap) or the
@@ -203,11 +203,12 @@ class NBParams:
     trail: str
     direction: str
     stop_atr: float | None = None
+    first_entry_minutes: int = 0   # bar close must be at least this long after the open
 
     @classmethod
     def from_config(cls, cfg) -> "NBParams":
         return cls(cfg.symbol, cfg.timeframe, cfg.band_lookback, cfg.band_mult, cfg.check_minutes,
-                   cfg.anchor, cfg.trail, cfg.direction, cfg.stop_atr_value)
+                   cfg.anchor, cfg.trail, cfg.direction, cfg.stop_atr_value, cfg.first_entry_minutes)
 
 
 def as_params(cfg) -> NBParams:
@@ -242,7 +243,8 @@ def signal_arrays(data: NBData, p: NBParams) -> dict[str, np.ndarray]:
     up, lo = data.bands(p.band_lookback, p.band_mult, p.anchor)
     c, vw = data.close, data.vwap
     chk = data.check(p.check_minutes)
-    can_enter = chk & ~data.is_last
+    since_open = data.tod + data.tf_minutes - data.open_minute  # bar close, minutes after the open
+    can_enter = chk & ~data.is_last & (since_open >= p.first_entry_minutes)
     above, below = c > up, c < lo  # NaN band -> False
     if p.trail == "band":
         lvl_l, lvl_s = up, lo

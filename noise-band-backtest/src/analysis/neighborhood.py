@@ -327,12 +327,14 @@ def neighborhood_stats(
 
 
 # Noise-band breakout v1 lattice. stop_atr_multiple: "none" = no stop (widest), after 2 ATR.
-# check_minutes is ordered (15 < 30 < 60); anchor, trail and direction are categorical.
+# check_minutes and first_entry_minutes are ordered (15 < 30 < 60); anchor, trail and
+# direction are categorical. v1 has no stop, so its stop axis has a single value.
 FIXED_AXES_NB = ["symbol", "anchor", "trail", "direction"]
 LATTICE_NB_V1 = Lattice({
     "timeframe": ["5min", "15min"],
     "band_lookback": [7, 10, 14, 20, 30],
-    "band_mult": [0.75, 1.0, 1.25, 1.5],
+    "band_mult": [0.75, 1.0, 1.25, 1.5, 2.0],
     "check_minutes": [15, 30, 60],
-    "stop_atr_multiple": ["1.0", "2.0", "none"],
+    "first_entry_minutes": [15, 30, 60],
+    "stop_atr_multiple": ["none"],
 }, FIXED_AXES_NB)
