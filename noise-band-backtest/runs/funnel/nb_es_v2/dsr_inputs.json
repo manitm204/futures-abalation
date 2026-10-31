@@ -1,0 +1,84 @@
+{
+  "calibration_verified": false,
+  "effective_trials": {
+    "li_ji": 416.9999999999982,
+    "n_components_95": 68,
+    "n_series": 8100,
+    "participation_ratio": 3.9158886107243105,
+    "rank_bound_T": 1259
+  },
+  "n_configs_with_defined_sharpe": 8100,
+  "primary_method": "li_ji",
+  "research_history": [
+    {
+      "n_configs": 8100,
+      "name": "noise_band ES v1 (nb_es_v1)",
+      "note": "First noise-band round on ES; 210 frozen finalists from 2018-2022, validation not run. This v2 grid was specified after reading those development results."
+    },
+    {
+      "n_configs": 6,
+      "name": "noise_band build smoke test (ES)",
+      "note": "Three hand-picked noise-band configs x 5min/15min run on ES 2018-2022 while building the backtester (incl. the paper's default: 14 sessions, 1.0x, 30 min, gap-adjusted, band/VWAP trail, both sides). Development data only."
+    },
+    {
+      "n_configs": 6804,
+      "name": "mean_reversion ES (mr_es_v6_1h)",
+      "note": "Different (mean-reversion) family on ES; 39 frozen candidates, 1 passed 2023-2024."
+    },
+    {
+      "n_configs": 864,
+      "name": "mean_reversion ES (mr_es_v6_15m)",
+      "note": "Different (mean-reversion) family on ES; 7 frozen candidates, 0 passed 2023-2024."
+    },
+    {
+      "n_configs": 41472,
+      "name": "mean_reversion ES (mr_es_v5)",
+      "note": "Different (mean-reversion) family on ES; 45 frozen candidates, 10 passed 2023-2024."
+    },
+    {
+      "n_configs": 46080,
+      "name": "mean_reversion ES (mr_es_v4)",
+      "note": "Different (mean-reversion) family on ES; 18 frozen candidates, 3 passed 2023-2024."
+    },
+    {
+      "n_configs": 46080,
+      "name": "mean_reversion ES (mr_es_v3)",
+      "note": "Different (mean-reversion) family on ES; 11 frozen candidates, 1 passed 2023-2024."
+    },
+    {
+      "n_configs": 248832,
+      "name": "ma_crossover v2 grid (ma_v2, SPY)",
+      "note": "Long-only trend-following MA crossover, 5min/15min, SPY."
+    },
+    {
+      "n_configs": 60000,
+      "name": "ma_crossover v1 grid (ma_v1, SPY)",
+      "note": "Long-only trend-following MA crossover, 5min/15min/1h, SPY."
+    },
+    {
+      "n_configs": 24576,
+      "name": "channel_breakout grid (funnel_v1..v4, SPY)",
+      "note": "Channel-breakout grid; four funnel variants with changed thresholds/methods."
+    },
+    {
+      "n_configs": 3888,
+      "name": "donchian_ablation (donchian_v1, SPY/QQQ)",
+      "note": "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+    }
+  ],
+  "serial_dependence": "lag1_effective_n",
+  "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+  "trial_count_options": {
+    "li_ji": 416.9999999999982,
+    "participation_ratio": 3.9158886107243105,
+    "raw": 8100.0,
+    "raw_plus_known_prior": 494802.0
+  },
+  "unresolved": [
+    "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+    "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+    "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+    "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+  ],
+  "variance_of_trial_sharpes_per_period": 0.0004229152501253694
+}

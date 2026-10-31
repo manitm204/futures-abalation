@@ -1,0 +1,494 @@
+{
+  "data_access": {
+    "actual_last_session": "2022-12-30",
+    "command": "develop",
+    "experiment_id": "nb_es_v4",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 60,
+    "partition_fingerprint": "6894648111dd3ffb",
+    "phase": "development",
+    "phase_end": "2022-12-31",
+    "rows": 1756356,
+    "symbol": "ES"
+  },
+  "data_history": {
+    "holdout_note": "No noise-band metrics have been computed on ES 2025+. ES 2025+ bars were read for mean-reversion holdout scoring (combined_v1 via combined_portfolio_holdout on 2026-10-25; mr_es_v6_1h via portfolio_holdout on 2026-10-24; trades_v1 via trade_distribution on 2026-10-25) per the mean-reversion data-access ledger: a different strategy family, so this is still the first test of this strategy, but the researcher has seen how that period treated mean reversion.",
+    "holdout_previously_inspected": false,
+    "validation_note": "v4 was specified after reading ES v1, v2 and v3 development results only (nb_es_v1..v3, 2018-2022). No noise-band strategy (v1-v4) has been selected or scored on ES 2023-2024; the frozen finalists of v1 (210), v2 (235) and v3 (268) have not been validated. The mean-reversion family was validated there earlier, so the period has been looked at by the researcher, but not for this strategy.",
+    "validation_previously_used_for_selection": false
+  },
+  "dsr": {
+    "calibration_verified": false,
+    "effective_trials": {
+      "li_ji": 593.0000000000011,
+      "n_components_95": 94,
+      "n_series": 13824,
+      "participation_ratio": 4.364782739484537,
+      "rank_bound_T": 1259
+    },
+    "n_configs_with_defined_sharpe": 13824,
+    "primary_method": "li_ji",
+    "research_history": [
+      {
+        "n_configs": 16200,
+        "name": "noise_band ES v3 (nb_es_v3)",
+        "note": "The v2 grid on 5min + 15min; 268 frozen finalists from 2018-2022, validation not run. Its 5min half repeats nb_es_v2 exactly. This v4 grid was specified after reading those development results."
+      },
+      {
+        "n_configs": 8100,
+        "name": "noise_band ES v2 (nb_es_v2)",
+        "note": "The v2 grid on 5min only; 235 frozen finalists from 2018-2022, validation not run. Its 5min configs are re-run inside this v3 grid (same rules and config ids)."
+      },
+      {
+        "n_configs": 8100,
+        "name": "noise_band ES v1 (nb_es_v1)",
+        "note": "First noise-band round on ES; 210 frozen finalists from 2018-2022, validation not run. This v2 grid was specified after reading those development results."
+      },
+      {
+        "n_configs": 6,
+        "name": "noise_band build smoke test (ES)",
+        "note": "Three hand-picked noise-band configs x 5min/15min run on ES 2018-2022 while building the backtester (incl. the paper's default: 14 sessions, 1.0x, 30 min, gap-adjusted, band/VWAP trail, both sides). Development data only."
+      },
+      {
+        "n_configs": 6804,
+        "name": "mean_reversion ES (mr_es_v6_1h)",
+        "note": "Different (mean-reversion) family on ES; 39 frozen candidates, 1 passed 2023-2024."
+      },
+      {
+        "n_configs": 864,
+        "name": "mean_reversion ES (mr_es_v6_15m)",
+        "note": "Different (mean-reversion) family on ES; 7 frozen candidates, 0 passed 2023-2024."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion ES (mr_es_v5)",
+        "note": "Different (mean-reversion) family on ES; 45 frozen candidates, 10 passed 2023-2024."
+      },
+      {
+        "n_configs": 46080,
+        "name": "mean_reversion ES (mr_es_v4)",
+        "note": "Different (mean-reversion) family on ES; 18 frozen candidates, 3 passed 2023-2024."
+      },
+      {
+        "n_configs": 46080,
+        "name": "mean_reversion ES (mr_es_v3)",
+        "note": "Different (mean-reversion) family on ES; 11 frozen candidates, 1 passed 2023-2024."
+      },
+      {
+        "n_configs": 248832,
+        "name": "ma_crossover v2 grid (ma_v2, SPY)",
+        "note": "Long-only trend-following MA crossover, 5min/15min, SPY."
+      },
+      {
+        "n_configs": 60000,
+        "name": "ma_crossover v1 grid (ma_v1, SPY)",
+        "note": "Long-only trend-following MA crossover, 5min/15min/1h, SPY."
+      },
+      {
+        "n_configs": 24576,
+        "name": "channel_breakout grid (funnel_v1..v4, SPY)",
+        "note": "Channel-breakout grid; four funnel variants with changed thresholds/methods."
+      },
+      {
+        "n_configs": 3888,
+        "name": "donchian_ablation (donchian_v1, SPY/QQQ)",
+        "note": "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+      }
+    ],
+    "serial_dependence": "lag1_effective_n",
+    "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+    "trial_count_options": {
+      "li_ji": 593.0000000000011,
+      "participation_ratio": 4.364782739484537,
+      "raw": 13824.0,
+      "raw_plus_known_prior": 524826.0
+    },
+    "unresolved": [
+      "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+      "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+      "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+      "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+    ],
+    "variance_of_trial_sharpes_per_period": 0.0004695598585107348
+  },
+  "elapsed_s": 986.0,
+  "experiment_id": "nb_es_v4",
+  "frozen_manifest_sha256": "040967c5b12f4bfbe834096a6944a6c8a292a75e125916955c82df4c967c9641",
+  "instrument_type": "futures",
+  "integrity": {
+    "checks_per_config": [
+      "entry_signal_condition_not_met",
+      "direction_not_allowed",
+      "entry_not_next_bar_same_session",
+      "exit_before_entry",
+      "position_held_overnight",
+      "trail_exit_condition_not_met",
+      "exit_not_next_open_after_decision",
+      "eod_exit_not_at_session_close",
+      "overlapping_positions",
+      "entry_fill_better_than_open",
+      "exit_fill_better_than_market",
+      "position_exceeds_equity",
+      "forced_close_not_final_trade",
+      "commission_below_minimum",
+      "unexpected_stop_or_target",
+      "stop_not_from_atr_known_before_entry",
+      "stop_exit_without_touch",
+      "stop_fill_better_than_open_stop",
+      "entries_per_session_over_cap"
+    ],
+    "cut_fractions": [
+      0.3,
+      0.6000000000000001,
+      0.9
+    ],
+    "failures": {},
+    "truncation_sample": 40
+  },
+  "mode": "development_only",
+  "n_configs": 13824,
+  "n_frozen_candidates": 326,
+  "provenance": {
+    "available_data_endpoint_per_manifest": {
+      "ES": "2026-10-16",
+      "NQ": "2026-10-16"
+    },
+    "config_path": "configs/funnel/nb_funnel_es_v4.yaml",
+    "config_sha256": "a1cd17a4da903eb168c5ea0effe87690077d053169ed74917e7984bfc5f35fde",
+    "created_at": "2026-10-31T13:22:50.734870+00:00",
+    "data_manifests": {
+      "ES": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3099325,
+        "schema_version": "1.0.0"
+      },
+      "NQ": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3099436,
+        "schema_version": "1.0.0"
+      }
+    },
+    "git_commit": "84bd658c6b313de76e97552a5f0f505def7b1993",
+    "git_diff_sha256": "db6bc2520c68d322255ee07e2cf1120648fa352c586fe19e95b8484bba25b03a",
+    "git_dirty": true,
+    "seed": 20261030
+  },
+  "rejection_reason_counts": {
+    "s3:hard_reject:max_drawdown": 6,
+    "s3:hard_reject:net_return": 1363,
+    "s3:hard_reject:sharpe": 10824,
+    "s4:hard_reject:local_median_sharpe": 9,
+    "s5:hard_reject:profitable_years": 71
+  },
+  "survivor_table": [
+    {
+      "evaluated": 13824,
+      "kind": "universe",
+      "passed": 13824,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "0 universe"
+    },
+    {
+      "evaluated": 13824,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 13824,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "1 backtest integrity",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 13824,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 13824,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "2 trade count & coverage",
+      "with_warnings": 9216
+    },
+    {
+      "evaluated": 13824,
+      "hard_reject": 10824,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 3000,
+      "pct_of_previous": 21.70138888888889,
+      "pct_of_universe": 21.70138888888889,
+      "stage": "3 performance & risk",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 3000,
+      "hard_reject": 9,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 2991,
+      "pct_of_previous": 99.7,
+      "pct_of_universe": 21.63628472222222,
+      "stage": "4 parameter stability",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 2991,
+      "hard_reject": 71,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 2920,
+      "pct_of_previous": 97.62621196924106,
+      "pct_of_universe": 21.122685185185187,
+      "stage": "5 time stability",
+      "with_warnings": 2280
+    },
+    {
+      "deduplicated": 2594,
+      "evaluated": 2920,
+      "kind": "dedup",
+      "n_clusters": 164,
+      "note": "best 2 per cluster",
+      "passed": 326,
+      "pct_of_previous": 11.164383561643836,
+      "pct_of_universe": 2.3582175925925926,
+      "stage": "6 deduplication"
+    },
+    {
+      "evaluated": 326,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 326,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 2.3582175925925926,
+      "stage": "7 execution stress",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": null,
+      "kind": "hard_gate",
+      "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "8 frozen validation"
+    },
+    {
+      "evaluated": 326,
+      "kind": "diagnostic_only",
+      "note": "diagnostic only: unverified: 326",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "9 DSR / transfer"
+    },
+    {
+      "evaluated": null,
+      "kind": "explicit_command",
+      "note": "not run; `final-test` command only",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "10 final holdout"
+    }
+  ],
+  "symbol": "ES",
+  "thresholds": {
+    "confidence": {
+      "dsr_calibration_verified": false,
+      "dsr_threshold": 0.95,
+      "effective_trials_method": "li_ji",
+      "serial_dependence": "lag1_effective_n",
+      "transfer_symbol": "NQ"
+    },
+    "data": {
+      "clean_root": "data/clean",
+      "development": {
+        "end": "2022-12-31",
+        "start": "2018-01-01"
+      },
+      "holdout": {
+        "end": null,
+        "start": "2025-01-01"
+      },
+      "timeframes": [
+        "5min",
+        "15min"
+      ],
+      "validation": {
+        "end": "2024-12-31",
+        "start": "2023-01-01"
+      }
+    },
+    "data_history": {
+      "holdout_note": "No noise-band metrics have been computed on ES 2025+. ES 2025+ bars were read for mean-reversion holdout scoring (combined_v1 via combined_portfolio_holdout on 2026-10-25; mr_es_v6_1h via portfolio_holdout on 2026-10-24; trades_v1 via trade_distribution on 2026-10-25) per the mean-reversion data-access ledger: a different strategy family, so this is still the first test of this strategy, but the researcher has seen how that period treated mean reversion.",
+      "holdout_previously_inspected": false,
+      "validation_note": "v4 was specified after reading ES v1, v2 and v3 development results only (nb_es_v1..v3, 2018-2022). No noise-band strategy (v1-v4) has been selected or scored on ES 2023-2024; the frozen finalists of v1 (210), v2 (235) and v3 (268) have not been validated. The mean-reversion family was validated there earlier, so the period has been looked at by the researcher, but not for this strategy.",
+      "validation_previously_used_for_selection": false
+    },
+    "dedup": {
+      "corr_threshold": 0.8,
+      "linkage": "complete",
+      "reps_per_cluster": 2,
+      "return_basis": "monthly"
+    },
+    "execution": {
+      "baseline": "configs/execution/futures.yaml"
+    },
+    "execution_stress": {
+      "breakeven_max_multiplier": 25.0,
+      "diagnostic_cost_multipliers": [
+        2.0
+      ],
+      "entry_delay_bars": 1,
+      "gate_cost_multiplier": 1.5,
+      "missed_entry_frac": 0.1,
+      "missed_entry_sims": 100
+    },
+    "holdout": {
+      "acceptance": {
+        "max_drawdown": -0.3,
+        "min_completed_trades": null,
+        "min_net_return": 0.0,
+        "min_sharpe": 0.0
+      }
+    },
+    "integrity": {
+      "truncation_check_sample": 40,
+      "truncation_points": 3
+    },
+    "metrics": {
+      "cash_treatment": "Idle cash earns 0% and the Sharpe excess return is measured against a 0% risk-free rate, so the two assumptions are consistent.",
+      "drawdown_basis": "daily session-close mark-to-market (understates intraday DD)",
+      "periods_per_year": 252,
+      "return_frequency": "daily",
+      "risk_free_rate_annual": 0.0
+    },
+    "parameter_stability": {
+      "local": {
+        "band_mult_abs": 0.25,
+        "entry_z_abs": null,
+        "exit_z_abs": null,
+        "int_rel": 0.2,
+        "stop_atr_abs": 0.25
+      },
+      "min_frac_profitable": 0.7,
+      "min_median_sharpe": 0.5,
+      "mode": "local_perturbation",
+      "neighbor_mode": "single_axis",
+      "perturbation": {
+        "float_rel_step": 0.1,
+        "integer_rel_step": 0.15,
+        "n_per_config": 20,
+        "z_abs": null
+      }
+    },
+    "performance": {
+      "max_drawdown": -0.3,
+      "max_drawdown_source": "src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct",
+      "min_net_return": 0.0,
+      "min_sharpe": 0.75
+    },
+    "research_history": [
+      {
+        "n_configs": 16200,
+        "name": "noise_band ES v3 (nb_es_v3)",
+        "note": "The v2 grid on 5min + 15min; 268 frozen finalists from 2018-2022, validation not run. Its 5min half repeats nb_es_v2 exactly. This v4 grid was specified after reading those development results."
+      },
+      {
+        "n_configs": 8100,
+        "name": "noise_band ES v2 (nb_es_v2)",
+        "note": "The v2 grid on 5min only; 235 frozen finalists from 2018-2022, validation not run. Its 5min configs are re-run inside this v3 grid (same rules and config ids)."
+      },
+      {
+        "n_configs": 8100,
+        "name": "noise_band ES v1 (nb_es_v1)",
+        "note": "First noise-band round on ES; 210 frozen finalists from 2018-2022, validation not run. This v2 grid was specified after reading those development results."
+      },
+      {
+        "n_configs": 6,
+        "name": "noise_band build smoke test (ES)",
+        "note": "Three hand-picked noise-band configs x 5min/15min run on ES 2018-2022 while building the backtester (incl. the paper's default: 14 sessions, 1.0x, 30 min, gap-adjusted, band/VWAP trail, both sides). Development data only."
+      },
+      {
+        "n_configs": 6804,
+        "name": "mean_reversion ES (mr_es_v6_1h)",
+        "note": "Different (mean-reversion) family on ES; 39 frozen candidates, 1 passed 2023-2024."
+      },
+      {
+        "n_configs": 864,
+        "name": "mean_reversion ES (mr_es_v6_15m)",
+        "note": "Different (mean-reversion) family on ES; 7 frozen candidates, 0 passed 2023-2024."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion ES (mr_es_v5)",
+        "note": "Different (mean-reversion) family on ES; 45 frozen candidates, 10 passed 2023-2024."
+      },
+      {
+        "n_configs": 46080,
+        "name": "mean_reversion ES (mr_es_v4)",
+        "note": "Different (mean-reversion) family on ES; 18 frozen candidates, 3 passed 2023-2024."
+      },
+      {
+        "n_configs": 46080,
+        "name": "mean_reversion ES (mr_es_v3)",
+        "note": "Different (mean-reversion) family on ES; 11 frozen candidates, 1 passed 2023-2024."
+      },
+      {
+        "n_configs": 248832,
+        "name": "ma_crossover v2 grid (ma_v2, SPY)",
+        "note": "Long-only trend-following MA crossover, 5min/15min, SPY."
+      },
+      {
+        "n_configs": 60000,
+        "name": "ma_crossover v1 grid (ma_v1, SPY)",
+        "note": "Long-only trend-following MA crossover, 5min/15min/1h, SPY."
+      },
+      {
+        "n_configs": 24576,
+        "name": "channel_breakout grid (funnel_v1..v4, SPY)",
+        "note": "Channel-breakout grid; four funnel variants with changed thresholds/methods."
+      },
+      {
+        "n_configs": 3888,
+        "name": "donchian_ablation (donchian_v1, SPY/QQQ)",
+        "note": "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+      }
+    ],
+    "seed": 20261030,
+    "strategy": "noise_band_v4",
+    "symbol": "ES",
+    "time_stability": {
+      "min_profitable_years": 3,
+      "top_trades_frac": 0.05,
+      "top_trades_k": 5
+    },
+    "trade_count": {
+      "min_completed_trades": 100,
+      "min_trades_per_year": 10,
+      "min_years_meeting_floor": 4
+    },
+    "validation": {
+      "max_drawdown": -0.3,
+      "min_completed_trades": 40,
+      "min_net_return": 0.0,
+      "min_sharpe": 0.3
+    },
+    "version": 1
+  },
+  "transfer_symbol": "NQ"
+}

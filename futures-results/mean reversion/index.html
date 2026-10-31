@@ -437,10 +437,13 @@ function renderRun(r) {
   </section>`;
 
   const TF_ORDER = ["5min", "15min", "1h"];
-  const L = r.luck && {...r.luck, curves: [...r.luck.curves].sort((a, b) => TF_ORDER.indexOf(a.timeframe) - TF_ORDER.indexOf(b.timeframe))};
+  // A curve covers the finalists in `match` (noise band: bar size + direction) or, without one, its bar size.
+  const curveTf = c => c.match?.timeframe ?? c.timeframe;
+  const L = r.luck && {...r.luck, curves: [...r.luck.curves].sort((a, b) => TF_ORDER.indexOf(curveTf(a)) - TF_ORDER.indexOf(curveTf(b)))};
+  const inCurve = (f, c) => c.match ? Object.entries(c.match).every(([k, v]) => f.settings[k] === v) : f.settings.timeframe === c.timeframe;
   const luckChart = (c) => {
     const W = 720, H = 260, P = {l: 44, r: 12, t: 12, b: 34};
-    const fs = finalists.filter(f => f.luck && f.settings.timeframe === c.timeframe);
+    const fs = finalists.filter(f => f.luck && inCurve(f, c));
     const xs = c.rows.map(q => q.exposure_pct), ys = [];
     c.rows.forEach(q => ys.push(q.p10_sharpe, q.p90_sharpe));
     fs.forEach(f => ys.push(f.val.sharpe));
@@ -460,7 +463,7 @@ function renderRun(r) {
     </svg>`;
   };
   const luckTable = c => {
-    const fs = finalists.filter(f => f.luck && f.settings.timeframe === c.timeframe);
+    const fs = finalists.filter(f => f.luck && inCurve(f, c));
     return `<div class="table-wrap"><table>
       <thead><tr><th>Time in mkt</th><th>Trades</th><th class="sep">Avg return</th><th>Return p10 – p90</th><th class="sep">Avg Sharpe</th><th>Sharpe p10 – p90</th><th>% profitable</th><th class="sep l">Finalists here: Sharpe (beats luck)</th></tr></thead>
       <tbody>${c.rows.map(q => {
@@ -475,10 +478,10 @@ function renderRun(r) {
   const luckSection = !L ? "" : `<section>
     <span class="eyebrow">Better than luck?</span>
     <h2>Finalists vs random entries at the same time in market</h2>
-    <p>For every whole-percent time in market from ${L.levels[0]}% to ${L.levels[L.levels.length - 1]}% (the finalists' ${val} range), ${L.n_sims} random runs buy ${esc(r.market)} at random bars and hold each trade a random ${L.hold_bars[0]}–${L.hold_bars[1]} bars. Trades never overlap, and together they cover exactly that share of bars. They pay the same costs and use the same sizing and Sharpe math as the strategy. The band is the middle 80% of random Sharpes (10th to 90th percentile), the line is their average, and dots are finalists (green passed validation). "Beats luck" is the share of random runs at the finalist's own bar size and time in market that it beat on Sharpe. Around 50% means no better than random entries, and 95%+ starts to look like an edge. With ${finalists.length} finalists, a few will clear 90% by chance alone.</p>
+    <p>${L.text ? esc(L.text) : `For every whole-percent time in market from ${L.levels[0]}% to ${L.levels[L.levels.length - 1]}% (the finalists' ${val} range), ${L.n_sims} random runs buy ${esc(r.market)} at random bars and hold each trade a random ${L.hold_bars[0]}–${L.hold_bars[1]} bars. Trades never overlap, and together they cover exactly that share of bars. They pay the same costs and use the same sizing and Sharpe math as the strategy.`} The band is the middle 80% of random Sharpes (10th to 90th percentile), the line is their average, and dots are finalists (green passed validation). "Beats luck" is the share of random runs at the finalist's own ${L.text ? "group" : "bar size"} and time in market that it beat on Sharpe. Around 50% means no better than random entries, and 95%+ starts to look like an edge. With ${finalists.length} finalists, a few will clear 90% by chance alone.</p>
     ${luckMulti ? `<div class="subtabs view-tabs" role="tablist">${L.curves.map((c, i) => `<button type="button" class="subtab" role="tab" data-view="luck:${esc(c.timeframe)}" aria-current="${i === 0}">${esc(c.timeframe)}</button>`).join("")}</div>` : ""}
     ${L.curves.map((c, i) => `<div data-panel="luck:${esc(c.timeframe)}"${i === 0 ? "" : " hidden"}>
-      ${luckMulti ? "" : `<h3>${esc(c.timeframe)} bars</h3>`}${luckChart(c)}${luckTable(c)}</div>`).join("")}
+      ${luckMulti ? "" : `<h3>${esc(c.timeframe)}${c.match ? "" : " bars"}</h3>`}${c.trade_bars ? `<p class="muted">Random trades here: median ${fmt.n(c.trade_bars[0])} bars long (mean ${fmt.x(c.trade_bars[1], 1)}), ${fmt.pctu(c.p_long, 0)} long.</p>` : ""}${luckChart(c)}${luckTable(c)}</div>`).join("")}
   </section>`;
 
   const assumptions = `<section>
@@ -550,7 +553,7 @@ function renderPortfolio(r, pk) {
   const legCard = l => `<section>
     <span class="eyebrow">Strategy ${esc(l.name)} alone · ${esc(yr)}</span>
     <h2>${esc(l.name)}: ${fmt.pct(l.periods[P].stats.net_return)}, Sharpe ${fmt.x(l.periods[P].stats.sharpe)}</h2>
-    <p class="muted">${esc(stg(l.settings))}. Full $${fmt.n(r.starting_equity)} account. Random runs are matched to this strategy's ${r.period[0].slice(0, 4)}–${r.period[1].slice(0, 4)} time in market.</p>
+    <p class="muted">${esc(l.settings_text ?? stg(l.settings))}. Full $${fmt.n(r.starting_equity)} account. Random runs are matched to this strategy's ${r.period[0].slice(0, 4)}–${r.period[1].slice(0, 4)} time in market.</p>
     ${eqChart(l, l.name)}${statTable(l)}
   </section>`;
 
@@ -612,8 +615,8 @@ function renderPortfolio(r, pk) {
     <span class="eyebrow">${esc(r.market)} · ${esc(r.strategy_name)} · from run ${esc(r.run_id)} · ${esc(r.generated_at.slice(0, 10))}</span>
     <h1>${esc(r.market_name)}: ${r.legs.map(l => esc(l.name)).join(" and ")}, ${esc(yr)}</h1>
     ${r.holdout
-      ? `<p class="lede">${r.prior_holdout_accesses ? "A repeat holdout test: the same two strategies, unchanged since they were frozen, run on the holdout period" : "The final test: the same two strategies, unchanged since they were frozen, run on data none of the research has seen"} (${esc(r.period[0])} to ${esc(r.period[1])}), first alone and then together. Each is compared with ${r.n_sims} random-entry runs at its own holdout time in market, paying the same costs (hold ${r.hold_bars[0]}–${r.hold_bars[1]} ${esc(r.timeframe)} bars, no overlap).</p>`
-      : `<p class="lede">The chosen strategies run unchanged as one continuous backtest from ${r.period[0].slice(0, 4)} to ${r.period[1].slice(0, 4)}, first alone and then together. Each is compared with ${r.n_sims} random-entry runs at the same time in market, paying the same costs (hold ${r.hold_bars[0]}–${r.hold_bars[1]} ${esc(r.timeframe)} bars, no overlap). Pick a period: every chart and table below is recomputed for it, starting from 0%. The holdout (2025 onward) is on its own tab.</p>
+      ? `<p class="lede">${r.prior_holdout_accesses ? "A repeat holdout test: the same two strategies, unchanged since they were frozen, run on the holdout period" : `The final test: the same two strategies, unchanged since they were frozen, run on data ${r.notes?.unseen ?? "none of the research has seen"}`} (${esc(r.period[0])} to ${esc(r.period[1])}), first alone and then together. ${r.notes ? esc(r.notes.random) : `Each is compared with ${r.n_sims} random-entry runs at its own holdout time in market, paying the same costs (hold ${r.hold_bars[0]}–${r.hold_bars[1]} ${esc(r.timeframe)} bars, no overlap).`}</p>`
+      : `<p class="lede">The chosen strategies run unchanged as one continuous backtest from ${r.period[0].slice(0, 4)} to ${r.period[1].slice(0, 4)}, first alone and then together. ${r.notes ? esc(r.notes.random) : `Each is compared with ${r.n_sims} random-entry runs at the same time in market, paying the same costs (hold ${r.hold_bars[0]}–${r.hold_bars[1]} ${esc(r.timeframe)} bars, no overlap).`} Pick a period: every chart and table below is recomputed for it, starting from 0%. The holdout (2025 onward) is on its own tab.</p>
     ${tabs}`}
     <div class="verdict v4">
       <div><b>${fmt.pct(CP.stats.net_return)}</b><span>together, ${esc(yr)}</span></div>
@@ -624,9 +627,9 @@ function renderPortfolio(r, pk) {
   </header>`;
   const caveat = `<section><div class="callout">
     ${P === "holdout"
-      ? `<p>${r.prior_holdout_accesses ? `<b>Not a clean test: this market's holdout was used ${r.prior_holdout_accesses} time(s) before this run.</b> An earlier pair was scored on ${esc(r.period[0].slice(0, 4))} onward first, and this pair was chosen after seeing that result, so the holdout has influenced the choice. Treat these numbers as a check, not independent proof.` : `<b>First look at the holdout.</b> No strategy had been scored on ${esc(r.period[0].slice(0, 4))} onward before this run, and nothing here was tuned or picked with it. Only these two were run, so there's no selection among holdout results.`} It's still one stretch of under two years: 95%+ against luck would be strong evidence; 50–95% means better than average, not proven.</p>`
+      ? `<p>${r.notes ? r.notes.holdout : r.prior_holdout_accesses ? `<b>Not a clean test: this market's holdout was used ${r.prior_holdout_accesses} time(s) before this run.</b> An earlier pair was scored on ${esc(r.period[0].slice(0, 4))} onward first, and this pair was chosen after seeing that result, so the holdout has influenced the choice. Treat these numbers as a check, not independent proof.` : `<b>First look at the holdout.</b> No strategy had been scored on ${esc(r.period[0].slice(0, 4))} onward before this run, and nothing here was tuned or picked with it. Only these two were run, so there's no selection among holdout results.`} It's still one stretch of under two years: 95%+ against luck would be strong evidence; 50–95% means better than average, not proven.</p>`
       : P === "val"
-      ? `<p><b>Validation only.</b> These were chosen with 2023–2024 results from earlier ${esc(r.market)} rounds in view, so this stretch isn't fully clean either. But it's the least in-sample part. 95%+ against luck here would be meaningful; between 50% and 95% is better than average but not conclusive.</p>`
+      ? `<p>${r.notes ? r.notes.val : `<b>Validation only.</b> These were chosen with 2023–2024 results from earlier ${esc(r.market)} rounds in view, so this stretch isn't fully clean either. But it's the least in-sample part. 95%+ against luck here would be meaningful; between 50% and 95% is better than average but not conclusive.`}</p>`
       : `<p><b>${P === "dev" ? "This is" : "Most of this period is"} in-sample.</b> 2018–2022 is the development data these strategies were picked from, out of thousands of versions, so beating 95%+ of random runs there is expected from the best of a big search, not proof of an edge. Switch to Validation for the more honest view; the untouched test is still the 2025+ holdout.</p>`}
     <p>Together, both strategies trade one $${fmt.n(r.starting_equity)} account. Each trade gets ${mx(SZ.per_trade)}× the account balance, and the open positions together can't go over ${mx(SZ.cap)}×. So a trade that opens while the other strategy is already in gets only what's left (about ${mx(SZ.cap - SZ.per_trade)}×). Sizes are whole ${esc(r.market)} contracts, and a trade that can't afford one is skipped. The solo runs below use the full account (1×), as in the funnel.</p>
   </div></section>`;

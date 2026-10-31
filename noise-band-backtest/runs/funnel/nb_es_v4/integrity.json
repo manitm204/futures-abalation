@@ -1,0 +1,42 @@
+{
+  "audit_notes": [
+    "Noise sigma at bar k = mean of |close - session open| / raw session open at the SAME time of day (bar-open minute, NY) over the previous band_lookback sessions that have a bar at that time; today's own move is never included, so sigma is known before the session starts.",
+    "Bands: upper = hi + band_mult x sigma x raw open, lower = lo - band_mult x sigma x raw open, with hi = lo = session open (anchor=open) or hi/lo = max/min(open, previous session's last close) (anchor=open_prev_close). Session VWAP uses typical price x volume of the session's bars through bar k.",
+    "Signals and trailing exits are evaluated only at check-bar closes (bar close a multiple of check_minutes after the session open) at least first_entry_minutes after the open; an entry is decided at that close and fills at the NEXT bar's open in the same session; the session's last bar never signals.",
+    "Trailing exit (decided at a check close, filled at the next open): long below the upper band / VWAP / max of the two (trail = band / vwap / band_vwap), short above the lower band / VWAP / min of the two.",
+    "Every position is closed at the session's last bar CLOSE (market-on-close with the same slippage); nothing is held overnight. This takes precedence over a trailing exit decided at the same close.",
+    "Optional protective stop = entry-bar open -/+ k x ATR(14) using the ATR known before the fill, live from the entry bar, filled at the worse of open and stop; it takes precedence over close-based exits of the same bar.",
+    "After a trailing or stop exit, a same-direction entry needs a check close back inside that side's band (at or after the exit decision, same session); each session starts armed. Missed-entry stress blocks the missed direction the same way, so a missed entry is never re-taken a bar later.",
+    "Long and short: P&L = side x (exit fill - entry fill) x quantity - commissions; sizing is the mean-reversion funnel's (as many whole contracts as equity covers at full contract value, unlevered, compounding).",
+    "Development backtests run on data physically truncated at the development end; the final session's trade is closed at the last development bar and flagged forced (not counted as completed).",
+    "Sharpe: daily session-close mark-to-market returns over every trading day (flat days = 0), sqrt(252) annualization, rf = 0, idle cash earns 0."
+  ],
+  "checks_per_config": [
+    "entry_signal_condition_not_met",
+    "direction_not_allowed",
+    "entry_not_next_bar_same_session",
+    "exit_before_entry",
+    "position_held_overnight",
+    "trail_exit_condition_not_met",
+    "exit_not_next_open_after_decision",
+    "eod_exit_not_at_session_close",
+    "overlapping_positions",
+    "entry_fill_better_than_open",
+    "exit_fill_better_than_market",
+    "position_exceeds_equity",
+    "forced_close_not_final_trade",
+    "commission_below_minimum",
+    "unexpected_stop_or_target",
+    "stop_not_from_atr_known_before_entry",
+    "stop_exit_without_touch",
+    "stop_fill_better_than_open_stop",
+    "entries_per_session_over_cap"
+  ],
+  "cut_fractions": [
+    0.3,
+    0.6000000000000001,
+    0.9
+  ],
+  "failures": {},
+  "truncation_sample": 40
+}

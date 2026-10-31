@@ -2,7 +2,7 @@
  "market": "ES",
  "market_name": "E-mini S&P 500",
  "strategy_key": "noise_band_v1",
- "strategy_name": "Noise-band breakout (intraday momentum)",
+ "strategy_name": "Noise band \u00b7 v1 first grid (5m + 15m)",
  "variant": null,
  "variant_label": null,
  "stability_mode": "local_perturbation",
@@ -13,7 +13,7 @@
   "min_completed_trades": 40
  },
  "run_id": "nb_es_v1",
- "generated_at": "2026-10-30T19:36:35+00:00",
+ "generated_at": "2026-10-31T13:43:00+00:00",
  "periods": {
   "dev": [
    "2018-01-01",
@@ -170,8 +170,8 @@
   {
    "name": "8 \u00b7 Validation",
    "sub": "2023\u20132024, new data",
-   "n": null,
-   "why": "Frozen finalists run once on unseen data: needs net > 0, Sharpe \u2265 0.3, drawdown no worse than 30% and \u226540 trades. Not run yet: the finalists are frozen and waiting for this step."
+   "n": 196,
+   "why": "Frozen finalists run once on unseen data: needs net > 0, Sharpe \u2265 0.3, drawdown no worse than 30% and \u226540 trades."
   }
  ],
  "stable": {
@@ -1114,8 +1114,18 @@
     "n_completed_trades": 399.0,
     "turnover_annual": 186.44953683991426
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.056442961896225,
+    "cagr": 0.027946540255991525,
+    "sharpe": 0.7768190109329813,
+    "max_drawdown": -0.045220664410525635,
+    "exposure": 0.16348522167487683,
+    "win_rate": 0.4717948717948718,
+    "profit_factor": 1.2187824848700606,
+    "n_completed_trades": 195.0,
+    "turnover_annual": 204.3363394728328
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 172,
@@ -1182,8 +1192,18 @@
     "n_completed_trades": 399.0,
     "turnover_annual": 186.44953683991426
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.056442961896225,
+    "cagr": 0.027946540255991525,
+    "sharpe": 0.7768190109329813,
+    "max_drawdown": -0.045220664410525635,
+    "exposure": 0.16348522167487683,
+    "win_rate": 0.4717948717948718,
+    "profit_factor": 1.2187824848700606,
+    "n_completed_trades": 195.0,
+    "turnover_annual": 204.3363394728328
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 172,
@@ -1250,8 +1270,18 @@
     "n_completed_trades": 345.0,
     "turnover_annual": 160.71314921837472
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08939260914677938,
+    "cagr": 0.04391775662168085,
+    "sharpe": 1.368889720031551,
+    "max_drawdown": -0.02761886447766937,
+    "exposure": 0.13916256157635468,
+    "win_rate": 0.5,
+    "profit_factor": 1.4511927256683004,
+    "n_completed_trades": 168.0,
+    "turnover_annual": 176.7044486905743
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 157,
@@ -1318,8 +1348,18 @@
     "n_completed_trades": 351.0,
     "turnover_annual": 163.58529516659104
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.047993295713991246,
+    "cagr": 0.023811036768882188,
+    "sharpe": 0.7517519875026047,
+    "max_drawdown": -0.0350585519199077,
+    "exposure": 0.15155480295566504,
+    "win_rate": 0.4857142857142857,
+    "profit_factor": 1.2200582947473457,
+    "n_completed_trades": 175.0,
+    "turnover_annual": 182.73773940496352
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 125,
@@ -1386,8 +1426,18 @@
     "n_completed_trades": 307.0,
     "turnover_annual": 142.89943635245612
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.05299853199022331,
+    "cagr": 0.026262735758974642,
+    "sharpe": 0.8300086162817307,
+    "max_drawdown": -0.028818650762372666,
+    "exposure": 0.1297465106732348,
+    "win_rate": 0.4966442953020134,
+    "profit_factor": 1.2640725844167993,
+    "n_completed_trades": 149.0,
+    "turnover_annual": 157.73318106805414
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 119,
@@ -1454,8 +1504,18 @@
     "n_completed_trades": 352.0,
     "turnover_annual": 164.09198926463537
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.04494852696452556,
+    "cagr": 0.0223167740258976,
+    "sharpe": 0.698752728470165,
+    "max_drawdown": -0.03479603392212771,
+    "exposure": 0.15486453201970443,
+    "win_rate": 0.48295454545454547,
+    "profit_factor": 1.2043373535882296,
+    "n_completed_trades": 176.0,
+    "turnover_annual": 183.75722917498902
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 126,
@@ -1522,8 +1582,18 @@
     "n_completed_trades": 437.0,
     "turnover_annual": 203.21811359173864
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09326713834242795,
+    "cagr": 0.04577990172523516,
+    "sharpe": 1.3060602131868382,
+    "max_drawdown": -0.027999181156022845,
+    "exposure": 0.1800338669950739,
+    "win_rate": 0.507537688442211,
+    "profit_factor": 1.3859392440194274,
+    "n_completed_trades": 199.0,
+    "turnover_annual": 207.85988711992965
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 185,
@@ -1590,8 +1660,18 @@
     "n_completed_trades": 437.0,
     "turnover_annual": 203.21811359173864
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09326713834242795,
+    "cagr": 0.04577990172523516,
+    "sharpe": 1.3060602131868382,
+    "max_drawdown": -0.027999181156022845,
+    "exposure": 0.1800338669950739,
+    "win_rate": 0.507537688442211,
+    "profit_factor": 1.3859392440194274,
+    "n_completed_trades": 199.0,
+    "turnover_annual": 207.85988711992965
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 185,
@@ -1658,8 +1738,18 @@
     "n_completed_trades": 382.0,
     "turnover_annual": 178.11297978977174
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09353816813313753,
+    "cagr": 0.04591003880100142,
+    "sharpe": 1.4050421781916491,
+    "max_drawdown": -0.02503551470248855,
+    "exposure": 0.14608990147783252,
+    "win_rate": 0.4835164835164835,
+    "profit_factor": 1.4484955272431552,
+    "n_completed_trades": 182.0,
+    "turnover_annual": 190.94655321788733
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 194,
@@ -1726,8 +1816,18 @@
     "n_completed_trades": 884.0,
     "turnover_annual": 414.2828137405558
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.15037669585998859,
+    "cagr": 0.07285550257500129,
+    "sharpe": 1.3793499725338791,
+    "max_drawdown": -0.04213832545553953,
+    "exposure": 0.30582922824302133,
+    "win_rate": 0.4794520547945205,
+    "profit_factor": 1.304431968705103,
+    "n_completed_trades": 365.0,
+    "turnover_annual": 389.88110331421115
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 443,
@@ -1794,8 +1894,18 @@
     "n_completed_trades": 884.0,
     "turnover_annual": 414.2828137405558
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.15037669585998859,
+    "cagr": 0.07285550257500129,
+    "sharpe": 1.3793499725338791,
+    "max_drawdown": -0.04213832545553953,
+    "exposure": 0.30582922824302133,
+    "win_rate": 0.4794520547945205,
+    "profit_factor": 1.304431968705103,
+    "n_completed_trades": 365.0,
+    "turnover_annual": 389.88110331421115
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 443,
@@ -1862,8 +1972,18 @@
     "n_completed_trades": 380.0,
     "turnover_annual": 177.3116662725208
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.0906169132458674,
+    "cagr": 0.04450652775003361,
+    "sharpe": 1.3374636582321178,
+    "max_drawdown": -0.02567478830086911,
+    "exposure": 0.1417538998357964,
+    "win_rate": 0.48333333333333334,
+    "profit_factor": 1.4290945465587768,
+    "n_completed_trades": 180.0,
+    "turnover_annual": 188.97110447358276
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 192,
@@ -1930,8 +2050,18 @@
     "n_completed_trades": 689.0,
     "turnover_annual": 320.36066499996434
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07149258630042876,
+    "cagr": 0.03527165768571505,
+    "sharpe": 0.7410563122692213,
+    "max_drawdown": -0.04421202412180936,
+    "exposure": 0.24581793924466339,
+    "win_rate": 0.4797297297297297,
+    "profit_factor": 1.1668737372334048,
+    "n_completed_trades": 296.0,
+    "turnover_annual": 315.93406746451575
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 334,
@@ -1998,8 +2128,18 @@
     "n_completed_trades": 689.0,
     "turnover_annual": 320.36066499996434
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07149258630042876,
+    "cagr": 0.03527165768571505,
+    "sharpe": 0.7410563122692213,
+    "max_drawdown": -0.04421202412180936,
+    "exposure": 0.24581793924466339,
+    "win_rate": 0.4797297297297297,
+    "profit_factor": 1.1668737372334048,
+    "n_completed_trades": 296.0,
+    "turnover_annual": 315.93406746451575
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 334,
@@ -2066,8 +2206,18 @@
     "n_completed_trades": 784.0,
     "turnover_annual": 369.1176349508683
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.10479641336620404,
+    "cagr": 0.05130165347585569,
+    "sharpe": 1.0666845118654424,
+    "max_drawdown": -0.0378067097314162,
+    "exposure": 0.28461104269293924,
+    "win_rate": 0.48,
+    "profit_factor": 1.2330474645239382,
+    "n_completed_trades": 325.0,
+    "turnover_annual": 348.6741811716619
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 341,
@@ -2134,8 +2284,18 @@
     "n_completed_trades": 612.0,
     "turnover_annual": 283.60598417162737
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.04514325024556687,
+    "cagr": 0.022412402040801638,
+    "sharpe": 0.5273381698021647,
+    "max_drawdown": -0.04021236418475094,
+    "exposure": 0.229064039408867,
+    "win_rate": 0.47191011235955055,
+    "profit_factor": 1.1157672542798338,
+    "n_completed_trades": 267.0,
+    "turnover_annual": 284.12810596050184
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 257,
@@ -2202,8 +2362,18 @@
     "n_completed_trades": 473.0,
     "turnover_annual": 220.7385446810337
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09028168341034326,
+    "cagr": 0.0443453475607285,
+    "sharpe": 1.2297518877435087,
+    "max_drawdown": -0.038765336851986465,
+    "exposure": 0.18080357142857142,
+    "win_rate": 0.45535714285714285,
+    "profit_factor": 1.3291718601316125,
+    "n_completed_trades": 224.0,
+    "turnover_annual": 233.54115535578853
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 236,
@@ -2270,8 +2440,18 @@
     "n_completed_trades": 815.0,
     "turnover_annual": 382.8210294231023
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.12709089704727328,
+    "cagr": 0.061898420887856576,
+    "sharpe": 1.2894416051989042,
+    "max_drawdown": -0.027912108037867367,
+    "exposure": 0.2905634236453202,
+    "win_rate": 0.47878787878787876,
+    "profit_factor": 1.2848341533763148,
+    "n_completed_trades": 330.0,
+    "turnover_annual": 353.4038536486736
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 360,
@@ -2338,8 +2518,18 @@
     "n_completed_trades": 614.0,
     "turnover_annual": 284.88959563357525
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.043860868431123246,
+    "cagr": 0.02178246490384539,
+    "sharpe": 0.5101170345197461,
+    "max_drawdown": -0.039876374590213426,
+    "exposure": 0.23399014778325122,
+    "win_rate": 0.4684014869888476,
+    "profit_factor": 1.1125748766737138,
+    "n_completed_trades": 268.0,
+    "turnover_annual": 286.25656622125143
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 258,
@@ -2406,8 +2596,18 @@
     "n_completed_trades": 457.0,
     "turnover_annual": 214.19612922444568
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.0698056203929538,
+    "cagr": 0.03445312006968049,
+    "sharpe": 0.9608539486792707,
+    "max_drawdown": -0.026443843859836003,
+    "exposure": 0.19517138752052546,
+    "win_rate": 0.4798206278026906,
+    "profit_factor": 1.2498495428042633,
+    "n_completed_trades": 223.0,
+    "turnover_annual": 233.0812786976427
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 181,
@@ -2474,8 +2674,18 @@
     "n_completed_trades": 515.0,
     "turnover_annual": 239.6589639073412
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09273502527974653,
+    "cagr": 0.045524356727089765,
+    "sharpe": 1.0967795429064355,
+    "max_drawdown": -0.03692510214952538,
+    "exposure": 0.2092826354679803,
+    "win_rate": 0.484,
+    "profit_factor": 1.279311709707097,
+    "n_completed_trades": 250.0,
+    "turnover_annual": 265.1298058027825
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 239,
@@ -2542,8 +2752,18 @@
     "n_completed_trades": 515.0,
     "turnover_annual": 239.6589639073412
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09273502527974653,
+    "cagr": 0.045524356727089765,
+    "sharpe": 1.0967795429064355,
+    "max_drawdown": -0.03692510214952538,
+    "exposure": 0.2092826354679803,
+    "win_rate": 0.484,
+    "profit_factor": 1.279311709707097,
+    "n_completed_trades": 250.0,
+    "turnover_annual": 265.1298058027825
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 239,
@@ -2610,8 +2830,18 @@
     "n_completed_trades": 402.0,
     "turnover_annual": 187.5855529236594
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03893294466232611,
+    "cagr": 0.019358155436469904,
+    "sharpe": 0.6013502447709139,
+    "max_drawdown": -0.04065868649993909,
+    "exposure": 0.16109913793103448,
+    "win_rate": 0.4371859296482412,
+    "profit_factor": 1.1564925804586625,
+    "n_completed_trades": 199.0,
+    "turnover_annual": 208.1107698969753
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 171,
@@ -2678,8 +2908,18 @@
     "n_completed_trades": 473.0,
     "turnover_annual": 220.87098570051148
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09434028496260605,
+    "cagr": 0.046295087390917145,
+    "sharpe": 1.2630532706159712,
+    "max_drawdown": -0.03895993690536803,
+    "exposure": 0.17549261083743842,
+    "win_rate": 0.4611872146118721,
+    "profit_factor": 1.3472492349540972,
+    "n_completed_trades": 219.0,
+    "turnover_annual": 228.09013305577608
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 236,
@@ -2746,8 +2986,18 @@
     "n_completed_trades": 485.0,
     "turnover_annual": 225.4175070772383
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06796722775759934,
+    "cagr": 0.03356037597285377,
+    "sharpe": 0.925836876049286,
+    "max_drawdown": -0.026803210027971813,
+    "exposure": 0.19327278325123154,
+    "win_rate": 0.4751131221719457,
+    "profit_factor": 1.2419573827462733,
+    "n_completed_trades": 221.0,
+    "turnover_annual": 230.3607896019871
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 196,
@@ -2814,8 +3064,18 @@
     "n_completed_trades": 444.0,
     "turnover_annual": 206.72344570080722
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07927259142318288,
+    "cagr": 0.03903833821682601,
+    "sharpe": 1.143916437585979,
+    "max_drawdown": -0.03793601583593509,
+    "exposure": 0.16294642857142858,
+    "win_rate": 0.465,
+    "profit_factor": 1.32145824170454,
+    "n_completed_trades": 200.0,
+    "turnover_annual": 208.5352403630585
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 232,
@@ -2882,9 +3142,21 @@
     "n_completed_trades": 392.0,
     "turnover_annual": 182.8653553725814
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": 0.02065467078761607,
+    "cagr": 0.010315697066336504,
+    "sharpe": 0.2941910960212805,
+    "max_drawdown": -0.04689723051469952,
+    "exposure": 0.1512212643678161,
+    "win_rate": 0.4689265536723164,
+    "profit_factor": 1.0855205405536004,
+    "n_completed_trades": 177.0,
+    "turnover_annual": 183.13840248713524
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.294 < 0.3"
+   ],
    "exits": {
     "trail": 159,
     "eod": 233,
@@ -2950,9 +3222,21 @@
     "n_completed_trades": 392.0,
     "turnover_annual": 182.8653553725814
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": 0.02065467078761607,
+    "cagr": 0.010315697066336504,
+    "sharpe": 0.2941910960212805,
+    "max_drawdown": -0.04689723051469952,
+    "exposure": 0.1512212643678161,
+    "win_rate": 0.4689265536723164,
+    "profit_factor": 1.0855205405536004,
+    "n_completed_trades": 177.0,
+    "turnover_annual": 183.13840248713524
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.294 < 0.3"
+   ],
    "exits": {
     "trail": 159,
     "eod": 233,
@@ -3018,8 +3302,18 @@
     "n_completed_trades": 658.0,
     "turnover_annual": 305.0789803610342
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06383190175338971,
+    "cagr": 0.03154941404481426,
+    "sharpe": 0.7505535000812551,
+    "max_drawdown": -0.03884906346007733,
+    "exposure": 0.22067426108374386,
+    "win_rate": 0.40836012861736337,
+    "profit_factor": 1.1669939875107367,
+    "n_completed_trades": 311.0,
+    "turnover_annual": 326.7294165689447
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 377,
@@ -3086,8 +3380,18 @@
     "n_completed_trades": 737.0,
     "turnover_annual": 341.0659673358768
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.0782552249567996,
+    "cagr": 0.038546551673806384,
+    "sharpe": 0.8209472219076874,
+    "max_drawdown": -0.048651913306952954,
+    "exposure": 0.2720135467980296,
+    "win_rate": 0.4603174603174603,
+    "profit_factor": 1.1851757297251297,
+    "n_completed_trades": 315.0,
+    "turnover_annual": 328.37198437690535
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 358,
@@ -3154,8 +3458,18 @@
     "n_completed_trades": 737.0,
     "turnover_annual": 341.0659673358768
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.0782552249567996,
+    "cagr": 0.038546551673806384,
+    "sharpe": 0.8209472219076874,
+    "max_drawdown": -0.048651913306952954,
+    "exposure": 0.2720135467980296,
+    "win_rate": 0.4603174603174603,
+    "profit_factor": 1.1851757297251297,
+    "n_completed_trades": 315.0,
+    "turnover_annual": 328.37198437690535
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 358,
@@ -3222,8 +3536,18 @@
     "n_completed_trades": 400.0,
     "turnover_annual": 185.75404550128079
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08835851724548305,
+    "cagr": 0.043420202293072974,
+    "sharpe": 1.2701216326649793,
+    "max_drawdown": -0.022356344217611346,
+    "exposure": 0.15347906403940886,
+    "win_rate": 0.48936170212765956,
+    "profit_factor": 1.38367010887178,
+    "n_completed_trades": 188.0,
+    "turnover_annual": 196.80424520754275
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 209,
@@ -3290,8 +3614,18 @@
     "n_completed_trades": 603.0,
     "turnover_annual": 280.57369639611784
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06916526015945101,
+    "cagr": 0.03414224072929084,
+    "sharpe": 0.8511888317913351,
+    "max_drawdown": -0.037189308516832664,
+    "exposure": 0.21197660098522167,
+    "win_rate": 0.43309859154929575,
+    "profit_factor": 1.1969891933172228,
+    "n_completed_trades": 284.0,
+    "turnover_annual": 294.6114147518747
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 322,
@@ -3358,8 +3692,18 @@
     "n_completed_trades": 685.0,
     "turnover_annual": 319.05999788575434
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.02597741013263355,
+    "cagr": 0.012957177737189074,
+    "sharpe": 0.41143324601637465,
+    "max_drawdown": -0.029903467271962136,
+    "exposure": 0.14311371100164202,
+    "win_rate": 0.3393939393939394,
+    "profit_factor": 1.0932045495819684,
+    "n_completed_trades": 330.0,
+    "turnover_annual": 345.62558747258583
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 503,
@@ -3426,8 +3770,18 @@
     "n_completed_trades": 397.0,
     "turnover_annual": 184.0938384007131
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09249754858039139,
+    "cagr": 0.045410289568812434,
+    "sharpe": 1.3170835305919555,
+    "max_drawdown": -0.02359749764320196,
+    "exposure": 0.14906609195402298,
+    "win_rate": 0.4891304347826087,
+    "profit_factor": 1.4094020140807415,
+    "n_completed_trades": 184.0,
+    "turnover_annual": 192.5445811743843
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 206,
@@ -3494,8 +3848,18 @@
     "n_completed_trades": 487.0,
     "turnover_annual": 226.55279433615675
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06592689684527087,
+    "cagr": 0.03256867187461698,
+    "sharpe": 0.8983610948670963,
+    "max_drawdown": -0.025703253652557767,
+    "exposure": 0.1969673645320197,
+    "win_rate": 0.46846846846846846,
+    "profit_factor": 1.234819878856576,
+    "n_completed_trades": 222.0,
+    "turnover_annual": 230.89455496275156
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 199,
@@ -3562,8 +3926,18 @@
     "n_completed_trades": 443.0,
     "turnover_annual": 206.21174014665667
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08185781599145048,
+    "cagr": 0.040286976712335054,
+    "sharpe": 1.1689094268966715,
+    "max_drawdown": -0.03874369135431699,
+    "exposure": 0.15807163382594416,
+    "win_rate": 0.4619289340101523,
+    "profit_factor": 1.3345327311529107,
+    "n_completed_trades": 197.0,
+    "turnover_annual": 205.22196902132833
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 231,
@@ -3630,8 +4004,18 @@
     "n_completed_trades": 985.0,
     "turnover_annual": 461.25068641566986
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08664446525826475,
+    "cagr": 0.0425949656837723,
+    "sharpe": 0.8193192706159204,
+    "max_drawdown": -0.03432955651841263,
+    "exposure": 0.3425184729064039,
+    "win_rate": 0.44282238442822386,
+    "profit_factor": 1.1564406418720015,
+    "n_completed_trades": 411.0,
+    "turnover_annual": 437.47680294739746
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 468,
@@ -3698,8 +4082,18 @@
     "n_completed_trades": 685.0,
     "turnover_annual": 318.8726915133557
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.026061797794973085,
+    "cagr": 0.012999001217857575,
+    "sharpe": 0.4125872463194399,
+    "max_drawdown": -0.029931692519720166,
+    "exposure": 0.1557112068965517,
+    "win_rate": 0.3393939393939394,
+    "profit_factor": 1.0935769432879259,
+    "n_completed_trades": 330.0,
+    "turnover_annual": 345.0889197451339
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 503,
@@ -3766,8 +4160,18 @@
     "n_completed_trades": 672.0,
     "turnover_annual": 314.0469017067862
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07253409994287718,
+    "cagr": 0.035776693135695536,
+    "sharpe": 0.7742384913829197,
+    "max_drawdown": -0.04000019057541071,
+    "exposure": 0.26785714285714285,
+    "win_rate": 0.49825783972125437,
+    "profit_factor": 1.1736455750650279,
+    "n_completed_trades": 286.0,
+    "turnover_annual": 304.4366992182933
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 258,
@@ -3834,8 +4238,18 @@
     "n_completed_trades": 672.0,
     "turnover_annual": 314.0469017067862
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07253409994287718,
+    "cagr": 0.035776693135695536,
+    "sharpe": 0.7742384913829197,
+    "max_drawdown": -0.04000019057541071,
+    "exposure": 0.26785714285714285,
+    "win_rate": 0.49825783972125437,
+    "profit_factor": 1.1736455750650279,
+    "n_completed_trades": 286.0,
+    "turnover_annual": 304.4366992182933
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 258,
@@ -3902,8 +4316,18 @@
     "n_completed_trades": 1053.0,
     "turnover_annual": 492.63100816271066
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.10221999205780863,
+    "cagr": 0.05007021928684918,
+    "sharpe": 0.95935755003885,
+    "max_drawdown": -0.02851007109004744,
+    "exposure": 0.34395525451559933,
+    "win_rate": 0.45083932853717024,
+    "profit_factor": 1.1822920061869233,
+    "n_completed_trades": 417.0,
+    "turnover_annual": 440.1934851838968
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 506,
@@ -3970,8 +4394,18 @@
     "n_completed_trades": 534.0,
     "turnover_annual": 250.9246496951578
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03428653352007682,
+    "cagr": 0.017067086300655898,
+    "sharpe": 0.4277062684595051,
+    "max_drawdown": -0.03555725818639355,
+    "exposure": 0.20448481116584566,
+    "win_rate": 0.4765957446808511,
+    "profit_factor": 1.1012852046716946,
+    "n_completed_trades": 235.0,
+    "turnover_annual": 245.4336287139832
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 205,
@@ -4038,8 +4472,18 @@
     "n_completed_trades": 698.0,
     "turnover_annual": 324.0109395842117
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.058049323739064906,
+    "cagr": 0.02873087298737298,
+    "sharpe": 0.6822614907280827,
+    "max_drawdown": -0.04197046535735105,
+    "exposure": 0.2193401067323481,
+    "win_rate": 0.40390879478827363,
+    "profit_factor": 1.1514145291830697,
+    "n_completed_trades": 307.0,
+    "turnover_annual": 323.6210211640556
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 406,
@@ -4106,8 +4550,18 @@
     "n_completed_trades": 1007.0,
     "turnover_annual": 470.492768047083
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.1265894228243971,
+    "cagr": 0.061661219299179004,
+    "sharpe": 1.128140747529635,
+    "max_drawdown": -0.03615432891475934,
+    "exposure": 0.3224291871921182,
+    "win_rate": 0.42789598108747046,
+    "profit_factor": 1.231672403447442,
+    "n_completed_trades": 422.0,
+    "turnover_annual": 446.69170004808944
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 579,
@@ -4174,8 +4628,18 @@
     "n_completed_trades": 307.0,
     "turnover_annual": 142.91977909830618
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07955714308673922,
+    "cagr": 0.03917584681924646,
+    "sharpe": 1.368447257521157,
+    "max_drawdown": -0.02474336945986433,
+    "exposure": 0.1261545566502463,
+    "win_rate": 0.5033557046979866,
+    "profit_factor": 1.4741442272003449,
+    "n_completed_trades": 149.0,
+    "turnover_annual": 155.996587186105
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 120,
@@ -4242,8 +4706,18 @@
     "n_completed_trades": 990.0,
     "turnover_annual": 465.5846334731438
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.12596267918122295,
+    "cagr": 0.061364690267727395,
+    "sharpe": 1.1191128842660554,
+    "max_drawdown": -0.044332121248698675,
+    "exposure": 0.34685447454844004,
+    "win_rate": 0.4345679012345679,
+    "profit_factor": 1.2256680033583645,
+    "n_completed_trades": 405.0,
+    "turnover_annual": 428.37180992845555
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 470,
@@ -4310,8 +4784,18 @@
     "n_completed_trades": 535.0,
     "turnover_annual": 250.89814533467057
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.02849713102457052,
+    "cagr": 0.01420524274269419,
+    "sharpe": 0.35802880611659776,
+    "max_drawdown": -0.039420036833196725,
+    "exposure": 0.208435960591133,
+    "win_rate": 0.4745762711864407,
+    "profit_factor": 1.083610477122052,
+    "n_completed_trades": 236.0,
+    "turnover_annual": 246.98189819444107
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 205,
@@ -4378,8 +4862,18 @@
     "n_completed_trades": 876.0,
     "turnover_annual": 409.2083862633568
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07156249403790427,
+    "cagr": 0.03530556396766715,
+    "sharpe": 0.7345539486500247,
+    "max_drawdown": -0.03783711585041072,
+    "exposure": 0.29679802955665024,
+    "win_rate": 0.4220430107526882,
+    "profit_factor": 1.1425994152248895,
+    "n_completed_trades": 371.0,
+    "turnover_annual": 395.60682548409903
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 447,
@@ -4446,8 +4940,18 @@
     "n_completed_trades": 653.0,
     "turnover_annual": 305.4129774898666
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08221219667797919,
+    "cagr": 0.04045802330384318,
+    "sharpe": 0.8793383346943391,
+    "max_drawdown": -0.039422086991875216,
+    "exposure": 0.26000615763546797,
+    "win_rate": 0.49097472924187724,
+    "profit_factor": 1.204189601512063,
+    "n_completed_trades": 276.0,
+    "turnover_annual": 292.9351181732834
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 252,
@@ -4514,8 +5018,18 @@
     "n_completed_trades": 653.0,
     "turnover_annual": 305.4129774898666
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08221219667797919,
+    "cagr": 0.04045802330384318,
+    "sharpe": 0.8793383346943391,
+    "max_drawdown": -0.039422086991875216,
+    "exposure": 0.26000615763546797,
+    "win_rate": 0.49097472924187724,
+    "profit_factor": 1.204189601512063,
+    "n_completed_trades": 276.0,
+    "turnover_annual": 292.9351181732834
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 252,
@@ -4582,8 +5096,18 @@
     "n_completed_trades": 701.0,
     "turnover_annual": 325.6271812044692
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06605834871109795,
+    "cagr": 0.0326325926105373,
+    "sharpe": 0.7795964978889601,
+    "max_drawdown": -0.04060450169737273,
+    "exposure": 0.22798645320197045,
+    "win_rate": 0.4110032362459547,
+    "profit_factor": 1.1742441209406496,
+    "n_completed_trades": 309.0,
+    "turnover_annual": 326.82690315840955
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 409,
@@ -4650,8 +5174,18 @@
     "n_completed_trades": 367.0,
     "turnover_annual": 170.41714738532627
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07374232127186264,
+    "cagr": 0.03636226011243049,
+    "sharpe": 1.1749965890727085,
+    "max_drawdown": -0.043361691819836734,
+    "exposure": 0.14562807881773399,
+    "win_rate": 0.46107784431137727,
+    "profit_factor": 1.3651162555702636,
+    "n_completed_trades": 167.0,
+    "turnover_annual": 174.27961163424473
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 145,
@@ -4718,8 +5252,18 @@
     "n_completed_trades": 344.0,
     "turnover_annual": 158.89331821844777
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.05917276236919644,
+    "cagr": 0.02927905812629672,
+    "sharpe": 0.9772658984783285,
+    "max_drawdown": -0.04506248492159226,
+    "exposure": 0.14201046798029557,
+    "win_rate": 0.4601226993865031,
+    "profit_factor": 1.2868620328757003,
+    "n_completed_trades": 163.0,
+    "turnover_annual": 168.95445191673178
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 133,
@@ -4786,8 +5330,18 @@
     "n_completed_trades": 789.0,
     "turnover_annual": 369.86066751517427
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09757905263745692,
+    "cagr": 0.0478483994841159,
+    "sharpe": 0.9604682060894946,
+    "max_drawdown": -0.032344919502195646,
+    "exposure": 0.28789511494252873,
+    "win_rate": 0.4481707317073171,
+    "profit_factor": 1.2163251066320042,
+    "n_completed_trades": 328.0,
+    "turnover_annual": 345.0542951729493
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 353,
@@ -4854,8 +5408,18 @@
     "n_completed_trades": 541.0,
     "turnover_annual": 251.25980427888413
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07482245458763082,
+    "cagr": 0.036885471225678756,
+    "sharpe": 0.8721365493009945,
+    "max_drawdown": -0.027084135655836894,
+    "exposure": 0.20966748768472906,
+    "win_rate": 0.49377593360995853,
+    "profit_factor": 1.2279780351220573,
+    "n_completed_trades": 241.0,
+    "turnover_annual": 253.22910092834206
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 243,
@@ -4922,8 +5486,18 @@
     "n_completed_trades": 541.0,
     "turnover_annual": 251.25980427888413
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07482245458763082,
+    "cagr": 0.036885471225678756,
+    "sharpe": 0.8721365493009945,
+    "max_drawdown": -0.027084135655836894,
+    "exposure": 0.20966748768472906,
+    "win_rate": 0.49377593360995853,
+    "profit_factor": 1.2279780351220573,
+    "n_completed_trades": 241.0,
+    "turnover_annual": 253.22910092834206
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 243,
@@ -4990,8 +5564,18 @@
     "n_completed_trades": 307.0,
     "turnover_annual": 142.83598698383983
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06990107710664639,
+    "cagr": 0.034499454048107836,
+    "sharpe": 1.1710876171729852,
+    "max_drawdown": -0.03191711144606657,
+    "exposure": 0.12364018883415435,
+    "win_rate": 0.5067567567567568,
+    "profit_factor": 1.3989485914115793,
+    "n_completed_trades": 148.0,
+    "turnover_annual": 155.0716155239294
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 120,
@@ -5058,8 +5642,18 @@
     "n_completed_trades": 766.0,
     "turnover_annual": 356.9658074134683
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.12017734209332187,
+    "cagr": 0.05862360309525805,
+    "sharpe": 1.16361165785228,
+    "max_drawdown": -0.038685940662190554,
+    "exposure": 0.2713208128078818,
+    "win_rate": 0.4646153846153846,
+    "profit_factor": 1.2662785784704944,
+    "n_completed_trades": 325.0,
+    "turnover_annual": 346.69962066500597
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 374,
@@ -5126,8 +5720,18 @@
     "n_completed_trades": 766.0,
     "turnover_annual": 356.9658074134683
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.12017734209332187,
+    "cagr": 0.05862360309525805,
+    "sharpe": 1.16361165785228,
+    "max_drawdown": -0.038685940662190554,
+    "exposure": 0.2713208128078818,
+    "win_rate": 0.4646153846153846,
+    "profit_factor": 1.2662785784704944,
+    "n_completed_trades": 325.0,
+    "turnover_annual": 346.69962066500597
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 374,
@@ -5194,8 +5798,18 @@
     "n_completed_trades": 841.0,
     "turnover_annual": 392.532231423297
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08722226826146606,
+    "cagr": 0.04287322344022071,
+    "sharpe": 1.1287880515267108,
+    "max_drawdown": -0.03275028536896529,
+    "exposure": 0.19258004926108374,
+    "win_rate": 0.3425692695214106,
+    "profit_factor": 1.2625836461111142,
+    "n_completed_trades": 397.0,
+    "turnover_annual": 413.71868590578845
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 610,
@@ -5262,8 +5876,18 @@
     "n_completed_trades": 1332.0,
     "turnover_annual": 628.5283901185078
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.18749414987550939,
+    "cagr": 0.09009515066851703,
+    "sharpe": 1.439042509280196,
+    "max_drawdown": -0.028856656308507533,
+    "exposure": 0.4418103448275862,
+    "win_rate": 0.43613138686131386,
+    "profit_factor": 1.249199131640987,
+    "n_completed_trades": 548.0,
+    "turnover_annual": 584.3049108621641
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 749,
@@ -5330,8 +5954,18 @@
     "n_completed_trades": 1332.0,
     "turnover_annual": 628.5283901185078
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.18749414987550939,
+    "cagr": 0.09009515066851703,
+    "sharpe": 1.439042509280196,
+    "max_drawdown": -0.028856656308507533,
+    "exposure": 0.4418103448275862,
+    "win_rate": 0.43613138686131386,
+    "profit_factor": 1.249199131640987,
+    "n_completed_trades": 548.0,
+    "turnover_annual": 584.3049108621641
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 749,
@@ -5398,8 +6032,18 @@
     "n_completed_trades": 794.0,
     "turnover_annual": 372.2765388753163
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09682345492387645,
+    "cagr": 0.04748621939679021,
+    "sharpe": 0.9496125591781304,
+    "max_drawdown": -0.028758363928481523,
+    "exposure": 0.29464285714285715,
+    "win_rate": 0.4481707317073171,
+    "profit_factor": 1.2138961014347176,
+    "n_completed_trades": 328.0,
+    "turnover_annual": 345.94818304029576
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 359,
@@ -5466,8 +6110,18 @@
     "n_completed_trades": 842.0,
     "turnover_annual": 393.8997056701894
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09272327766004751,
+    "cagr": 0.04551871428440779,
+    "sharpe": 1.1972594191263932,
+    "max_drawdown": -0.03206568186654868,
+    "exposure": 0.20681958128078817,
+    "win_rate": 0.34760705289672544,
+    "profit_factor": 1.2808145464380498,
+    "n_completed_trades": 397.0,
+    "turnover_annual": 414.1576446744659
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 612,
@@ -5534,8 +6188,18 @@
     "n_completed_trades": 995.0,
     "turnover_annual": 467.7171320990804
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.12782840967456144,
+    "cagr": 0.06224717518870437,
+    "sharpe": 1.1264597795713671,
+    "max_drawdown": -0.04193266509307192,
+    "exposure": 0.3560652709359606,
+    "win_rate": 0.43349753694581283,
+    "profit_factor": 1.2293806745648257,
+    "n_completed_trades": 405.0,
+    "turnover_annual": 428.77677026685257
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 477,
@@ -5602,8 +6266,18 @@
     "n_completed_trades": 1100.0,
     "turnover_annual": 511.6174297007683
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06436719721485096,
+    "cagr": 0.03180994120652314,
+    "sharpe": 0.6715239622392163,
+    "max_drawdown": -0.027126594214369804,
+    "exposure": 0.29733682266009853,
+    "win_rate": 0.3696581196581197,
+    "profit_factor": 1.1243534131999235,
+    "n_completed_trades": 468.0,
+    "turnover_annual": 488.14510970370986
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 669,
@@ -5670,8 +6344,18 @@
     "n_completed_trades": 1226.0,
     "turnover_annual": 575.0745683884327
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.20628232200998298,
+    "cagr": 0.09871924238864449,
+    "sharpe": 1.6606493842539818,
+    "max_drawdown": -0.046953970530708045,
+    "exposure": 0.4123050082101806,
+    "win_rate": 0.43775933609958506,
+    "profit_factor": 1.3222914935232868,
+    "n_completed_trades": 482.0,
+    "turnover_annual": 516.5042727381593
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 622,
@@ -5738,8 +6422,18 @@
     "n_completed_trades": 1233.0,
     "turnover_annual": 576.4756579333516
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.11773751563040413,
+    "cagr": 0.05746550250897764,
+    "sharpe": 1.055241885998813,
+    "max_drawdown": -0.02704837510620217,
+    "exposure": 0.31945299671592775,
+    "win_rate": 0.38095238095238093,
+    "profit_factor": 1.2041637960730278,
+    "n_completed_trades": 525.0,
+    "turnover_annual": 556.5322704129118
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 803,
@@ -5806,8 +6500,18 @@
     "n_completed_trades": 1233.0,
     "turnover_annual": 576.4756579333516
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.11773751563040413,
+    "cagr": 0.05746550250897764,
+    "sharpe": 1.055241885998813,
+    "max_drawdown": -0.02704837510620217,
+    "exposure": 0.31945299671592775,
+    "win_rate": 0.38095238095238093,
+    "profit_factor": 1.2041637960730278,
+    "n_completed_trades": 525.0,
+    "turnover_annual": 556.5322704129118
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 803,
@@ -5874,8 +6578,18 @@
     "n_completed_trades": 1100.0,
     "turnover_annual": 512.0796156566148
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06254034045041545,
+    "cagr": 0.030920544989099907,
+    "sharpe": 0.6551384220688058,
+    "max_drawdown": -0.02730588830306846,
+    "exposure": 0.31134544334975367,
+    "win_rate": 0.36752136752136755,
+    "profit_factor": 1.1209850983070624,
+    "n_completed_trades": 468.0,
+    "turnover_annual": 489.6450946551504
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 670,
@@ -5942,8 +6656,18 @@
     "n_completed_trades": 1205.0,
     "turnover_annual": 567.045634512443
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.1897423653047079,
+    "cagr": 0.09113068162016003,
+    "sharpe": 1.5821083155642983,
+    "max_drawdown": -0.037729748887695425,
+    "exposure": 0.4053776683087028,
+    "win_rate": 0.44017094017094016,
+    "profit_factor": 1.2959497448709096,
+    "n_completed_trades": 468.0,
+    "turnover_annual": 496.42194454869303
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 609,
@@ -6010,8 +6734,18 @@
     "n_completed_trades": 556.0,
     "turnover_annual": 259.01558471951324
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.035592524462942254,
+    "cagr": 0.0177115659880267,
+    "sharpe": 0.6375918266552306,
+    "max_drawdown": -0.031098131330738688,
+    "exposure": 0.13793103448275862,
+    "win_rate": 0.33579335793357934,
+    "profit_factor": 1.1610993195295918,
+    "n_completed_trades": 271.0,
+    "turnover_annual": 281.5951266985329
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 374,
@@ -6078,8 +6812,18 @@
     "n_completed_trades": 1440.0,
     "turnover_annual": 672.7878270882608
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.16157375331912305,
+    "cagr": 0.0780849178301255,
+    "sharpe": 1.208230890485785,
+    "max_drawdown": -0.03360189647551737,
+    "exposure": 0.47757594417077176,
+    "win_rate": 0.4117647058823529,
+    "profit_factor": 1.2118917250478751,
+    "n_completed_trades": 578.0,
+    "turnover_annual": 611.5066371653344
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 761,
@@ -6146,8 +6890,18 @@
     "n_completed_trades": 311.0,
     "turnover_annual": 143.4893741796103
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06586248132176853,
+    "cagr": 0.032537347282625806,
+    "sharpe": 1.1209731167063222,
+    "max_drawdown": -0.03228177195087589,
+    "exposure": 0.12946428571428573,
+    "win_rate": 0.5031446540880503,
+    "profit_factor": 1.3703641550595738,
+    "n_completed_trades": 159.0,
+    "turnover_annual": 163.7061539286895
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 157,
@@ -6214,8 +6968,18 @@
     "n_completed_trades": 585.0,
     "turnover_annual": 272.1169879191024
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07688397958746718,
+    "cagr": 0.03788333721492876,
+    "sharpe": 0.9600102534767305,
+    "max_drawdown": -0.04350715737455957,
+    "exposure": 0.20879515599343185,
+    "win_rate": 0.4801587301587302,
+    "profit_factor": 1.246854246244523,
+    "n_completed_trades": 252.0,
+    "turnover_annual": 263.8178233756307
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 275,
@@ -6282,8 +7046,18 @@
     "n_completed_trades": 585.0,
     "turnover_annual": 272.1169879191024
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07688397958746718,
+    "cagr": 0.03788333721492876,
+    "sharpe": 0.9600102534767305,
+    "max_drawdown": -0.04350715737455957,
+    "exposure": 0.20879515599343185,
+    "win_rate": 0.4801587301587302,
+    "profit_factor": 1.246854246244523,
+    "n_completed_trades": 252.0,
+    "turnover_annual": 263.8178233756307
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 275,
@@ -6350,8 +7124,18 @@
     "n_completed_trades": 634.0,
     "turnover_annual": 296.6328903650435
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.078335845571331,
+    "cagr": 0.03858553144084231,
+    "sharpe": 1.0112994979192609,
+    "max_drawdown": -0.026746535311625852,
+    "exposure": 0.19427339901477833,
+    "win_rate": 0.4181184668989547,
+    "profit_factor": 1.2587442139947043,
+    "n_completed_trades": 287.0,
+    "turnover_annual": 298.5929148960527
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 382,
@@ -6418,8 +7202,18 @@
     "n_completed_trades": 634.0,
     "turnover_annual": 296.6328903650435
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.078335845571331,
+    "cagr": 0.03858553144084231,
+    "sharpe": 1.0112994979192609,
+    "max_drawdown": -0.026746535311625852,
+    "exposure": 0.19427339901477833,
+    "win_rate": 0.4181184668989547,
+    "profit_factor": 1.2587442139947043,
+    "n_completed_trades": 287.0,
+    "turnover_annual": 298.5929148960527
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 382,
@@ -6486,8 +7280,18 @@
     "n_completed_trades": 919.0,
     "turnover_annual": 432.190472320842
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.18149676180573393,
+    "cagr": 0.08732795988504605,
+    "sharpe": 1.5961807289149288,
+    "max_drawdown": -0.03140892252279148,
+    "exposure": 0.3340260673234811,
+    "win_rate": 0.45144356955380577,
+    "profit_factor": 1.340018762622943,
+    "n_completed_trades": 381.0,
+    "turnover_annual": 409.2715685144861
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 430,
@@ -6554,8 +7358,18 @@
     "n_completed_trades": 677.0,
     "turnover_annual": 315.728488463743
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.10661440354315554,
+    "cagr": 0.05216972519302954,
+    "sharpe": 1.5778067257365347,
+    "max_drawdown": -0.025212345500948974,
+    "exposure": 0.18226600985221675,
+    "win_rate": 0.34796238244514105,
+    "profit_factor": 1.4135539240079926,
+    "n_completed_trades": 319.0,
+    "turnover_annual": 335.0825183277526
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 445,
@@ -6622,8 +7436,18 @@
     "n_completed_trades": 897.0,
     "turnover_annual": 418.7237158737808
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.13868422768468402,
+    "cagr": 0.0673675855214746,
+    "sharpe": 1.2633090264800186,
+    "max_drawdown": -0.041071879272675416,
+    "exposure": 0.3174004515599343,
+    "win_rate": 0.45135135135135135,
+    "profit_factor": 1.2630788735007439,
+    "n_completed_trades": 370.0,
+    "turnover_annual": 391.5316212481459
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 426,
@@ -6690,8 +7514,18 @@
     "n_completed_trades": 1503.0,
     "turnover_annual": 704.5157035903112
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.18627898143894228,
+    "cagr": 0.08953503601242585,
+    "sharpe": 1.4226576489058362,
+    "max_drawdown": -0.041821117596727686,
+    "exposure": 0.4811935550082102,
+    "win_rate": 0.4166666666666667,
+    "profit_factor": 1.2397151071336336,
+    "n_completed_trades": 588.0,
+    "turnover_annual": 625.4895811917024
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 802,
@@ -6758,8 +7592,18 @@
     "n_completed_trades": 1367.0,
     "turnover_annual": 643.4685383805861
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.20452007822513507,
+    "cagr": 0.09791319857885705,
+    "sharpe": 1.565671995352188,
+    "max_drawdown": -0.023324020657208844,
+    "exposure": 0.439065065681445,
+    "win_rate": 0.4338235294117647,
+    "profit_factor": 1.2798538159726618,
+    "n_completed_trades": 544.0,
+    "turnover_annual": 579.6870330334511
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 774,
@@ -6826,8 +7670,18 @@
     "n_completed_trades": 1367.0,
     "turnover_annual": 643.4685383805861
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.20452007822513507,
+    "cagr": 0.09791319857885705,
+    "sharpe": 1.565671995352188,
+    "max_drawdown": -0.023324020657208844,
+    "exposure": 0.439065065681445,
+    "win_rate": 0.4338235294117647,
+    "profit_factor": 1.2798538159726618,
+    "n_completed_trades": 544.0,
+    "turnover_annual": 579.6870330334511
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 774,
@@ -6894,8 +7748,18 @@
     "n_completed_trades": 556.0,
     "turnover_annual": 258.1872661625902
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03542510733811555,
+    "cagr": 0.017628971704588547,
+    "sharpe": 0.6344916177352055,
+    "max_drawdown": -0.031165221110027175,
+    "exposure": 0.12848932676518884,
+    "win_rate": 0.33579335793357934,
+    "profit_factor": 1.1603132158469696,
+    "n_completed_trades": 271.0,
+    "turnover_annual": 281.6289505823993
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 374,
@@ -6962,8 +7826,18 @@
     "n_completed_trades": 1288.0,
     "turnover_annual": 598.3382484931329
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.1712653310774841,
+    "cagr": 0.08259098875799453,
+    "sharpe": 1.4107079155882236,
+    "max_drawdown": -0.033983246749204166,
+    "exposure": 0.3963208128078818,
+    "win_rate": 0.4122137404580153,
+    "profit_factor": 1.2647816166883963,
+    "n_completed_trades": 523.0,
+    "turnover_annual": 554.397404751623
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 785,
@@ -7030,8 +7904,18 @@
     "n_completed_trades": 900.0,
     "turnover_annual": 419.7295400470918
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.14192128238052604,
+    "cagr": 0.06888971104800534,
+    "sharpe": 1.2886946781372461,
+    "max_drawdown": -0.04356651319372251,
+    "exposure": 0.3261237684729064,
+    "win_rate": 0.450402144772118,
+    "profit_factor": 1.2705701078582434,
+    "n_completed_trades": 372.0,
+    "turnover_annual": 394.37378777464534
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 430,
@@ -7098,8 +7982,18 @@
     "n_completed_trades": 312.0,
     "turnover_annual": 143.12317797979935
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.0682079061490577,
+    "cagr": 0.03367729561582866,
+    "sharpe": 1.1568083458917886,
+    "max_drawdown": -0.032938026090680084,
+    "exposure": 0.12574404761904762,
+    "win_rate": 0.4968152866242038,
+    "profit_factor": 1.3882827030378178,
+    "n_completed_trades": 157.0,
+    "turnover_annual": 162.24585404682145
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 158,
@@ -7166,8 +8060,18 @@
     "n_completed_trades": 677.0,
     "turnover_annual": 316.2364662390099
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.10461482435879921,
+    "cagr": 0.05121490751822666,
+    "sharpe": 1.538489209289894,
+    "max_drawdown": -0.025135370129502954,
+    "exposure": 0.17223419540229884,
+    "win_rate": 0.34796238244514105,
+    "profit_factor": 1.4025742574257425,
+    "n_completed_trades": 319.0,
+    "turnover_annual": 333.41306618440865
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 445,
@@ -7234,8 +8138,18 @@
     "n_completed_trades": 901.0,
     "turnover_annual": 421.01297234292434
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.13900422092253373,
+    "cagr": 0.06751814841153791,
+    "sharpe": 1.2532407707194275,
+    "max_drawdown": -0.027300679229600333,
+    "exposure": 0.31355192939244664,
+    "win_rate": 0.4540540540540541,
+    "profit_factor": 1.2851665163332804,
+    "n_completed_trades": 370.0,
+    "turnover_annual": 388.6209767034078
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 463,
@@ -7302,8 +8216,18 @@
     "n_completed_trades": 901.0,
     "turnover_annual": 421.01297234292434
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.13900422092253373,
+    "cagr": 0.06751814841153791,
+    "sharpe": 1.2532407707194275,
+    "max_drawdown": -0.027300679229600333,
+    "exposure": 0.31355192939244664,
+    "win_rate": 0.4540540540540541,
+    "profit_factor": 1.2851665163332804,
+    "n_completed_trades": 370.0,
+    "turnover_annual": 388.6209767034078
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 463,
@@ -7370,8 +8294,18 @@
     "n_completed_trades": 563.0,
     "turnover_annual": 263.09770472761477
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07307077251107108,
+    "cagr": 0.03603683314105344,
+    "sharpe": 1.074296586226533,
+    "max_drawdown": -0.025356006094341632,
+    "exposure": 0.1790332512315271,
+    "win_rate": 0.40476190476190477,
+    "profit_factor": 1.2885607183049557,
+    "n_completed_trades": 252.0,
+    "turnover_annual": 259.7810304293251
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 311,
@@ -7438,8 +8372,18 @@
     "n_completed_trades": 563.0,
     "turnover_annual": 263.0459864113294
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07395968223543381,
+    "cagr": 0.036467569722094195,
+    "sharpe": 1.081898790197524,
+    "max_drawdown": -0.024876316554147127,
+    "exposure": 0.1725933908045977,
+    "win_rate": 0.4087301587301587,
+    "profit_factor": 1.290869323088595,
+    "n_completed_trades": 252.0,
+    "turnover_annual": 259.581319206313
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 311,
@@ -7506,8 +8450,18 @@
     "n_completed_trades": 922.0,
     "turnover_annual": 433.68097388944875
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.17917759374095032,
+    "cagr": 0.08625602231417662,
+    "sharpe": 1.5893108404678224,
+    "max_drawdown": -0.03273245875059483,
+    "exposure": 0.34313423645320196,
+    "win_rate": 0.4505208333333333,
+    "profit_factor": 1.339694633075078,
+    "n_completed_trades": 383.0,
+    "turnover_annual": 409.0316019080903
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 436,
@@ -7574,8 +8528,18 @@
     "n_completed_trades": 1039.0,
     "turnover_annual": 487.29953126554653
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.13780374682490826,
+    "cagr": 0.06695319378015907,
+    "sharpe": 1.1844007118834508,
+    "max_drawdown": -0.04818726771725945,
+    "exposure": 0.39039408866995073,
+    "win_rate": 0.47058823529411764,
+    "profit_factor": 1.231870654923229,
+    "n_completed_trades": 407.0,
+    "turnover_annual": 433.66385459173176
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 452,
@@ -7642,8 +8606,18 @@
     "n_completed_trades": 1039.0,
     "turnover_annual": 487.29953126554653
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.13780374682490826,
+    "cagr": 0.06695319378015907,
+    "sharpe": 1.1844007118834508,
+    "max_drawdown": -0.04818726771725945,
+    "exposure": 0.39039408866995073,
+    "win_rate": 0.47058823529411764,
+    "profit_factor": 1.231870654923229,
+    "n_completed_trades": 407.0,
+    "turnover_annual": 433.66385459173176
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 452,
@@ -7710,8 +8684,18 @@
     "n_completed_trades": 561.0,
     "turnover_annual": 260.67255857058944
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03611550988911261,
+    "cagr": 0.017969535042396734,
+    "sharpe": 0.4254557926058743,
+    "max_drawdown": -0.04700763224213078,
+    "exposure": 0.22983374384236452,
+    "win_rate": 0.47035573122529645,
+    "profit_factor": 1.096549288204309,
+    "n_completed_trades": 252.0,
+    "turnover_annual": 263.3237712031441
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 205,
@@ -7778,8 +8762,18 @@
     "n_completed_trades": 561.0,
     "turnover_annual": 260.67255857058944
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03611550988911261,
+    "cagr": 0.017969535042396734,
+    "sharpe": 0.4254557926058743,
+    "max_drawdown": -0.04700763224213078,
+    "exposure": 0.22983374384236452,
+    "win_rate": 0.47035573122529645,
+    "profit_factor": 1.096549288204309,
+    "n_completed_trades": 252.0,
+    "turnover_annual": 263.3237712031441
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 205,
@@ -7846,8 +8840,18 @@
     "n_completed_trades": 588.0,
     "turnover_annual": 274.76041200353956
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07714402240619145,
+    "cagr": 0.03800914143241951,
+    "sharpe": 0.9881992629763003,
+    "max_drawdown": -0.04077261933137355,
+    "exposure": 0.19488916256157635,
+    "win_rate": 0.4101694915254237,
+    "profit_factor": 1.2502413944447928,
+    "n_completed_trades": 295.0,
+    "turnover_annual": 310.31311632945597
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 357,
@@ -7914,8 +8918,18 @@
     "n_completed_trades": 588.0,
     "turnover_annual": 274.76041200353956
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07714402240619145,
+    "cagr": 0.03800914143241951,
+    "sharpe": 0.9881992629763003,
+    "max_drawdown": -0.04077261933137355,
+    "exposure": 0.19488916256157635,
+    "win_rate": 0.4101694915254237,
+    "profit_factor": 1.2502413944447928,
+    "n_completed_trades": 295.0,
+    "turnover_annual": 310.31311632945597
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 357,
@@ -7982,8 +8996,18 @@
     "n_completed_trades": 1168.0,
     "turnover_annual": 550.3899487817457
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.10400072612811018,
+    "cagr": 0.05092149715713856,
+    "sharpe": 0.93696697856946,
+    "max_drawdown": -0.0426530741668516,
+    "exposure": 0.31870894909688013,
+    "win_rate": 0.37218045112781956,
+    "profit_factor": 1.17674451093157,
+    "n_completed_trades": 532.0,
+    "turnover_annual": 565.9091708108234
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 761,
@@ -8050,8 +9074,18 @@
     "n_completed_trades": 1168.0,
     "turnover_annual": 550.3899487817457
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.10400072612811018,
+    "cagr": 0.05092149715713856,
+    "sharpe": 0.93696697856946,
+    "max_drawdown": -0.0426530741668516,
+    "exposure": 0.31870894909688013,
+    "win_rate": 0.37218045112781956,
+    "profit_factor": 1.17674451093157,
+    "n_completed_trades": 532.0,
+    "turnover_annual": 565.9091708108234
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 761,
@@ -8118,8 +9152,18 @@
     "n_completed_trades": 594.0,
     "turnover_annual": 278.1210102065835
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.045319006543723894,
+    "cagr": 0.022498707809449847,
+    "sharpe": 0.5541035271941023,
+    "max_drawdown": -0.05079292158323867,
+    "exposure": 0.17048953201970443,
+    "win_rate": 0.37668161434977576,
+    "profit_factor": 1.1548615787267023,
+    "n_completed_trades": 222.0,
+    "turnover_annual": 231.78117223462343
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 363,
@@ -8186,8 +9230,18 @@
     "n_completed_trades": 1283.0,
     "turnover_annual": 596.2459762742284
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.1548430538446992,
+    "cagr": 0.07494447285338679,
+    "sharpe": 1.2731754078043056,
+    "max_drawdown": -0.03822550892680676,
+    "exposure": 0.38108066502463056,
+    "win_rate": 0.4091778202676864,
+    "profit_factor": 1.235670537349806,
+    "n_completed_trades": 523.0,
+    "turnover_annual": 551.9144876393403
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 781,
@@ -8254,8 +9308,18 @@
     "n_completed_trades": 592.0,
     "turnover_annual": 276.70385769161436
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.0386399395165411,
+    "cagr": 0.019213830339902538,
+    "sharpe": 0.4770542564182885,
+    "max_drawdown": -0.05075537546471087,
+    "exposure": 0.16394704433497537,
+    "win_rate": 0.38839285714285715,
+    "profit_factor": 1.12998025394921,
+    "n_completed_trades": 224.0,
+    "turnover_annual": 232.22760502266095
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 363,
@@ -8322,8 +9386,18 @@
     "n_completed_trades": 872.0,
     "turnover_annual": 409.2478406818703
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.12309912872771789,
+    "cagr": 0.06000882170979116,
+    "sharpe": 1.2166925518803025,
+    "max_drawdown": -0.03169089920789847,
+    "exposure": 0.26311063218390807,
+    "win_rate": 0.4369747899159664,
+    "profit_factor": 1.2724903888940113,
+    "n_completed_trades": 357.0,
+    "turnover_annual": 374.5219509154977
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 517,
@@ -8390,8 +9464,18 @@
     "n_completed_trades": 776.0,
     "turnover_annual": 362.54092341901156
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03783744505950071,
+    "cagr": 0.018818443024224862,
+    "sharpe": 0.4730630742227507,
+    "max_drawdown": -0.03328437960055175,
+    "exposure": 0.1875,
+    "win_rate": 0.4228571428571429,
+    "profit_factor": 1.1035948029158356,
+    "n_completed_trades": 350.0,
+    "turnover_annual": 366.2497956820217
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 510,
@@ -8458,8 +9542,18 @@
     "n_completed_trades": 776.0,
     "turnover_annual": 362.54092341901156
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03783744505950071,
+    "cagr": 0.018818443024224862,
+    "sharpe": 0.4730630742227507,
+    "max_drawdown": -0.03328437960055175,
+    "exposure": 0.1875,
+    "win_rate": 0.4228571428571429,
+    "profit_factor": 1.1035948029158356,
+    "n_completed_trades": 350.0,
+    "turnover_annual": 366.2497956820217
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 510,
@@ -8526,8 +9620,18 @@
     "n_completed_trades": 927.0,
     "turnover_annual": 434.11526632444674
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09687512092115669,
+    "cagr": 0.047510988377539976,
+    "sharpe": 0.9346353757189061,
+    "max_drawdown": -0.03659330797829152,
+    "exposure": 0.2945145730706076,
+    "win_rate": 0.4175824175824176,
+    "profit_factor": 1.1945140201784017,
+    "n_completed_trades": 364.0,
+    "turnover_annual": 382.58896595089425
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 472,
@@ -8594,8 +9698,18 @@
     "n_completed_trades": 932.0,
     "turnover_annual": 436.53833151078254
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.10210532912587,
+    "cagr": 0.050015381341529386,
+    "sharpe": 0.9916842917325223,
+    "max_drawdown": -0.035809309168310044,
+    "exposure": 0.3034944581280788,
+    "win_rate": 0.410958904109589,
+    "profit_factor": 1.2071375420201846,
+    "n_completed_trades": 365.0,
+    "turnover_annual": 384.0200750396568
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 474,
@@ -8662,8 +9776,18 @@
     "n_completed_trades": 1138.0,
     "turnover_annual": 532.2595838003723
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.1102320236757377,
+    "cagr": 0.0538949916472895,
+    "sharpe": 0.9621521576201318,
+    "max_drawdown": -0.03485972888023825,
+    "exposure": 0.3225831280788177,
+    "win_rate": 0.42572062084257206,
+    "profit_factor": 1.1916909117186862,
+    "n_completed_trades": 451.0,
+    "turnover_annual": 474.29291463378615
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 693,
@@ -8730,8 +9854,18 @@
     "n_completed_trades": 759.0,
     "turnover_annual": 354.9663101123129
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.10133725614317779,
+    "cagr": 0.04964797448584157,
+    "sharpe": 1.002114622023023,
+    "max_drawdown": -0.033730619301854614,
+    "exposure": 0.2774271346469622,
+    "win_rate": 0.46273291925465837,
+    "profit_factor": 1.2186243928177911,
+    "n_completed_trades": 322.0,
+    "turnover_annual": 341.53496065401833
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 346,
@@ -8798,8 +9932,18 @@
     "n_completed_trades": 685.0,
     "turnover_annual": 319.2113137781023
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09164606653149265,
+    "cagr": 0.04500119574008665,
+    "sharpe": 1.034382511067626,
+    "max_drawdown": -0.03372618989538534,
+    "exposure": 0.23591440886699508,
+    "win_rate": 0.4726027397260274,
+    "profit_factor": 1.2389523234761617,
+    "n_completed_trades": 292.0,
+    "turnover_annual": 303.5878192607168
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 364,
@@ -8866,8 +10010,18 @@
     "n_completed_trades": 954.0,
     "turnover_annual": 447.4818091374251
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.17558948346432968,
+    "cagr": 0.08459549882925987,
+    "sharpe": 1.49945299129643,
+    "max_drawdown": -0.032079335445096,
+    "exposure": 0.3783866995073892,
+    "win_rate": 0.4860759493670886,
+    "profit_factor": 1.3130185934227565,
+    "n_completed_trades": 394.0,
+    "turnover_annual": 417.057311532706
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 416,
@@ -8934,8 +10088,18 @@
     "n_completed_trades": 954.0,
     "turnover_annual": 447.4818091374251
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.17558948346432968,
+    "cagr": 0.08459549882925987,
+    "sharpe": 1.49945299129643,
+    "max_drawdown": -0.032079335445096,
+    "exposure": 0.3783866995073892,
+    "win_rate": 0.4860759493670886,
+    "profit_factor": 1.3130185934227565,
+    "n_completed_trades": 394.0,
+    "turnover_annual": 417.057311532706
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 416,
@@ -9002,8 +10166,18 @@
     "n_completed_trades": 450.0,
     "turnover_annual": 210.0182537841405
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.05873700784262925,
+    "cagr": 0.02906646483247588,
+    "sharpe": 0.7526885178373317,
+    "max_drawdown": -0.038791582505068756,
+    "exposure": 0.14870689655172414,
+    "win_rate": 0.4175824175824176,
+    "profit_factor": 1.2286789524733268,
+    "n_completed_trades": 182.0,
+    "turnover_annual": 187.4273769666786
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 243,
@@ -9070,8 +10244,18 @@
     "n_completed_trades": 1095.0,
     "turnover_annual": 512.9869019919241
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.12238828008817348,
+    "cagr": 0.0596719738347653,
+    "sharpe": 1.039550680866945,
+    "max_drawdown": -0.039748070711067784,
+    "exposure": 0.32047926929392445,
+    "win_rate": 0.41685144124168516,
+    "profit_factor": 1.2097462222543562,
+    "n_completed_trades": 451.0,
+    "turnover_annual": 479.2946662070183
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 669,
@@ -9138,8 +10322,18 @@
     "n_completed_trades": 762.0,
     "turnover_annual": 356.1795860907529
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.1063888697867843,
+    "cagr": 0.05206207373875471,
+    "sharpe": 1.05550623989995,
+    "max_drawdown": -0.03385043473790417,
+    "exposure": 0.28417487684729065,
+    "win_rate": 0.4613003095975232,
+    "profit_factor": 1.2324705007750467,
+    "n_completed_trades": 322.0,
+    "turnover_annual": 342.3907487088914
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 351,
@@ -9206,8 +10400,18 @@
     "n_completed_trades": 764.0,
     "turnover_annual": 355.9549041850267
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.1516319051085171,
+    "cagr": 0.07344298673882865,
+    "sharpe": 1.458136365830625,
+    "max_drawdown": -0.02518543693444919,
+    "exposure": 0.2695504926108374,
+    "win_rate": 0.46325878594249204,
+    "profit_factor": 1.359188100670677,
+    "n_completed_trades": 312.0,
+    "turnover_annual": 326.718343453541
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 397,
@@ -9274,8 +10478,18 @@
     "n_completed_trades": 764.0,
     "turnover_annual": 355.9549041850267
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.1516319051085171,
+    "cagr": 0.07344298673882865,
+    "sharpe": 1.458136365830625,
+    "max_drawdown": -0.02518543693444919,
+    "exposure": 0.2695504926108374,
+    "win_rate": 0.46325878594249204,
+    "profit_factor": 1.359188100670677,
+    "n_completed_trades": 312.0,
+    "turnover_annual": 326.718343453541
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 397,
@@ -9342,8 +10556,18 @@
     "n_completed_trades": 940.0,
     "turnover_annual": 438.9544962957363
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.12715017033757814,
+    "cagr": 0.061926454186608026,
+    "sharpe": 1.2025087932325622,
+    "max_drawdown": -0.035015542613302864,
+    "exposure": 0.27670874384236455,
+    "win_rate": 0.44235924932975873,
+    "profit_factor": 1.2659416783200796,
+    "n_completed_trades": 373.0,
+    "turnover_annual": 390.5385397762534
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 558,
@@ -9410,9 +10634,22 @@
     "n_completed_trades": 578.0,
     "turnover_annual": 270.86599488034597
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": -0.0035168049478356833,
+    "cagr": -0.001766956747350168,
+    "sharpe": -0.030090433450557067,
+    "max_drawdown": -0.05036105287677617,
+    "exposure": 0.10668103448275862,
+    "win_rate": 0.275,
+    "profit_factor": 0.9846906469827997,
+    "n_completed_trades": 240.0,
+    "turnover_annual": 247.0899398952445
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0035 <= 0.0",
+    "sharpe -0.030 < 0.3"
+   ],
    "exits": {
     "trail": 434,
     "eod": 144,
@@ -9478,8 +10715,18 @@
     "n_completed_trades": 708.0,
     "turnover_annual": 330.5689352775252
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08039454919340838,
+    "cagr": 0.03958041572043536,
+    "sharpe": 1.064352370679688,
+    "max_drawdown": -0.028715768582366796,
+    "exposure": 0.19473522167487683,
+    "win_rate": 0.42214532871972316,
+    "profit_factor": 1.2689685001588171,
+    "n_completed_trades": 289.0,
+    "turnover_annual": 299.4249673974159
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 448,
@@ -9546,8 +10793,18 @@
     "n_completed_trades": 708.0,
     "turnover_annual": 330.5689352775252
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08039454919340838,
+    "cagr": 0.03958041572043536,
+    "sharpe": 1.064352370679688,
+    "max_drawdown": -0.028715768582366796,
+    "exposure": 0.19473522167487683,
+    "win_rate": 0.42214532871972316,
+    "profit_factor": 1.2689685001588171,
+    "n_completed_trades": 289.0,
+    "turnover_annual": 299.4249673974159
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 448,
@@ -9614,8 +10871,18 @@
     "n_completed_trades": 684.0,
     "turnover_annual": 318.4903453879841
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09006191273396369,
+    "cagr": 0.044239667321281706,
+    "sharpe": 0.9907799661338856,
+    "max_drawdown": -0.031324465090588505,
+    "exposure": 0.2284739326765189,
+    "win_rate": 0.4724137931034483,
+    "profit_factor": 1.2327306918441219,
+    "n_completed_trades": 290.0,
+    "turnover_annual": 301.0161064253847
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 363,
@@ -9682,9 +10949,22 @@
     "n_completed_trades": 578.0,
     "turnover_annual": 270.76000413967597
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": -0.0035404724596862502,
+    "cagr": -0.001778858583249776,
+    "sharpe": -0.030662392584944825,
+    "max_drawdown": -0.051173630892794364,
+    "exposure": 0.09616174055829228,
+    "win_rate": 0.2791666666666667,
+    "profit_factor": 0.9845241501287487,
+    "n_completed_trades": 240.0,
+    "turnover_annual": 247.1318021755878
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0035 <= 0.0",
+    "sharpe -0.031 < 0.3"
+   ],
    "exits": {
     "trail": 433,
     "eod": 145,
@@ -9750,9 +11030,21 @@
     "n_completed_trades": 307.0,
     "turnover_annual": 141.58381609599712
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": 0.0015728319360559517,
+    "cagr": 0.000789240121860102,
+    "sharpe": 0.04005540663271141,
+    "max_drawdown": -0.06221591076721544,
+    "exposure": 0.12358887520525452,
+    "win_rate": 0.463768115942029,
+    "profit_factor": 1.0073924537370824,
+    "n_completed_trades": 138.0,
+    "turnover_annual": 144.829895223087
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.040 < 0.3"
+   ],
    "exits": {
     "trail": 87,
     "eod": 220,
@@ -9818,9 +11110,21 @@
     "n_completed_trades": 307.0,
     "turnover_annual": 141.58381609599712
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": 0.0015728319360559517,
+    "cagr": 0.000789240121860102,
+    "sharpe": 0.04005540663271141,
+    "max_drawdown": -0.06221591076721544,
+    "exposure": 0.12358887520525452,
+    "win_rate": 0.463768115942029,
+    "profit_factor": 1.0073924537370824,
+    "n_completed_trades": 138.0,
+    "turnover_annual": 144.829895223087
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.040 < 0.3"
+   ],
    "exits": {
     "trail": 87,
     "eod": 220,
@@ -9886,8 +11190,18 @@
     "n_completed_trades": 402.0,
     "turnover_annual": 188.9323912591229
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.05561931159362743,
+    "cagr": 0.027544149034872456,
+    "sharpe": 0.7279450212585841,
+    "max_drawdown": -0.045987508388749876,
+    "exposure": 0.1469365763546798,
+    "win_rate": 0.44785276073619634,
+    "profit_factor": 1.2373419866472362,
+    "n_completed_trades": 162.0,
+    "turnover_annual": 168.41763308644082
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 186,
@@ -9954,8 +11268,18 @@
     "n_completed_trades": 402.0,
     "turnover_annual": 188.9323912591229
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.05561931159362743,
+    "cagr": 0.027544149034872456,
+    "sharpe": 0.7279450212585841,
+    "max_drawdown": -0.045987508388749876,
+    "exposure": 0.1469365763546798,
+    "win_rate": 0.44785276073619634,
+    "profit_factor": 1.2373419866472362,
+    "n_completed_trades": 162.0,
+    "turnover_annual": 168.41763308644082
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 186,
@@ -10022,8 +11346,18 @@
     "n_completed_trades": 452.0,
     "turnover_annual": 210.9464035459289
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06399269904642235,
+    "cagr": 0.031627680603645736,
+    "sharpe": 0.8217609188447093,
+    "max_drawdown": -0.03935301776160116,
+    "exposure": 0.15424876847290642,
+    "win_rate": 0.4207650273224044,
+    "profit_factor": 1.2532337760433059,
+    "n_completed_trades": 182.0,
+    "turnover_annual": 188.40724439333638
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 244,
@@ -10090,8 +11424,18 @@
     "n_completed_trades": 721.0,
     "turnover_annual": 335.12184857224184
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.10419443087259306,
+    "cagr": 0.05101405623639632,
+    "sharpe": 1.1475244420337871,
+    "max_drawdown": -0.027963941092309486,
+    "exposure": 0.23591440886699508,
+    "win_rate": 0.45733788395904434,
+    "profit_factor": 1.2780712035190795,
+    "n_completed_trades": 293.0,
+    "turnover_annual": 304.41195616134513
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 378,
@@ -10158,8 +11502,18 @@
     "n_completed_trades": 812.0,
     "turnover_annual": 377.6999690551606
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.049619597184365594,
+    "cagr": 0.024608281141630606,
+    "sharpe": 0.5934703595117903,
+    "max_drawdown": -0.03491681699739424,
+    "exposure": 0.20705049261083744,
+    "win_rate": 0.4253521126760563,
+    "profit_factor": 1.1328311129635633,
+    "n_completed_trades": 355.0,
+    "turnover_annual": 373.95926961558007
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 551,
@@ -10226,8 +11580,18 @@
     "n_completed_trades": 812.0,
     "turnover_annual": 377.6999690551606
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.049619597184365594,
+    "cagr": 0.024608281141630606,
+    "sharpe": 0.5934703595117903,
+    "max_drawdown": -0.03491681699739424,
+    "exposure": 0.20705049261083744,
+    "win_rate": 0.4253521126760563,
+    "profit_factor": 1.1328311129635633,
+    "n_completed_trades": 355.0,
+    "turnover_annual": 373.95926961558007
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 551,
@@ -10294,8 +11658,18 @@
     "n_completed_trades": 688.0,
     "turnover_annual": 320.82323881161557
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.043768881457695974,
+    "cagr": 0.021737263855092115,
+    "sharpe": 0.5104629951771168,
+    "max_drawdown": -0.06032384679730052,
+    "exposure": 0.17869971264367815,
+    "win_rate": 0.36704119850187267,
+    "profit_factor": 1.134701634359559,
+    "n_completed_trades": 267.0,
+    "turnover_annual": 275.4770176419832
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 459,
@@ -10362,8 +11736,18 @@
     "n_completed_trades": 500.0,
     "turnover_annual": 233.0872329767876
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07176640708551107,
+    "cagr": 0.035404458505573055,
+    "sharpe": 0.8663335523244186,
+    "max_drawdown": -0.043770585513242755,
+    "exposure": 0.16120176518883417,
+    "win_rate": 0.4175257731958763,
+    "profit_factor": 1.2691370751925888,
+    "n_completed_trades": 194.0,
+    "turnover_annual": 201.5160514795713
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 269,
@@ -10430,8 +11814,18 @@
     "n_completed_trades": 701.0,
     "turnover_annual": 326.3227824665965
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03589032566216299,
+    "cagr": 0.01785846807815261,
+    "sharpe": 0.48252267133894544,
+    "max_drawdown": -0.03813579553175628,
+    "exposure": 0.17392754515599343,
+    "win_rate": 0.41533546325878595,
+    "profit_factor": 1.1110532708658685,
+    "n_completed_trades": 313.0,
+    "turnover_annual": 327.95001288311465
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 434,
@@ -10498,8 +11892,18 @@
     "n_completed_trades": 720.0,
     "turnover_annual": 333.8073491529482
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09989102866636745,
+    "cagr": 0.0489558266755441,
+    "sharpe": 1.083633225982669,
+    "max_drawdown": -0.027486861438886567,
+    "exposure": 0.22831999178981938,
+    "win_rate": 0.4570446735395189,
+    "profit_factor": 1.2639350744150208,
+    "n_completed_trades": 291.0,
+    "turnover_annual": 303.2363913692396
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 378,
@@ -10566,8 +11970,18 @@
     "n_completed_trades": 692.0,
     "turnover_annual": 322.2768876677391
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.04910406419190516,
+    "cagr": 0.024355623555242456,
+    "sharpe": 0.5713608311772465,
+    "max_drawdown": -0.06038601583013481,
+    "exposure": 0.1873460591133005,
+    "win_rate": 0.3595505617977528,
+    "profit_factor": 1.1547383207866586,
+    "n_completed_trades": 266.0,
+    "turnover_annual": 275.5125356287261
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 462,
@@ -10634,8 +12048,18 @@
     "n_completed_trades": 578.0,
     "turnover_annual": 267.5593530116513
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.025254361885992616,
+    "cagr": 0.012598756594528249,
+    "sharpe": 0.3418869809379816,
+    "max_drawdown": -0.04050431141735156,
+    "exposure": 0.1798799261083744,
+    "win_rate": 0.43346007604562736,
+    "profit_factor": 1.082545180337926,
+    "n_completed_trades": 263.0,
+    "turnover_annual": 275.20665521004815
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 310,
@@ -10702,8 +12126,18 @@
     "n_completed_trades": 982.0,
     "turnover_annual": 460.26198633557897
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07849162406717736,
+    "cagr": 0.03866084565247219,
+    "sharpe": 0.7828875157630933,
+    "max_drawdown": -0.040951129213185666,
+    "exposure": 0.3033148604269294,
+    "win_rate": 0.4398976982097187,
+    "profit_factor": 1.1557246654188278,
+    "n_completed_trades": 391.0,
+    "turnover_annual": 412.7514413354641
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 525,
@@ -10770,8 +12204,18 @@
     "n_completed_trades": 982.0,
     "turnover_annual": 460.26198633557897
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07849162406717736,
+    "cagr": 0.03866084565247219,
+    "sharpe": 0.7828875157630933,
+    "max_drawdown": -0.040951129213185666,
+    "exposure": 0.3033148604269294,
+    "win_rate": 0.4398976982097187,
+    "profit_factor": 1.1557246654188278,
+    "n_completed_trades": 391.0,
+    "turnover_annual": 412.7514413354641
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 525,
@@ -10838,8 +12282,18 @@
     "n_completed_trades": 1205.0,
     "turnover_annual": 560.2199863979062
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09155608151182304,
+    "cagr": 0.04495795323082419,
+    "sharpe": 0.937469560522537,
+    "max_drawdown": -0.02871578568608535,
+    "exposure": 0.3033148604269294,
+    "win_rate": 0.3903966597077244,
+    "profit_factor": 1.174563756513964,
+    "n_completed_trades": 479.0,
+    "turnover_annual": 502.05671600803703
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 757,
@@ -10906,8 +12360,18 @@
     "n_completed_trades": 1205.0,
     "turnover_annual": 560.228514647304
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09210536007601489,
+    "cagr": 0.04522188266673455,
+    "sharpe": 0.9480885708180181,
+    "max_drawdown": -0.028219810072481533,
+    "exposure": 0.31842672413793105,
+    "win_rate": 0.3903966597077244,
+    "profit_factor": 1.176571717036216,
+    "n_completed_trades": 479.0,
+    "turnover_annual": 500.31663188780357
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 758,
@@ -10974,8 +12438,18 @@
     "n_completed_trades": 618.0,
     "turnover_annual": 286.7897214283921
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08404640173005307,
+    "cagr": 0.04134288150412302,
+    "sharpe": 0.9607642304345746,
+    "max_drawdown": -0.03745992391660913,
+    "exposure": 0.18611453201970443,
+    "win_rate": 0.39737991266375544,
+    "profit_factor": 1.277503526093089,
+    "n_completed_trades": 229.0,
+    "turnover_annual": 238.63846674331486
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 356,
@@ -11042,9 +12516,21 @@
     "n_completed_trades": 398.0,
     "turnover_annual": 183.35350429215194
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": 0.016290831638284375,
+    "cagr": 0.008144961439723541,
+    "sharpe": 0.26585822623527516,
+    "max_drawdown": -0.03215530988729376,
+    "exposure": 0.05860016420361248,
+    "win_rate": 0.3184713375796178,
+    "profit_factor": 1.1045102350662268,
+    "n_completed_trades": 157.0,
+    "turnover_annual": 160.12088894170225
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.266 < 0.3"
+   ],
    "exits": {
     "trail": 298,
     "eod": 100,
@@ -11110,8 +12596,18 @@
     "n_completed_trades": 890.0,
     "turnover_annual": 414.1951092715053
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.12114913998042232,
+    "cagr": 0.05908453182317541,
+    "sharpe": 1.1138140630087785,
+    "max_drawdown": -0.045672933860701925,
+    "exposure": 0.34013238916256155,
+    "win_rate": 0.4676056338028169,
+    "profit_factor": 1.2392908315638649,
+    "n_completed_trades": 354.0,
+    "turnover_annual": 376.8544802373872
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 374,
@@ -11178,8 +12674,18 @@
     "n_completed_trades": 890.0,
     "turnover_annual": 414.1951092715053
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.12114913998042232,
+    "cagr": 0.05908453182317541,
+    "sharpe": 1.1138140630087785,
+    "max_drawdown": -0.045672933860701925,
+    "exposure": 0.34013238916256155,
+    "win_rate": 0.4676056338028169,
+    "profit_factor": 1.2392908315638649,
+    "n_completed_trades": 354.0,
+    "turnover_annual": 376.8544802373872
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 374,
@@ -11246,8 +12752,18 @@
     "n_completed_trades": 363.0,
     "turnover_annual": 165.84493099003762
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03909143298285289,
+    "cagr": 0.01943621333856793,
+    "sharpe": 0.6283357472578833,
+    "max_drawdown": -0.03927739764672089,
+    "exposure": 0.13500615763546797,
+    "win_rate": 0.4523809523809524,
+    "profit_factor": 1.1800967809804335,
+    "n_completed_trades": 168.0,
+    "turnover_annual": 172.8182589912045
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 179,
@@ -11314,8 +12830,18 @@
     "n_completed_trades": 490.0,
     "turnover_annual": 228.10716743863725
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.05040221472925421,
+    "cagr": 0.02499171611682094,
+    "sharpe": 0.77656149354707,
+    "max_drawdown": -0.020935218257258192,
+    "exposure": 0.15232450738916256,
+    "win_rate": 0.44214876033057854,
+    "profit_factor": 1.2095041182252653,
+    "n_completed_trades": 242.0,
+    "turnover_annual": 252.2070570434324
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 305,
@@ -11382,8 +12908,18 @@
     "n_completed_trades": 490.0,
     "turnover_annual": 228.10716743863725
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.05040221472925421,
+    "cagr": 0.02499171611682094,
+    "sharpe": 0.77656149354707,
+    "max_drawdown": -0.020935218257258192,
+    "exposure": 0.15232450738916256,
+    "win_rate": 0.44214876033057854,
+    "profit_factor": 1.2095041182252653,
+    "n_completed_trades": 242.0,
+    "turnover_annual": 252.2070570434324
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 305,
@@ -11450,9 +12986,21 @@
     "n_completed_trades": 398.0,
     "turnover_annual": 183.35350429215194
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": 0.016290831638284375,
+    "cagr": 0.008144961439723541,
+    "sharpe": 0.26585822623527516,
+    "max_drawdown": -0.03215530988729376,
+    "exposure": 0.0648091133004926,
+    "win_rate": 0.3184713375796178,
+    "profit_factor": 1.1045102350662268,
+    "n_completed_trades": 157.0,
+    "turnover_annual": 160.12088894170225
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.266 < 0.3"
+   ],
    "exits": {
     "trail": 298,
     "eod": 100,
@@ -11518,8 +13066,18 @@
     "n_completed_trades": 1122.0,
     "turnover_annual": 520.9369907411526
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.037803497180195045,
+    "cagr": 0.018801713620088645,
+    "sharpe": 0.44775106052300595,
+    "max_drawdown": -0.04253024278825823,
+    "exposure": 0.2483066502463054,
+    "win_rate": 0.3152610441767068,
+    "profit_factor": 1.0844140725521512,
+    "n_completed_trades": 498.0,
+    "turnover_annual": 525.8880436919007
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 787,
@@ -11586,9 +13144,21 @@
     "n_completed_trades": 279.0,
     "turnover_annual": 127.84026707731407
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": 0.0035279261608960333,
+    "cagr": 0.0017694377982564458,
+    "sharpe": 0.07255029553116227,
+    "max_drawdown": -0.044997812897001,
+    "exposure": 0.1263084975369458,
+    "win_rate": 0.4788732394366197,
+    "profit_factor": 1.0169258634688652,
+    "n_completed_trades": 142.0,
+    "turnover_annual": 146.11695684023798
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.073 < 0.3"
+   ],
    "exits": {
     "trail": 110,
     "eod": 169,
@@ -11654,9 +13224,21 @@
     "n_completed_trades": 279.0,
     "turnover_annual": 127.84026707731407
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": 0.0035279261608960333,
+    "cagr": 0.0017694377982564458,
+    "sharpe": 0.07255029553116227,
+    "max_drawdown": -0.044997812897001,
+    "exposure": 0.1263084975369458,
+    "win_rate": 0.4788732394366197,
+    "profit_factor": 1.0169258634688652,
+    "n_completed_trades": 142.0,
+    "turnover_annual": 146.11695684023798
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.073 < 0.3"
+   ],
    "exits": {
     "trail": 110,
     "eod": 169,
@@ -11722,8 +13304,18 @@
     "n_completed_trades": 424.0,
     "turnover_annual": 199.50940585947717
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03572556813410488,
+    "cagr": 0.017777197582439452,
+    "sharpe": 0.48050004882515757,
+    "max_drawdown": -0.056145518534103545,
+    "exposure": 0.15625,
+    "win_rate": 0.44508670520231214,
+    "profit_factor": 1.1452836478652215,
+    "n_completed_trades": 172.0,
+    "turnover_annual": 179.05101234148668
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 204,
@@ -11790,8 +13382,18 @@
     "n_completed_trades": 424.0,
     "turnover_annual": 199.50940585947717
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03572556813410488,
+    "cagr": 0.017777197582439452,
+    "sharpe": 0.48050004882515757,
+    "max_drawdown": -0.056145518534103545,
+    "exposure": 0.15625,
+    "win_rate": 0.44508670520231214,
+    "profit_factor": 1.1452836478652215,
+    "n_completed_trades": 172.0,
+    "turnover_annual": 179.05101234148668
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 204,
@@ -11858,8 +13460,18 @@
     "n_completed_trades": 659.0,
     "turnover_annual": 302.57531191628453
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07436225291885878,
+    "cagr": 0.03666258389617694,
+    "sharpe": 1.2019416917221881,
+    "max_drawdown": -0.024195205147586107,
+    "exposure": 0.15586514778325122,
+    "win_rate": 0.3741935483870968,
+    "profit_factor": 1.3055773289116672,
+    "n_completed_trades": 310.0,
+    "turnover_annual": 321.08407514304133
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 465,
@@ -11926,8 +13538,18 @@
     "n_completed_trades": 470.0,
     "turnover_annual": 218.3296739909098
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.042675166741297677,
+    "cagr": 0.021199676397419154,
+    "sharpe": 0.5948026549180004,
+    "max_drawdown": -0.04028619785917664,
+    "exposure": 0.13608374384236452,
+    "win_rate": 0.4397905759162304,
+    "profit_factor": 1.1933632334881734,
+    "n_completed_trades": 191.0,
+    "turnover_annual": 197.83225237550354
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 274,
@@ -11994,8 +13616,18 @@
     "n_completed_trades": 470.0,
     "turnover_annual": 218.3296739909098
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.042675166741297677,
+    "cagr": 0.021199676397419154,
+    "sharpe": 0.5948026549180004,
+    "max_drawdown": -0.04028619785917664,
+    "exposure": 0.13608374384236452,
+    "win_rate": 0.4397905759162304,
+    "profit_factor": 1.1933632334881734,
+    "n_completed_trades": 191.0,
+    "turnover_annual": 197.83225237550354
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 274,
@@ -12062,8 +13694,18 @@
     "n_completed_trades": 1291.0,
     "turnover_annual": 605.6916741866065
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07518027580028641,
+    "cagr": 0.03705874026528666,
+    "sharpe": 0.7782577073683857,
+    "max_drawdown": -0.044715322341285724,
+    "exposure": 0.2482553366174056,
+    "win_rate": 0.32149200710479575,
+    "profit_factor": 1.1525610671801854,
+    "n_completed_trades": 563.0,
+    "turnover_annual": 591.2831304050859
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 956,
@@ -12130,8 +13772,18 @@
     "n_completed_trades": 609.0,
     "turnover_annual": 284.07846139796
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.04697517441421417,
+    "cagr": 0.023311620430239044,
+    "sharpe": 0.5308268544550135,
+    "max_drawdown": -0.05125003144394169,
+    "exposure": 0.2365301724137931,
+    "win_rate": 0.4883720930232558,
+    "profit_factor": 1.1236379944755324,
+    "n_completed_trades": 258.0,
+    "turnover_annual": 268.6144482695475
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 223,
@@ -12198,8 +13850,18 @@
     "n_completed_trades": 609.0,
     "turnover_annual": 284.07846139796
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.04697517441421417,
+    "cagr": 0.023311620430239044,
+    "sharpe": 0.5308268544550135,
+    "max_drawdown": -0.05125003144394169,
+    "exposure": 0.2365301724137931,
+    "win_rate": 0.4883720930232558,
+    "profit_factor": 1.1236379944755324,
+    "n_completed_trades": 258.0,
+    "turnover_annual": 268.6144482695475
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 223,
@@ -12266,8 +13928,18 @@
     "n_completed_trades": 829.0,
     "turnover_annual": 386.75173233962346
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.10316499004238366,
+    "cagr": 0.050522059705870426,
+    "sharpe": 1.3481170144770915,
+    "max_drawdown": -0.02863990544563122,
+    "exposure": 0.19881465517241378,
+    "win_rate": 0.35135135135135137,
+    "profit_factor": 1.3338489096882085,
+    "n_completed_trades": 370.0,
+    "turnover_annual": 382.0417855864152
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 587,
@@ -12334,8 +14006,18 @@
     "n_completed_trades": 314.0,
     "turnover_annual": 147.72719988471445
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.04103962173444731,
+    "cagr": 0.02039524189022024,
+    "sharpe": 0.598884837256292,
+    "max_drawdown": -0.033051894765085965,
+    "exposure": 0.10314039408866996,
+    "win_rate": 0.43356643356643354,
+    "profit_factor": 1.2330633920446037,
+    "n_completed_trades": 143.0,
+    "turnover_annual": 147.27212896511602
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 176,
@@ -12402,8 +14084,18 @@
     "n_completed_trades": 314.0,
     "turnover_annual": 147.72719988471445
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.04103962173444731,
+    "cagr": 0.02039524189022024,
+    "sharpe": 0.598884837256292,
+    "max_drawdown": -0.033051894765085965,
+    "exposure": 0.10314039408866996,
+    "win_rate": 0.43356643356643354,
+    "profit_factor": 1.2330633920446037,
+    "n_completed_trades": 143.0,
+    "turnover_annual": 147.27212896511602
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 176,
@@ -12470,8 +14162,18 @@
     "n_completed_trades": 617.0,
     "turnover_annual": 287.4286743988831
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.0498080736158204,
+    "cagr": 0.02470063613634066,
+    "sharpe": 0.7364794358439386,
+    "max_drawdown": -0.029226879975851827,
+    "exposure": 0.17926416256157635,
+    "win_rate": 0.4246031746031746,
+    "profit_factor": 1.1876296493294327,
+    "n_completed_trades": 252.0,
+    "turnover_annual": 261.51869496174197
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 350,
@@ -12538,8 +14240,18 @@
     "n_completed_trades": 617.0,
     "turnover_annual": 287.36838977105936
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.050350436125235376,
+    "cagr": 0.024966352147537174,
+    "sharpe": 0.7436954561156168,
+    "max_drawdown": -0.029267186821075653,
+    "exposure": 0.17182368637110015,
+    "win_rate": 0.4246031746031746,
+    "profit_factor": 1.1897616744483628,
+    "n_completed_trades": 252.0,
+    "turnover_annual": 261.2809910358981
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 350,
@@ -12606,8 +14318,18 @@
     "n_completed_trades": 359.0,
     "turnover_annual": 167.60477861251405
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06880642046342422,
+    "cagr": 0.03396799223177638,
+    "sharpe": 0.9464329482095345,
+    "max_drawdown": -0.030711928643774256,
+    "exposure": 0.1375974958949097,
+    "win_rate": 0.512987012987013,
+    "profit_factor": 1.3434190922816946,
+    "n_completed_trades": 154.0,
+    "turnover_annual": 158.7958013436437
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 145,
@@ -12674,8 +14396,18 @@
     "n_completed_trades": 359.0,
     "turnover_annual": 167.60477861251405
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06880642046342422,
+    "cagr": 0.03396799223177638,
+    "sharpe": 0.9464329482095345,
+    "max_drawdown": -0.030711928643774256,
+    "exposure": 0.1375974958949097,
+    "win_rate": 0.512987012987013,
+    "profit_factor": 1.3434190922816946,
+    "n_completed_trades": 154.0,
+    "turnover_annual": 158.7958013436437
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 145,
@@ -12742,8 +14474,18 @@
     "n_completed_trades": 339.0,
     "turnover_annual": 158.57213364904547
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.030937641255429194,
+    "cagr": 0.015412622371396845,
+    "sharpe": 0.5083929799872551,
+    "max_drawdown": -0.026571920090510348,
+    "exposure": 0.11258210180623973,
+    "win_rate": 0.4728682170542636,
+    "profit_factor": 1.1892203764694569,
+    "n_completed_trades": 129.0,
+    "turnover_annual": 132.07308772343103
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 146,
@@ -12810,8 +14552,18 @@
     "n_completed_trades": 339.0,
     "turnover_annual": 158.57213364904547
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.030937641255429194,
+    "cagr": 0.015412622371396845,
+    "sharpe": 0.5083929799872551,
+    "max_drawdown": -0.026571920090510348,
+    "exposure": 0.11258210180623973,
+    "win_rate": 0.4728682170542636,
+    "profit_factor": 1.1892203764694569,
+    "n_completed_trades": 129.0,
+    "turnover_annual": 132.07308772343103
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 146,
@@ -12878,9 +14630,21 @@
     "n_completed_trades": 348.0,
     "turnover_annual": 159.56209678731062
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": 0.010024506321920645,
+    "cagr": 0.005019723640693474,
+    "sharpe": 0.2102086404303242,
+    "max_drawdown": -0.03864317984991528,
+    "exposure": 0.09051724137931035,
+    "win_rate": 0.45348837209302323,
+    "profit_factor": 1.0578618286182861,
+    "n_completed_trades": 172.0,
+    "turnover_annual": 179.91503793941393
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.210 < 0.3"
+   ],
    "exits": {
     "trail": 239,
     "eod": 109,
@@ -12946,9 +14710,21 @@
     "n_completed_trades": 348.0,
     "turnover_annual": 159.56209678731062
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": 0.010024506321920645,
+    "cagr": 0.005019723640693474,
+    "sharpe": 0.2102086404303242,
+    "max_drawdown": -0.03864317984991528,
+    "exposure": 0.09051724137931035,
+    "win_rate": 0.45348837209302323,
+    "profit_factor": 1.0578618286182861,
+    "n_completed_trades": 172.0,
+    "turnover_annual": 179.91503793941393
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.210 < 0.3"
+   ],
    "exits": {
     "trail": 239,
     "eod": 109,
@@ -13014,8 +14790,18 @@
     "n_completed_trades": 1232.0,
     "turnover_annual": 575.4571155617967
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09747706841272108,
+    "cagr": 0.04779952271215282,
+    "sharpe": 0.8000924626861989,
+    "max_drawdown": -0.041251217994197176,
+    "exposure": 0.3722034072249589,
+    "win_rate": 0.40148698884758366,
+    "profit_factor": 1.1419618992854785,
+    "n_completed_trades": 537.0,
+    "turnover_annual": 564.5292719926446
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 742,
@@ -13082,8 +14868,18 @@
     "n_completed_trades": 563.0,
     "turnover_annual": 259.4039988957291
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07385356879435023,
+    "cagr": 0.03641615995369363,
+    "sharpe": 1.1192296977023029,
+    "max_drawdown": -0.03407119521274238,
+    "exposure": 0.1560960591133005,
+    "win_rate": 0.4819277108433735,
+    "profit_factor": 1.3078071446238648,
+    "n_completed_trades": 249.0,
+    "turnover_annual": 257.2179477877032
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 353,
@@ -13150,8 +14946,18 @@
     "n_completed_trades": 563.0,
     "turnover_annual": 259.4039988957291
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07385356879435023,
+    "cagr": 0.03641615995369363,
+    "sharpe": 1.1192296977023029,
+    "max_drawdown": -0.03407119521274238,
+    "exposure": 0.1560960591133005,
+    "win_rate": 0.4819277108433735,
+    "profit_factor": 1.3078071446238648,
+    "n_completed_trades": 249.0,
+    "turnover_annual": 257.2179477877032
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 353,
@@ -13218,8 +15024,18 @@
     "n_completed_trades": 1384.0,
     "turnover_annual": 645.0403641158957
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.05869885265307495,
+    "cagr": 0.029047847833791218,
+    "sharpe": 0.5946497401480427,
+    "max_drawdown": -0.049226876774677075,
+    "exposure": 0.2565938013136289,
+    "win_rate": 0.32830820770519265,
+    "profit_factor": 1.1111910759265924,
+    "n_completed_trades": 597.0,
+    "turnover_annual": 631.0066660250951
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 1049,
@@ -13286,8 +15102,18 @@
     "n_completed_trades": 349.0,
     "turnover_annual": 163.76444771563789
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03090241425726359,
+    "cagr": 0.015395204851448074,
+    "sharpe": 0.49144150268605974,
+    "max_drawdown": -0.0349053427403927,
+    "exposure": 0.10072865353037767,
+    "win_rate": 0.45652173913043476,
+    "profit_factor": 1.1693904188645459,
+    "n_completed_trades": 138.0,
+    "turnover_annual": 142.60456160551382
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 189,
@@ -13354,8 +15180,18 @@
     "n_completed_trades": 349.0,
     "turnover_annual": 163.76444771563789
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.03090241425726359,
+    "cagr": 0.015395204851448074,
+    "sharpe": 0.49144150268605974,
+    "max_drawdown": -0.0349053427403927,
+    "exposure": 0.10072865353037767,
+    "win_rate": 0.45652173913043476,
+    "profit_factor": 1.1693904188645459,
+    "n_completed_trades": 138.0,
+    "turnover_annual": 142.60456160551382
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 189,
@@ -13422,8 +15258,18 @@
     "n_completed_trades": 1232.0,
     "turnover_annual": 574.8990839274509
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.10356719811063941,
+    "cagr": 0.05071431259964054,
+    "sharpe": 0.8525714919401604,
+    "max_drawdown": -0.03999459285672535,
+    "exposure": 0.38785406403940886,
+    "win_rate": 0.4048059149722736,
+    "profit_factor": 1.1512433721736048,
+    "n_completed_trades": 540.0,
+    "turnover_annual": 568.1826227603666
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 741,
@@ -13490,8 +15336,18 @@
     "n_completed_trades": 682.0,
     "turnover_annual": 317.5056090098316
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.0871026213050754,
+    "cagr": 0.04281561003323997,
+    "sharpe": 0.9853740057967614,
+    "max_drawdown": -0.05236006815170069,
+    "exposure": 0.2471520935960591,
+    "win_rate": 0.4618055555555556,
+    "profit_factor": 1.2386745699065584,
+    "n_completed_trades": 288.0,
+    "turnover_annual": 303.7753886248682
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 346,
@@ -13558,8 +15414,18 @@
     "n_completed_trades": 682.0,
     "turnover_annual": 317.5056090098316
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.0871026213050754,
+    "cagr": 0.04281561003323997,
+    "sharpe": 0.9853740057967614,
+    "max_drawdown": -0.05236006815170069,
+    "exposure": 0.2471520935960591,
+    "win_rate": 0.4618055555555556,
+    "profit_factor": 1.2386745699065584,
+    "n_completed_trades": 288.0,
+    "turnover_annual": 303.7753886248682
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 346,
@@ -13626,8 +15492,18 @@
     "n_completed_trades": 722.0,
     "turnover_annual": 335.61518291135053
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08306145750492089,
+    "cagr": 0.04086781694681818,
+    "sharpe": 1.2539980403035804,
+    "max_drawdown": -0.030545212363394136,
+    "exposure": 0.18342056650246305,
+    "win_rate": 0.34055727554179566,
+    "profit_factor": 1.3130103044128059,
+    "n_completed_trades": 323.0,
+    "turnover_annual": 331.58518713430067
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 479,
@@ -13694,8 +15570,18 @@
     "n_completed_trades": 829.0,
     "turnover_annual": 386.29831830840584
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.0994023563293085,
+    "cagr": 0.04872185128933548,
+    "sharpe": 1.3024930158944985,
+    "max_drawdown": -0.027530831977522263,
+    "exposure": 0.1857809934318555,
+    "win_rate": 0.34594594594594597,
+    "profit_factor": 1.3209078981545,
+    "n_completed_trades": 370.0,
+    "turnover_annual": 381.560267764479
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 587,
@@ -13762,8 +15648,18 @@
     "n_completed_trades": 512.0,
     "turnover_annual": 238.24236791275985
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08751224574429073,
+    "cagr": 0.04301284273408612,
+    "sharpe": 1.1159065472569358,
+    "max_drawdown": -0.030876593217362025,
+    "exposure": 0.19889162561576354,
+    "win_rate": 0.4888888888888889,
+    "profit_factor": 1.3081774761363878,
+    "n_completed_trades": 225.0,
+    "turnover_annual": 235.92721546453222
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 240,
@@ -13830,8 +15726,18 @@
     "n_completed_trades": 512.0,
     "turnover_annual": 238.24236791275985
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08751224574429073,
+    "cagr": 0.04301284273408612,
+    "sharpe": 1.1159065472569358,
+    "max_drawdown": -0.030876593217362025,
+    "exposure": 0.19889162561576354,
+    "win_rate": 0.4888888888888889,
+    "profit_factor": 1.3081774761363878,
+    "n_completed_trades": 225.0,
+    "turnover_annual": 235.92721546453222
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 240,
@@ -13898,9 +15804,22 @@
     "n_completed_trades": 449.0,
     "turnover_annual": 206.18733313487095
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": -0.0004929978276030367,
+    "cagr": -0.0002475113690433295,
+    "sharpe": 0.01083904514321149,
+    "max_drawdown": -0.05171559435137374,
+    "exposure": 0.12810447454844007,
+    "win_rate": 0.4517766497461929,
+    "profit_factor": 0.9979543300014968,
+    "n_completed_trades": 197.0,
+    "turnover_annual": 205.40373782004605
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0005 <= 0.0",
+    "sharpe 0.011 < 0.3"
+   ],
    "exits": {
     "trail": 242,
     "eod": 207,
@@ -13966,9 +15885,22 @@
     "n_completed_trades": 449.0,
     "turnover_annual": 206.18733313487095
    },
-   "val": null,
-   "status": "pending",
-   "reasons": [],
+   "val": {
+    "net_return": -0.0004929978276030367,
+    "cagr": -0.0002475113690433295,
+    "sharpe": 0.01083904514321149,
+    "max_drawdown": -0.05171559435137374,
+    "exposure": 0.12810447454844007,
+    "win_rate": 0.4517766497461929,
+    "profit_factor": 0.9979543300014968,
+    "n_completed_trades": 197.0,
+    "turnover_annual": 205.40373782004605
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0005 <= 0.0",
+    "sharpe 0.011 < 0.3"
+   ],
    "exits": {
     "trail": 242,
     "eod": 207,
@@ -14034,8 +15966,18 @@
     "n_completed_trades": 464.0,
     "turnover_annual": 213.610957822336
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.041291557311904814,
+    "cagr": 0.020519196111888016,
+    "sharpe": 0.4927519688234516,
+    "max_drawdown": -0.04865452108029944,
+    "exposure": 0.18472906403940886,
+    "win_rate": 0.46766169154228854,
+    "profit_factor": 1.1329140434197045,
+    "n_completed_trades": 201.0,
+    "turnover_annual": 209.9940742234444
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 158,
@@ -14102,8 +16044,18 @@
     "n_completed_trades": 464.0,
     "turnover_annual": 213.610957822336
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.041291557311904814,
+    "cagr": 0.020519196111888016,
+    "sharpe": 0.4927519688234516,
+    "max_drawdown": -0.04865452108029944,
+    "exposure": 0.18472906403940886,
+    "win_rate": 0.46766169154228854,
+    "profit_factor": 1.1329140434197045,
+    "n_completed_trades": 201.0,
+    "turnover_annual": 209.9940742234444
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 158,
@@ -14170,8 +16122,18 @@
     "n_completed_trades": 662.0,
     "turnover_annual": 310.31278565758555
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.04826539870974411,
+    "cagr": 0.02394446980691578,
+    "sharpe": 0.5495363126262821,
+    "max_drawdown": -0.035554370906775046,
+    "exposure": 0.2065886699507389,
+    "win_rate": 0.4507042253521127,
+    "profit_factor": 1.1292611949162608,
+    "n_completed_trades": 284.0,
+    "turnover_annual": 294.807663563305
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 378,
@@ -14238,8 +16200,18 @@
     "n_completed_trades": 754.0,
     "turnover_annual": 349.43857995261965
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.09606471341618583,
+    "cagr": 0.04712240734353257,
+    "sharpe": 1.4425113075307998,
+    "max_drawdown": -0.026087519166140494,
+    "exposure": 0.18411330049261085,
+    "win_rate": 0.35668789808917195,
+    "profit_factor": 1.3718740663582116,
+    "n_completed_trades": 314.0,
+    "turnover_annual": 321.68041939740704
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 505,
@@ -14306,8 +16278,18 @@
     "n_completed_trades": 531.0,
     "turnover_annual": 246.45966449310845
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07662896451164336,
+    "cagr": 0.03775995063866344,
+    "sharpe": 0.9589763954833264,
+    "max_drawdown": -0.04081707813360291,
+    "exposure": 0.20951354679802955,
+    "win_rate": 0.4789915966386555,
+    "profit_factor": 1.261704597910168,
+    "n_completed_trades": 238.0,
+    "turnover_annual": 248.55718848218487
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 257,
@@ -14374,8 +16356,18 @@
     "n_completed_trades": 531.0,
     "turnover_annual": 246.45966449310845
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.07662896451164336,
+    "cagr": 0.03775995063866344,
+    "sharpe": 0.9589763954833264,
+    "max_drawdown": -0.04081707813360291,
+    "exposure": 0.20951354679802955,
+    "win_rate": 0.4789915966386555,
+    "profit_factor": 1.261704597910168,
+    "n_completed_trades": 238.0,
+    "turnover_annual": 248.55718848218487
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 257,
@@ -14442,8 +16434,18 @@
     "n_completed_trades": 667.0,
     "turnover_annual": 312.3989225407916
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.058339208144077226,
+    "cagr": 0.028872350660992918,
+    "sharpe": 0.6652216034999595,
+    "max_drawdown": -0.029972145451781174,
+    "exposure": 0.21351600985221675,
+    "win_rate": 0.450354609929078,
+    "profit_factor": 1.1584330374372829,
+    "n_completed_trades": 281.0,
+    "turnover_annual": 293.3257136088679
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 382,
@@ -14510,8 +16512,18 @@
     "n_completed_trades": 296.0,
     "turnover_annual": 139.01578178346634
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.0393971767123622,
+    "cagr": 0.01958678001331937,
+    "sharpe": 0.6152301931739814,
+    "max_drawdown": -0.031195445920303655,
+    "exposure": 0.09138957307060755,
+    "win_rate": 0.4690265486725664,
+    "profit_factor": 1.258764294705268,
+    "n_completed_trades": 113.0,
+    "turnover_annual": 116.93626763057345
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 150,
@@ -14578,8 +16590,18 @@
     "n_completed_trades": 296.0,
     "turnover_annual": 139.01578178346634
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.0393971767123622,
+    "cagr": 0.01958678001331937,
+    "sharpe": 0.6152301931739814,
+    "max_drawdown": -0.031195445920303655,
+    "exposure": 0.09138957307060755,
+    "win_rate": 0.4690265486725664,
+    "profit_factor": 1.258764294705268,
+    "n_completed_trades": 113.0,
+    "turnover_annual": 116.93626763057345
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 150,
@@ -14646,8 +16668,18 @@
     "n_completed_trades": 502.0,
     "turnover_annual": 233.92560889402887
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.038473924898555056,
+    "cagr": 0.01913204777450339,
+    "sharpe": 0.47753562032760716,
+    "max_drawdown": -0.027195568459828068,
+    "exposure": 0.1637161330049261,
+    "win_rate": 0.42346938775510207,
+    "profit_factor": 1.1356277392853948,
+    "n_completed_trades": 195.0,
+    "turnover_annual": 202.92610527937097
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 238,
@@ -14714,8 +16746,18 @@
     "n_completed_trades": 614.0,
     "turnover_annual": 287.87719899934626
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06260012888320499,
+    "cagr": 0.030949664741337868,
+    "sharpe": 0.7982287130367085,
+    "max_drawdown": -0.03724499202639742,
+    "exposure": 0.14847598522167488,
+    "win_rate": 0.3360323886639676,
+    "profit_factor": 1.2344453991855644,
+    "n_completed_trades": 247.0,
+    "turnover_annual": 255.9827221046629
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 416,
@@ -14782,8 +16824,18 @@
     "n_completed_trades": 466.0,
     "turnover_annual": 214.86958063611698
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.05492755758132439,
+    "cagr": 0.027206074423555382,
+    "sharpe": 0.9857763901829901,
+    "max_drawdown": -0.026555432950563285,
+    "exposure": 0.14154864532019704,
+    "win_rate": 0.4377880184331797,
+    "profit_factor": 1.2857384346650138,
+    "n_completed_trades": 217.0,
+    "turnover_annual": 224.42969997453284
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 269,
@@ -14850,8 +16902,18 @@
     "n_completed_trades": 466.0,
     "turnover_annual": 214.86958063611698
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.05492755758132439,
+    "cagr": 0.027206074423555382,
+    "sharpe": 0.9857763901829901,
+    "max_drawdown": -0.026555432950563285,
+    "exposure": 0.13462130541871922,
+    "win_rate": 0.4377880184331797,
+    "profit_factor": 1.2857384346650138,
+    "n_completed_trades": 217.0,
+    "turnover_annual": 224.42969997453284
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 269,
@@ -14918,8 +16980,18 @@
     "n_completed_trades": 529.0,
     "turnover_annual": 244.3419624609416
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.028474546248205,
+    "cagr": 0.014194062846799138,
+    "sharpe": 0.4839424184373911,
+    "max_drawdown": -0.04401652807107548,
+    "exposure": 0.12417898193760263,
+    "win_rate": 0.4224137931034483,
+    "profit_factor": 1.1253073989179558,
+    "n_completed_trades": 232.0,
+    "turnover_annual": 239.81411768326265
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 367,
@@ -14986,8 +17058,18 @@
     "n_completed_trades": 529.0,
     "turnover_annual": 244.3419624609416
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.028474546248205,
+    "cagr": 0.014194062846799138,
+    "sharpe": 0.4839424184373911,
+    "max_drawdown": -0.04401652807107548,
+    "exposure": 0.13269704433497537,
+    "win_rate": 0.4224137931034483,
+    "profit_factor": 1.1253073989179558,
+    "n_completed_trades": 232.0,
+    "turnover_annual": 239.81411768326265
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 367,
@@ -15054,8 +17136,18 @@
     "n_completed_trades": 897.0,
     "turnover_annual": 416.4459537741122
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08247377474283013,
+    "cagr": 0.040584259572638226,
+    "sharpe": 1.0332870312102949,
+    "max_drawdown": -0.03298196349889615,
+    "exposure": 0.21828817733990147,
+    "win_rate": 0.3258145363408521,
+    "profit_factor": 1.2357532732431602,
+    "n_completed_trades": 399.0,
+    "turnover_annual": 412.8455782458307
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 629,
@@ -15122,8 +17214,18 @@
     "n_completed_trades": 897.0,
     "turnover_annual": 413.3646965302142
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.08151233747928877,
+    "cagr": 0.04012020001222183,
+    "sharpe": 1.0217544898939328,
+    "max_drawdown": -0.033504240669050556,
+    "exposure": 0.20350985221674878,
+    "win_rate": 0.3258145363408521,
+    "profit_factor": 1.2335838113336937,
+    "n_completed_trades": 399.0,
+    "turnover_annual": 412.8554999681068
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 629,
@@ -15190,8 +17292,18 @@
     "n_completed_trades": 1384.0,
     "turnover_annual": 639.6190586303242
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.029324899638155655,
+    "cagr": 0.014614919699045492,
+    "sharpe": 0.31548552140641867,
+    "max_drawdown": -0.054372604685479,
+    "exposure": 0.2722444581280788,
+    "win_rate": 0.31825795644891125,
+    "profit_factor": 1.0550289552280663,
+    "n_completed_trades": 597.0,
+    "turnover_annual": 623.8967145480054
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 1012,
@@ -15258,8 +17370,18 @@
     "n_completed_trades": 698.0,
     "turnover_annual": 325.79176515321734
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06327908880342714,
+    "cagr": 0.03128029262552112,
+    "sharpe": 0.8252562643258927,
+    "max_drawdown": -0.04211730958180082,
+    "exposure": 0.1713362068965517,
+    "win_rate": 0.4533762057877814,
+    "profit_factor": 1.2060559288178683,
+    "n_completed_trades": 311.0,
+    "turnover_annual": 323.88618293936605
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 478,
@@ -15326,8 +17448,18 @@
     "n_completed_trades": 698.0,
     "turnover_annual": 325.79176515321734
    },
-   "val": null,
-   "status": "pending",
+   "val": {
+    "net_return": 0.06327908880342714,
+    "cagr": 0.03128029262552112,
+    "sharpe": 0.8252562643258927,
+    "max_drawdown": -0.04211730958180082,
+    "exposure": 0.1713362068965517,
+    "win_rate": 0.4533762057877814,
+    "profit_factor": 1.2060559288178683,
+    "n_completed_trades": 311.0,
+    "turnover_annual": 323.88618293936605
+   },
+   "status": "pass",
    "reasons": [],
    "exits": {
     "trail": 478,
@@ -15379,7 +17511,8 @@
   "anchor": "Anchor",
   "trail": "Exit",
   "direction": "Side",
-  "stop_atr_multiple": "Stop"
+  "stop_atr_multiple": "Stop",
+  "max_entries_per_session": "Max"
  },
  "exit_labels": [
   [
