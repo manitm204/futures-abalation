@@ -338,3 +338,22 @@ LATTICE_NB_V1 = Lattice({
     "first_entry_minutes": [15, 30, 60],
     "stop_atr_multiple": ["none"],
 }, FIXED_AXES_NB)
+LATTICE_NB_V2 = Lattice({
+    "timeframe": ["5min"],
+    "band_lookback": [3, 5, 7, 10, 15, 25, 35, 45, 60, 80],
+    "band_mult": [0.25, 0.5, 0.75, 1.0, 1.25],
+    "check_minutes": [15, 30, 60],
+    "first_entry_minutes": [15, 30, 60],
+    "stop_atr_multiple": ["none"],
+}, FIXED_AXES_NB)
+LATTICE_NB_V3 = Lattice({**LATTICE_NB_V2.ordered, "timeframe": ["5min", "15min"]}, FIXED_AXES_NB)
+# v4: entries per session is ordered (1 < 2 < no cap).
+LATTICE_NB_V4 = Lattice({
+    "timeframe": ["5min", "15min"],
+    "band_lookback": [1, 8, 12, 16, 20, 24, 28, 32],
+    "band_mult": [0.75, 1.0, 1.25, 1.5, 1.75, 2.0],
+    "check_minutes": [15, 30, 60],
+    "first_entry_minutes": [30, 60],
+    "max_entries_per_session": [1, 2, "none"],
+    "stop_atr_multiple": ["none"],
+}, FIXED_AXES_NB)

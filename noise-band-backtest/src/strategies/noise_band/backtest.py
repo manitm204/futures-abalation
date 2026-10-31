@@ -170,18 +170,18 @@ class NBData:
                          lambda: (self.tod + self.tf_minutes - self.open_minute) % minutes == 0)
 
     def bands(self, lookback: int, mult: float, anchor: str) -> tuple[np.ndarray, np.ndarray]:
-        def calc():
-            if anchor == "open":
-                hi = lo = self.sess_open
-            elif anchor == "open_prev_close":
-                hi = np.fmax(self.sess_open, self.prev_close)  # NaN prior close -> the open
-                lo = np.fmin(self.sess_open, self.prev_close)
-            else:
-                raise ValueError(f"Unknown anchor {anchor!r}")
-            w = mult * self.sigma(lookback) * self.raw_sess_open
-            return np.stack([hi + w, lo - w])
-        b = self._get(("bands", lookback, float(mult), anchor), calc)
-        return b[0], b[1]
+        # Not cached: perturbation draws give every job its own float `mult`, so a cache
+        # here grew ~1 MB per job per worker (16,200-config runs ran out of memory). The
+        # expensive part, sigma, is cached by its integer lookback.
+        if anchor == "open":
+            hi = lo = self.sess_open
+        elif anchor == "open_prev_close":
+            hi = np.fmax(self.sess_open, self.prev_close)  # NaN prior close -> the open
+            lo = np.fmin(self.sess_open, self.prev_close)
+        else:
+            raise ValueError(f"Unknown anchor {anchor!r}")
+        w = mult * self.sigma(lookback) * self.raw_sess_open
+        return hi + w, lo - w
 
     @property
     def atr(self) -> np.ndarray:
@@ -204,11 +204,13 @@ class NBParams:
     direction: str
     stop_atr: float | None = None
     first_entry_minutes: int = 0   # bar close must be at least this long after the open
+    max_entries: int | None = None  # entries allowed per session (None = no cap)
 
     @classmethod
     def from_config(cls, cfg) -> "NBParams":
         return cls(cfg.symbol, cfg.timeframe, cfg.band_lookback, cfg.band_mult, cfg.check_minutes,
-                   cfg.anchor, cfg.trail, cfg.direction, cfg.stop_atr_value, cfg.first_entry_minutes)
+                   cfg.anchor, cfg.trail, cfg.direction, cfg.stop_atr_value, cfg.first_entry_minutes,
+                   cfg.max_entries_value)
 
 
 def as_params(cfg) -> NBParams:
@@ -290,6 +292,7 @@ def simulate_noise_band(
     inside = {1: np.flatnonzero(sig["inside_l"]), -1: np.flatnonzero(sig["inside_s"])}
     exit_sig = {1: sig["exit_l"], -1: sig["exit_s"]}
     block: dict[int, tuple[int, int] | None] = {1: None, -1: None}  # side -> (session, from bar)
+    sess_entries = [-1, 0]  # (session, entries taken in it) for the per-session cap
 
     def armed(d: int, k: int) -> bool:
         b = block[d]
@@ -318,6 +321,9 @@ def simulate_noise_band(
             break
         k = int(cand[ci])
         ci += 1
+        if p.max_entries is not None and sess_entries[0] == data.sess[k] and sess_entries[1] >= p.max_entries:
+            start = int(data.sess_end[k]) + 1  # cap reached: nothing more this session
+            continue
         d = 1 if sig["entry_l"][k] else -1
         if not armed(d, k):
             continue
@@ -340,6 +346,7 @@ def simulate_noise_band(
         if qty <= 0:
             continue
         seq += 1
+        sess_entries = [int(data.sess[e]), sess_entries[1] + 1 if sess_entries[0] == data.sess[e] else 1]
         side = "long" if d > 0 else "short"
         entry_fill = Fill(order_id=f"e{seq}", symbol=p.symbol, side=side, quantity=qty, fill_price=fill_px,
                           fill_ts=ts[e], commission=costs.commission(qty),

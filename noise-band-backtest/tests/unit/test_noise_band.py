@@ -16,10 +16,11 @@ from src.analysis.neighborhood import LATTICE_NB_V1, neighbor_ids
 from src.experiments.funnel_config import load_funnel_config
 from src.experiments.funnel_prep import FAMILIES, family_for
 from src.experiments.funnel_robustness import local_perturbations_nb, perturbations_nb
-from src.experiments.nb_grid import AXES_V1, nb_grid, variants_per_symbol
+from src.experiments.nb_grid import (AXES_V1, AXES_V2, AXES_V3, AXES_V4, nb_grid, nb_grid_v2, nb_grid_v3, nb_grid_v4,
+                                    variants_per_symbol)
 from src.experiments.nb_integrity import check_sim_integrity, truncation_invariance
 from src.strategies.noise_band.backtest import NBData, NBParams, simulate_noise_band
-from src.strategies.noise_band.config import NoiseBandConfig
+from src.strategies.noise_band.config import NoiseBandConfig, NoiseBandV4Config
 from src.utils.config_models import ExecutionConfig
 from tests.unit.test_funnel_integrity import _bars
 
@@ -177,6 +178,41 @@ def test_same_direction_reentry_needs_rearm():
     assert n_checked > 0
 
 
+
+@pytest.mark.parametrize("seed", [0, 3, 7])
+def test_max_entries_per_session_caps_and_keeps_earliest_trades(seed):
+    bars = _walk(n_days=60, seed=seed)
+    data, free = _sim(bars, _p(check_minutes=15, trail="band"))
+    per = np.unique(data.sess[free.entry_idx], return_counts=True)[1]
+    assert per.max() > 1  # the fixture re-enters within a session
+    _, same = _sim(bars, _p(check_minutes=15, trail="band", max_entries=int(per.max())))
+    assert np.array_equal(same.entry_idx, free.entry_idx)  # a cap above the max changes nothing
+    for cap in (1, 2):
+        p = _p(check_minutes=15, trail="band", max_entries=cap)
+        _, sim = _sim(bars, p)
+        counts = dict(zip(*np.unique(data.sess[sim.entry_idx], return_counts=True)))
+        assert max(counts.values()) <= cap
+        assert check_sim_integrity(sim, data, EC, p) == []
+        # Each session's first `cap` trades are the uncapped run's first `cap` trades.
+        for sess in counts:
+            first = free.entry_idx[data.sess[free.entry_idx] == sess][:cap]
+            assert np.array_equal(sim.entry_idx[data.sess[sim.entry_idx] == sess], first)
+
+
+def test_v4_grid_and_cap_mapping():
+    g = nb_grid_v4(("ES",))
+    assert variants_per_symbol(AXES_V4) == 13824 == len(g)
+    assert {ce.config.max_entries_per_session for ce in g} == {1, 2, "none"}
+    caps = {NBParams.from_config(ce.config).max_entries for ce in g}
+    assert caps == {1, 2, None}
+    assert NBParams.from_config(NoiseBandConfig(symbol="ES")).max_entries is None
+    # Older configs hash exactly as before (no new field on the v1 model).
+    assert "max_entries_per_session" not in NoiseBandConfig(symbol="ES").model_dump()
+    one = NBParams.from_config(NoiseBandV4Config(symbol="ES", band_lookback=1))
+    labels = [lab for lab, _ in local_perturbations_nb(one, SimpleNamespace(int_rel=0.2, band_mult_abs=0.25,
+                                                                            stop_atr_abs=0.25))]
+    assert labels == ["band_lookback=2", "band_mult=0.75", "band_mult=1.25"]
+
 def test_stop_is_from_atr_before_entry_and_side_aware():
     bars = _walk(seed=8, n_days=60)
     p = _p(stop_atr=0.5)
@@ -237,6 +273,22 @@ def test_grid_size_and_config_mapping():
     p = NBParams.from_config(NoiseBandConfig(symbol="ES", band_mult=2.0, first_entry_minutes=60))
     assert (p.stop_atr, p.band_mult, p.first_entry_minutes) == (None, 2.0, 60)
 
+
+def test_v2_grid_size_and_values():
+    g = nb_grid_v2(("ES",))
+    assert variants_per_symbol(AXES_V2) == 8100 == len(g)
+    assert {ce.config.timeframe for ce in g} == {"5min"}
+    assert sorted({ce.config.band_lookback for ce in g}) == [3, 5, 7, 10, 15, 25, 35, 45, 60, 80]
+    assert sorted({ce.config.band_mult for ce in g}) == [0.25, 0.5, 0.75, 1.0, 1.25]
+
+
+
+def test_v3_grid_is_v2_on_both_timeframes():
+    g = nb_grid_v3(("ES",))
+    assert variants_per_symbol(AXES_V3) == 16200 == len(g)
+    assert {ce.config.timeframe for ce in g} == {"5min", "15min"}
+    v2_ids = {ce.config_id for ce in nb_grid_v2(("ES",))}
+    assert v2_ids <= {ce.config_id for ce in g}  # ids hash the settings, so the 5min half is v2
 
 def test_lattice_neighbors_hold_categoricals():
     recs = [{"config_id": ce.config_id, **ce.config.model_dump(mode="json")} for ce in nb_grid(("ES",))]

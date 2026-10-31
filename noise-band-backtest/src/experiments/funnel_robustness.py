@@ -208,16 +208,16 @@ def perturbations_nb(p: NBParams, *, config_id: str, base_seed: int, pcfg: Pertu
 def local_perturbations_nb(p: NBParams, lcfg) -> list[tuple[str, NBParams]]:
     """Stage-4 local test for the noise band: move ONE setting at a time, down and up,
     everything else held. The band lookback goes to round(v x (1 -/+ int_rel)) (half
-    rounds up), at least one session away (never below 2); the band multiple by -/+
+    rounds up), at least one session away (never below 1); the band multiple by -/+
     band_mult_abs (never below 0.1); a numeric ATR stop by -/+ stop_atr_abs (never below
     0.25). "No stop" has no numeric neighbor, so those configs get two fewer moves. The
     check interval, timeframe and the categoricals are never moved. Returns (label, params)."""
-    down = max(2, min(math.floor(p.band_lookback * (1 - lcfg.int_rel) + 0.5), p.band_lookback - 1))
+    down = max(1, min(math.floor(p.band_lookback * (1 - lcfg.int_rel) + 0.5), p.band_lookback - 1))
     up = max(math.floor(p.band_lookback * (1 + lcfg.int_rel) + 0.5), p.band_lookback + 1)
     out: list[tuple[str, NBParams]] = []
 
     def add(name: str, values, field: str) -> None:
-        for v in values:
+        for v in dict.fromkeys(values):  # lookback 1 has no move down
             if v != getattr(p, field):
                 out.append((f"{name}={v:g}", replace(p, **{field: v})))
 

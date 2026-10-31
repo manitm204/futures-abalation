@@ -24,6 +24,9 @@ its exit bar, except a stop, which can fill any time inside its bar and so only
 frees capital from the END of that bar. A position closing at or before an entry's
 time frees its capital for that entry. Trades entering at the same time go in the
 order the strategies are listed.
+
+Noise-band copy: trades may be short (`SimResult.side`, P&L signed accordingly), and
+a session-close exit frees its capital at the end of the last bar, like a stop.
 """
 
 from __future__ import annotations
@@ -33,6 +36,17 @@ from dataclasses import dataclass, replace
 import numpy as np
 
 from src.strategies.mean_reversion.backtest import STOP_EXIT, CostModel, MRData, SimResult
+from src.strategies.noise_band.backtest import EOD_EXIT, FORCED
+
+# Exits that can fill at any time inside (or at the end of) their bar free capital only from that bar's END:
+# a stop, and the noise band's session-close exit, which fills at the last bar's close.
+_END_OF_BAR_EXITS = (STOP_EXIT, EOD_EXIT, FORCED)
+
+
+def _side(sim: SimResult) -> np.ndarray:
+    """+1 / -1 per trade; long-only families (no `side`) are all +1."""
+    s = getattr(sim, "side", None)
+    return np.ones(len(sim.entry_idx)) if s is None else np.asarray(s, dtype=float)
 
 
 @dataclass
@@ -49,7 +63,8 @@ def _take(sim: SimResult, keep: np.ndarray, qty: np.ndarray, com: np.ndarray, pn
                    exit_idx=sim.exit_idx[keep], decision_idx=sim.decision_idx[keep], quantity=qty[keep],
                    entry_px=sim.entry_px[keep], exit_px=sim.exit_px[keep], entry_commission=com[keep],
                    realized_pnl=pnl[keep], forced_close=sim.forced_close[keep], exit_reason=sim.exit_reason[keep],
-                   stop_level=sim.stop_level[keep])
+                   stop_level=sim.stop_level[keep],
+                   **({"side": sim.side[keep]} if getattr(sim, "side", None) is not None else {}))
 
 
 def share_account(sims: list[SimResult], data: MRData | list[MRData], costs: CostModel, starting_equity: float, *,
@@ -112,9 +127,9 @@ def share_account_multi(sims: list[SimResult], data: MRData | list[MRData], cost
         if k == 0:
             continue
         q = k * cm.multiplier
-        pnl = (sim.exit_px[t] - sim.entry_px[t]) * q - 2 * k * per_c
+        pnl = _side(sim)[t] * (sim.exit_px[t] - sim.entry_px[t]) * q - 2 * k * per_c
         x = int(sim.exit_idx[t])
-        free_at = d.bar_open[x] + (np.timedelta64(mins[s], "m") if sim.exit_reason[t] == STOP_EXIT else np.timedelta64(0, "m"))
+        free_at = d.bar_open[x] + (np.timedelta64(mins[s], "m") if sim.exit_reason[t] in _END_OF_BAR_EXITS else np.timedelta64(0, "m"))
         open_.append((free_at, k * per, pnl, mkts[s], grps[s]))
         peak["total"] = max(peak["total"], sum(o[1] for o in open_) / cash)
         peak["market"] = max(peak["market"], sum(o[1] for o in open_ if o[3] == mkts[s]) / cash)
@@ -125,6 +140,6 @@ def share_account_multi(sims: list[SimResult], data: MRData | list[MRData], cost
         k = n_c[s]
         q = k * cms[s].multiplier
         com = k * cms[s].ec.commission_per_contract
-        pnl = (sim.exit_px - sim.entry_px) * q - 2 * com
+        pnl = _side(sim) * (sim.exit_px - sim.entry_px) * q - 2 * com
         out.append(_take(sim, k > 0, q.astype(float), com.astype(float), pnl))
     return SharedAccountResult(out, n_c, trim, bound, peak)

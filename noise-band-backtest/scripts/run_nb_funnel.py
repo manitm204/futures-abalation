@@ -3,7 +3,8 @@
 Same stages, thresholds and commands as the mean-reversion funnel
 (../mean-reversion-backtest/scripts/run_mr_funnel.py); only the base strategy
 (src/strategies/noise_band/) and its grid (src/experiments/nb_grid.py) differ. The
-YAML's `strategy` picks the parameter space (`noise_band` = v1, 8,100 configs).
+YAML's `strategy` picks the parameter space (`noise_band` = v1, `noise_band_v2` = v2, 8,100 configs each; `noise_band_v3` = v2 on 5min + 15min, 16,200;
+`noise_band_v4` = adds max entries per session, 13,824).
 All thresholds live in the YAML (hashed into every output).
 
 Commands (each is a separate, explicit step):
@@ -38,7 +39,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.analysis.neighborhood import LATTICE_NB_V1, NeighborhoodStats, neighborhood_stats
+from src.analysis.neighborhood import LATTICE_NB_V1, LATTICE_NB_V2, LATTICE_NB_V3, LATTICE_NB_V4, NeighborhoodStats, neighborhood_stats
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.data.aggregation import AGG_INTERVAL_MINUTES, aggregate_bars
 from src.experiments.data_access import (
@@ -83,10 +84,10 @@ from src.experiments.funnel_robustness import (
     perturbations_nb,
     quantile,
 )
-from src.experiments.nb_grid import nb_grid
+from src.experiments.nb_grid import nb_grid, nb_grid_v2, nb_grid_v3, nb_grid_v4
 from src.experiments.nb_integrity import CHECKS, truncation_invariance
 from src.strategies.noise_band.backtest import NBParams
-from src.strategies.noise_band.config import NoiseBandConfig
+from src.strategies.noise_band.config import NoiseBandConfig, NoiseBandV2Config, NoiseBandV3Config, NoiseBandV4Config
 from src.utils.hashing import canonical_json
 from src.utils.logging import configure_logging, get_logger
 from src.utils.seeds import derive_seed
@@ -103,6 +104,18 @@ SPACES = {
     "noise_band": {
         "grid": nb_grid, "cls": NoiseBandConfig, "lattice": LATTICE_NB_V1, "perturb": perturbations_nb,
         "local": local_perturbations_nb, "keys": NB_KEYS,
+    },
+    "noise_band_v2": {
+        "grid": nb_grid_v2, "cls": NoiseBandV2Config, "lattice": LATTICE_NB_V2, "perturb": perturbations_nb,
+        "local": local_perturbations_nb, "keys": NB_KEYS,
+    },
+    "noise_band_v3": {
+        "grid": nb_grid_v3, "cls": NoiseBandV3Config, "lattice": LATTICE_NB_V3, "perturb": perturbations_nb,
+        "local": local_perturbations_nb, "keys": NB_KEYS,
+    },
+    "noise_band_v4": {
+        "grid": nb_grid_v4, "cls": NoiseBandV4Config, "lattice": LATTICE_NB_V4, "perturb": perturbations_nb,
+        "local": local_perturbations_nb, "keys": (*NB_KEYS, "max_entries_per_session"),
     },
 }
 SPACE = SPACES["noise_band"]

@@ -29,7 +29,8 @@ CHECKS = ["entry_signal_condition_not_met", "direction_not_allowed", "entry_not_
           "exit_not_next_open_after_decision", "eod_exit_not_at_session_close", "overlapping_positions",
           "entry_fill_better_than_open", "exit_fill_better_than_market", "position_exceeds_equity",
           "forced_close_not_final_trade", "commission_below_minimum", "unexpected_stop_or_target",
-          "stop_not_from_atr_known_before_entry", "stop_exit_without_touch", "stop_fill_better_than_open_stop"]
+          "stop_not_from_atr_known_before_entry", "stop_exit_without_touch", "stop_fill_better_than_open_stop",
+          "entries_per_session_over_cap"]
 
 
 def check_sim_integrity(sim: SimResult, data: NBData, exec_config: ExecutionConfig, cfg) -> list[str]:
@@ -83,6 +84,8 @@ def check_sim_integrity(sim: SimResult, data: NBData, exec_config: ExecutionConf
         expect = data.open[e] - d * p.stop_atr * data.atr[e - 1]
         if not np.allclose(sim.stop_level, expect, rtol=0, atol=1e-9):
             issues.append("stop_not_from_atr_known_before_entry")
+    if p.max_entries is not None and np.unique(data.sess[e], return_counts=True)[1].max() > p.max_entries:
+        issues.append("entries_per_session_over_cap")
     if len(e) > 1 and (e[1:] <= x[:-1]).any():
         issues.append("overlapping_positions")
     eq_before = exec_config.starting_equity + np.concatenate([[0.0], np.cumsum(sim.realized_pnl)[:-1]])

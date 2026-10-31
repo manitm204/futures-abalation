@@ -22,6 +22,7 @@ Axes (the Cartesian grid, v1 = 8,100 variants per symbol):
                    vwap                 (long exits on a check close below session VWAP)
                    band_vwap            (the tighter of the two: below max(upper band, VWAP))
   direction      : long, short, both
+  max_entries_per_session : 1, 2, none  (v4+: entries allowed per session; none = no cap)
   stop_atr       : none                 (v1: no protective stop; the backtester supports
                                          entry open -/+ k x ATR(14), intrabar, for later rounds)
 """
@@ -63,3 +64,57 @@ class NoiseBandConfig(FrozenModel):
     @property
     def stop_atr_value(self) -> float | None:
         return None if self.stop_atr_multiple == "none" else float(self.stop_atr_multiple)
+
+    @property
+    def max_entries_value(self) -> int | None:
+        """Entries allowed per session (None = no cap). Only v4+ configs have the field."""
+        v = getattr(self, "max_entries_per_session", "none")
+        return None if v == "none" else int(v)
+
+
+# --- v2 parameter space (ES round 2, 8,100 variants per symbol) ---------------------------
+# Specified by the user after reading ES v1 development results (2018-2022 only; validation
+# untouched): 5min bars only (with no stop, 15min decides at the same check times), band
+# lookback 3-80 sessions, band multiple 0.25-1.25, the other axes as in v1, no stop.
+V2_TIMEFRAMES: tuple[str, ...] = ("5min",)
+V2_BAND_LOOKBACKS: tuple[int, ...] = (3, 5, 7, 10, 15, 25, 35, 45, 60, 80)
+V2_BAND_MULTS: tuple[float, ...] = (0.25, 0.5, 0.75, 1.0, 1.25)
+
+
+class NoiseBandV2Config(NoiseBandConfig):
+    timeframe: Literal["5min"] = "5min"
+    band_lookback: Literal[3, 5, 7, 10, 15, 25, 35, 45, 60, 80] = 10
+    band_mult: Literal[0.25, 0.5, 0.75, 1.0, 1.25] = 0.75
+
+
+# --- v3 parameter space (ES round 3, 16,200 variants per symbol) --------------------------
+# The v2 grid re-run on both 5min and 15min bars, at the user's request after v2's
+# development results (2018-2022 only; validation untouched).
+V3_TIMEFRAMES: tuple[str, ...] = ("5min", "15min")
+
+
+class NoiseBandV3Config(NoiseBandV2Config):
+    timeframe: Literal["5min", "15min"] = "5min"
+
+
+# --- v4 parameter space (ES round 4, 13,824 variants per symbol) --------------------------
+# Specified by the user after reading ES v1-v3 development results (2018-2022 only;
+# validation untouched): 5min + 15min, band lookback 1-32 sessions, band multiple
+# 0.75-2.0, check 15/30/60, first entry 30/60, anchor open / gap-adjusted, trailing exit
+# VWAP / closer of band and VWAP, long / both, and a NEW axis: at most 1 or 2 entries per
+# session, or no cap (the v1-v3 behaviour). No stop.
+V4_BAND_LOOKBACKS: tuple[int, ...] = (1, 8, 12, 16, 20, 24, 28, 32)
+V4_BAND_MULTS: tuple[float, ...] = (0.75, 1.0, 1.25, 1.5, 1.75, 2.0)
+V4_FIRST_ENTRY_MINUTES: tuple[int, ...] = (30, 60)
+V4_TRAILS: tuple[str, ...] = ("vwap", "band_vwap")
+V4_DIRECTIONS: tuple[str, ...] = ("long", "both")
+V4_MAX_ENTRIES: tuple = (1, 2, "none")
+
+
+class NoiseBandV4Config(NoiseBandConfig):
+    band_lookback: Literal[1, 8, 12, 16, 20, 24, 28, 32] = 16
+    band_mult: Literal[0.75, 1.0, 1.25, 1.5, 1.75, 2.0] = 1.0
+    first_entry_minutes: Literal[30, 60] = 30
+    trail: Literal["vwap", "band_vwap"] = "vwap"
+    direction: Literal["long", "both"] = "both"
+    max_entries_per_session: Literal[1, 2, "none"] = "none"

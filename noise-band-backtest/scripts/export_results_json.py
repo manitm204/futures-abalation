@@ -28,13 +28,13 @@ import typer
 
 from src.data.futures import session_spec
 from src.experiments.funnel_config import load_execution_config, load_funnel_config
-from src.experiments.nb_grid import AXES_V1
+from src.experiments.nb_grid import AXES_V1, AXES_V2, AXES_V3, AXES_V4
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SITE_ROOT = PROJECT_ROOT.parent / "futures-results"
 app = typer.Typer(add_completion=False)
 
-SPACES = {"noise_band": AXES_V1}
+SPACES = {"noise_band": AXES_V1, "noise_band_v2": AXES_V2, "noise_band_v3": AXES_V3, "noise_band_v4": AXES_V4}
 MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini Dow", "RTY": "E-mini Russell 2000",
                 "CL": "Crude oil", "GC": "Gold", "6E": "Euro FX", "6J": "Japanese yen", "ZN": "10-year T-note",
                 "ZB": "30-year T-bond"}
@@ -42,10 +42,11 @@ LABELS = {
     "timeframe": "Bar size", "band_lookback": "Band lookback (days)", "band_mult": "Band multiple",
     "check_minutes": "Check every (min)", "first_entry_minutes": "First entry (min)", "anchor": "Band anchor",
     "trail": "Trailing exit", "direction": "Direction", "stop_atr_multiple": "Stop (× ATR)",
+    "max_entries_per_session": "Max entries / session",
 }
 SHORT = {"timeframe": "Bar", "band_lookback": "Days", "band_mult": "Band", "check_minutes": "Check",
          "first_entry_minutes": "1st", "anchor": "Anchor", "trail": "Exit", "direction": "Side",
-         "stop_atr_multiple": "Stop"}
+         "stop_atr_multiple": "Stop", "max_entries_per_session": "Max"}
 
 
 def _val(axis: str, v) -> str:
@@ -101,7 +102,7 @@ def main(
     config: Path = typer.Option(...),
     market_name: str = typer.Option("", help="Default: the market's usual name"),
     key: str = typer.Option("", help="File name / tab id under data/<MARKET>/ (default: noise_band_<version>)"),
-    label: str = typer.Option("Noise-band breakout (intraday momentum)", help="Strategy tab label"),
+    label: str = typer.Option("", help="Strategy tab label (default: Noise band - <version>)"),
     variant: str = typer.Option("", help="Optional variant id (e.g. 15m) when one strategy tab holds several runs"),
     variant_label: str = typer.Option("", help="Button text for the variant (default: the variant id)"),
     out_root: Path = typer.Option(SITE_ROOT / "data"),
@@ -112,7 +113,9 @@ def main(
     if axes is None:
         raise typer.BadParameter(f"exporter knows the noise-band grids {sorted(SPACES)} only")
     sym = fcfg.symbol
-    key = key or f"noise_band_{experiment_id.rsplit('_', 1)[-1]}"
+    version = experiment_id.rsplit("_", 1)[-1]
+    key = key or f"noise_band_{version}"
+    label = label or f"Noise band · {version}"
     exp = PROJECT_ROOT / "runs" / "funnel" / experiment_id
     summary = json.loads((exp / "summary.json").read_text())
     frozen = json.loads((exp / "frozen_representatives.json").read_text())
@@ -120,6 +123,8 @@ def main(
     val = json.loads(val_path.read_text()) if val_path.exists() else None
     val_by_id = {r["config_id"]: r for r in val["results"]} if val else {}
     df = pl.read_parquet(exp / "config_status.parquet")
+    # Mixed int/"none" axes (max entries per session) are stored as text; match their values.
+    axes = {ax: tuple(str(v) for v in vals) if df.schema.get(ax) == pl.Utf8 else vals for ax, vals in axes.items()}
     by_id = {r["config_id"]: r for r in df.filter(pl.col("s7_status") == "pass").to_dicts()}
     n = df.height
     dev_w, val_w = fcfg.data.development, fcfg.data.validation
@@ -204,6 +209,35 @@ def main(
                          "n_survivors": int((g["s7_status"] == "pass").sum())})
         ablation.append({"axis": ax, "label": LABELS[ax], "values": rows})
 
+    # ---- random-entry ("luck") benchmark, if run (scripts/run_nb_random_benchmark.py) ----
+    luck_path = exp / "random_benchmark.json"
+    luck_raw = json.loads(luck_path.read_text()) if luck_path.exists() and val else None
+    luck_by_id = {f["config_id"]: f for f in luck_raw["finalists"]} if luck_raw else {}
+    luck = None
+    if luck_raw:
+        def _match(g):  # the finalists this curve is for (only axes the settings show)
+            return {ax: _val(ax, luck_raw["groups"][g][ax]) for ax in ("timeframe", "direction") if len(axes[ax]) > 1}
+
+        def _glabel(g):
+            meta = luck_raw["groups"][g]
+            side = "long only" if meta["direction"] == "long" else f"long + short ({meta['p_long']:.0%} long)"
+            return f"{_val('timeframe', meta['timeframe'])} · {side}"
+        luck = {
+            "n_sims": luck_raw["n_sims"], "levels": luck_raw["levels"], "method": luck_raw["method"],
+            "curves": [{"timeframe": _glabel(g), "match": _match(g), "rows": rows,
+                        "trade_bars": [luck_raw["groups"][g]["median_trade_bars"], luck_raw["groups"][g]["mean_trade_bars"]],
+                        "p_long": luck_raw["groups"][g]["p_long"]}
+                       for g, rows in luck_raw["curves"].items()],
+            "text": (f"For every whole-percent time in market in each group's {val_w.start.year}–{val_w.end.year} "
+                     f"range, {luck_raw['n_sims']} random runs trade {sym} at random times on random days. Each "
+                     "group is one bar size and direction setting. Like the strategy, the random trades are "
+                     "intraday only, never overlap, and are always closed by the session's last bar. Their lengths "
+                     "are drawn from that group's own finalist trades, so trade counts and costs match. Long-only "
+                     "groups trade long; long-and-short groups go long with the same share of trades their "
+                     "finalists did. They pay the same costs and use the same sizing and Sharpe math as the "
+                     "strategy."),
+        }
+
     # ---- finalists: frozen development order; validation filled in once it has run ----
     finalists = []
     for c in frozen["candidates"]:
@@ -224,7 +258,8 @@ def main(
             "local_median_sharpe": _num(d.get("local_median_sharpe")),
             "local_detail": json.loads(d["local_detail"]) if d.get("local_detail") else None,
             "dsr": _num(d.get("dsr_li_ji")),
-            "luck": None,
+            "luck": None if c["config_id"] not in luck_by_id else {
+                k: luck_by_id[c["config_id"]][k] for k in ("exposure_level", "luck_pct_sharpe", "luck_pct_return")},
         })
 
     # ---- band lookback x band multiple map around the top finalist (validation passer if any) ----
@@ -278,7 +313,9 @@ def main(
                                           "the next open. Anything still open is closed at the session's last close."
                                           + (" An optional stop sits k × ATR(14) from the entry." if stop_on else
                                              " No stop loss in this round.")},
-                {"label": "Size", "text": f"Long, short or both; one position at a time, never held overnight. As "
+                {"label": "Size", "text": f"Long, short or both; one position at a time, never held overnight"
+                                          + ("; optionally capped at 1 or 2 entries per session" if
+                                             "max_entries_per_session" in axes else "") + ". As "
                                           f"many whole {sym} contracts as the account covers at full contract value "
                                           f"(no leverage), starting from ${ec.starting_equity:,.0f}."},
             ],
@@ -290,7 +327,7 @@ def main(
         "stable": {"n": s4.height, "axes": stable, "by_timeframe": stable_by_tf},
         "ablation": ablation,
         "length_map": length_map,
-        "luck": None,
+        "luck": luck,
         "finalists": finalists,
         "short_labels": SHORT,
         "exit_labels": [["trail", "trail", "trailing exit"], ["eod", "close", "session close"], ["stop", "stop", "stop"]],
