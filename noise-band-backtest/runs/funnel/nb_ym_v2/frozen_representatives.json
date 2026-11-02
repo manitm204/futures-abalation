@@ -1,0 +1,102 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 40,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 0,
+      "config_id": "cfg_fbebaa786ecb0f1ee713",
+      "dev_net_return": 0.19661499999999998,
+      "dev_order": 1,
+      "dev_sharpe": 0.8070493415846989,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.6125535224742388,
+      "params": {
+        "anchor": "open_prev_close",
+        "band_lookback": 80,
+        "band_mult": 0.5,
+        "check_minutes": 15,
+        "direction": "long",
+        "first_entry_minutes": 60,
+        "last_entry_cutoff_minutes": 120,
+        "max_entries_per_session": 1,
+        "momentum_minutes": 30,
+        "stop_atr_multiple": "none",
+        "symbol": "YM",
+        "timeframe": "15min",
+        "trail": "band_vwap"
+      },
+      "stability_median_sharpe": 0.6720762934337611
+    }
+  ],
+  "code_version": "e84559a57227109bf9d051ac1ff1a68603e0ddfd",
+  "config_sha256": "4c0afaea0b5309b95ae7f5db01361cd0da204e85408f5a0190238aeeef4d7ed7",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "15min"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "nb_ym_v2",
+  "frozen_at": "2026-11-02T17:54:53.665226+00:00",
+  "git_diff_sha256": "4a703c6fe1ca25ab52dc5b8714ea8f7b2f9cf6a65422eb35acd64737a8aa6549",
+  "git_dirty": true,
+  "seed": 20261030,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, best 2 per cluster)",
+      "7 execution stress"
+    ],
+    "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": false,
+    "commission_minimum": 0.0,
+    "commission_per_contract": 2.5,
+    "commission_per_share": 0.0,
+    "extended_hours_slippage_multiplier": 1.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "instrument_type": "futures",
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 0.0,
+    "slippage_bps_stop": 0.0,
+    "slippage_ticks_market": 1.0,
+    "slippage_ticks_stop": 1.0,
+    "starting_equity": 1000000.0
+  },
+  "symbol": "YM"
+}

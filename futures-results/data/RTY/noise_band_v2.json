@@ -1,0 +1,847 @@
+{
+ "market": "RTY",
+ "market_name": "E-mini Russell 2000",
+ "strategy_key": "noise_band_v2",
+ "strategy_name": "Noise band \u00b7 v2",
+ "variant": null,
+ "variant_label": null,
+ "stability_mode": "local_perturbation",
+ "validation_rules": {
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3,
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40
+ },
+ "run_id": "nb_rty_v2",
+ "generated_at": "2026-11-02T17:55:42+00:00",
+ "periods": {
+  "dev": [
+   "2018-01-01",
+   "2022-12-31"
+  ],
+  "val": [
+   "2023-01-01",
+   "2024-12-31"
+  ]
+ },
+ "strategy": {
+  "summary": "Trade breakouts from the day's normal range, flat by the close. For every time of day the strategy averages how far price has been from that day's open over the last N sessions; times the band multiple, that is the noise band around today's open. At each check time a close above the band goes long and a close below it goes short, at the next bar's open. The position trails out through the band, the session VWAP, or whichever is closer, and is always closed at the session's last close. After Zarattini, Aziz & Barbon (2024).",
+  "formula": "band = open \u00b1 multiple \u00d7 average |close \u2212 open| \u00f7 open at this time of day over the last N sessions (\u00d7 today's open)",
+  "rules": [
+   {
+    "label": "Enter",
+    "text": "At a check time (every 15, 30 or 60 minutes from the open, and not before the first-entry time), buy when the bar closes above the upper band and sell short when it closes below the lower band. The order fills at the next bar's open. The gap-adjusted anchor starts the upper band from the higher of the open and the prior close, the lower band from the lower."
+   },
+   {
+    "label": "Exit",
+    "text": "At a check time, exit when price closes back through the band, through the session VWAP, or through whichever of the two is closer, filled at the next open. Anything still open is closed at the session's last close. No stop loss in this round."
+   },
+   {
+    "label": "Size",
+    "text": "Long, short or both; one position at a time, never held overnight; optionally capped at 1 or 2 entries per session; optionally no new entries in the last 60 or 120 minutes; optionally only when the last 30 or 60 minutes moved the same way. As many whole RTY contracts as the account covers at full contract value (no leverage), starting from $1,000,000."
+   }
+  ],
+  "axes": [
+   {
+    "label": "Bar size",
+    "values": [
+     "15min"
+    ]
+   },
+   {
+    "label": "Band lookback (days)",
+    "values": [
+     "1",
+     "3",
+     "5",
+     "10",
+     "20",
+     "30",
+     "45",
+     "80"
+    ]
+   },
+   {
+    "label": "Band multiple",
+    "values": [
+     "0.5",
+     "0.75",
+     "1",
+     "1.5"
+    ]
+   },
+   {
+    "label": "Check every (min)",
+    "values": [
+     "15"
+    ]
+   },
+   {
+    "label": "First entry (min)",
+    "values": [
+     "60"
+    ]
+   },
+   {
+    "label": "Band anchor",
+    "values": [
+     "gap-adj"
+    ]
+   },
+   {
+    "label": "Trailing exit",
+    "values": [
+     "VWAP",
+     "closer"
+    ]
+   },
+   {
+    "label": "Direction",
+    "values": [
+     "long",
+     "both"
+    ]
+   },
+   {
+    "label": "Max entries / session",
+    "values": [
+     "1",
+     "2",
+     "none"
+    ]
+   },
+   {
+    "label": "No entries in last (min)",
+    "values": [
+     "0",
+     "60",
+     "120"
+    ]
+   },
+   {
+    "label": "Momentum filter (min)",
+    "values": [
+     "0",
+     "30",
+     "60"
+    ]
+   },
+   {
+    "label": "Stop (\u00d7 ATR)",
+    "values": [
+     "none"
+    ]
+   }
+  ],
+  "grid_size": 3456,
+  "length_note": "The band lookback counts trading days; check and first-entry times are minutes after the open."
+ },
+ "funnel": [
+  {
+   "name": "Start",
+   "sub": "every combination",
+   "n": 3456,
+   "why": "All 3,456 versions backtested once on 2018\u20132022 data."
+  },
+  {
+   "name": "1 \u00b7 Integrity",
+   "sub": "no cheating",
+   "n": 3456,
+   "why": "Per-trade checks for look-ahead, impossible fills and overnight holds on every version, plus 40 random versions re-run on cut-off data. 0 failed."
+  },
+  {
+   "name": "2 \u00b7 Enough trades",
+   "sub": "\u2265100 trades, spread out",
+   "n": 3456,
+   "why": "Needs \u2265100 completed trades and \u226510 a year in \u22654 of the 5 years. Removed 0 (none)."
+  },
+  {
+   "name": "3 \u00b7 Profit",
+   "sub": "net > 0, Sharpe \u2265 0.75",
+   "n": 0,
+   "why": "Needs a net profit, Sharpe \u2265 0.75 and drawdown no worse than 30%. Removed 3,456 (3,456 on 15min); 3,450 of them lost money."
+  },
+  {
+   "name": "4 \u00b7 Stable settings",
+   "sub": "nudged settings also work",
+   "n": 0,
+   "why": "Each setting is nudged one at a time, down and up: band lookback by \u00b120% (rounded) and band multiple by \u00b10.25. At least 70% of the nudged versions must be profitable, with median Sharpe \u2265 0.5. Removed 0."
+  },
+  {
+   "name": "5 \u00b7 Time stability",
+   "sub": "\u22653 profitable years",
+   "n": 0,
+   "why": "Removed 0."
+  },
+  {
+   "name": "6 \u00b7 Remove duplicates",
+   "sub": "best 2 per group",
+   "n": 0,
+   "why": "Versions whose monthly returns correlate \u2265 0.8 form a group; the best 2 of each go on (a group of one keeps its one). 0 versions formed 0 groups; 0 of the 0 picks are distinct backtests (first-entry times before the first check act alike)."
+  },
+  {
+   "name": "7 \u00b7 Cost stress",
+   "sub": "profitable at 1.5\u00d7 costs",
+   "n": 0,
+   "why": "Removed 0."
+  },
+  {
+   "name": "8 \u00b7 Validation",
+   "sub": "2023\u20132024, new data",
+   "n": null,
+   "why": "Frozen finalists run once on unseen data: needs net > 0, Sharpe \u2265 0.3, drawdown no worse than 30% and \u226540 trades. Not run yet: the finalists are frozen and waiting for this step."
+  }
+ ],
+ "stable": {
+  "n": 0,
+  "axes": [
+   {
+    "axis": "band_lookback",
+    "label": "Band lookback (days)",
+    "values": [
+     {
+      "v": "1",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "3",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "10",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "20",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "30",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "45",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "80",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "band_mult",
+    "label": "Band multiple",
+    "values": [
+     {
+      "v": "0.5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "0.75",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "1",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "1.5",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "trail",
+    "label": "Trailing exit",
+    "values": [
+     {
+      "v": "VWAP",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "closer",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "direction",
+    "label": "Direction",
+    "values": [
+     {
+      "v": "long",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "both",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "max_entries_per_session",
+    "label": "Max entries / session",
+    "values": [
+     {
+      "v": "1",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "2",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "none",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "last_entry_cutoff_minutes",
+    "label": "No entries in last (min)",
+    "values": [
+     {
+      "v": "0",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "60",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "120",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "momentum_minutes",
+    "label": "Momentum filter (min)",
+    "values": [
+     {
+      "v": "0",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "30",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "60",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   }
+  ],
+  "by_timeframe": []
+ },
+ "ablation": [
+  {
+   "axis": "band_lookback",
+   "label": "Band lookback (days)",
+   "values": [
+    {
+     "v": "1",
+     "n": 432,
+     "pct_profitable": 0.0023148148148148147,
+     "median_sharpe": -0.5798537289216423,
+     "p90_sharpe": -0.30956049472094116,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "3",
+     "n": 432,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.8358351668372945,
+     "p90_sharpe": -0.6295923703795439,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "5",
+     "n": 432,
+     "pct_profitable": 0.011574074074074073,
+     "median_sharpe": -0.8308742878822531,
+     "p90_sharpe": -0.41767287600679487,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "10",
+     "n": 432,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.859075033375306,
+     "p90_sharpe": -0.5463571144806038,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "20",
+     "n": 432,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.7411313078341966,
+     "p90_sharpe": -0.4829121305228278,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "30",
+     "n": 432,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.6995513292575372,
+     "p90_sharpe": -0.461195490765316,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "45",
+     "n": 432,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.6854038723837697,
+     "p90_sharpe": -0.4236365800740636,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "80",
+     "n": 432,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.5589304613136485,
+     "p90_sharpe": -0.29410113561566475,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "band_mult",
+   "label": "Band multiple",
+   "values": [
+    {
+     "v": "0.5",
+     "n": 864,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.7174536383562005,
+     "p90_sharpe": -0.5015883365486522,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "0.75",
+     "n": 864,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.7178123753988079,
+     "p90_sharpe": -0.38516117055133653,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "1",
+     "n": 864,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.6778700627168246,
+     "p90_sharpe": -0.38473053190392115,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "1.5",
+     "n": 864,
+     "pct_profitable": 0.006944444444444444,
+     "median_sharpe": -0.7910966078487138,
+     "p90_sharpe": -0.39347637584973694,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "trail",
+   "label": "Trailing exit",
+   "values": [
+    {
+     "v": "VWAP",
+     "n": 1728,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.6679538103091394,
+     "p90_sharpe": -0.4161811842557096,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "closer",
+     "n": 1728,
+     "pct_profitable": 0.003472222222222222,
+     "median_sharpe": -0.767395504989687,
+     "p90_sharpe": -0.42079630497536874,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "direction",
+   "label": "Direction",
+   "values": [
+    {
+     "v": "long",
+     "n": 1728,
+     "pct_profitable": 0.003472222222222222,
+     "median_sharpe": -0.6149724371897412,
+     "p90_sharpe": -0.31685216403399624,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "both",
+     "n": 1728,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.8245664944558241,
+     "p90_sharpe": -0.564273188538804,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "max_entries_per_session",
+   "label": "Max entries / session",
+   "values": [
+    {
+     "v": "1",
+     "n": 1152,
+     "pct_profitable": 0.005208333333333333,
+     "median_sharpe": -0.6625304177796181,
+     "p90_sharpe": -0.30620463948861,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "2",
+     "n": 1152,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.7596271149287124,
+     "p90_sharpe": -0.44977225924282316,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "none",
+     "n": 1152,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.7393034274252099,
+     "p90_sharpe": -0.4744098876189744,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "last_entry_cutoff_minutes",
+   "label": "No entries in last (min)",
+   "values": [
+    {
+     "v": "0",
+     "n": 1152,
+     "pct_profitable": 0.001736111111111111,
+     "median_sharpe": -0.6708895173413894,
+     "p90_sharpe": -0.39640284535558956,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "60",
+     "n": 1152,
+     "pct_profitable": 0.0008680555555555555,
+     "median_sharpe": -0.7139229665918254,
+     "p90_sharpe": -0.42747591288058445,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "120",
+     "n": 1152,
+     "pct_profitable": 0.0026041666666666665,
+     "median_sharpe": -0.7879084247102448,
+     "p90_sharpe": -0.44755921383930214,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "momentum_minutes",
+   "label": "Momentum filter (min)",
+   "values": [
+    {
+     "v": "0",
+     "n": 1152,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.727638634623984,
+     "p90_sharpe": -0.41983507664403463,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "30",
+     "n": 1152,
+     "pct_profitable": 0.003472222222222222,
+     "median_sharpe": -0.6616561467412823,
+     "p90_sharpe": -0.38421974950935833,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "60",
+     "n": 1152,
+     "pct_profitable": 0.001736111111111111,
+     "median_sharpe": -0.7682754442022288,
+     "p90_sharpe": -0.4588640885630365,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  }
+ ],
+ "length_map": {
+  "title": "Band lookback \u00d7 band multiple",
+  "pair_text": "band lookback and band multiple",
+  "corner": "Days \u2193 \u00b7 Band \u2192",
+  "row_short": "lookback",
+  "col_short": "band",
+  "order": null,
+  "fixed": {
+   "Trailing exit": "closer",
+   "Direction": "long",
+   "Max entries / session": "1",
+   "No entries in last (min)": "120",
+   "Momentum filter (min)": "30"
+  },
+  "center": [
+   5,
+   "1.5"
+  ],
+  "rows": [
+   1,
+   3,
+   5,
+   10,
+   20,
+   30,
+   45,
+   80
+  ],
+  "cols": [
+   "0.5",
+   "0.75",
+   "1",
+   "1.5"
+  ],
+  "sharpe": [
+   [
+    -0.5585891204798227,
+    -0.4268314787142996,
+    -0.0479372384282714,
+    0.045806364422640675
+   ],
+   [
+    -0.7878539448492684,
+    -0.5097983332177474,
+    -0.8233155703495285,
+    -0.5459383382540717
+   ],
+   [
+    -0.49836053906490857,
+    -0.63522966770485,
+    -0.41767287600679487,
+    0.07585101304795364
+   ],
+   [
+    -0.7702743773006746,
+    -0.6870709232660669,
+    -0.13302703294023552,
+    -0.3002289188979875
+   ],
+   [
+    -0.5876380241205063,
+    -0.36676804474573044,
+    -0.19869402810975464,
+    -0.4435966822979078
+   ],
+   [
+    -0.4520325048490589,
+    -0.11664163645134397,
+    -0.461195490765316,
+    -0.7337381890786122
+   ],
+   [
+    -0.506010060438613,
+    -0.4672508076892725,
+    -0.2078293726243789,
+    -0.5119978721800957
+   ],
+   [
+    -0.4445654654411961,
+    -0.22658180235669048,
+    -0.09901111214293944,
+    -0.39060994905938723
+   ]
+  ],
+  "trades": [
+   [
+    572,
+    491,
+    444,
+    352
+   ],
+   [
+    558,
+    460,
+    386,
+    263
+   ],
+   [
+    552,
+    464,
+    368,
+    226
+   ],
+   [
+    534,
+    442,
+    360,
+    206
+   ],
+   [
+    526,
+    424,
+    351,
+    202
+   ],
+   [
+    519,
+    424,
+    338,
+    191
+   ],
+   [
+    504,
+    411,
+    333,
+    192
+   ],
+   [
+    485,
+    398,
+    319,
+    184
+   ]
+  ]
+ },
+ "luck": null,
+ "finalists": [],
+ "short_labels": {
+  "timeframe": "Bar",
+  "band_lookback": "Days",
+  "band_mult": "Band",
+  "check_minutes": "Check",
+  "first_entry_minutes": "1st",
+  "anchor": "Anchor",
+  "trail": "Exit",
+  "direction": "Side",
+  "stop_atr_multiple": "Stop",
+  "max_entries_per_session": "Max",
+  "last_entry_cutoff_minutes": "Cutoff",
+  "momentum_minutes": "Mom",
+  "max_extension": "Ext",
+  "rel_volume": "RVol"
+ },
+ "exit_labels": [
+  [
+   "trail",
+   "trail",
+   "trailing exit"
+  ],
+  [
+   "eod",
+   "close",
+   "session close"
+  ],
+  [
+   "stop",
+   "stop",
+   "stop"
+  ]
+ ],
+ "local_moves": [
+  [
+   "band_lookback",
+   "Lookback"
+  ],
+  [
+   "band_mult",
+   "Band"
+  ]
+ ],
+ "benchmark": {
+  "label": "Holding RTY (rolled, unlevered)",
+  "dev": {
+   "net_return": 0.12665174210938357,
+   "sharpe": 0.22532829923144213,
+   "max_drawdown": -0.4312907456545637
+  },
+  "val": {
+   "net_return": 0.16788924049686904,
+   "sharpe": 0.48133397715771425,
+   "max_drawdown": -0.20393881186164675
+  }
+ },
+ "transfer_symbol": "ES",
+ "dsr": {
+  "effective_trials": 239.99999999999878,
+  "raw_trials": 3456.0
+ },
+ "assumptions": [
+  "Data: Databento CME continuous front month (RTY.v.0), 1-minute bars aggregated to 5 and 15 minutes. Rolls are back-adjusted so the roll gap is not treated as a price move; the band is scaled by the real (unadjusted) open.",
+  "Day session only: NYSE regular session 09:30-16:00 NY on NYSE trading days. Overnight Globex trading is not used: \"the open\" is the day-session open and the prior close is the previous day-session close. Nothing is held overnight.",
+  "Costs: 1 tick slippage per side and $2.50 commission per contract per side, including the session-close exit.",
+  "The paper sizes by volatility with up to 4\u00d7 leverage; here each trade uses the whole account in whole contracts with no leverage, the same as the mean-reversion runs.",
+  "Session VWAP is built from the 5- or 15-minute bars' typical price and volume, not ticks.",
+  "After an exit, a new entry in the same direction waits until price closes back inside the band at a check time; the opposite direction isn't blocked.",
+  "With no stop, 5- and 15-minute bars decide at the same check times, and a first-entry time before the first check changes nothing, so the grid contains exact duplicates; they collapse in stage 6.",
+  "Sharpe uses daily mark-to-market returns (\u221a252), with idle cash earning 0%. Time in market is the share of bars with an open position.",
+  "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead."
+ ],
+ "source": "noise-band-backtest/runs/funnel/nb_rty_v2/ \u00b7 configs/funnel/nb_funnel_rty_v2.yaml"
+}

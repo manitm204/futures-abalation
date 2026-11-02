@@ -1,0 +1,1216 @@
+{
+ "market": "CL",
+ "market_name": "Crude oil",
+ "strategy_key": "noise_band_v2",
+ "strategy_name": "Noise band \u00b7 v2",
+ "variant": null,
+ "variant_label": null,
+ "stability_mode": "local_perturbation",
+ "validation_rules": {
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3,
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40
+ },
+ "run_id": "nb_cl_v2",
+ "generated_at": "2026-11-02T17:49:22+00:00",
+ "periods": {
+  "dev": [
+   "2018-01-01",
+   "2022-12-31"
+  ],
+  "val": [
+   "2023-01-01",
+   "2024-12-31"
+  ]
+ },
+ "strategy": {
+  "summary": "Trade breakouts from the day's normal range, flat by the close. For every time of day the strategy averages how far price has been from that day's open over the last N sessions; times the band multiple, that is the noise band around today's open. At each check time a close above the band goes long and a close below it goes short, at the next bar's open. The position trails out through the band, the session VWAP, or whichever is closer, and is always closed at the session's last close. After Zarattini, Aziz & Barbon (2024).",
+  "formula": "band = open \u00b1 multiple \u00d7 average |close \u2212 open| \u00f7 open at this time of day over the last N sessions (\u00d7 today's open)",
+  "rules": [
+   {
+    "label": "Enter",
+    "text": "At a check time (every 15, 30 or 60 minutes from the open, and not before the first-entry time), buy when the bar closes above the upper band and sell short when it closes below the lower band. The order fills at the next bar's open. The gap-adjusted anchor starts the upper band from the higher of the open and the prior close, the lower band from the lower."
+   },
+   {
+    "label": "Exit",
+    "text": "At a check time, exit when price closes back through the band, through the session VWAP, or through whichever of the two is closer, filled at the next open. Anything still open is closed at the session's last close. No stop loss in this round."
+   },
+   {
+    "label": "Size",
+    "text": "Long, short or both; one position at a time, never held overnight; optionally capped at 1 or 2 entries per session; optionally no new entries in the last 60 or 120 minutes; optionally only when the last 30 or 60 minutes moved the same way; optionally skipping breakouts already far beyond the band; optionally only on above-normal volume. As many whole CL contracts as the account covers at full contract value (no leverage), starting from $1,000,000."
+   }
+  ],
+  "axes": [
+   {
+    "label": "Bar size",
+    "values": [
+     "15min"
+    ]
+   },
+   {
+    "label": "Band lookback (days)",
+    "values": [
+     "1",
+     "3",
+     "5",
+     "10",
+     "20",
+     "30",
+     "45",
+     "80"
+    ]
+   },
+   {
+    "label": "Band multiple",
+    "values": [
+     "0.5",
+     "0.75",
+     "1",
+     "1.5",
+     "2"
+    ]
+   },
+   {
+    "label": "Check every (min)",
+    "values": [
+     "15"
+    ]
+   },
+   {
+    "label": "First entry (min)",
+    "values": [
+     "60"
+    ]
+   },
+   {
+    "label": "Band anchor",
+    "values": [
+     "gap-adj"
+    ]
+   },
+   {
+    "label": "Trailing exit",
+    "values": [
+     "VWAP",
+     "closer"
+    ]
+   },
+   {
+    "label": "Direction",
+    "values": [
+     "long",
+     "both"
+    ]
+   },
+   {
+    "label": "Max entries / session",
+    "values": [
+     "1",
+     "none"
+    ]
+   },
+   {
+    "label": "No entries in last (min)",
+    "values": [
+     "0",
+     "60"
+    ]
+   },
+   {
+    "label": "Momentum filter (min)",
+    "values": [
+     "0",
+     "30",
+     "60"
+    ]
+   },
+   {
+    "label": "Max entry extension (\u00d7 band)",
+    "values": [
+     "off",
+     "0.25"
+    ]
+   },
+   {
+    "label": "Relative volume (\u00d7)",
+    "values": [
+     "off",
+     "1.5"
+    ]
+   },
+   {
+    "label": "Stop (\u00d7 ATR)",
+    "values": [
+     "none"
+    ]
+   }
+  ],
+  "grid_size": 7680,
+  "length_note": "The band lookback counts trading days; check and first-entry times are minutes after the open."
+ },
+ "funnel": [
+  {
+   "name": "Start",
+   "sub": "every combination",
+   "n": 7680,
+   "why": "All 7,680 versions backtested once on 2018\u20132022 data."
+  },
+  {
+   "name": "1 \u00b7 Integrity",
+   "sub": "no cheating",
+   "n": 7680,
+   "why": "Per-trade checks for look-ahead, impossible fills and overnight holds on every version, plus 40 random versions re-run on cut-off data. 0 failed."
+  },
+  {
+   "name": "2 \u00b7 Enough trades",
+   "sub": "\u2265100 trades, spread out",
+   "n": 4716,
+   "why": "Needs \u2265100 completed trades and \u226510 a year in \u22654 of the 5 years. Removed 2,964 (2,964 on 15min)."
+  },
+  {
+   "name": "3 \u00b7 Profit",
+   "sub": "net > 0, Sharpe \u2265 0.75",
+   "n": 1,
+   "why": "Needs a net profit, Sharpe \u2265 0.75 and drawdown no worse than 30%. Removed 4,715 (4,715 on 15min); 3,890 of them lost money."
+  },
+  {
+   "name": "4 \u00b7 Stable settings",
+   "sub": "nudged settings also work",
+   "n": 1,
+   "why": "Each setting is nudged one at a time, down and up: band lookback by \u00b120% (rounded) and band multiple by \u00b10.25. At least 70% of the nudged versions must be profitable, with median Sharpe \u2265 0.5. Removed 0."
+  },
+  {
+   "name": "5 \u00b7 Time stability",
+   "sub": "\u22653 profitable years",
+   "n": 1,
+   "why": "Removed 0."
+  },
+  {
+   "name": "6 \u00b7 Remove duplicates",
+   "sub": "best 2 per group",
+   "n": 1,
+   "why": "Versions whose monthly returns correlate \u2265 0.8 form a group; the best 2 of each go on (a group of one keeps its one). 1 versions formed 1 groups; 1 of the 1 picks are distinct backtests (first-entry times before the first check act alike)."
+  },
+  {
+   "name": "7 \u00b7 Cost stress",
+   "sub": "profitable at 1.5\u00d7 costs",
+   "n": 1,
+   "why": "Removed 0."
+  },
+  {
+   "name": "8 \u00b7 Validation",
+   "sub": "2023\u20132024, new data",
+   "n": null,
+   "why": "Frozen finalists run once on unseen data: needs net > 0, Sharpe \u2265 0.3, drawdown no worse than 30% and \u226540 trades. Not run yet: the finalists are frozen and waiting for this step."
+  }
+ ],
+ "stable": {
+  "n": 1,
+  "axes": [
+   {
+    "axis": "band_lookback",
+    "label": "Band lookback (days)",
+    "values": [
+     {
+      "v": "1",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "3",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "10",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "20",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "30",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "45",
+      "n": 1,
+      "median_sharpe": 0.813830098094287
+     },
+     {
+      "v": "80",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "band_mult",
+    "label": "Band multiple",
+    "values": [
+     {
+      "v": "0.5",
+      "n": 1,
+      "median_sharpe": 0.813830098094287
+     },
+     {
+      "v": "0.75",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "1",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "1.5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "2",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "trail",
+    "label": "Trailing exit",
+    "values": [
+     {
+      "v": "VWAP",
+      "n": 1,
+      "median_sharpe": 0.813830098094287
+     },
+     {
+      "v": "closer",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "direction",
+    "label": "Direction",
+    "values": [
+     {
+      "v": "long",
+      "n": 1,
+      "median_sharpe": 0.813830098094287
+     },
+     {
+      "v": "both",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "max_entries_per_session",
+    "label": "Max entries / session",
+    "values": [
+     {
+      "v": "1",
+      "n": 1,
+      "median_sharpe": 0.813830098094287
+     },
+     {
+      "v": "none",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "last_entry_cutoff_minutes",
+    "label": "No entries in last (min)",
+    "values": [
+     {
+      "v": "0",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "60",
+      "n": 1,
+      "median_sharpe": 0.813830098094287
+     }
+    ]
+   },
+   {
+    "axis": "momentum_minutes",
+    "label": "Momentum filter (min)",
+    "values": [
+     {
+      "v": "0",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "30",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "60",
+      "n": 1,
+      "median_sharpe": 0.813830098094287
+     }
+    ]
+   },
+   {
+    "axis": "max_extension",
+    "label": "Max entry extension (\u00d7 band)",
+    "values": [
+     {
+      "v": "off",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "0.25",
+      "n": 1,
+      "median_sharpe": 0.813830098094287
+     }
+    ]
+   },
+   {
+    "axis": "rel_volume",
+    "label": "Relative volume (\u00d7)",
+    "values": [
+     {
+      "v": "off",
+      "n": 1,
+      "median_sharpe": 0.813830098094287
+     },
+     {
+      "v": "1.5",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   }
+  ],
+  "by_timeframe": [
+   {
+    "timeframe": "15min",
+    "n": 1,
+    "axes": [
+     {
+      "axis": "band_lookback",
+      "label": "Band lookback (days)",
+      "values": [
+       {
+        "v": "1",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "3",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "5",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "10",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "20",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "30",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "45",
+        "n": 1,
+        "median_sharpe": 0.813830098094287
+       },
+       {
+        "v": "80",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "band_mult",
+      "label": "Band multiple",
+      "values": [
+       {
+        "v": "0.5",
+        "n": 1,
+        "median_sharpe": 0.813830098094287
+       },
+       {
+        "v": "0.75",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "1",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "1.5",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "2",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "trail",
+      "label": "Trailing exit",
+      "values": [
+       {
+        "v": "VWAP",
+        "n": 1,
+        "median_sharpe": 0.813830098094287
+       },
+       {
+        "v": "closer",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "direction",
+      "label": "Direction",
+      "values": [
+       {
+        "v": "long",
+        "n": 1,
+        "median_sharpe": 0.813830098094287
+       },
+       {
+        "v": "both",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "max_entries_per_session",
+      "label": "Max entries / session",
+      "values": [
+       {
+        "v": "1",
+        "n": 1,
+        "median_sharpe": 0.813830098094287
+       },
+       {
+        "v": "none",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "last_entry_cutoff_minutes",
+      "label": "No entries in last (min)",
+      "values": [
+       {
+        "v": "0",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "60",
+        "n": 1,
+        "median_sharpe": 0.813830098094287
+       }
+      ]
+     },
+     {
+      "axis": "momentum_minutes",
+      "label": "Momentum filter (min)",
+      "values": [
+       {
+        "v": "0",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "30",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "60",
+        "n": 1,
+        "median_sharpe": 0.813830098094287
+       }
+      ]
+     },
+     {
+      "axis": "max_extension",
+      "label": "Max entry extension (\u00d7 band)",
+      "values": [
+       {
+        "v": "off",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "0.25",
+        "n": 1,
+        "median_sharpe": 0.813830098094287
+       }
+      ]
+     },
+     {
+      "axis": "rel_volume",
+      "label": "Relative volume (\u00d7)",
+      "values": [
+       {
+        "v": "off",
+        "n": 1,
+        "median_sharpe": 0.813830098094287
+       },
+       {
+        "v": "1.5",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "ablation": [
+  {
+   "axis": "band_lookback",
+   "label": "Band lookback (days)",
+   "values": [
+    {
+     "v": "1",
+     "n": 960,
+     "pct_profitable": 0.2635416666666667,
+     "median_sharpe": -0.2527426423482475,
+     "p90_sharpe": 0.37881918246927954,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "3",
+     "n": 960,
+     "pct_profitable": 0.12395833333333334,
+     "median_sharpe": -0.410600145845603,
+     "p90_sharpe": 0.11040746608181763,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "5",
+     "n": 960,
+     "pct_profitable": 0.2,
+     "median_sharpe": -0.31301274819266744,
+     "p90_sharpe": 0.23929699817000252,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "10",
+     "n": 960,
+     "pct_profitable": 0.1375,
+     "median_sharpe": -0.4139710444122569,
+     "p90_sharpe": 0.21298841452394743,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "20",
+     "n": 960,
+     "pct_profitable": 0.16770833333333332,
+     "median_sharpe": -0.3504835624853453,
+     "p90_sharpe": 0.15612801114983815,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "30",
+     "n": 960,
+     "pct_profitable": 0.14270833333333333,
+     "median_sharpe": -0.3822636695723692,
+     "p90_sharpe": 0.1519847204230633,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "45",
+     "n": 960,
+     "pct_profitable": 0.20104166666666667,
+     "median_sharpe": -0.29805964331555146,
+     "p90_sharpe": 0.19767699074229592,
+     "n_stage3": 1,
+     "n_survivors": 1
+    },
+    {
+     "v": "80",
+     "n": 960,
+     "pct_profitable": 0.109375,
+     "median_sharpe": -0.5139808478987762,
+     "p90_sharpe": 0.07155408772849112,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "band_mult",
+   "label": "Band multiple",
+   "values": [
+    {
+     "v": "0.5",
+     "n": 1536,
+     "pct_profitable": 0.12565104166666666,
+     "median_sharpe": -0.4138356252776868,
+     "p90_sharpe": 0.10677707611501112,
+     "n_stage3": 1,
+     "n_survivors": 1
+    },
+    {
+     "v": "0.75",
+     "n": 1536,
+     "pct_profitable": 0.12174479166666667,
+     "median_sharpe": -0.4038345527674858,
+     "p90_sharpe": 0.10135867960838729,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "1",
+     "n": 1536,
+     "pct_profitable": 0.19205729166666666,
+     "median_sharpe": -0.2667321359808882,
+     "p90_sharpe": 0.2448231734805593,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "1.5",
+     "n": 1536,
+     "pct_profitable": 0.14908854166666666,
+     "median_sharpe": -0.3929442583067707,
+     "p90_sharpe": 0.15734524877273798,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "2",
+     "n": 1536,
+     "pct_profitable": 0.2526041666666667,
+     "median_sharpe": -0.30385199411456476,
+     "p90_sharpe": 0.2818689729346437,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "trail",
+   "label": "Trailing exit",
+   "values": [
+    {
+     "v": "VWAP",
+     "n": 3840,
+     "pct_profitable": 0.14973958333333334,
+     "median_sharpe": -0.34458845680181194,
+     "p90_sharpe": 0.15990823801536264,
+     "n_stage3": 1,
+     "n_survivors": 1
+    },
+    {
+     "v": "closer",
+     "n": 3840,
+     "pct_profitable": 0.18671875,
+     "median_sharpe": -0.38521095940496614,
+     "p90_sharpe": 0.239534099831474,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "direction",
+   "label": "Direction",
+   "values": [
+    {
+     "v": "long",
+     "n": 3840,
+     "pct_profitable": 0.08333333333333333,
+     "median_sharpe": -0.6205677153390023,
+     "p90_sharpe": -0.05579380519489303,
+     "n_stage3": 1,
+     "n_survivors": 1
+    },
+    {
+     "v": "both",
+     "n": 3840,
+     "pct_profitable": 0.253125,
+     "median_sharpe": -0.15970958646274241,
+     "p90_sharpe": 0.30072296806800575,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "max_entries_per_session",
+   "label": "Max entries / session",
+   "values": [
+    {
+     "v": "1",
+     "n": 3840,
+     "pct_profitable": 0.19453125,
+     "median_sharpe": -0.3428786764739056,
+     "p90_sharpe": 0.251038597119679,
+     "n_stage3": 1,
+     "n_survivors": 1
+    },
+    {
+     "v": "none",
+     "n": 3840,
+     "pct_profitable": 0.14192708333333334,
+     "median_sharpe": -0.37281179017530236,
+     "p90_sharpe": 0.14143052573621168,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "last_entry_cutoff_minutes",
+   "label": "No entries in last (min)",
+   "values": [
+    {
+     "v": "0",
+     "n": 3840,
+     "pct_profitable": 0.18177083333333333,
+     "median_sharpe": -0.334575659839232,
+     "p90_sharpe": 0.22802569505197812,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "60",
+     "n": 3840,
+     "pct_profitable": 0.1546875,
+     "median_sharpe": -0.3783336884645082,
+     "p90_sharpe": 0.16199597965593868,
+     "n_stage3": 1,
+     "n_survivors": 1
+    }
+   ]
+  },
+  {
+   "axis": "momentum_minutes",
+   "label": "Momentum filter (min)",
+   "values": [
+    {
+     "v": "0",
+     "n": 2560,
+     "pct_profitable": 0.169921875,
+     "median_sharpe": -0.3805800493252886,
+     "p90_sharpe": 0.1906220290914579,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "30",
+     "n": 2560,
+     "pct_profitable": 0.171484375,
+     "median_sharpe": -0.3525670608053775,
+     "p90_sharpe": 0.204605565479617,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "60",
+     "n": 2560,
+     "pct_profitable": 0.16328125,
+     "median_sharpe": -0.34648605472957084,
+     "p90_sharpe": 0.1937273513856477,
+     "n_stage3": 1,
+     "n_survivors": 1
+    }
+   ]
+  },
+  {
+   "axis": "max_extension",
+   "label": "Max entry extension (\u00d7 band)",
+   "values": [
+    {
+     "v": "off",
+     "n": 3840,
+     "pct_profitable": 0.10989583333333333,
+     "median_sharpe": -0.36946135241151934,
+     "p90_sharpe": 0.10362956573869991,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "0.25",
+     "n": 3840,
+     "pct_profitable": 0.2265625,
+     "median_sharpe": -0.3540508995860597,
+     "p90_sharpe": 0.26266607458457225,
+     "n_stage3": 1,
+     "n_survivors": 1
+    }
+   ]
+  },
+  {
+   "axis": "rel_volume",
+   "label": "Relative volume (\u00d7)",
+   "values": [
+    {
+     "v": "off",
+     "n": 3840,
+     "pct_profitable": 0.21276041666666667,
+     "median_sharpe": -0.30328652122999944,
+     "p90_sharpe": 0.2519565001653764,
+     "n_stage3": 1,
+     "n_survivors": 1
+    },
+    {
+     "v": "1.5",
+     "n": 3840,
+     "pct_profitable": 0.12369791666666667,
+     "median_sharpe": -0.4686062741335048,
+     "p90_sharpe": 0.0923910035153953,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  }
+ ],
+ "length_map": {
+  "title": "Band lookback \u00d7 band multiple",
+  "pair_text": "band lookback and band multiple",
+  "corner": "Days \u2193 \u00b7 Band \u2192",
+  "row_short": "lookback",
+  "col_short": "band",
+  "order": 1,
+  "fixed": {
+   "Trailing exit": "VWAP",
+   "Direction": "long",
+   "Max entries / session": "1",
+   "No entries in last (min)": "60",
+   "Momentum filter (min)": "60",
+   "Max entry extension (\u00d7 band)": "0.25",
+   "Relative volume (\u00d7)": "off"
+  },
+  "center": [
+   45,
+   "0.5"
+  ],
+  "rows": [
+   1,
+   3,
+   5,
+   10,
+   20,
+   30,
+   45,
+   80
+  ],
+  "cols": [
+   "0.5",
+   "0.75",
+   "1",
+   "1.5",
+   "2"
+  ],
+  "sharpe": [
+   [
+    -0.016687347615677563,
+    -0.23739221374726033,
+    0.13823825307144383,
+    -0.2958457756624628,
+    -0.4144090351589972
+   ],
+   [
+    -0.3820781071658792,
+    -0.582465185105873,
+    -0.2898729118968565,
+    -0.4955680900932736,
+    -0.15886678523113038
+   ],
+   [
+    0.46831478985999114,
+    -0.13683731951593753,
+    -0.242694410583076,
+    -0.338084616039551,
+    0.1385225808781261
+   ],
+   [
+    0.21548354798686767,
+    -0.37949355293143583,
+    0.3588616794937136,
+    -0.5392719713854118,
+    -0.7941107606427571
+   ],
+   [
+    0.5287785110067361,
+    -0.023829568834030278,
+    -0.19947933014696403,
+    -0.3592284342214009,
+    -0.6478767964874758
+   ],
+   [
+    0.4327036132386171,
+    0.07538984671020557,
+    0.22675232082237393,
+    -0.9473047249422285,
+    -0.4707737057254066
+   ],
+   [
+    0.813830098094287,
+    -0.35040786951210007,
+    0.2553577968092571,
+    -0.9141196877802992,
+    -0.10663263917695007
+   ],
+   [
+    0.6006663795513758,
+    -0.5188291566315174,
+    -0.47840386763465353,
+    -0.6726575867299852,
+    -0.8314226742818618
+   ]
+  ],
+  "trades": [
+   [
+    226,
+    215,
+    215,
+    171,
+    168
+   ],
+   [
+    241,
+    269,
+    252,
+    204,
+    155
+   ],
+   [
+    242,
+    255,
+    243,
+    184,
+    130
+   ],
+   [
+    249,
+    244,
+    236,
+    182,
+    112
+   ],
+   [
+    229,
+    237,
+    243,
+    168,
+    101
+   ],
+   [
+    229,
+    249,
+    235,
+    161,
+    89
+   ],
+   [
+    239,
+    243,
+    219,
+    145,
+    90
+   ],
+   [
+    224,
+    241,
+    189,
+    140,
+    91
+   ]
+  ]
+ },
+ "luck": null,
+ "finalists": [
+  {
+   "order": 1,
+   "group": 0,
+   "config_id": "cfg_fb76",
+   "settings": {
+    "band_lookback": "45",
+    "band_mult": "0.5",
+    "trail": "VWAP",
+    "direction": "long",
+    "max_entries_per_session": "1",
+    "last_entry_cutoff_minutes": "60",
+    "momentum_minutes": "60",
+    "max_extension": "0.25",
+    "rel_volume": "off"
+   },
+   "dev": {
+    "net_return": 0.25460499999999886,
+    "cagr": 0.046484317867884206,
+    "sharpe": 0.813830098094287,
+    "max_drawdown": -0.05743499999999757,
+    "exposure": 0.0685993839463671,
+    "win_rate": 0.4083333333333333,
+    "profit_factor": 1.3870877011607827,
+    "n_completed_trades": 239.0,
+    "turnover_annual": 41.33308815088963
+   },
+   "val": null,
+   "status": "pending",
+   "reasons": [],
+   "exits": {
+    "trail": 121,
+    "eod": 118,
+    "stop": 0
+   },
+   "stress_1_5x": 0.19044499999999842,
+   "breakeven_cost_x": 3.3527783691717916,
+   "transfer_sharpe": null,
+   "neighbor_median_sharpe": 0.43294073014524864,
+   "local_frac_profitable": 0.75,
+   "local_median_sharpe": 0.5275771410579106,
+   "local_detail": [
+    {
+     "move": "band_lookback=36",
+     "sharpe": 0.9243967698010858,
+     "net_return": 0.3012349999999995,
+     "trades": 236
+    },
+    {
+     "move": "band_lookback=54",
+     "sharpe": 0.41688176188352233,
+     "net_return": 0.13949499999999837,
+     "trades": 226
+    },
+    {
+     "move": "band_mult=0.25",
+     "sharpe": 0.6382725202322991,
+     "net_return": 0.14790999999999954,
+     "trades": 164
+    },
+    {
+     "move": "band_mult=0.75",
+     "sharpe": -0.35040786951210007,
+     "net_return": -0.0917300000000022,
+     "trades": 243
+    }
+   ],
+   "dsr": 0.13721177938122014,
+   "luck": null
+  }
+ ],
+ "short_labels": {
+  "timeframe": "Bar",
+  "band_lookback": "Days",
+  "band_mult": "Band",
+  "check_minutes": "Check",
+  "first_entry_minutes": "1st",
+  "anchor": "Anchor",
+  "trail": "Exit",
+  "direction": "Side",
+  "stop_atr_multiple": "Stop",
+  "max_entries_per_session": "Max",
+  "last_entry_cutoff_minutes": "Cutoff",
+  "momentum_minutes": "Mom",
+  "max_extension": "Ext",
+  "rel_volume": "RVol"
+ },
+ "exit_labels": [
+  [
+   "trail",
+   "trail",
+   "trailing exit"
+  ],
+  [
+   "eod",
+   "close",
+   "session close"
+  ],
+  [
+   "stop",
+   "stop",
+   "stop"
+  ]
+ ],
+ "local_moves": [
+  [
+   "band_lookback",
+   "Lookback"
+  ],
+  [
+   "band_mult",
+   "Band"
+  ]
+ ],
+ "benchmark": {
+  "label": "Holding CL (rolled, unlevered)",
+  "dev": {
+   "net_return": -0.09158222435250041,
+   "sharpe": 0.26393326414896356,
+   "max_drawdown": -0.9070687276501677
+  },
+  "val": {
+   "net_return": -0.0035659867780233334,
+   "sharpe": 0.14915004157635411,
+   "max_drawdown": -0.2585602619816283
+  }
+ },
+ "transfer_symbol": null,
+ "dsr": {
+  "effective_trials": 440.0000000000008,
+  "raw_trials": 7680.0
+ },
+ "assumptions": [
+  "Data: Databento CME continuous front month (CL.v.0), 1-minute bars aggregated to 5 and 15 minutes. Rolls are back-adjusted so the roll gap is not treated as a price move; the band is scaled by the real (unadjusted) open.",
+  "Day session only: NYMEX crude day session 09:00-14:30 NY (settlement window) on NYSE trading days. Overnight Globex trading is not used: \"the open\" is the day-session open and the prior close is the previous day-session close. Nothing is held overnight.",
+  "Costs: 1 tick slippage per side and $2.50 commission per contract per side, including the session-close exit.",
+  "The paper sizes by volatility with up to 4\u00d7 leverage; here each trade uses the whole account in whole contracts with no leverage, the same as the mean-reversion runs.",
+  "Session VWAP is built from the 5- or 15-minute bars' typical price and volume, not ticks.",
+  "After an exit, a new entry in the same direction waits until price closes back inside the band at a check time; the opposite direction isn't blocked.",
+  "With no stop, 5- and 15-minute bars decide at the same check times, and a first-entry time before the first check changes nothing, so the grid contains exact duplicates; they collapse in stage 6.",
+  "Sharpe uses daily mark-to-market returns (\u221a252), with idle cash earning 0%. Time in market is the share of bars with an open position.",
+  "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead."
+ ],
+ "source": "noise-band-backtest/runs/funnel/nb_cl_v2/ \u00b7 configs/funnel/nb_funnel_cl_v2.yaml"
+}

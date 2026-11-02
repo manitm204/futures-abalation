@@ -1,0 +1,84 @@
+{
+  "calibration_verified": false,
+  "effective_trials": {
+    "li_ji": 239.99999999999878,
+    "n_components_95": 58,
+    "n_series": 3456,
+    "participation_ratio": 3.141417926699707,
+    "rank_bound_T": 1259
+  },
+  "n_configs_with_defined_sharpe": 3456,
+  "primary_method": "li_ji",
+  "research_history": [
+    {
+      "n_configs": 140292,
+      "name": "noise_band NQ v1-v3 (nb_nq_v1..v3) and stopped v5",
+      "note": "Same family on NQ (8,100 + 3,456 + 432 configs run; 128,304 stopped in stage 5). This grid is NQ v2's, picked after NQ v2's validation and holdout."
+    },
+    {
+      "n_configs": 7680,
+      "name": "noise_band CL v2 (nb_cl_v2)",
+      "note": "Same family on CL (NQ v2's grid plus filters); 1 of 7,680 survived 2018-2022."
+    },
+    {
+      "n_configs": 46224,
+      "name": "noise_band ES v1-v4 (nb_es_v1..v4)",
+      "note": "Same family on ES; frozen finalists validated on ES 2023-2024; ES pair lost 1.5% on the 2025+ holdout. ES 2018-2022 is also this run's transfer check."
+    },
+    {
+      "n_configs": 8640,
+      "name": "mean_reversion RTY (mr_rty_v7_1h)",
+      "note": "Different (mean-reversion) family on RTY; 162 frozen candidates, 69 passed 2023-2024."
+    },
+    {
+      "n_configs": 13608,
+      "name": "mean_reversion RTY (mr_rty_v7_15m)",
+      "note": "Different (mean-reversion) family on RTY; 154 frozen candidates, 7 passed 2023-2024."
+    },
+    {
+      "n_configs": 84672,
+      "name": "mean_reversion RTY (mr_rty_v6)",
+      "note": "Different (mean-reversion) family on RTY; 108 frozen candidates, 19 passed 2023-2024."
+    },
+    {
+      "n_configs": 41472,
+      "name": "mean_reversion RTY (mr_rty_v5)",
+      "note": "Different (mean-reversion) family on RTY; 27 frozen candidates, 5 passed 2023-2024."
+    },
+    {
+      "n_configs": 248832,
+      "name": "ma_crossover v2 grid (ma_v2, SPY)",
+      "note": "Long-only trend-following MA crossover, 5min/15min, SPY."
+    },
+    {
+      "n_configs": 60000,
+      "name": "ma_crossover v1 grid (ma_v1, SPY)",
+      "note": "Long-only trend-following MA crossover, 5min/15min/1h, SPY."
+    },
+    {
+      "n_configs": 24576,
+      "name": "channel_breakout grid (funnel_v1..v4, SPY)",
+      "note": "Channel-breakout grid; four funnel variants with changed thresholds/methods."
+    },
+    {
+      "n_configs": 3888,
+      "name": "donchian_ablation (donchian_v1, SPY/QQQ)",
+      "note": "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+    }
+  ],
+  "serial_dependence": "lag1_effective_n",
+  "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+  "trial_count_options": {
+    "li_ji": 239.99999999999878,
+    "participation_ratio": 3.141417926699707,
+    "raw": 3456.0,
+    "raw_plus_known_prior": 683340.0
+  },
+  "unresolved": [
+    "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+    "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+    "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+    "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+  ],
+  "variance_of_trial_sharpes_per_period": 0.00024755122563817035
+}

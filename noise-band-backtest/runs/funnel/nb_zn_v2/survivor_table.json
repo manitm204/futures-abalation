@@ -1,0 +1,114 @@
+[
+  {
+    "evaluated": 3456,
+    "kind": "universe",
+    "passed": 3456,
+    "pct_of_previous": 100.0,
+    "pct_of_universe": 100.0,
+    "stage": "0 universe"
+  },
+  {
+    "evaluated": 3456,
+    "hard_reject": 0,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 3456,
+    "pct_of_previous": 100.0,
+    "pct_of_universe": 100.0,
+    "stage": "1 backtest integrity",
+    "with_warnings": 0
+  },
+  {
+    "evaluated": 3456,
+    "hard_reject": 0,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 3456,
+    "pct_of_previous": 100.0,
+    "pct_of_universe": 100.0,
+    "stage": "2 trade count & coverage",
+    "with_warnings": 2304
+  },
+  {
+    "evaluated": 3456,
+    "hard_reject": 3456,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 0,
+    "pct_of_previous": 0.0,
+    "pct_of_universe": 0.0,
+    "stage": "3 performance & risk",
+    "with_warnings": 0
+  },
+  {
+    "evaluated": 0,
+    "hard_reject": 0,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 0,
+    "pct_of_previous": null,
+    "pct_of_universe": 0.0,
+    "stage": "4 parameter stability",
+    "with_warnings": 0
+  },
+  {
+    "evaluated": 0,
+    "hard_reject": 0,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 0,
+    "pct_of_previous": null,
+    "pct_of_universe": 0.0,
+    "stage": "5 time stability",
+    "with_warnings": 0
+  },
+  {
+    "deduplicated": 0,
+    "evaluated": 0,
+    "kind": "dedup",
+    "n_clusters": 0,
+    "note": "best 2 per cluster",
+    "passed": 0,
+    "pct_of_previous": null,
+    "pct_of_universe": 0.0,
+    "stage": "6 deduplication"
+  },
+  {
+    "evaluated": 0,
+    "hard_reject": 0,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 0,
+    "pct_of_previous": null,
+    "pct_of_universe": 0.0,
+    "stage": "7 execution stress",
+    "with_warnings": 0
+  },
+  {
+    "evaluated": null,
+    "kind": "hard_gate",
+    "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+    "passed": null,
+    "pct_of_previous": null,
+    "pct_of_universe": null,
+    "stage": "8 frozen validation"
+  },
+  {
+    "evaluated": 0,
+    "kind": "diagnostic_only",
+    "note": "diagnostic only: ",
+    "passed": null,
+    "pct_of_previous": null,
+    "pct_of_universe": null,
+    "stage": "9 DSR / transfer"
+  },
+  {
+    "evaluated": null,
+    "kind": "explicit_command",
+    "note": "not run; `final-test` command only",
+    "passed": null,
+    "pct_of_previous": null,
+    "pct_of_universe": null,
+    "stage": "10 final holdout"
+  }
+]
