@@ -4,7 +4,9 @@ Same stages, thresholds and commands as the mean-reversion funnel
 (../mean-reversion-backtest/scripts/run_mr_funnel.py); only the base strategy
 (src/strategies/noise_band/) and its grid (src/experiments/nb_grid.py) differ. The
 YAML's `strategy` picks the parameter space (`noise_band` = v1, `noise_band_v2` = v2, 8,100 configs each; `noise_band_v3` = v2 on 5min + 15min, 16,200;
-`noise_band_v4` = adds max entries per session, 13,824).
+`noise_band_v4` = adds max entries per session, 13,824; `noise_band_v5` = adds a last-entry cutoff, 128,304;
+`noise_band_v6` = NQ round 2 with a momentum filter, 3,456;
+`noise_band_v7` = NQ round 3 with an entry-extension cap and relative volume, 432).
 All thresholds live in the YAML (hashed into every output).
 
 Commands (each is a separate, explicit step):
@@ -39,7 +41,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.analysis.neighborhood import LATTICE_NB_V1, LATTICE_NB_V2, LATTICE_NB_V3, LATTICE_NB_V4, NeighborhoodStats, neighborhood_stats
+from src.analysis.neighborhood import LATTICE_NB_V1, LATTICE_NB_V2, LATTICE_NB_V3, LATTICE_NB_V4, LATTICE_NB_V5, LATTICE_NB_V6, LATTICE_NB_V7, NeighborhoodStats, neighborhood_stats
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.data.aggregation import AGG_INTERVAL_MINUTES, aggregate_bars
 from src.experiments.data_access import (
@@ -54,11 +56,11 @@ from src.experiments.funnel import (
     DIAGNOSTIC,
     HARD_REJECT,
     INSUFFICIENT,
+    LARGE_CLUSTER_N,
     NOT_EVALUATED,
     PASS,
     Outcome,
     cluster_by_correlation,
-    correlation_matrix,
     monthly_returns,
     representative_key,
     select_representatives,
@@ -67,6 +69,7 @@ from src.experiments.funnel import (
     stage3_performance,
     stage4_parameter_stability,
     stage5_time_stability,
+    standardized_rows,
     survivor_table,
 )
 from src.experiments.funnel_config import (
@@ -84,10 +87,10 @@ from src.experiments.funnel_robustness import (
     perturbations_nb,
     quantile,
 )
-from src.experiments.nb_grid import nb_grid, nb_grid_v2, nb_grid_v3, nb_grid_v4
+from src.experiments.nb_grid import nb_grid, nb_grid_v2, nb_grid_v3, nb_grid_v4, nb_grid_v5, nb_grid_v6, nb_grid_v7
 from src.experiments.nb_integrity import CHECKS, truncation_invariance
 from src.strategies.noise_band.backtest import NBParams
-from src.strategies.noise_band.config import NoiseBandConfig, NoiseBandV2Config, NoiseBandV3Config, NoiseBandV4Config
+from src.strategies.noise_band.config import NoiseBandConfig, NoiseBandV2Config, NoiseBandV3Config, NoiseBandV4Config, NoiseBandV5Config, NoiseBandV6Config, NoiseBandV7Config
 from src.utils.hashing import canonical_json
 from src.utils.logging import configure_logging, get_logger
 from src.utils.seeds import derive_seed
@@ -116,6 +119,21 @@ SPACES = {
     "noise_band_v4": {
         "grid": nb_grid_v4, "cls": NoiseBandV4Config, "lattice": LATTICE_NB_V4, "perturb": perturbations_nb,
         "local": local_perturbations_nb, "keys": (*NB_KEYS, "max_entries_per_session"),
+    },
+    "noise_band_v5": {
+        "grid": nb_grid_v5, "cls": NoiseBandV5Config, "lattice": LATTICE_NB_V5, "perturb": perturbations_nb,
+        "local": local_perturbations_nb, "keys": (*NB_KEYS, "max_entries_per_session", "last_entry_cutoff_minutes"),
+    },
+    "noise_band_v6": {
+        "grid": nb_grid_v6, "cls": NoiseBandV6Config, "lattice": LATTICE_NB_V6, "perturb": perturbations_nb,
+        "local": local_perturbations_nb,
+        "keys": (*NB_KEYS, "max_entries_per_session", "last_entry_cutoff_minutes", "momentum_minutes"),
+    },
+    "noise_band_v7": {
+        "grid": nb_grid_v7, "cls": NoiseBandV7Config, "lattice": LATTICE_NB_V7, "perturb": perturbations_nb,
+        "local": local_perturbations_nb,
+        "keys": (*NB_KEYS, "max_entries_per_session", "last_entry_cutoff_minutes", "momentum_minutes",
+                 "max_extension", "rel_volume"),
     },
 }
 SPACE = SPACES["noise_band"]
@@ -171,6 +189,15 @@ def _frames(fcfg, symbol, phase, *, command, experiment_id, authorization=None):
 def _params(rec: dict, symbol: str | None = None) -> NBParams:
     p = NBParams.from_config(SPACE["cls"](**{k: rec[k] for k in GRID_KEYS if k in rec}))
     return p if symbol is None else NBParams(**{**p.__dict__, "symbol": symbol})
+
+
+LOCAL_METRICS = ("sharpe", "net_return", "n_completed_trades")  # what stage 4 reads from a local move
+OVERLAP_SAMPLE = 25  # members per cluster whose trade overlap with the representative is measured
+
+
+def _pkey(p: NBParams) -> tuple:
+    """Backtest identity of a parameter set (band multiple rounded like the local moves)."""
+    return tuple(round(v, 6) if isinstance(v, float) else v for v in p.__dict__.values())
 
 
 def _set(rec: dict, stage: int, out: Outcome) -> None:
@@ -244,6 +271,10 @@ def develop(
     if reuse_prep and rec_path.exists() and ret_path.exists() and meta_path.exists() \
             and json.loads(meta_path.read_text()).get("fingerprint") == fp:
         records = pl.read_parquet(rec_path).to_dicts()
+        # Parquet stores mixed int / "none" axes (entry cap) as strings; restore the grid values.
+        orig = {ce.config_id: ce.config.model_dump() for ce in grid}
+        for r in records:
+            r.update({k: orig[r["config_id"]][k] for k in GRID_KEYS if k in r})
         R = np.load(ret_path)
         logger.info("prep_reused", n=len(records))
     else:
@@ -280,9 +311,43 @@ def develop(
     s1 = gate(1, "1 backtest integrity", records, stage1_integrity)
     s2 = gate(2, "2 trade count & coverage", s1, lambda r: stage2_trade_count(r, fcfg))
     s3 = gate(3, "3 performance & risk", s2, lambda r: stage3_performance(r, fcfg))
+    ps = fcfg.parameter_stability
+    dd = fcfg.dedup
+
+    def _cluster(ids):
+        """Stage-6 clustering (development monthly returns); big pools cluster within groups."""
+        M = monthly_returns(R[[row[c] for c in ids]], days) if ids else np.zeros((0, 0))
+        split = len(ids) > LARGE_CLUSTER_N
+        groups = [f"{by_id[c]['direction']}|{by_id[c]['trail']}" for c in ids] if split else None
+        return cluster_by_correlation(ids, M, threshold=dd.corr_threshold, method=dd.linkage, groups=groups), M, split
+
+    # ---- Prescreen (optional, big grids): best few per cluster go into stage 4 ----
+    pre = ps.prescreen
+    if pre is not None and len(s3) > pre.max_configs:
+        pcl, _, psplit = _cluster([r["config_id"] for r in s3])
+        ranked = sorted(s3, key=lambda r: (-(r["dev_sharpe"] if r["dev_sharpe"] is not None else -np.inf),
+                                           -(r.get("dev_n_profitable_years") or 0), r["config_id"]))
+        taken: Counter = Counter()
+        keep = []
+        for r in ranked:
+            k = pcl[r["config_id"]]
+            r["prescreen_cluster"] = k
+            if taken[k] < pre.per_cluster:
+                taken[k] += 1
+                keep.append(r)
+            else:
+                _set(r, 4, Outcome(DEDUPLICATED, [f"prescreen: not in the best {pre.per_cluster} of cluster {k} "
+                                                  "by development Sharpe"]))
+        keep_ids = {r["config_id"] for r in keep}
+        s3 = [r for r in s3 if r["config_id"] in keep_ids]  # original order
+        table.append({"stage": "4a prescreen", "kind": "dedup", "evaluated": len(ranked), "passed": len(s3),
+                      "deduplicated": len(ranked) - len(s3), "n_clusters": len(taken),
+                      "note": f"{len(ranked)} > {pre.max_configs} passed stage 3: best {pre.per_cluster} per cluster "
+                              "by development Sharpe go into stage 4"
+                              + (" (clustered within direction x trailing-exit groups)" if psplit else "")})
+        logger.info("stage_done", stage="4a prescreen", evaluated=len(ranked), passed=len(s3))
 
     # ---- Stage 4: immediate neighbors from the FULL universe ----
-    ps = fcfg.parameter_stability
     nstats = neighborhood_stats(records, net_return_key="dev_net_return", sharpe_key="dev_sharpe",
                                 lattice=SPACE["lattice"],
                                 include_joint=ps.neighbor_mode == "single_and_joint",
@@ -299,8 +364,18 @@ def develop(
                   "neighbor_boundary_axes": ",".join(ns.boundary_axes)})
     if ps.mode == "local_perturbation":
         lmoves = {r["config_id"]: SPACE["local"](_params(r), ps.local) for r in s3}
-        lres = run_jobs([Job(f"{c}|loc|{lab}", p, dev.start, dev.end) for c, mv in lmoves.items() for lab, p in mv],
-                        frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
+        # A move that lands on a grid config was already backtested in prep: reuse it.
+        on_grid = {_pkey(_params(r)): r for r in records}
+        lres, ljobs = {}, []
+        for c, mv in lmoves.items():
+            for lab, p in mv:
+                hit = on_grid.get(_pkey(p))
+                if hit is not None:
+                    lres[f"{c}|loc|{lab}"] = {"metrics": {k: hit[f"dev_{k}"] for k in LOCAL_METRICS}}
+                else:
+                    ljobs.append(Job(f"{c}|loc|{lab}", p, dev.start, dev.end))
+        lres.update(run_jobs(ljobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers))
+        logger.info("stage4_local_moves", reused_from_prep=len(lres) - len(ljobs), backtested=len(ljobs))
         stab = {}
         for c, mv in lmoves.items():
             ms = [(lab, lres[f"{c}|loc|{lab}"]["metrics"]) for lab, _ in mv]
@@ -325,60 +400,59 @@ def develop(
         return out
     s4 = gate(4, "4 parameter stability", s3, _s4)
 
-    # Perturbation diagnostics (never a gate) for stage-4 survivors.
-    pjobs = []
-    for r in s4:
-        for k, p in enumerate(SPACE["perturb"](_params(r), config_id=r["config_id"], base_seed=fcfg.seed,
-                                            pcfg=ps.perturbation)):
-            pjobs.append(Job(f"{r['config_id']}|p{k}", p, dev.start, dev.end))
-    pres = run_jobs(pjobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
-    for r in s4:
-        ms = [pres[f"{r['config_id']}|p{k}"]["metrics"] for k in range(ps.perturbation.n_per_config)]
-        sh = [m["sharpe"] for m in ms]
-        med = quantile(sh, 0.5)
-        r["perturb_n"] = len(ms)
-        r["perturb_frac_profitable"] = float(np.mean([m["net_return"] > 0 for m in ms])) if ms else None
-        r["perturb_median_sharpe"] = med
-        r["perturb_p10_sharpe"] = quantile(sh, 0.1)
-        r["perturb_center_minus_median_sharpe"] = (r["dev_sharpe"] - med) if med is not None else None
-
     s5 = gate(5, "5 time stability", s4, lambda r: stage5_time_stability(r, fcfg))
     for r in s5:
         r["n_profitable_years"] = r.get("dev_n_profitable_years")  # representative ordering key
 
     # ---- Stage 6: complete-linkage dedup on development monthly returns ----
-    dd = fcfg.dedup
     ids5 = [r["config_id"] for r in s5]
     rows5 = [row[c] for c in ids5]
-    M5 = monthly_returns(R[rows5], days) if ids5 else np.zeros((0, 0))
-    cluster_of = cluster_by_correlation(ids5, M5, threshold=dd.corr_threshold, method=dd.linkage)
+    # Big grids: one linkage over every survivor does not fit in memory, so above
+    # LARGE_CLUSTER_N survivors the dedup runs within each direction x trailing-exit group.
+    cluster_of, M5, split = _cluster(ids5)
     reps = select_representatives(s5, cluster_of, dd.reps_per_cluster)
     rep_ids = {r["config_id"] for r in reps}
     rep_of = {}  # cluster -> its best representative
     for r in reps:
         rep_of.setdefault(cluster_of[r["config_id"]], r["config_id"])
-    ijobs = [Job(f"{c}|iv", _params(by_id[c]), dev.start, dev.end, return_series=True) for c in ids5]
+    by_cluster: dict[int, list[str]] = {}
+    for c in ids5:
+        by_cluster.setdefault(cluster_of[c], []).append(c)
+    # Trade overlap with the representative is a diagnostic: measured on every member of a
+    # small cluster, on a seeded sample of OVERLAP_SAMPLE members of a big one.
+    ov_members = {}
+    for k, mem in by_cluster.items():
+        others = sorted(c for c in mem if c != rep_of[k])
+        if len(others) > OVERLAP_SAMPLE:
+            pick = np.random.default_rng(derive_seed(fcfg.seed, "overlap_sample", str(k))).choice(
+                len(others), OVERLAP_SAMPLE, replace=False)
+            others = [others[i] for i in sorted(pick)]
+        ov_members[k] = others
+    iv_ids = sorted({*rep_of.values(), *(c for v in ov_members.values() for c in v)})
+    ijobs = [Job(f"{c}|iv", _params(by_id[c]), dev.start, dev.end, return_series=True) for c in iv_ids]
     ivs = {k.split("|")[0]: v["intervals"] for k, v in
            run_jobs(ijobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers).items()}
-    Cm = correlation_matrix(M5) if ids5 else None
-    Cd = correlation_matrix(R[rows5].astype(np.float64)) if ids5 else None
+    # Per-cluster correlations from standardized rows (no n x n matrix; same values as correlation_matrix).
+    Zm = standardized_rows(M5) if ids5 else None
+    Zd = standardized_rows(R[rows5]) if ids5 else None
     pos5 = {c: i for i, c in enumerate(ids5)}
     clusters = []
-    for k in sorted(set(cluster_of.values())):
-        members = sorted([c for c in ids5 if cluster_of[c] == k], key=lambda c: representative_key(by_id[c]))
+    for k in sorted(by_cluster):
+        members = sorted(by_cluster[k], key=lambda c: representative_key(by_id[c]))
         rep = rep_of[k]
         idx = [pos5[c] for c in members]
-        sub = Cm[np.ix_(idx, idx)]
+        sub = np.clip(Zm[idx] @ Zm[idx].T / Zm.shape[1], -1.0, 1.0)
+        np.fill_diagonal(sub, 1.0)
         others = [c for c in members if c != rep]
-        dcorr = [float(Cd[pos5[rep], pos5[c]]) for c in others]
-        ovl = [interval_overlap(ivs[rep], ivs[c]) for c in others]
+        dcorr = [float(np.clip(Zd[pos5[rep]] @ Zd[pos5[c]] / Zd.shape[1], -1.0, 1.0)) for c in others]
+        ovl = [interval_overlap(ivs[rep], ivs[c]) for c in ov_members[k]]
         clusters.append({"cluster": k, "representative": rep, "representatives": [c for c in members if c in rep_ids],
                          "size": len(members), "members": members,
                          "min_pairwise_monthly_corr": float(sub.min()) if len(members) > 1 else None,
                          "rep_daily_corr_min": min(dcorr) if dcorr else None,
                          "rep_daily_corr_median": quantile(dcorr, 0.5),
                          "rep_trade_overlap_median": quantile(ovl, 0.5),
-                         "rep_trade_overlap_min": quantile(ovl, 0.0)})
+                         "rep_trade_overlap_min": quantile(ovl, 0.0), "rep_trade_overlap_n": len(ovl)})
     for r in s5:
         k = cluster_of[r["config_id"]]
         r["dedup_cluster"] = k
@@ -389,7 +463,26 @@ def develop(
             _set(r, 6, Outcome(DEDUPLICATED, [f"represented_by {rep_of[k]} (cluster {k})"]))
     table.append({"stage": "6 deduplication", "kind": "dedup", "evaluated": len(s5), "passed": len(reps),
                   "deduplicated": len(s5) - len(reps), "n_clusters": len(rep_of),
-                  "note": f"best {dd.reps_per_cluster} per cluster"})
+                  "note": f"best {dd.reps_per_cluster} per cluster"
+                          + (" (clustered within direction x trailing-exit groups)" if split else "")})
+
+    # Perturbation diagnostics (never a gate, never a ranking key): stage-6 representatives only.
+    pjobs = []
+    for r in reps:
+        for k, p in enumerate(SPACE["perturb"](_params(r), config_id=r["config_id"], base_seed=fcfg.seed,
+                                            pcfg=ps.perturbation)):
+            pjobs.append(Job(f"{r['config_id']}|p{k}", p, dev.start, dev.end))
+    pres = run_jobs(pjobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
+    for r in reps:
+        ms = [pres[f"{r['config_id']}|p{k}"]["metrics"] for k in range(ps.perturbation.n_per_config)]
+        sh = [m["sharpe"] for m in ms]
+        med = quantile(sh, 0.5)
+        r["perturb_n"] = len(ms)
+        r["perturb_frac_profitable"] = float(np.mean([m["net_return"] > 0 for m in ms])) if ms else None
+        r["perturb_median_sharpe"] = med
+        r["perturb_p10_sharpe"] = quantile(sh, 0.1)
+        r["perturb_center_minus_median_sharpe"] = (r["dev_sharpe"] - med) if med is not None else None
+
 
     # ---- Stage 7: execution stress on representatives (development data) ----
     st = fcfg.execution_stress

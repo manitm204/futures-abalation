@@ -34,7 +34,7 @@ data:
 data_history:
   validation_previously_used_for_selection: false
   validation_note: >-
-    No noise-band strategy has been selected or scored on NQ 2023-2024. The mean-reversion family was validated there (mr_nq_v7_1h, mr_nq_v7_15m, mr_nq_v6, mr_nq_v5), so the period has been looked at by the researcher, but not for this strategy.
+    No noise-band strategy has been selected or scored on NQ 2023-2024. NQ 2018-2022 was used only as the unchanged-rules transfer check (stage-9 diagnostic) for the ES noise-band finalists (nb_es_v1..v4), and nb_nq_v5 (128,304 configs, the user's larger grid) was stopped in stage 5 on 2018-2022 with no finalists before this v1 round was run. The mean-reversion family was validated there (mr_nq_v7_1h, mr_nq_v7_15m, mr_nq_v6, mr_nq_v5), so the period has been looked at by the researcher, but not for this strategy.
   holdout_previously_inspected: false
   holdout_note: >-
     No noise-band metrics have been computed on NQ 2025+. NQ 2025+ bars were read for mean-reversion holdout scoring (combined_v1 via combined_portfolio_holdout on 2026-10-25; mr_nq_v7_15m+mr_nq_v7_1h via portfolio_holdout on 2026-10-24; mr_nq_v7_15m+mr_nq_v7_1h via portfolio_holdout_diagnostic on 2026-10-24; trades_v1 via trade_distribution on 2026-10-25) per the mean-reversion data-access ledger: a different strategy family, so this is still the first test of this strategy, but the researcher has seen how that period treated mean reversion.

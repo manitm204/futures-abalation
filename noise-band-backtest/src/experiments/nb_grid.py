@@ -28,10 +28,23 @@ from src.strategies.noise_band.config import (
     V4_FIRST_ENTRY_MINUTES,
     V4_MAX_ENTRIES,
     V4_TRAILS,
+    V5_BAND_LOOKBACKS,
+    V5_BAND_MULTS,
+    V5_LAST_ENTRY_CUTOFFS,
+    V6_BAND_LOOKBACKS,
+    V6_BAND_MULTS,
+    V6_MOMENTUM_MINUTES,
+    V7_BAND_LOOKBACKS,
+    V7_MAX_EXTENSIONS,
+    V7_MOMENTUM_MINUTES,
+    V7_REL_VOLUMES,
     NoiseBandConfig,
     NoiseBandV2Config,
     NoiseBandV3Config,
     NoiseBandV4Config,
+    NoiseBandV5Config,
+    NoiseBandV6Config,
+    NoiseBandV7Config,
 )
 
 AXES_V1: dict[str, tuple] = {
@@ -82,3 +95,64 @@ AXES_V4: dict[str, tuple] = {
 
 def nb_grid_v4(symbols: tuple[str, ...]) -> list[ConfigEntry]:
     return _grid(symbols, AXES_V4, NoiseBandV4Config)
+
+
+AXES_V5: dict[str, tuple] = {
+    "timeframe": TIMEFRAMES,
+    "band_lookback": V5_BAND_LOOKBACKS,
+    "band_mult": V5_BAND_MULTS,
+    "check_minutes": CHECK_MINUTES,
+    "first_entry_minutes": FIRST_ENTRY_MINUTES,
+    "anchor": ANCHORS,
+    "trail": TRAILS,
+    "direction": V4_DIRECTIONS,
+    "max_entries_per_session": V4_MAX_ENTRIES,
+    "last_entry_cutoff_minutes": V5_LAST_ENTRY_CUTOFFS,
+    "stop_atr_multiple": STOP_ATRS,
+}
+
+
+def nb_grid_v5(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_V5, NoiseBandV5Config)
+
+
+AXES_V6: dict[str, tuple] = {
+    "timeframe": ("15min",),
+    "band_lookback": V6_BAND_LOOKBACKS,
+    "band_mult": V6_BAND_MULTS,
+    "check_minutes": (15,),
+    "first_entry_minutes": (60,),
+    "anchor": ("open_prev_close",),
+    "trail": V4_TRAILS,
+    "direction": V4_DIRECTIONS,
+    "max_entries_per_session": V4_MAX_ENTRIES,
+    "last_entry_cutoff_minutes": V5_LAST_ENTRY_CUTOFFS,
+    "momentum_minutes": V6_MOMENTUM_MINUTES,
+    "stop_atr_multiple": STOP_ATRS,
+}
+
+
+def nb_grid_v6(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_V6, NoiseBandV6Config)
+
+
+AXES_V7: dict[str, tuple] = {
+    "timeframe": ("15min",),
+    "band_lookback": V7_BAND_LOOKBACKS,
+    "band_mult": V6_BAND_MULTS,
+    "check_minutes": (15,),
+    "first_entry_minutes": (60,),
+    "anchor": ("open_prev_close",),
+    "trail": ("vwap",),
+    "direction": ("both",),
+    "max_entries_per_session": ("none",),
+    "last_entry_cutoff_minutes": (60,),
+    "momentum_minutes": V7_MOMENTUM_MINUTES,
+    "max_extension": V7_MAX_EXTENSIONS,
+    "rel_volume": V7_REL_VOLUMES,
+    "stop_atr_multiple": STOP_ATRS,
+}
+
+
+def nb_grid_v7(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_V7, NoiseBandV7Config)

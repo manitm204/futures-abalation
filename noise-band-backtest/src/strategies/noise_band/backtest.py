@@ -23,7 +23,13 @@ Execution assumptions (audited by src/experiments/nb_integrity.py):
   * long and/or short (`direction`), one position at a time, compounding equity, no
     leverage; every position is closed by the session's last bar (no overnight risk);
   * entry: at a check-bar close above upper (long) / below lower (short), at least
-    `first_entry_minutes` after the session open, never on the session's last bar; filled at the NEXT bar's open (bar k+1+delay), which must be
+    `first_entry_minutes` after the session open, at least `last_entry_cutoff` minutes
+    before the session close (bar close to the last bar's close), with the optional momentum
+    filter agreeing (long: close_k above the close `momentum_minutes` earlier -- the session
+    open when that is at or before the open; short: below it), optionally no further than
+    `max_extension` x the band half-width beyond the band, optionally with relative volume
+    (session volume through bar k / its 20-session same-time-of-day average) of at least
+    `rel_volume`, never on the session's last bar; filled at the NEXT bar's open (bar k+1+delay), which must be
     in the same session (otherwise the signal is skipped);
   * trailing exit at a check-bar close j: long when close_j < level_j, short when
     close_j > level_j, with level = upper/lower (trail=band), VWAP (vwap) or the
@@ -58,6 +64,7 @@ from src.data.aggregation import AGG_INTERVAL_MINUTES
 from src.engine.events import EquityPoint, ExitReason, Fill, Trade
 from src.features.atr import wilder_atr
 from src.strategies.mean_reversion.backtest import CostModel, scale_variable_costs  # noqa: F401  (re-export)
+from src.strategies.noise_band.config import REL_VOLUME_LOOKBACK
 from src.utils.config_models import ExecutionConfig
 
 TRAIL_EXIT, EOD_EXIT, STOP_EXIT, FORCED = "trail_exit", "eod_exit", "stop_exit", "forced_close"
@@ -151,6 +158,30 @@ class NBData:
         return self._get(("sigma", lookback), calc)
 
     @property
+    def cum_volume(self) -> np.ndarray:
+        """Session volume through each bar."""
+        def calc():
+            v = np.cumsum(self.volume)
+            base = self.sess_start - 1
+            return v - np.where(base >= 0, v[np.maximum(base, 0)], 0.0)
+        return self._get(("cum_volume",), calc)
+
+    @property
+    def rel_volume(self) -> np.ndarray:
+        """Session volume through this bar / its mean at the same time of day over the
+        previous REL_VOLUME_LOOKBACK sessions (today excluded; NaN until that many exist)."""
+        def calc():
+            f = pl.DataFrame({"i": np.arange(self.n), "slot": self.tod, "cv": self.cum_volume})
+            avg = (f.sort(["slot", "i"])
+                   .with_columns(pl.col("cv").shift(1).rolling_mean(window_size=REL_VOLUME_LOOKBACK,
+                                                                     min_samples=REL_VOLUME_LOOKBACK)
+                                 .over("slot").alias("avg"))
+                   .sort("i"))["avg"].fill_null(np.nan).to_numpy().astype(float)
+            with np.errstate(divide="ignore", invalid="ignore"):
+                return np.where(avg > 0, self.cum_volume / avg, np.nan)
+        return self._get(("rel_volume",), calc)
+
+    @property
     def vwap(self) -> np.ndarray:
         def calc():
             typ = (self.high + self.low + self.close) / 3.0
@@ -205,12 +236,17 @@ class NBParams:
     stop_atr: float | None = None
     first_entry_minutes: int = 0   # bar close must be at least this long after the open
     max_entries: int | None = None  # entries allowed per session (None = no cap)
+    last_entry_cutoff: int = 0      # bar close must be at least this long before the session close
+    momentum_minutes: int = 0       # entry must agree with the return over this many minutes (0 = off)
+    max_extension: float | None = None  # close at most this x band half-width beyond the band (None = off)
+    rel_volume: float | None = None     # session volume so far >= this x its usual level (None = off)
 
     @classmethod
     def from_config(cls, cfg) -> "NBParams":
         return cls(cfg.symbol, cfg.timeframe, cfg.band_lookback, cfg.band_mult, cfg.check_minutes,
                    cfg.anchor, cfg.trail, cfg.direction, cfg.stop_atr_value, cfg.first_entry_minutes,
-                   cfg.max_entries_value)
+                   cfg.max_entries_value, cfg.last_entry_cutoff_value, cfg.momentum_value,
+                   cfg.max_extension_value, cfg.rel_volume_value)
 
 
 def as_params(cfg) -> NBParams:
@@ -246,8 +282,25 @@ def signal_arrays(data: NBData, p: NBParams) -> dict[str, np.ndarray]:
     c, vw = data.close, data.vwap
     chk = data.check(p.check_minutes)
     since_open = data.tod + data.tf_minutes - data.open_minute  # bar close, minutes after the open
-    can_enter = chk & ~data.is_last & (since_open >= p.first_entry_minutes)
+    to_close = data.tod[data.sess_end] - data.tod  # bar close to the session's last bar close, minutes
+    can_enter = chk & ~data.is_last & (since_open >= p.first_entry_minutes) & (to_close >= p.last_entry_cutoff)
     above, below = c > up, c < lo  # NaN band -> False
+    go_l, go_s = above, below      # entry side conditions (re-arming stays on the band alone)
+    if p.momentum_minutes:
+        k_back, rem = divmod(p.momentum_minutes, data.tf_minutes)
+        if rem or k_back < 1:
+            raise ValueError(f"momentum_minutes {p.momentum_minutes} must be a multiple of the {data.tf_minutes}-min bar")
+        j = np.arange(data.n) - k_back
+        # Close momentum_minutes earlier; at or before the open the session open stands in.
+        ref = np.where(j >= data.sess_start, c[np.maximum(j, 0)], data.sess_open)
+        go_l, go_s = go_l & (c > ref), go_s & (c < ref)
+    if p.max_extension is not None:
+        half = p.band_mult * data.sigma(p.band_lookback) * data.raw_sess_open
+        go_l = go_l & (c - up <= p.max_extension * half)  # NaN -> False
+        go_s = go_s & (lo - c <= p.max_extension * half)
+    if p.rel_volume is not None:
+        rv = data.rel_volume
+        go_l, go_s = go_l & (rv >= p.rel_volume), go_s & (rv >= p.rel_volume)
     if p.trail == "band":
         lvl_l, lvl_s = up, lo
     elif p.trail == "vwap":
@@ -259,8 +312,8 @@ def signal_arrays(data: NBData, p: NBParams) -> dict[str, np.ndarray]:
     if p.direction not in ("long", "short", "both"):
         raise ValueError(f"Unknown direction {p.direction!r}")
     out = {
-        "entry_l": can_enter & above if p.direction in ("long", "both") else np.zeros(data.n, dtype=bool),
-        "entry_s": can_enter & below if p.direction in ("short", "both") else np.zeros(data.n, dtype=bool),
+        "entry_l": can_enter & go_l if p.direction in ("long", "both") else np.zeros(data.n, dtype=bool),
+        "entry_s": can_enter & go_s if p.direction in ("short", "both") else np.zeros(data.n, dtype=bool),
         "exit_l": chk & (c < lvl_l), "exit_s": chk & (c > lvl_s),
         "inside_l": chk & ~above, "inside_s": chk & ~below,
         "upper": up, "lower": lo, "level_l": lvl_l, "level_s": lvl_s,

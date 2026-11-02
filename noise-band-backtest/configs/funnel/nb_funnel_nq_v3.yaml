@@ -1,0 +1,176 @@
+# NQ futures noise-band breakout (intraday momentum) screening funnel, run nb_nq_v3 --
+# the ONE place every threshold lives. Third noise-band round on NQ, a quick test
+# (noise_band_v7, 432 configs) specified by the user after reading NQ v2 development results
+# (2018-2022 only; validation untouched): 15min bars, band lookback 1/5/15/25/40/60 sessions,
+# band multiple 0.5/0.75/1/1.5, check every 15 min, first entry 60 min, gap-adjusted anchor
+# (those three held from v2), VWAP trailing exit, both sides, no entry cap, no entries in the
+# last 60 min, momentum filter off / 45 min, and two NEW axes: a maximum entry extension (off /
+# 0.25x / 0.5x the band half-width beyond the band) and a relative-volume filter (off / 1x /
+# 1.25x the 20-session same-time-of-day cumulative volume). No stop.
+# After Zarattini, Aziz & Barbon (2024); see src/strategies/noise_band/config.py.
+#
+# Every gate, threshold, data split and cost is identical to the latest mean-reversion
+# round (mean-reversion-backtest/configs/funnel/mr_funnel_ym_v7_15m.yaml) EXCEPT:
+#   * strategy / grid, and timeframes 5min/15min (the noise band needs intraday check times)
+#   * stage-4 local moves are the noise band's: band lookback x0.8/x1.2 and band multiple
+#     -/+ 0.25 (no stop; every other setting is held)
+#   * perturbation diagnostics move the band multiple / stop by a relative step
+#
+# Thresholds are fixed for the duration of a run and are hashed into every run's
+# outputs. They are NEVER adjusted automatically to hit a survivor count; zero
+# survivors is a valid outcome. Changing a value here is a new research trial
+# and should be recorded under `research_history` below.
+
+version: 1
+strategy: noise_band_v7
+symbol: NQ
+seed: 20261030
+
+data:
+  clean_root: data/clean
+  development: {start: 2018-01-01, end: 2022-12-31}
+  validation:  {start: 2023-01-01, end: 2024-12-31}
+  # end: null -> the actual available endpoint, recorded at access time.
+  holdout:     {start: 2025-01-01, end: null}
+  timeframes: ["15min"]
+
+data_history:
+  validation_previously_used_for_selection: false
+  validation_note: >-
+    No noise-band strategy has been selected or scored on NQ 2023-2024. NQ 2018-2022 was used only as the unchanged-rules transfer check (stage-9 diagnostic) for the ES noise-band finalists (nb_es_v1..v4), nb_nq_v5 (128,304 configs) was stopped in stage 5 with no finalists, nb_nq_v1 (8,100 configs, 757 frozen finalists) and nb_nq_v2 (3,456 configs, 374 frozen finalists) were run there; this v3 grid was specified after reading their development results. The mean-reversion family was validated there (mr_nq_v7_1h, mr_nq_v7_15m, mr_nq_v6, mr_nq_v5), so the period has been looked at by the researcher, but not for this strategy.
+  holdout_previously_inspected: false
+  holdout_note: >-
+    No noise-band metrics have been computed on NQ 2025+. NQ 2025+ bars were read for mean-reversion holdout scoring (combined_v1 via combined_portfolio_holdout on 2026-10-25; mr_nq_v7_15m+mr_nq_v7_1h via portfolio_holdout on 2026-10-24; mr_nq_v7_15m+mr_nq_v7_1h via portfolio_holdout_diagnostic on 2026-10-24; trades_v1 via trade_distribution on 2026-10-25) per the mean-reversion data-access ledger: a different strategy family, so this is still the first test of this strategy, but the researcher has seen how that period treated mean reversion.
+
+metrics:
+  return_frequency: daily          # mark-to-market equity at each session close
+  periods_per_year: 252            # Sharpe = mean/std(daily) * sqrt(252)
+  risk_free_rate_annual: 0.0
+  cash_treatment: >-
+    Idle cash earns 0% and the Sharpe excess return is measured against a 0%
+    risk-free rate, so the two assumptions are consistent.
+  drawdown_basis: daily session-close mark-to-market (understates intraday DD)
+
+execution:
+  baseline: configs/execution/futures.yaml   # $2.50/contract/side + 1 tick/side slippage, unlevered whole contracts
+
+integrity:            # stage 1
+  truncation_check_sample: 40
+  truncation_points: 3
+
+trade_count:          # stage 2 -- hard gate
+  min_completed_trades: 100
+  min_trades_per_year: 10
+  min_years_meeting_floor: 4
+
+performance:          # stage 3 -- hard gate
+  min_net_return: 0.0               # strictly greater than
+  min_sharpe: 0.75                  # annualized, daily MTM returns incl. flat days
+  max_drawdown: -0.30
+  max_drawdown_source: src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct
+
+parameter_stability:  # stage 4 -- hard gate
+  mode: local_perturbation          # gate on `local` moves below; grid neighbors are diagnostic only
+  local:
+    int_rel: 0.20                   # band lookback: x0.8 / x1.2, rounded, >= 1 session away
+    band_mult_abs: 0.25             # band multiple -/+ 0.25
+    stop_atr_abs: 0.25              # numeric ATR stop -/+ 0.25 ("none" stays none)
+  neighbor_mode: single_axis        # grid-neighbor diagnostic
+  min_frac_profitable: 0.70         # of the local moves, share with dev net return > 0
+  min_median_sharpe: 0.50           # median dev Sharpe of the local moves
+  prescreen:                        # big grids: fixed before the run, like every gate
+    max_configs: 3000               # if more than this many pass stage 3, cluster them first (stage-6 rules)
+    per_cluster: 3                  # and send only the best 3 per cluster by dev Sharpe into stage 4
+  perturbation:                     # diagnostic only, never a gate
+    n_per_config: 20
+    integer_rel_step: 0.15          # band lookback
+    float_rel_step: 0.10            # band multiple, ATR stop (relative)
+
+time_stability:       # stage 5 -- light hard gate + diagnostics
+  min_profitable_years: 3
+  top_trades_k: 5
+  top_trades_frac: 0.05
+
+dedup:                # stage 6
+  corr_threshold: 0.80
+  return_basis: monthly
+  linkage: complete
+  reps_per_cluster: 2               # best 2 per cluster; a single-member cluster keeps its 1
+
+execution_stress:     # stage 7
+  gate_cost_multiplier: 1.5         # hard gate: positive dev net return
+  diagnostic_cost_multipliers: [2.0]
+  entry_delay_bars: 1
+  missed_entry_frac: 0.10
+  missed_entry_sims: 100
+  breakeven_max_multiplier: 25.0
+
+validation:           # stage 8 -- hard gate (frozen representatives only)
+  min_net_return: 0.0
+  min_sharpe: 0.30
+  max_drawdown: -0.30
+  min_completed_trades: 40          # project default from 2026-10-22
+
+confidence:           # stage 9 -- diagnostics only
+  dsr_threshold: 0.95
+  dsr_calibration_verified: false
+  effective_trials_method: li_ji
+  serial_dependence: lag1_effective_n
+  transfer_symbol: ES               # unchanged rules, development period only
+
+holdout:              # stage 10 -- explicit `final-test` command only
+  acceptance:
+    min_net_return: 0.0
+    min_sharpe: 0.0
+    max_drawdown: -0.30
+    min_completed_trades: null
+
+# Earlier trials: the mean-reversion family on this market, and the SPY momentum /
+# breakout studies (the closest prior search to this family). These count toward the
+# DSR "known prior" sensitivity only.
+research_history:
+  - name: "noise_band NQ v2 (nb_nq_v2)"
+    n_configs: 3456
+    note: "Second noise-band round on NQ (momentum filter, entry cap, last-entry cutoff); 374 frozen finalists from 2018-2022, validation not run. This v3 grid was specified after reading those development results."
+  - name: "noise_band NQ v1 (nb_nq_v1)"
+    n_configs: 8100
+    note: "First noise-band round on NQ; 757 frozen finalists from 2018-2022, validation not run."
+  - name: "noise_band NQ v5 grid (nb_nq_v5, stopped)"
+    n_configs: 128304
+    note: "Stopped by the user in stage 5 (2018-2022 only); every config was backtested on development data and 82,236 passed stage 4, no finalists were frozen."
+  - name: "noise_band ES v4 (nb_es_v4)"
+    n_configs: 13824
+    note: "Same family on ES; 326 frozen finalists, 291 passed ES 2023-2024; #17 + #104 lost 1.5% each on ES 2025+. NQ 2018-2022 was their transfer diagnostic."
+  - name: "noise_band ES v3 (nb_es_v3)"
+    n_configs: 16200
+    note: "Same family on ES; 268 frozen finalists, 255 passed ES 2023-2024."
+  - name: "noise_band ES v2 (nb_es_v2)"
+    n_configs: 8100
+    note: "Same family on ES; 235 frozen finalists, 225 passed ES 2023-2024."
+  - name: "noise_band ES v1 (nb_es_v1)"
+    n_configs: 8100
+    note: "Same family on ES; 210 frozen finalists, 196 passed ES 2023-2024."
+  - name: "mean_reversion NQ (mr_nq_v7_1h)"
+    n_configs: 3456
+    note: "Different (mean-reversion) family on NQ; 153 frozen candidates, 123 passed 2023-2024."
+  - name: "mean_reversion NQ (mr_nq_v7_15m)"
+    n_configs: 1152
+    note: "Different (mean-reversion) family on NQ; 8 frozen candidates, 6 passed 2023-2024."
+  - name: "mean_reversion NQ (mr_nq_v6)"
+    n_configs: 21600
+    note: "Different (mean-reversion) family on NQ; 201 frozen candidates, 161 passed 2023-2024."
+  - name: "mean_reversion NQ (mr_nq_v5)"
+    n_configs: 41472
+    note: "Different (mean-reversion) family on NQ; 93 frozen candidates, 38 passed 2023-2024."
+  - name: "ma_crossover v2 grid (ma_v2, SPY)"
+    n_configs: 248832
+    note: "Long-only trend-following MA crossover, 5min/15min, SPY."
+  - name: "ma_crossover v1 grid (ma_v1, SPY)"
+    n_configs: 60000
+    note: "Long-only trend-following MA crossover, 5min/15min/1h, SPY."
+  - name: "channel_breakout grid (funnel_v1..v4, SPY)"
+    n_configs: 24576
+    note: "Channel-breakout grid; four funnel variants with changed thresholds/methods."
+  - name: "donchian_ablation (donchian_v1, SPY/QQQ)"
+    n_configs: 3888
+    note: "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."

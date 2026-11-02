@@ -289,3 +289,31 @@ def test_survivor_table_percentages_and_zero_survivors():
 
 def test_status_vocabulary_distinct():
     assert len({PASS, HARD_REJECT, INSUFFICIENT, DEDUPLICATED}) == 4
+
+
+def test_large_cluster_path_matches_dense_path(monkeypatch):
+    import src.experiments.funnel as fn
+    rng = np.random.default_rng(5)
+    base = rng.normal(size=(12, 60))
+    X = np.vstack([base + rng.normal(scale=s, size=base.shape) for s in (0.05, 0.4, 1.5)] + [base[:4]])  # + exact copies
+    X[7] = 0.0  # a flat row
+    ids = [f"c{i:03d}" for i in range(len(X))]
+    dense = fn.cluster_by_correlation(ids, X, threshold=0.8)
+    monkeypatch.setattr(fn, "LARGE_CLUSTER_N", 0)
+    light = fn.cluster_by_correlation(ids, X, threshold=0.8)
+    assert dense == light
+
+
+def test_grouped_large_clusters_never_cross_groups(monkeypatch):
+    import src.experiments.funnel as fn
+    rng = np.random.default_rng(9)
+    base = rng.normal(size=(6, 60))
+    X = np.vstack([base, base + rng.normal(scale=0.05, size=base.shape)])
+    ids = [f"c{i:03d}" for i in range(len(X))]
+    groups = ["a"] * 6 + ["b"] * 6
+    monkeypatch.setattr(fn, "LARGE_CLUSTER_N", 0)
+    together = fn.cluster_by_correlation(ids, X, threshold=0.8)
+    split = fn.cluster_by_correlation(ids, X, threshold=0.8, groups=groups)
+    assert len(set(together.values())) == 6 and len(set(split.values())) == 12
+    for i in range(6):  # a series and its near-copy share a cluster only when they share a group
+        assert together[ids[i]] == together[ids[i + 6]] and split[ids[i]] != split[ids[i + 6]]

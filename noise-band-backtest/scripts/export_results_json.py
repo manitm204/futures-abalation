@@ -28,13 +28,13 @@ import typer
 
 from src.data.futures import session_spec
 from src.experiments.funnel_config import load_execution_config, load_funnel_config
-from src.experiments.nb_grid import AXES_V1, AXES_V2, AXES_V3, AXES_V4
+from src.experiments.nb_grid import AXES_V1, AXES_V2, AXES_V3, AXES_V4, AXES_V5, AXES_V6, AXES_V7
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SITE_ROOT = PROJECT_ROOT.parent / "futures-results"
 app = typer.Typer(add_completion=False)
 
-SPACES = {"noise_band": AXES_V1, "noise_band_v2": AXES_V2, "noise_band_v3": AXES_V3, "noise_band_v4": AXES_V4}
+SPACES = {"noise_band": AXES_V1, "noise_band_v2": AXES_V2, "noise_band_v3": AXES_V3, "noise_band_v4": AXES_V4, "noise_band_v5": AXES_V5, "noise_band_v6": AXES_V6, "noise_band_v7": AXES_V7}
 MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini Dow", "RTY": "E-mini Russell 2000",
                 "CL": "Crude oil", "GC": "Gold", "6E": "Euro FX", "6J": "Japanese yen", "ZN": "10-year T-note",
                 "ZB": "30-year T-bond"}
@@ -43,10 +43,14 @@ LABELS = {
     "check_minutes": "Check every (min)", "first_entry_minutes": "First entry (min)", "anchor": "Band anchor",
     "trail": "Trailing exit", "direction": "Direction", "stop_atr_multiple": "Stop (× ATR)",
     "max_entries_per_session": "Max entries / session",
+    "last_entry_cutoff_minutes": "No entries in last (min)",
+    "momentum_minutes": "Momentum filter (min)",
+    "max_extension": "Max entry extension (× band)",
+    "rel_volume": "Relative volume (×)",
 }
 SHORT = {"timeframe": "Bar", "band_lookback": "Days", "band_mult": "Band", "check_minutes": "Check",
          "first_entry_minutes": "1st", "anchor": "Anchor", "trail": "Exit", "direction": "Side",
-         "stop_atr_multiple": "Stop", "max_entries_per_session": "Max"}
+         "stop_atr_multiple": "Stop", "max_entries_per_session": "Max", "last_entry_cutoff_minutes": "Cutoff", "momentum_minutes": "Mom", "max_extension": "Ext", "rel_volume": "RVol"}
 
 
 def _val(axis: str, v) -> str:
@@ -125,6 +129,16 @@ def main(
     df = pl.read_parquet(exp / "config_status.parquet")
     # Mixed int/"none" axes (max entries per session) are stored as text; match their values.
     axes = {ax: tuple(str(v) for v in vals) if df.schema.get(ax) == pl.Utf8 else vals for ax, vals in axes.items()}
+    for ax, vals in axes.items():  # text cells may spell a float differently ("1" vs "1.0"): use the axis spelling
+        if df.schema.get(ax) == pl.Utf8:
+            def _canon(x):
+                try:
+                    return repr(float(x))
+                except ValueError:
+                    return x
+            spell = {_canon(v): v for v in vals}
+            df = df.with_columns(pl.col(ax).map_elements(lambda x, sp=spell: sp.get(_canon(x), x),
+                                                         return_dtype=pl.Utf8))
     by_id = {r["config_id"]: r for r in df.filter(pl.col("s7_status") == "pass").to_dicts()}
     n = df.height
     dev_w, val_w = fcfg.data.development, fcfg.data.validation
@@ -154,12 +168,17 @@ def main(
          "why": f"Needs a net profit, Sharpe ≥ {pf.min_sharpe} and drawdown no worse than {abs(pf.max_drawdown):.0%}. "
                 f"Removed {st['2']['passed'] - st['3']['passed']:,} ({removed_by_tf(3)}); "
                 f"{rej.get('s3:hard_reject:net_return', 0):,} of them lost money."},
+        *([{"name": "Prescreen", "sub": f"best {ps.prescreen.per_cluster} per group", "n": st["4a"]["passed"],
+            "why": f"More than {ps.prescreen.max_configs:,} versions passed the profit test, so they were grouped first "
+                   f"(monthly returns correlating ≥ {fcfg.dedup.corr_threshold}) and only the best "
+                   f"{ps.prescreen.per_cluster} of each of the {st['4a']['n_clusters']:,} groups by 2018–2022 Sharpe "
+                   "went on to the stable-settings test. This rule was set before the run."}] if "4a" in st else []),
         {"name": "4 · Stable settings", "sub": "nudged settings also work", "n": st["4"]["passed"],
          "why": f"Each setting is nudged one at a time, down and up: band lookback by ±{ps.local.int_rel:.0%} "
                 f"(rounded) and band multiple by ±{ps.local.band_mult_abs:g}"
                 + (f", a numeric ATR stop by ±{ps.local.stop_atr_abs:g}" if any(v != "none" for v in axes["stop_atr_multiple"]) else "")
                 + f". At least {ps.min_frac_profitable:.0%} of the nudged versions must be profitable, with median "
-                  f"Sharpe ≥ {ps.min_median_sharpe}. Removed {st['3']['passed'] - st['4']['passed']}."},
+                  f"Sharpe ≥ {ps.min_median_sharpe}. Removed {st['4a' if '4a' in st else '3']['passed'] - st['4']['passed']}."},
         {"name": "5 · Time stability", "sub": f"≥{fcfg.time_stability.min_profitable_years} profitable years",
          "n": st["5"]["passed"], "why": f"Removed {st['4']['passed'] - st['5']['passed']}."},
         {"name": "6 · Remove duplicates", "sub": f"best {fcfg.dedup.reps_per_cluster} per group", "n": st["6"]["passed"],
@@ -315,7 +334,15 @@ def main(
                                              " No stop loss in this round.")},
                 {"label": "Size", "text": f"Long, short or both; one position at a time, never held overnight"
                                           + ("; optionally capped at 1 or 2 entries per session" if
-                                             "max_entries_per_session" in axes else "") + ". As "
+                                             "max_entries_per_session" in axes else "")
+                                          + ("; optionally no new entries in the last 60 or 120 minutes" if
+                                             "last_entry_cutoff_minutes" in axes else "")
+                                          + ("; optionally only when the last 30 or 60 minutes moved the same way"
+                                             if "momentum_minutes" in axes else "")
+                                          + ("; optionally skipping breakouts already far beyond the band"
+                                             if "max_extension" in axes else "")
+                                          + ("; optionally only on above-normal volume"
+                                             if "rel_volume" in axes else "") + ". As "
                                           f"many whole {sym} contracts as the account covers at full contract value "
                                           f"(no leverage), starting from ${ec.starting_equity:,.0f}."},
             ],

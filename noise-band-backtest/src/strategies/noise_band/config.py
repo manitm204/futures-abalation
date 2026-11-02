@@ -23,6 +23,15 @@ Axes (the Cartesian grid, v1 = 8,100 variants per symbol):
                    band_vwap            (the tighter of the two: below max(upper band, VWAP))
   direction      : long, short, both
   max_entries_per_session : 1, 2, none  (v4+: entries allowed per session; none = no cap)
+  last_entry_cutoff_minutes : 0, 60, 120 (v5+: no entry signal in the last N minutes before
+                                         the session close; 0 = only the last-bar rule)
+  momentum_minutes : 0, 30, 60          (v6+: a long also needs close > the close N minutes
+                                         earlier, a short close < it; the session open stands
+                                         in when N minutes back is at or before the open; 0 = off)
+  max_extension  : off, 0.25, 0.5       (v7+: skip a breakout whose close is already more than this
+                                         x the band half-width beyond the band)
+  rel_volume     : off, 1.0, 1.25       (v7+: session volume so far must be at least this x the
+                                         average at the same time of day over the previous 20 sessions)
   stop_atr       : none                 (v1: no protective stop; the backtester supports
                                          entry open -/+ k x ATR(14), intrabar, for later rounds)
 """
@@ -71,6 +80,26 @@ class NoiseBandConfig(FrozenModel):
         v = getattr(self, "max_entries_per_session", "none")
         return None if v == "none" else int(v)
 
+    @property
+    def last_entry_cutoff_value(self) -> int:
+        """Minutes before the session close with no new entries (0 = none). v5+ only."""
+        return int(getattr(self, "last_entry_cutoff_minutes", 0))
+
+    @property
+    def momentum_value(self) -> int:
+        """Momentum-filter lookback in minutes (0 = off). v6+ only."""
+        return int(getattr(self, "momentum_minutes", 0))
+
+    @property
+    def max_extension_value(self) -> float | None:
+        v = getattr(self, "max_extension", "off")
+        return None if v == "off" else float(v)
+
+    @property
+    def rel_volume_value(self) -> float | None:
+        v = getattr(self, "rel_volume", "off")
+        return None if v == "off" else float(v)
+
 
 # --- v2 parameter space (ES round 2, 8,100 variants per symbol) ---------------------------
 # Specified by the user after reading ES v1 development results (2018-2022 only; validation
@@ -118,3 +147,77 @@ class NoiseBandV4Config(NoiseBandConfig):
     trail: Literal["vwap", "band_vwap"] = "vwap"
     direction: Literal["long", "both"] = "both"
     max_entries_per_session: Literal[1, 2, "none"] = "none"
+
+
+# --- v5 parameter space (NQ round 1, 128,304 variants per symbol) -------------------------
+# Specified by the user after the ES v1-v4 rounds (no NQ noise-band results seen): 5min +
+# 15min, band lookback 1-75 sessions, band multiple 0.5-1.75, check 15/30/60, first entry
+# 15/30/60, anchor open / gap-adjusted, every trailing exit (band / VWAP / closer of the
+# two), long / both, at most 1 or 2 entries per session or no cap, and a NEW axis: no new
+# entries in the last 0 / 60 / 120 minutes before the session close. No stop.
+V5_BAND_LOOKBACKS: tuple[int, ...] = (1, 5, 7, 10, 15, 20, 25, 30, 35, 50, 75)
+V5_BAND_MULTS: tuple[float, ...] = (0.5, 0.75, 1.0, 1.25, 1.5, 1.75)
+V5_LAST_ENTRY_CUTOFFS: tuple[int, ...] = (0, 60, 120)
+
+
+class NoiseBandV5Config(NoiseBandConfig):
+    band_lookback: Literal[1, 5, 7, 10, 15, 20, 25, 30, 35, 50, 75] = 15
+    band_mult: Literal[0.5, 0.75, 1.0, 1.25, 1.5, 1.75] = 1.0
+    direction: Literal["long", "both"] = "both"
+    max_entries_per_session: Literal[1, 2, "none"] = "none"
+    last_entry_cutoff_minutes: Literal[0, 60, 120] = 0
+
+
+# --- v6 parameter space (NQ round 2, 3,456 variants per symbol) ---------------------------
+# Specified by the user after reading NQ v1 development results (2018-2022 only; validation
+# untouched): 15min bars, band lookback 1-80 sessions, band multiple 0.5-1.5, check every 15
+# min, first entry 60 min, gap-adjusted anchor, trailing exit VWAP / closer of band and VWAP,
+# long / both, entry cap 1 / 2 / none, last-entry cutoff 0 / 60 / 120 min, and a NEW axis: a
+# momentum filter (off, or the trade must agree with the last 30 / 60 minutes' return).
+V6_BAND_LOOKBACKS: tuple[int, ...] = (1, 3, 5, 10, 20, 30, 45, 80)
+V6_BAND_MULTS: tuple[float, ...] = (0.5, 0.75, 1.0, 1.5)
+V6_MOMENTUM_MINUTES: tuple[int, ...] = (0, 30, 60)
+
+
+class NoiseBandV6Config(NoiseBandConfig):
+    timeframe: Literal["15min"] = "15min"
+    band_lookback: Literal[1, 3, 5, 10, 20, 30, 45, 80] = 10
+    band_mult: Literal[0.5, 0.75, 1.0, 1.5] = 1.0
+    check_minutes: Literal[15] = 15
+    first_entry_minutes: Literal[60] = 60
+    anchor: Literal["open_prev_close"] = "open_prev_close"
+    trail: Literal["vwap", "band_vwap"] = "vwap"
+    direction: Literal["long", "both"] = "both"
+    max_entries_per_session: Literal[1, 2, "none"] = "none"
+    last_entry_cutoff_minutes: Literal[0, 60, 120] = 0
+    momentum_minutes: Literal[0, 30, 60] = 0
+
+
+# --- v7 parameter space (NQ round 3, 432 variants per symbol) -----------------------------
+# A quick test specified by the user after reading NQ v2 development results (2018-2022 only;
+# validation untouched): 15min, band lookback 1-60, band multiple 0.5-1.5, check 15 / first
+# entry 60 / gap-adjusted anchor held from v2, VWAP exit, both sides, no entry cap, no entries
+# in the last 60 min, momentum filter off / 45 min, and two NEW axes: a maximum entry
+# extension (off / 0.25x / 0.5x the band half-width beyond the band) and a relative-volume
+# filter (off / 1x / 1.25x the 20-session same-time-of-day cumulative volume).
+V7_BAND_LOOKBACKS: tuple[int, ...] = (1, 5, 15, 25, 40, 60)
+V7_MOMENTUM_MINUTES: tuple[int, ...] = (0, 45)
+V7_MAX_EXTENSIONS: tuple = ("off", 0.25, 0.5)
+V7_REL_VOLUMES: tuple = ("off", 1.0, 1.25)
+REL_VOLUME_LOOKBACK = 20  # sessions
+
+
+class NoiseBandV7Config(NoiseBandConfig):
+    timeframe: Literal["15min"] = "15min"
+    band_lookback: Literal[1, 5, 15, 25, 40, 60] = 15
+    band_mult: Literal[0.5, 0.75, 1.0, 1.5] = 1.0
+    check_minutes: Literal[15] = 15
+    first_entry_minutes: Literal[60] = 60
+    anchor: Literal["open_prev_close"] = "open_prev_close"
+    trail: Literal["vwap"] = "vwap"
+    direction: Literal["both"] = "both"
+    max_entries_per_session: Literal["none"] = "none"
+    last_entry_cutoff_minutes: Literal[60] = 60
+    momentum_minutes: Literal[0, 45] = 0
+    max_extension: Literal["off", 0.25, 0.5] = "off"
+    rel_volume: Literal["off", 1.0, 1.25] = "off"

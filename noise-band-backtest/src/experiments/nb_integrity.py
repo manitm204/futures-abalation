@@ -30,7 +30,8 @@ CHECKS = ["entry_signal_condition_not_met", "direction_not_allowed", "entry_not_
           "entry_fill_better_than_open", "exit_fill_better_than_market", "position_exceeds_equity",
           "forced_close_not_final_trade", "commission_below_minimum", "unexpected_stop_or_target",
           "stop_not_from_atr_known_before_entry", "stop_exit_without_touch", "stop_fill_better_than_open_stop",
-          "entries_per_session_over_cap"]
+          "entries_per_session_over_cap", "entry_inside_last_entry_cutoff", "entry_against_momentum",
+          "entry_beyond_max_extension", "entry_below_rel_volume"]
 
 
 def check_sim_integrity(sim: SimResult, data: NBData, exec_config: ExecutionConfig, cfg) -> list[str]:
@@ -86,6 +87,36 @@ def check_sim_integrity(sim: SimResult, data: NBData, exec_config: ExecutionConf
             issues.append("stop_not_from_atr_known_before_entry")
     if p.max_entries is not None and np.unique(data.sess[e], return_counts=True)[1].max() > p.max_entries:
         issues.append("entries_per_session_over_cap")
+    if p.last_entry_cutoff:  # from timestamps: signal bar close vs the session's last bar close
+        gap = (data.bar_open[data.sess_end[s]] - data.bar_open[s]).astype("timedelta64[m]").astype(np.int64)
+        if (gap < p.last_entry_cutoff).any():
+            issues.append("entry_inside_last_entry_cutoff")
+    if p.momentum_minutes:  # from timestamps: the bar closing momentum_minutes earlier in the session, else the open
+        back = data.bar_open[s] - np.timedelta64(p.momentum_minutes, "m")
+        j = np.searchsorted(data.bar_open, back)
+        j = np.minimum(j, data.n - 1)
+        same = (data.bar_open[j] == back) & (data.sess[j] == data.sess[s])
+        ref = np.where(same, data.close[j], data.sess_open[s])
+        if (np.where(long_, data.close[s] <= ref, data.close[s] >= ref)).any():
+            issues.append("entry_against_momentum")
+    if p.max_extension is not None:
+        half = p.band_mult * data.sigma(p.band_lookback)[s] * data.raw_sess_open[s]
+        beyond = np.where(long_, data.close[s] - sig["upper"][s], sig["lower"][s] - data.close[s])
+        if (beyond > p.max_extension * half + 1e-9).any():
+            issues.append("entry_beyond_max_extension")
+    if p.rel_volume is not None:  # session volume from its own running sum; slot average over the prior 20 sessions
+        csum = np.concatenate([[0.0], np.cumsum(data.volume)])
+        cv = lambda k: csum[k + 1] - csum[data.sess_start[k]]  # noqa: E731
+        slots: dict[int, np.ndarray] = {}
+        bad = False
+        for k in s:
+            arr = slots.setdefault(int(data.tod[k]), np.flatnonzero(data.tod == data.tod[k]))
+            i = int(np.searchsorted(arr, k))
+            prior = arr[max(0, i - 20):i]
+            avg = np.mean([cv(j) for j in prior]) if len(prior) == 20 else np.nan
+            bad |= not (avg > 0 and cv(k) / avg >= p.rel_volume - 1e-9)
+        if bad:
+            issues.append("entry_below_rel_volume")
     if len(e) > 1 and (e[1:] <= x[:-1]).any():
         issues.append("overlapping_positions")
     eq_before = exec_config.starting_equity + np.concatenate([[0.0], np.cumsum(sim.realized_pnl)[:-1]])

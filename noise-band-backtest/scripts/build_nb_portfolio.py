@@ -104,23 +104,39 @@ def _settings_text(p: dict) -> str:
     side = {"long": "long only", "short": "short only", "both": "long + short"}[p["direction"]]
     cap = p.get("max_entries_per_session", "none")
     cap_t = "no entry cap" if cap == "none" else f"max {cap} entr{'y' if str(cap) == '1' else 'ies'} per session"
-    return (f"{p['timeframe'].replace('min', 'm')} bars, band lookback {p['band_lookback']} days × {p['band_mult']:g}, "
+    extra = ""
+    if p.get("last_entry_cutoff_minutes"):
+        extra += f", no new entries in the last {p['last_entry_cutoff_minutes']} min"
+    if p.get("momentum_minutes"):
+        extra += f", only when the last {p['momentum_minutes']} min moved the same way"
+    if p.get("max_extension", "off") != "off":
+        extra += f", skipping breakouts more than {p['max_extension']}× the band beyond it"
+    if p.get("rel_volume", "off") != "off":
+        extra += f", only on volume ≥ {p['rel_volume']}× normal"
+    days = "day" if p["band_lookback"] == 1 else "days"
+    return (f"{p['timeframe'].replace('min', 'm')} bars, band lookback {p['band_lookback']} {days} × {p['band_mult']:g}, "
             f"check every {p['check_minutes']} min, first entry {p['first_entry_minutes']} min after the open, "
-            f"{anchor}, {trail}, {side}, {cap_t}, no stop")
+            f"{anchor}, {trail}, {side}, {cap_t}{extra}, no stop")
 
 
-def _notes(fcfg, holdout: bool, prior_access, n_sims: int) -> dict:
+def _notes(fcfg, holdout: bool, prior_access, n_sims: int, n_legs: int = 2, runs: tuple[str, ...] = ("nb_es_v4",)) -> dict:
     """Page text that differs from the mean-reversion pair pages."""
-    random = (f"Each is compared with {n_sims} random-entry runs at its own time in market: random intraday trades, "
-              "never overlapping and closed by the session's last bar, with lengths drawn from that strategy's own "
-              "trades and the same share of longs, paying the same costs.")
-    val = ("<b>Not a clean test.</b> These two were picked from the v4 finalists using their 2023–2024 results "
-           "(Sharpe, beats-luck, both years profitable) as well as 2018–2022, so 2023–2024 is in-sample for the "
-           "choice. It shows they held up; it can't prove it. The untouched test is the 2025+ holdout tab.")
-    hold = (("<b>First noise-band look at the holdout.</b> No noise-band strategy had been scored on 2025 onward "
-             "before this run, and only these two, frozen beforehand, were run, so there's no selection among "
-             "holdout results. The mean-reversion family was scored on ES 2025+ earlier (a different strategy), so "
-             "the researcher has seen how that period treated mean reversion.")
+    one = n_legs == 1
+    them, were = ("this one", "was") if one else (f"these {n_legs}", "were")
+    random = (f"{'It is' if one else 'Each is'} compared with {n_sims} random-entry runs at its own time in market: "
+              "random intraday trades, never overlapping and closed by the session's last bar, with lengths drawn "
+              "from that strategy's own trades and the same share of longs, paying the same costs.")
+    picked = "This strategy was" if one else f"These {n_legs} were"
+    val = (f"<b>Not a clean test.</b> {picked} picked from the {', '.join(runs)} finalists using their 2023–2024 "
+           "results (Sharpe, beats-luck, both years profitable) as well as 2018–2022, so 2023–2024 is in-sample for "
+           "the choice. It shows the strategy held up; it can't prove it. The untouched test is the 2025+ holdout tab.")
+    seen_es = ("" if fcfg.symbol == "ES" else
+               " The ES noise-band pair's holdout result (2025+, a loss) was known when this was picked.")
+    hold = ((f"<b>First noise-band look at the {fcfg.symbol} holdout.</b> No noise-band strategy had been scored on "
+             f"{fcfg.symbol} 2025 onward before this run, and only {them}, frozen beforehand, {were} run, so there's "
+             f"no selection among holdout results. The mean-reversion family was scored on {fcfg.symbol} 2025+ "
+             "earlier (a different strategy), so the researcher has seen how that period treated mean reversion."
+             + seen_es)
             if not prior_access else
             (f"<b>Not a clean test: the noise-band holdout for {fcfg.symbol} was used {prior_access} time(s) before this "
              "run.</b> Treat these numbers as a check, not independent proof."))
@@ -336,6 +352,9 @@ def main(
 
     cor = {}
     for k, (a, b) in periods.items():
+        if len(specs) < 2:  # one strategy: nothing to correlate
+            cor[k] = None
+            continue
         x, y = rets[0, a:b + 1], rets[1, a:b + 1]
         act = (x != 0) | (y != 0)
         mk = months[a:b + 1]
@@ -349,7 +368,7 @@ def main(
                   "both_up_days": int(((x > 0) & (y > 0)).sum()), "active_days": int(act.sum())}
     win = 63
     roll = [None] * len(days)
-    for t in range(win - 1, len(days)):
+    for t in range(win - 1, len(days)) if len(specs) > 1 else ():
         roll[t] = corr(rets[0, t - win + 1:t + 1], rets[1, t - win + 1:t + 1])
     combined = block(" + ".join(sp["name"] for sp in specs), ceq, list(zip(sa.sims, ds)), rr,
                      {"sizing": sizing, "sleeves_equity": sleeve_curve, "correlation": cor,
@@ -357,7 +376,7 @@ def main(
     for k in periods:
         P = combined["periods"][k]
         typer.echo(f"combined {k}: return {P['stats']['net_return']:+.1%}, Sharpe {P['stats']['sharpe']:.2f}, "
-                   f"beats {P['luck']['pct_sharpe']:.0%}; corr {cor[k]['daily']:.2f}")
+                   f"beats {P['luck']['pct_sharpe']:.0%}" + (f"; corr {cor[k]['daily']:.2f}" if cor[k] else ""))
 
     # Holding the market (rolled, unlevered): session-close returns of the back-adjusted price / raw price.
     e_idx = ref.day_end_idx[dmask]
@@ -375,7 +394,7 @@ def main(
         "period": [str(start), str(end)], "validation_start": str(fcfg.data.validation.start),
         "holdout": holdout, "prior_holdout_accesses": prior_access,
         "timeframe": " / ".join(tfs), "starting_equity": eq0, "n_sims": n_sims, "hold_bars": None,
-        "notes": _notes(fcfg, holdout, prior_access, n_sims),
+        "notes": _notes(fcfg, holdout, prior_access, n_sims, len(specs), tuple(runs)),
         "days": [str(d) for d in days], "periods": {k: {"range": list(v), "label": labels[k]} for k, v in periods.items()},
         "legs": legs, "combined": combined, "hold": hold,
         "data_access": info,

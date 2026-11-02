@@ -95,6 +95,14 @@ class LocalPerturbationCfg(_Frozen):
     band_mult_abs: float | None = None  # noise band
 
 
+class PrescreenCfg(_Frozen):
+    """Big grids only: when more than `max_configs` configs pass stage 3, cluster them first
+    (stage-6 rules on development monthly returns) and send only the best `per_cluster` of
+    each cluster by development Sharpe into stage 4. Fixed before the run, like every gate."""
+    max_configs: int
+    per_cluster: int
+
+
 class ParamStabilityCfg(_Frozen):
     neighbor_mode: Literal["single_axis", "single_and_joint"]
     min_frac_profitable: float
@@ -104,6 +112,7 @@ class ParamStabilityCfg(_Frozen):
     # gate on `local` moves; grid neighbors are then reported as a diagnostic only.
     mode: Literal["grid_neighbors", "local_perturbation"] = "grid_neighbors"
     local: LocalPerturbationCfg | None = None
+    prescreen: PrescreenCfg | None = None
 
 
 class TimeStabilityCfg(_Frozen):
@@ -197,6 +206,8 @@ class FunnelConfig(_Frozen):
                 del sub[k]
         if ps["mode"] == "grid_neighbors" and ps["local"] is None:
             del ps["mode"], ps["local"]
+        if ps.get("prescreen", 0) is None:
+            del ps["prescreen"]
         return hashlib.sha256(canonical_json(d).encode()).hexdigest()
 
 

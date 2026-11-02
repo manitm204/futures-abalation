@@ -557,7 +557,8 @@ function renderPortfolio(r, pk) {
     ${eqChart(l, l.name)}${statTable(l)}
   </section>`;
 
-  const C = r.combined, CP = C.periods[P], K = C.correlation[P], SZ = C.sizing, SP = SZ.periods[P], mx = v => String(+v.toFixed(2));
+  const solo = r.legs.length === 1;  // one strategy: no correlation, no shared account
+  const C = solo ? r.legs[0] : r.combined, CP = C.periods[P], K = (solo ? null : C.correlation[P]) ?? {}, SZ = C.sizing ?? {}, SP = SZ.periods?.[P], mx = v => String(+v.toFixed(2));
   const [A, Bl] = r.legs;
   // Correlation: overlay, rolling correlation, daily-return scatter.
   const overlay = () => {
@@ -593,7 +594,7 @@ function renderPortfolio(r, pk) {
       <div class="legend"><span><i class="k ptboth"></i>both had a P&L that day</span><span><i class="k ptone"></i>only one did (dots on an axis)</span></div>`;
   };
   const card = (v, l, sub) => `<div><b>${v}</b><span>${l}${sub ? `<br><small>${sub}</small>` : ""}</span></div>`;
-  const corrSection = `<section>
+  const corrSection = solo ? "" : `<section>
     <span class="eyebrow">How the two strategies move together · ${esc(yr)}</span>
     <h2>Correlation: ${fmt.x(K.daily)} on daily returns</h2>
     <p class="muted">Low correlation is what makes running both worth it: one's losing days are often the other's flat or winning days, so the combined curve is smoother than either alone.</p>
@@ -615,14 +616,15 @@ function renderPortfolio(r, pk) {
     <span class="eyebrow">${esc(r.market)} · ${esc(r.strategy_name)} · from run ${esc(r.run_id)} · ${esc(r.generated_at.slice(0, 10))}</span>
     <h1>${esc(r.market_name)}: ${r.legs.map(l => esc(l.name)).join(" and ")}, ${esc(yr)}</h1>
     ${r.holdout
-      ? `<p class="lede">${r.prior_holdout_accesses ? "A repeat holdout test: the same two strategies, unchanged since they were frozen, run on the holdout period" : `The final test: the same two strategies, unchanged since they were frozen, run on data ${r.notes?.unseen ?? "none of the research has seen"}`} (${esc(r.period[0])} to ${esc(r.period[1])}), first alone and then together. ${r.notes ? esc(r.notes.random) : `Each is compared with ${r.n_sims} random-entry runs at its own holdout time in market, paying the same costs (hold ${r.hold_bars[0]}–${r.hold_bars[1]} ${esc(r.timeframe)} bars, no overlap).`}</p>`
-      : `<p class="lede">The chosen strategies run unchanged as one continuous backtest from ${r.period[0].slice(0, 4)} to ${r.period[1].slice(0, 4)}, first alone and then together. ${r.notes ? esc(r.notes.random) : `Each is compared with ${r.n_sims} random-entry runs at the same time in market, paying the same costs (hold ${r.hold_bars[0]}–${r.hold_bars[1]} ${esc(r.timeframe)} bars, no overlap).`} Pick a period: every chart and table below is recomputed for it, starting from 0%. The holdout (2025 onward) is on its own tab.</p>
+      ? solo ? `<p class="lede">${r.prior_holdout_accesses ? "A repeat holdout test" : "The final test"}: the strategy, unchanged since it was frozen, run on data ${r.notes?.unseen ?? "none of the research has seen"} (${esc(r.period[0])} to ${esc(r.period[1])}). ${r.notes ? esc(r.notes.random) : ""}</p>`
+      : `<p class="lede">${r.prior_holdout_accesses ? "A repeat holdout test: the same two strategies, unchanged since they were frozen, run on the holdout period" : `The final test: the same two strategies, unchanged since they were frozen, run on data ${r.notes?.unseen ?? "none of the research has seen"}`} (${esc(r.period[0])} to ${esc(r.period[1])}), first alone and then together. ${r.notes ? esc(r.notes.random) : `Each is compared with ${r.n_sims} random-entry runs at its own holdout time in market, paying the same costs (hold ${r.hold_bars[0]}–${r.hold_bars[1]} ${esc(r.timeframe)} bars, no overlap).`}</p>`
+      : `<p class="lede">${solo ? "The chosen strategy runs" : "The chosen strategies run"} unchanged as one continuous backtest from ${r.period[0].slice(0, 4)} to ${r.period[1].slice(0, 4)}${solo ? "." : ", first alone and then together."} ${r.notes ? esc(r.notes.random) : `Each is compared with ${r.n_sims} random-entry runs at the same time in market, paying the same costs (hold ${r.hold_bars[0]}–${r.hold_bars[1]} ${esc(r.timeframe)} bars, no overlap).`} Pick a period: every chart and table below is recomputed for it, starting from 0%. The holdout (2025 onward) is on its own tab.</p>
     ${tabs}`}
     <div class="verdict v4">
-      <div><b>${fmt.pct(CP.stats.net_return)}</b><span>together, ${esc(yr)}</span></div>
-      <div><b>${fmt.x(CP.stats.sharpe)}</b><span>Sharpe together</span></div>
+      <div><b>${fmt.pct(CP.stats.net_return)}</b><span>${solo ? "return" : "together"}, ${esc(yr)}</span></div>
+      <div><b>${fmt.x(CP.stats.sharpe)}</b><span>Sharpe${solo ? "" : " together"}</span></div>
       <div class="${CP.luck.pct_sharpe >= 0.95 ? "ok" : "few"}"><b>${fmt.pctu(CP.luck.pct_sharpe, 0)}</b><span>of random runs beaten on Sharpe</span></div>
-      <div><b>${fmt.x(K.daily)}</b><span>correlation between the two</span></div>
+      ${solo ? `<div><b>${fmt.x(CP.stats.profit_factor)}</b><span>profit factor</span></div>` : `<div><b>${fmt.x(K.daily)}</b><span>correlation between the two</span></div>`}
     </div>
   </header>`;
   const caveat = `<section><div class="callout">
@@ -631,9 +633,9 @@ function renderPortfolio(r, pk) {
       : P === "val"
       ? `<p>${r.notes ? r.notes.val : `<b>Validation only.</b> These were chosen with 2023–2024 results from earlier ${esc(r.market)} rounds in view, so this stretch isn't fully clean either. But it's the least in-sample part. 95%+ against luck here would be meaningful; between 50% and 95% is better than average but not conclusive.`}</p>`
       : `<p><b>${P === "dev" ? "This is" : "Most of this period is"} in-sample.</b> 2018–2022 is the development data these strategies were picked from, out of thousands of versions, so beating 95%+ of random runs there is expected from the best of a big search, not proof of an edge. Switch to Validation for the more honest view; the untouched test is still the 2025+ holdout.</p>`}
-    <p>Together, both strategies trade one $${fmt.n(r.starting_equity)} account. Each trade gets ${mx(SZ.per_trade)}× the account balance, and the open positions together can't go over ${mx(SZ.cap)}×. So a trade that opens while the other strategy is already in gets only what's left (about ${mx(SZ.cap - SZ.per_trade)}×). Sizes are whole ${esc(r.market)} contracts, and a trade that can't afford one is skipped. The solo runs below use the full account (1×), as in the funnel.</p>
+    ${solo ? "" : `<p>Together, both strategies trade one $${fmt.n(r.starting_equity)} account. Each trade gets ${mx(SZ.per_trade)}× the account balance, and the open positions together can't go over ${mx(SZ.cap)}×. So a trade that opens while the other strategy is already in gets only what's left (about ${mx(SZ.cap - SZ.per_trade)}×). Sizes are whole ${esc(r.market)} contracts, and a trade that can't afford one is skipped. The solo runs below use the full account (1×), as in the funnel.</p>`}
   </div></section>`;
-  const together = `<section>
+  const together = solo ? "" : `<section>
     <span class="eyebrow">Both strategies together · ${esc(yr)}</span>
     <h2>${esc(C.name)}: ${fmt.pct(CP.stats.net_return)}, Sharpe ${fmt.x(CP.stats.sharpe)}</h2>
     <p class="muted">Random runs: one random trade stream per strategy at that strategy's time in market, sized through the same shared account.</p>
@@ -648,6 +650,12 @@ function renderPortfolio(r, pk) {
     <tbody>${r.legs.map(l => yrow(esc(l.name), l.years)).join("")}${yrow(esc(C.name), C.years, "passrow")}${yrow("Random, average (together)", C.random_years_mean, "bench")}${yrow(esc(r.hold.name), r.hold.years, "bench")}</tbody></table></div>
   </section>`;
   const foot = `<footer>Source: <span class="mono">${esc(r.source)}</span>. Generated ${esc(r.generated_at)}.</footer>`;
+  if (solo) {
+    const soloYears = `<section><span class="eyebrow">Year by year · ${esc(yr)}</span>
+      <div class="table-wrap"><table><thead><tr><th class="l"></th>${years.map(y => `<th>${y}${!r.holdout && y >= r.validation_start.slice(0, 4) ? " ·val" : ""}${r.holdout && y === r.period[1].slice(0, 4) ? " (to " + r.period[1].slice(5) + ")" : ""}</th>`).join("")}</tr></thead>
+      <tbody>${yrow(esc(A.name), A.years, "passrow")}${A.random_years_mean ? yrow("Random, average", A.random_years_mean, "bench") : ""}${yrow(esc(r.hold.name), r.hold.years, "bench")}</tbody></table></div></section>`;
+    return head + caveat + legCard(A) + soloYears + foot;
+  }
   return head + caveat + together + corrSection + r.legs.map(legCard).join("") + foot;
 }
 function renderCombined(r, pk) {

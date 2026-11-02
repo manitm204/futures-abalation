@@ -16,11 +16,11 @@ from src.analysis.neighborhood import LATTICE_NB_V1, neighbor_ids
 from src.experiments.funnel_config import load_funnel_config
 from src.experiments.funnel_prep import FAMILIES, family_for
 from src.experiments.funnel_robustness import local_perturbations_nb, perturbations_nb
-from src.experiments.nb_grid import (AXES_V1, AXES_V2, AXES_V3, AXES_V4, nb_grid, nb_grid_v2, nb_grid_v3, nb_grid_v4,
-                                    variants_per_symbol)
+from src.experiments.nb_grid import (AXES_V1, AXES_V2, AXES_V3, AXES_V4, AXES_V5, AXES_V6, AXES_V7, nb_grid, nb_grid_v2, nb_grid_v3,
+                                    nb_grid_v4, nb_grid_v5, nb_grid_v6, nb_grid_v7, variants_per_symbol)
 from src.experiments.nb_integrity import check_sim_integrity, truncation_invariance
 from src.strategies.noise_band.backtest import NBData, NBParams, simulate_noise_band
-from src.strategies.noise_band.config import NoiseBandConfig, NoiseBandV4Config
+from src.strategies.noise_band.config import NoiseBandConfig, NoiseBandV4Config, NoiseBandV5Config, NoiseBandV6Config, NoiseBandV7Config
 from src.utils.config_models import ExecutionConfig
 from tests.unit.test_funnel_integrity import _bars
 
@@ -213,6 +213,36 @@ def test_v4_grid_and_cap_mapping():
                                                                             stop_atr_abs=0.25))]
     assert labels == ["band_lookback=2", "band_mult=0.75", "band_mult=1.25"]
 
+@pytest.mark.parametrize("seed", [0, 3, 7])
+def test_last_entry_cutoff_drops_only_late_entries(seed):
+    bars = _walk(n_days=60, seed=seed)
+    data, free = _sim(bars, _p(check_minutes=15, trail="band"))
+    _, zero = _sim(bars, _p(check_minutes=15, trail="band", last_entry_cutoff=0))
+    assert np.array_equal(zero.entry_idx, free.entry_idx)  # 0 = the old rule
+    left = (data.bar_open[data.sess_end] - data.bar_open).astype("timedelta64[m]").astype(int)
+    for cut in (60, 120):
+        p = _p(check_minutes=15, trail="band", last_entry_cutoff=cut)
+        _, sim = _sim(bars, p)
+        assert (left[sim.signal_idx] >= cut).all() and len(sim.entry_idx) < len(free.entry_idx)
+        assert check_sim_integrity(sim, data, EC, p) == []
+        # Entries never depend on later bars, so the cutoff run is the free run minus its late trades.
+        assert np.array_equal(sim.signal_idx, free.signal_idx[left[free.signal_idx] >= cut])
+    late = _p(check_minutes=15, trail="band", last_entry_cutoff=120)
+    assert "entry_inside_last_entry_cutoff" in check_sim_integrity(free, data, EC, late)
+
+
+def test_v5_grid_and_cutoff_mapping():
+    g = nb_grid_v5(("NQ",))
+    assert variants_per_symbol(AXES_V5) == 128304 == len(g)
+    assert {ce.config.last_entry_cutoff_minutes for ce in g} == {0, 60, 120}
+    assert {NBParams.from_config(ce.config).last_entry_cutoff for ce in g} == {0, 60, 120}
+    assert {ce.config.trail for ce in g} == {"band", "vwap", "band_vwap"}
+    assert NBParams.from_config(NoiseBandV4Config(symbol="ES")).last_entry_cutoff == 0
+    assert "last_entry_cutoff_minutes" not in NoiseBandV4Config(symbol="ES").model_dump()
+    assert NoiseBandV5Config(symbol="NQ").last_entry_cutoff_value == 0
+    assert load_funnel_config(Path(CONFIGS) / "nb_funnel_nq_v5.yaml").strategy == "noise_band_v5"
+
+
 def test_stop_is_from_atr_before_entry_and_side_aware():
     bars = _walk(seed=8, n_days=60)
     p = _p(stop_atr=0.5)
@@ -323,3 +353,93 @@ def test_market_configs_load_and_pick_the_noise_band_family():
         assert f.strategy == "noise_band" and family_for(f) is FAMILIES["noise_band"]
         assert f.parameter_stability.mode == "local_perturbation" and f.parameter_stability.local.band_mult_abs
         assert f.data.timeframes == ["5min", "15min"]
+
+
+def test_prescreen_is_optional_and_hashed_only_when_set():
+    import yaml
+    from src.experiments.funnel_config import FunnelConfig
+    base = load_funnel_config(Path(CONFIGS) / "nb_funnel_nq_v1.yaml")
+    assert base.parameter_stability.prescreen is None
+    d = yaml.safe_load((Path(CONFIGS) / "nb_funnel_nq_v1.yaml").read_text())
+    d["parameter_stability"]["prescreen"] = None
+    assert FunnelConfig.model_validate(d).config_sha256() == base.config_sha256()
+    d["parameter_stability"]["prescreen"] = {"max_configs": 3000, "per_cluster": 3}
+    assert FunnelConfig.model_validate(d).config_sha256() != base.config_sha256()
+    v5 = load_funnel_config(Path(CONFIGS) / "nb_funnel_nq_v5.yaml").parameter_stability.prescreen
+    assert (v5.max_configs, v5.per_cluster) == (3000, 3)
+
+
+
+@pytest.mark.parametrize("seed", [0, 3, 7])
+def test_momentum_filter_only_drops_entries_against_recent_move(seed):
+    bars = _walk(n_days=60, seed=seed)
+    base = dict(check_minutes=15, trail="band", first_entry_minutes=60)
+    data, free = _sim(bars, _p(**base))
+    for mom in (30, 60):
+        p = _p(**base, momentum_minutes=mom)
+        _, sim = _sim(bars, p)
+        assert 0 < len(sim.entry_idx) <= len(free.entry_idx)
+        assert check_sim_integrity(sim, data, EC, p) == []
+        k = mom // 15
+        s = sim.signal_idx
+        ref = np.where(s - k >= data.sess_start[s], data.close[s - k], data.sess_open[s])
+        assert (np.where(sim.side > 0, data.close[s] > ref, data.close[s] < ref)).all()
+    # The unfiltered run breaks the 30-minute rule somewhere: the filter drops it and the check catches it.
+    assert len(_sim(bars, _p(**base, momentum_minutes=30))[1].entry_idx) < len(free.entry_idx)
+    assert "entry_against_momentum" in check_sim_integrity(free, data, EC, _p(**base, momentum_minutes=30))
+    # Re-arming is unchanged: it still only needs a close back inside the band.
+    from src.strategies.noise_band.backtest import signal_arrays
+    a, b = signal_arrays(data, _p(**base)), signal_arrays(data, _p(**base, momentum_minutes=30))
+    assert np.array_equal(a["inside_l"], b["inside_l"]) and np.array_equal(a["inside_s"], b["inside_s"])
+    with pytest.raises(ValueError):
+        signal_arrays(data, _p(**base, momentum_minutes=20))
+
+
+def test_v6_grid_and_momentum_mapping():
+    g = nb_grid_v6(("NQ",))
+    assert variants_per_symbol(AXES_V6) == 3456 == len(g)
+    assert {NBParams.from_config(ce.config).momentum_minutes for ce in g} == {0, 30, 60}
+    assert NBParams.from_config(NoiseBandV5Config(symbol="NQ")).momentum_minutes == 0
+    assert "momentum_minutes" not in NoiseBandV5Config(symbol="NQ").model_dump()
+    assert NoiseBandV6Config(symbol="NQ").momentum_value == 0
+    assert load_funnel_config(Path(CONFIGS) / "nb_funnel_nq_v2.yaml").strategy == "noise_band_v6"
+
+
+
+def _vol_walk(seed):
+    """_walk with varying volume so relative volume moves around 1."""
+    bars = _walk(n_days=70, seed=seed)
+    rng = np.random.default_rng(seed + 100)
+    return bars.with_columns(pl.Series("volume", rng.integers(500, 1500, bars.height)))
+
+
+@pytest.mark.parametrize("seed", [0, 3])
+def test_extension_cap_and_rel_volume_filters(seed):
+    bars = _vol_walk(seed)
+    base = dict(check_minutes=15, trail="band", first_entry_minutes=60)
+    data, free = _sim(bars, _p(**base))
+    for kw, issue in ((dict(max_extension=0.25), "entry_beyond_max_extension"),
+                      (dict(rel_volume=1.0), "entry_below_rel_volume")):
+        p = _p(**base, **kw)
+        _, sim = _sim(bars, p)
+        assert 0 < len(sim.entry_idx) < len(free.entry_idx)
+        assert check_sim_integrity(sim, data, EC, p) == []
+        assert issue in check_sim_integrity(free, data, EC, p)
+    # Relative volume by hand: session volume so far / mean of the same slot's value over the prior 20 sessions.
+    rv = data.rel_volume
+    k = int(np.flatnonzero(np.isfinite(rv))[50])
+    cv = data.volume[data.sess_start[k]:k + 1].sum()
+    prior = np.flatnonzero((data.tod == data.tod[k]) & (data.sess < data.sess[k]))[-20:]
+    assert rv[k] == pytest.approx(cv / np.mean([data.volume[data.sess_start[j]:j + 1].sum() for j in prior]))
+    assert np.isnan(rv[data.sess < 20]).all()
+
+
+def test_v7_grid_and_mapping():
+    g = nb_grid_v7(("NQ",))
+    assert variants_per_symbol(AXES_V7) == 432 == len(g)
+    ps = {(NBParams.from_config(ce.config).max_extension, NBParams.from_config(ce.config).rel_volume) for ce in g}
+    assert ps == {(a, b) for a in (None, 0.25, 0.5) for b in (None, 1.0, 1.25)}
+    assert NBParams.from_config(NoiseBandV6Config(symbol="NQ")).max_extension is None
+    assert "rel_volume" not in NoiseBandV6Config(symbol="NQ").model_dump()
+    assert NoiseBandV7Config(symbol="NQ").last_entry_cutoff_value == 60
+    assert load_funnel_config(Path(CONFIGS) / "nb_funnel_nq_v3.yaml").strategy == "noise_band_v7"

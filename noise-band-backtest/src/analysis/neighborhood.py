@@ -357,3 +357,40 @@ LATTICE_NB_V4 = Lattice({
     "max_entries_per_session": [1, 2, "none"],
     "stop_atr_multiple": ["none"],
 }, FIXED_AXES_NB)
+# v5: last-entry cutoff is ordered (0 < 60 < 120 minutes before the close).
+LATTICE_NB_V5 = Lattice({
+    "timeframe": ["5min", "15min"],
+    "band_lookback": [1, 5, 7, 10, 15, 20, 25, 30, 35, 50, 75],
+    "band_mult": [0.5, 0.75, 1.0, 1.25, 1.5, 1.75],
+    "check_minutes": [15, 30, 60],
+    "first_entry_minutes": [15, 30, 60],
+    "max_entries_per_session": [1, 2, "none"],
+    "last_entry_cutoff_minutes": [0, 60, 120],
+    "stop_atr_multiple": ["none"],
+}, FIXED_AXES_NB)
+# v6: momentum filter is ordered (off < 30 < 60 minutes).
+LATTICE_NB_V6 = Lattice({
+    "timeframe": ["15min"],
+    "band_lookback": [1, 3, 5, 10, 20, 30, 45, 80],
+    "band_mult": [0.5, 0.75, 1.0, 1.5],
+    "check_minutes": [15],
+    "first_entry_minutes": [60],
+    "max_entries_per_session": [1, 2, "none"],
+    "last_entry_cutoff_minutes": [0, 60, 120],
+    "momentum_minutes": [0, 30, 60],
+    "stop_atr_multiple": ["none"],
+}, FIXED_AXES_NB)
+# v7: extension cap ordered tight -> off; relative volume ordered off -> strict.
+LATTICE_NB_V7 = Lattice({
+    "timeframe": ["15min"],
+    "band_lookback": [1, 5, 15, 25, 40, 60],
+    "band_mult": [0.5, 0.75, 1.0, 1.5],
+    "check_minutes": [15],
+    "first_entry_minutes": [60],
+    "max_entries_per_session": ["none"],
+    "last_entry_cutoff_minutes": [60],
+    "momentum_minutes": [0, 45],
+    "max_extension": [0.25, 0.5, "off"],
+    "rel_volume": ["off", 1.0, 1.25],
+    "stop_atr_multiple": ["none"],
+}, FIXED_AXES_NB)

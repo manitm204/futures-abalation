@@ -176,8 +176,46 @@ def correlation_matrix(series: np.ndarray) -> np.ndarray:
     return np.clip(C, -1.0, 1.0)
 
 
+LARGE_CLUSTER_N = 8000  # above this, stage 6 uses the memory-light path below
+
+
+def standardized_rows(series: np.ndarray) -> np.ndarray:
+    """Rows scaled so that (Z[i] @ Z[j]) / T is their Pearson correlation (0 for flat rows)."""
+    X = np.asarray(series, dtype=np.float64)
+    sd = X.std(axis=1)
+    Z = np.zeros_like(X)
+    ok = sd > 0
+    Z[ok] = (X[ok] - X[ok].mean(axis=1, keepdims=True)) / sd[ok, None]
+    return Z
+
+
+def _cluster_large(X: np.ndarray, *, threshold: float, method: str, chunk: int = 1024) -> np.ndarray:
+    """Same clustering for big grids without any n x n matrix: identical rows are merged
+    first (distance 0 to each other and the same distance to everyone else, so with complete
+    linkage they always share a cluster), then the condensed 1 - corr distances are built
+    in row chunks. Only the condensed vector (and scipy's copy of it) is held."""
+    uniq, inv = np.unique(X, axis=0, return_inverse=True)
+    inv = inv.reshape(-1)
+    m = len(uniq)
+    if m == 1:
+        return np.ones(len(X), dtype=int)
+    Z = standardized_rows(uniq)
+    T = X.shape[1]
+    d = np.empty(m * (m - 1) // 2, dtype=np.float64)
+    pos = 0
+    for a in range(0, m, chunk):
+        b = min(a + chunk, m)
+        C = np.clip((Z[a:b] @ Z[a:].T) / T, -1.0, 1.0)
+        for i in range(a, b):
+            row = C[i - a, i - a + 1:]
+            d[pos:pos + len(row)] = np.clip(1.0 - row, 0.0, 2.0)
+            pos += len(row)
+    lab = fcluster(linkage(d, method=method), t=1.0 - threshold + 1e-12, criterion="distance")
+    return lab[inv]
+
+
 def cluster_by_correlation(ids: list[str], series: np.ndarray, *, threshold: float,
-                           method: str = "complete") -> dict[str, int]:
+                           method: str = "complete", groups: list | None = None) -> dict[str, int]:
     """Agglomerative clustering on distance 1 - corr, cut at 1 - threshold.
 
     With complete linkage a cluster's merge height is its MAXIMUM pairwise
@@ -187,10 +225,25 @@ def cluster_by_correlation(ids: list[str], series: np.ndarray, *, threshold: flo
         return {}
     if len(ids) == 1:
         return {ids[0]: 0}
-    D = np.clip(1.0 - correlation_matrix(series), 0.0, 2.0)
-    np.fill_diagonal(D, 0.0)
-    Z = linkage(squareform(D, checks=False), method=method)
-    labels = fcluster(Z, t=1.0 - threshold + 1e-12, criterion="distance")
+    if len(ids) > LARGE_CLUSTER_N and groups is not None:
+        # Too many for one linkage: cluster within each group only (configs in different groups
+        # never share a cluster -- every pair inside a cluster still has corr >= threshold).
+        X = np.asarray(series, dtype=np.float64)
+        g = np.asarray([str(x) for x in groups])
+        labels = np.empty(len(ids), dtype=np.int64)
+        off = 0
+        for key in sorted(set(g)):
+            m = np.flatnonzero(g == key)
+            lab = _cluster_large(X[m], threshold=threshold, method=method) if len(m) > 1 else np.ones(1, dtype=int)
+            labels[m] = lab + off
+            off += int(lab.max())
+    elif len(ids) > LARGE_CLUSTER_N:
+        labels = _cluster_large(np.asarray(series, dtype=np.float64), threshold=threshold, method=method)
+    else:
+        D = np.clip(1.0 - correlation_matrix(series), 0.0, 2.0)
+        np.fill_diagonal(D, 0.0)
+        Z = linkage(squareform(D, checks=False), method=method)
+        labels = fcluster(Z, t=1.0 - threshold + 1e-12, criterion="distance")
     # Relabel deterministically by the smallest config_id in each cluster.
     first: dict[int, str] = {}
     for cid, lab in zip(ids, labels):
