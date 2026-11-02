@@ -38,6 +38,11 @@ from src.strategies.noise_band.config import (
     V7_MAX_EXTENSIONS,
     V7_MOMENTUM_MINUTES,
     V7_REL_VOLUMES,
+    V8_BAND_MULTS,
+    V8_LAST_ENTRY_CUTOFFS,
+    V8_MAX_ENTRIES,
+    V8_MAX_EXTENSIONS,
+    V8_REL_VOLUMES,
     NoiseBandConfig,
     NoiseBandV2Config,
     NoiseBandV3Config,
@@ -45,6 +50,7 @@ from src.strategies.noise_band.config import (
     NoiseBandV5Config,
     NoiseBandV6Config,
     NoiseBandV7Config,
+    NoiseBandV8Config,
 )
 
 AXES_V1: dict[str, tuple] = {
@@ -156,3 +162,25 @@ AXES_V7: dict[str, tuple] = {
 
 def nb_grid_v7(symbols: tuple[str, ...]) -> list[ConfigEntry]:
     return _grid(symbols, AXES_V7, NoiseBandV7Config)
+
+
+AXES_V8: dict[str, tuple] = {
+    "timeframe": ("15min",),
+    "band_lookback": V6_BAND_LOOKBACKS,
+    "band_mult": V8_BAND_MULTS,
+    "check_minutes": (15,),
+    "first_entry_minutes": (60,),
+    "anchor": ("open_prev_close",),
+    "trail": V4_TRAILS,
+    "direction": V4_DIRECTIONS,
+    "max_entries_per_session": V8_MAX_ENTRIES,
+    "last_entry_cutoff_minutes": V8_LAST_ENTRY_CUTOFFS,
+    "momentum_minutes": V6_MOMENTUM_MINUTES,
+    "max_extension": V8_MAX_EXTENSIONS,
+    "rel_volume": V8_REL_VOLUMES,
+    "stop_atr_multiple": STOP_ATRS,
+}
+
+
+def nb_grid_v8(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_V8, NoiseBandV8Config)

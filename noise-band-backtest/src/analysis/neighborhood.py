@@ -394,3 +394,16 @@ LATTICE_NB_V7 = Lattice({
     "rel_volume": ["off", 1.0, 1.25],
     "stop_atr_multiple": ["none"],
 }, FIXED_AXES_NB)
+LATTICE_NB_V8 = Lattice({
+    "timeframe": ["15min"],
+    "band_lookback": [1, 3, 5, 10, 20, 30, 45, 80],
+    "band_mult": [0.5, 0.75, 1.0, 1.5, 2.0],
+    "check_minutes": [15],
+    "first_entry_minutes": [60],
+    "max_entries_per_session": [1, "none"],
+    "last_entry_cutoff_minutes": [0, 60],
+    "momentum_minutes": [0, 30, 60],
+    "max_extension": [0.25, "off"],
+    "rel_volume": ["off", 1.5],
+    "stop_atr_multiple": ["none"],
+}, FIXED_AXES_NB)

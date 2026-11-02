@@ -16,8 +16,8 @@ from src.analysis.neighborhood import LATTICE_NB_V1, neighbor_ids
 from src.experiments.funnel_config import load_funnel_config
 from src.experiments.funnel_prep import FAMILIES, family_for
 from src.experiments.funnel_robustness import local_perturbations_nb, perturbations_nb
-from src.experiments.nb_grid import (AXES_V1, AXES_V2, AXES_V3, AXES_V4, AXES_V5, AXES_V6, AXES_V7, nb_grid, nb_grid_v2, nb_grid_v3,
-                                    nb_grid_v4, nb_grid_v5, nb_grid_v6, nb_grid_v7, variants_per_symbol)
+from src.experiments.nb_grid import (AXES_V1, AXES_V2, AXES_V3, AXES_V4, AXES_V5, AXES_V6, AXES_V7, AXES_V8, nb_grid, nb_grid_v2, nb_grid_v3,
+                                    nb_grid_v4, nb_grid_v5, nb_grid_v6, nb_grid_v7, nb_grid_v8, variants_per_symbol)
 from src.experiments.nb_integrity import check_sim_integrity, truncation_invariance
 from src.strategies.noise_band.backtest import NBData, NBParams, simulate_noise_band
 from src.strategies.noise_band.config import NoiseBandConfig, NoiseBandV4Config, NoiseBandV5Config, NoiseBandV6Config, NoiseBandV7Config
@@ -443,3 +443,15 @@ def test_v7_grid_and_mapping():
     assert "rel_volume" not in NoiseBandV6Config(symbol="NQ").model_dump()
     assert NoiseBandV7Config(symbol="NQ").last_entry_cutoff_value == 60
     assert load_funnel_config(Path(CONFIGS) / "nb_funnel_nq_v3.yaml").strategy == "noise_band_v7"
+
+
+
+def test_v8_grid_and_cl_config():
+    g = nb_grid_v8(("CL",))
+    assert variants_per_symbol(AXES_V8) == 7680 == len(g)
+    ps = {(NBParams.from_config(ce.config).max_entries, NBParams.from_config(ce.config).rel_volume,
+           NBParams.from_config(ce.config).max_extension) for ce in g}
+    assert ps == {(a, b, c) for a in (1, None) for b in (None, 1.5) for c in (None, 0.25)}
+    assert {ce.config.band_mult for ce in g} == {0.5, 0.75, 1.0, 1.5, 2.0}
+    c = load_funnel_config(Path(CONFIGS) / "nb_funnel_cl_v2.yaml")
+    assert (c.strategy, c.symbol, c.data.timeframes) == ("noise_band_v8", "CL", ["15min"])

@@ -28,13 +28,13 @@ import typer
 
 from src.data.futures import session_spec
 from src.experiments.funnel_config import load_execution_config, load_funnel_config
-from src.experiments.nb_grid import AXES_V1, AXES_V2, AXES_V3, AXES_V4, AXES_V5, AXES_V6, AXES_V7
+from src.experiments.nb_grid import AXES_V1, AXES_V2, AXES_V3, AXES_V4, AXES_V5, AXES_V6, AXES_V7, AXES_V8
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SITE_ROOT = PROJECT_ROOT.parent / "futures-results"
 app = typer.Typer(add_completion=False)
 
-SPACES = {"noise_band": AXES_V1, "noise_band_v2": AXES_V2, "noise_band_v3": AXES_V3, "noise_band_v4": AXES_V4, "noise_band_v5": AXES_V5, "noise_band_v6": AXES_V6, "noise_band_v7": AXES_V7}
+SPACES = {"noise_band": AXES_V1, "noise_band_v2": AXES_V2, "noise_band_v3": AXES_V3, "noise_band_v4": AXES_V4, "noise_band_v5": AXES_V5, "noise_band_v6": AXES_V6, "noise_band_v7": AXES_V7, "noise_band_v8": AXES_V8}
 MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini Dow", "RTY": "E-mini Russell 2000",
                 "CL": "Crude oil", "GC": "Gold", "6E": "Euro FX", "6J": "Japanese yen", "ZN": "10-year T-note",
                 "ZB": "30-year T-bond"}

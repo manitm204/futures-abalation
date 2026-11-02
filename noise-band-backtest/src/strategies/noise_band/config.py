@@ -221,3 +221,30 @@ class NoiseBandV7Config(NoiseBandConfig):
     momentum_minutes: Literal[0, 45] = 0
     max_extension: Literal["off", 0.25, 0.5] = "off"
     rel_volume: Literal["off", 1.0, 1.25] = "off"
+
+
+# --- v8 parameter space (CL round 1, 7,680 variants per symbol) ---------------------------
+# Specified by the user after the NQ rounds (no CL noise-band results seen): NQ v2's grid
+# (v6) with band multiple 2.0 added, entry cap 1 / none, last-entry cutoff 0 / 60 min, and
+# the v7 filters at max extension off / 0.25x and relative volume off / 1.5x.
+V8_BAND_MULTS: tuple[float, ...] = (0.5, 0.75, 1.0, 1.5, 2.0)
+V8_MAX_ENTRIES: tuple = (1, "none")
+V8_LAST_ENTRY_CUTOFFS: tuple[int, ...] = (0, 60)
+V8_MAX_EXTENSIONS: tuple = ("off", 0.25)
+V8_REL_VOLUMES: tuple = ("off", 1.5)
+
+
+class NoiseBandV8Config(NoiseBandConfig):
+    timeframe: Literal["15min"] = "15min"
+    band_lookback: Literal[1, 3, 5, 10, 20, 30, 45, 80] = 10
+    band_mult: Literal[0.5, 0.75, 1.0, 1.5, 2.0] = 1.0
+    check_minutes: Literal[15] = 15
+    first_entry_minutes: Literal[60] = 60
+    anchor: Literal["open_prev_close"] = "open_prev_close"
+    trail: Literal["vwap", "band_vwap"] = "vwap"
+    direction: Literal["long", "both"] = "both"
+    max_entries_per_session: Literal[1, "none"] = "none"
+    last_entry_cutoff_minutes: Literal[0, 60] = 0
+    momentum_minutes: Literal[0, 30, 60] = 0
+    max_extension: Literal["off", 0.25] = "off"
+    rel_volume: Literal["off", 1.5] = "off"
