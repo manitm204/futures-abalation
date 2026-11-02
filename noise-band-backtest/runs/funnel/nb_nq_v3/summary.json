@@ -1,0 +1,523 @@
+{
+  "data_access": {
+    "actual_last_session": "2022-12-30",
+    "command": "develop",
+    "experiment_id": "nb_nq_v3",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 60,
+    "partition_fingerprint": "e3cd5f1caf0a7064",
+    "phase": "development",
+    "phase_end": "2022-12-31",
+    "rows": 1756201,
+    "symbol": "NQ"
+  },
+  "data_history": {
+    "holdout_note": "No noise-band metrics have been computed on NQ 2025+. NQ 2025+ bars were read for mean-reversion holdout scoring (combined_v1 via combined_portfolio_holdout on 2026-10-25; mr_nq_v7_15m+mr_nq_v7_1h via portfolio_holdout on 2026-10-24; mr_nq_v7_15m+mr_nq_v7_1h via portfolio_holdout_diagnostic on 2026-10-24; trades_v1 via trade_distribution on 2026-10-25) per the mean-reversion data-access ledger: a different strategy family, so this is still the first test of this strategy, but the researcher has seen how that period treated mean reversion.",
+    "holdout_previously_inspected": false,
+    "validation_note": "No noise-band strategy has been selected or scored on NQ 2023-2024. NQ 2018-2022 was used only as the unchanged-rules transfer check (stage-9 diagnostic) for the ES noise-band finalists (nb_es_v1..v4), nb_nq_v5 (128,304 configs) was stopped in stage 5 with no finalists, nb_nq_v1 (8,100 configs, 757 frozen finalists) and nb_nq_v2 (3,456 configs, 374 frozen finalists) were run there; this v3 grid was specified after reading their development results. The mean-reversion family was validated there (mr_nq_v7_1h, mr_nq_v7_15m, mr_nq_v6, mr_nq_v5), so the period has been looked at by the researcher, but not for this strategy.",
+    "validation_previously_used_for_selection": false
+  },
+  "dsr": {
+    "calibration_verified": false,
+    "effective_trials": {
+      "li_ji": 92.00000000000026,
+      "n_components_95": 60,
+      "n_series": 432,
+      "participation_ratio": 5.129654920517378,
+      "rank_bound_T": 1259
+    },
+    "n_configs_with_defined_sharpe": 432,
+    "primary_method": "li_ji",
+    "research_history": [
+      {
+        "n_configs": 3456,
+        "name": "noise_band NQ v2 (nb_nq_v2)",
+        "note": "Second noise-band round on NQ (momentum filter, entry cap, last-entry cutoff); 374 frozen finalists from 2018-2022, validation not run. This v3 grid was specified after reading those development results."
+      },
+      {
+        "n_configs": 8100,
+        "name": "noise_band NQ v1 (nb_nq_v1)",
+        "note": "First noise-band round on NQ; 757 frozen finalists from 2018-2022, validation not run."
+      },
+      {
+        "n_configs": 128304,
+        "name": "noise_band NQ v5 grid (nb_nq_v5, stopped)",
+        "note": "Stopped by the user in stage 5 (2018-2022 only); every config was backtested on development data and 82,236 passed stage 4, no finalists were frozen."
+      },
+      {
+        "n_configs": 13824,
+        "name": "noise_band ES v4 (nb_es_v4)",
+        "note": "Same family on ES; 326 frozen finalists, 291 passed ES 2023-2024; #17 + #104 lost 1.5% each on ES 2025+. NQ 2018-2022 was their transfer diagnostic."
+      },
+      {
+        "n_configs": 16200,
+        "name": "noise_band ES v3 (nb_es_v3)",
+        "note": "Same family on ES; 268 frozen finalists, 255 passed ES 2023-2024."
+      },
+      {
+        "n_configs": 8100,
+        "name": "noise_band ES v2 (nb_es_v2)",
+        "note": "Same family on ES; 235 frozen finalists, 225 passed ES 2023-2024."
+      },
+      {
+        "n_configs": 8100,
+        "name": "noise_band ES v1 (nb_es_v1)",
+        "note": "Same family on ES; 210 frozen finalists, 196 passed ES 2023-2024."
+      },
+      {
+        "n_configs": 3456,
+        "name": "mean_reversion NQ (mr_nq_v7_1h)",
+        "note": "Different (mean-reversion) family on NQ; 153 frozen candidates, 123 passed 2023-2024."
+      },
+      {
+        "n_configs": 1152,
+        "name": "mean_reversion NQ (mr_nq_v7_15m)",
+        "note": "Different (mean-reversion) family on NQ; 8 frozen candidates, 6 passed 2023-2024."
+      },
+      {
+        "n_configs": 21600,
+        "name": "mean_reversion NQ (mr_nq_v6)",
+        "note": "Different (mean-reversion) family on NQ; 201 frozen candidates, 161 passed 2023-2024."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion NQ (mr_nq_v5)",
+        "note": "Different (mean-reversion) family on NQ; 93 frozen candidates, 38 passed 2023-2024."
+      },
+      {
+        "n_configs": 248832,
+        "name": "ma_crossover v2 grid (ma_v2, SPY)",
+        "note": "Long-only trend-following MA crossover, 5min/15min, SPY."
+      },
+      {
+        "n_configs": 60000,
+        "name": "ma_crossover v1 grid (ma_v1, SPY)",
+        "note": "Long-only trend-following MA crossover, 5min/15min/1h, SPY."
+      },
+      {
+        "n_configs": 24576,
+        "name": "channel_breakout grid (funnel_v1..v4, SPY)",
+        "note": "Channel-breakout grid; four funnel variants with changed thresholds/methods."
+      },
+      {
+        "n_configs": 3888,
+        "name": "donchian_ablation (donchian_v1, SPY/QQQ)",
+        "note": "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+      }
+    ],
+    "serial_dependence": "lag1_effective_n",
+    "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+    "trial_count_options": {
+      "li_ji": 92.00000000000026,
+      "participation_ratio": 5.129654920517378,
+      "raw": 432.0,
+      "raw_plus_known_prior": 591492.0
+    },
+    "unresolved": [
+      "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+      "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+      "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+      "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+    ],
+    "variance_of_trial_sharpes_per_period": 0.0006893320020434972
+  },
+  "elapsed_s": 103.0,
+  "experiment_id": "nb_nq_v3",
+  "frozen_manifest_sha256": "ba3b131e30cec83f1c88481845312f7e7fffa6909d491b2fd013e70e77a62609",
+  "instrument_type": "futures",
+  "integrity": {
+    "checks_per_config": [
+      "entry_signal_condition_not_met",
+      "direction_not_allowed",
+      "entry_not_next_bar_same_session",
+      "exit_before_entry",
+      "position_held_overnight",
+      "trail_exit_condition_not_met",
+      "exit_not_next_open_after_decision",
+      "eod_exit_not_at_session_close",
+      "overlapping_positions",
+      "entry_fill_better_than_open",
+      "exit_fill_better_than_market",
+      "position_exceeds_equity",
+      "forced_close_not_final_trade",
+      "commission_below_minimum",
+      "unexpected_stop_or_target",
+      "stop_not_from_atr_known_before_entry",
+      "stop_exit_without_touch",
+      "stop_fill_better_than_open_stop",
+      "entries_per_session_over_cap",
+      "entry_inside_last_entry_cutoff",
+      "entry_against_momentum",
+      "entry_beyond_max_extension",
+      "entry_below_rel_volume"
+    ],
+    "cut_fractions": [
+      0.3,
+      0.6000000000000001,
+      0.9
+    ],
+    "failures": {},
+    "truncation_sample": 40
+  },
+  "mode": "development_only",
+  "n_configs": 432,
+  "n_frozen_candidates": 71,
+  "provenance": {
+    "available_data_endpoint_per_manifest": {
+      "ES": "2026-10-16",
+      "NQ": "2026-10-16"
+    },
+    "config_path": "configs/funnel/nb_funnel_nq_v3.yaml",
+    "config_sha256": "52e85c040cbb94a5f27ea4f2d16f87854394d53caeb9c30d424e869353ae6a7e",
+    "created_at": "2026-11-02T16:42:25.327498+00:00",
+    "data_manifests": {
+      "ES": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3099325,
+        "schema_version": "1.0.0"
+      },
+      "NQ": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3099436,
+        "schema_version": "1.0.0"
+      }
+    },
+    "git_commit": "4d0f832c58e2ff7b957dc0b8775261570fa785a1",
+    "git_diff_sha256": "54949601c80d75e95cb5346c5a464fb71053970566641fa18124f2e947829211",
+    "git_dirty": true,
+    "seed": 20261030
+  },
+  "rejection_reason_counts": {
+    "s2:hard_reject:completed_trades": 25,
+    "s2:hard_reject:years_with_>=10_trades": 1,
+    "s3:hard_reject:net_return": 24,
+    "s3:hard_reject:sharpe": 240,
+    "s4:hard_reject:local_frac_profitable": 1,
+    "s4:hard_reject:local_median_sharpe": 3,
+    "s5:hard_reject:profitable_years": 4
+  },
+  "survivor_table": [
+    {
+      "evaluated": 432,
+      "kind": "universe",
+      "passed": 432,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "0 universe"
+    },
+    {
+      "evaluated": 432,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 432,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "1 backtest integrity",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 432,
+      "hard_reject": 25,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 407,
+      "pct_of_previous": 94.21296296296296,
+      "pct_of_universe": 94.21296296296296,
+      "stage": "2 trade count & coverage",
+      "with_warnings": 432
+    },
+    {
+      "evaluated": 407,
+      "hard_reject": 240,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 167,
+      "pct_of_previous": 41.03194103194103,
+      "pct_of_universe": 38.657407407407405,
+      "stage": "3 performance & risk",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 167,
+      "hard_reject": 4,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 163,
+      "pct_of_previous": 97.60479041916167,
+      "pct_of_universe": 37.73148148148148,
+      "stage": "4 parameter stability",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 163,
+      "hard_reject": 4,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 159,
+      "pct_of_previous": 97.54601226993866,
+      "pct_of_universe": 36.80555555555556,
+      "stage": "5 time stability",
+      "with_warnings": 122
+    },
+    {
+      "deduplicated": 88,
+      "evaluated": 159,
+      "kind": "dedup",
+      "n_clusters": 40,
+      "note": "best 2 per cluster",
+      "passed": 71,
+      "pct_of_previous": 44.65408805031446,
+      "pct_of_universe": 16.435185185185187,
+      "stage": "6 deduplication"
+    },
+    {
+      "evaluated": 71,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 71,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 16.435185185185187,
+      "stage": "7 execution stress",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": null,
+      "kind": "hard_gate",
+      "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "8 frozen validation"
+    },
+    {
+      "evaluated": 71,
+      "kind": "diagnostic_only",
+      "note": "diagnostic only: unverified: 71",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "9 DSR / transfer"
+    },
+    {
+      "evaluated": null,
+      "kind": "explicit_command",
+      "note": "not run; `final-test` command only",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "10 final holdout"
+    }
+  ],
+  "symbol": "NQ",
+  "thresholds": {
+    "confidence": {
+      "dsr_calibration_verified": false,
+      "dsr_threshold": 0.95,
+      "effective_trials_method": "li_ji",
+      "serial_dependence": "lag1_effective_n",
+      "transfer_symbol": "ES"
+    },
+    "data": {
+      "clean_root": "data/clean",
+      "development": {
+        "end": "2022-12-31",
+        "start": "2018-01-01"
+      },
+      "holdout": {
+        "end": null,
+        "start": "2025-01-01"
+      },
+      "timeframes": [
+        "15min"
+      ],
+      "validation": {
+        "end": "2024-12-31",
+        "start": "2023-01-01"
+      }
+    },
+    "data_history": {
+      "holdout_note": "No noise-band metrics have been computed on NQ 2025+. NQ 2025+ bars were read for mean-reversion holdout scoring (combined_v1 via combined_portfolio_holdout on 2026-10-25; mr_nq_v7_15m+mr_nq_v7_1h via portfolio_holdout on 2026-10-24; mr_nq_v7_15m+mr_nq_v7_1h via portfolio_holdout_diagnostic on 2026-10-24; trades_v1 via trade_distribution on 2026-10-25) per the mean-reversion data-access ledger: a different strategy family, so this is still the first test of this strategy, but the researcher has seen how that period treated mean reversion.",
+      "holdout_previously_inspected": false,
+      "validation_note": "No noise-band strategy has been selected or scored on NQ 2023-2024. NQ 2018-2022 was used only as the unchanged-rules transfer check (stage-9 diagnostic) for the ES noise-band finalists (nb_es_v1..v4), nb_nq_v5 (128,304 configs) was stopped in stage 5 with no finalists, nb_nq_v1 (8,100 configs, 757 frozen finalists) and nb_nq_v2 (3,456 configs, 374 frozen finalists) were run there; this v3 grid was specified after reading their development results. The mean-reversion family was validated there (mr_nq_v7_1h, mr_nq_v7_15m, mr_nq_v6, mr_nq_v5), so the period has been looked at by the researcher, but not for this strategy.",
+      "validation_previously_used_for_selection": false
+    },
+    "dedup": {
+      "corr_threshold": 0.8,
+      "linkage": "complete",
+      "reps_per_cluster": 2,
+      "return_basis": "monthly"
+    },
+    "execution": {
+      "baseline": "configs/execution/futures.yaml"
+    },
+    "execution_stress": {
+      "breakeven_max_multiplier": 25.0,
+      "diagnostic_cost_multipliers": [
+        2.0
+      ],
+      "entry_delay_bars": 1,
+      "gate_cost_multiplier": 1.5,
+      "missed_entry_frac": 0.1,
+      "missed_entry_sims": 100
+    },
+    "holdout": {
+      "acceptance": {
+        "max_drawdown": -0.3,
+        "min_completed_trades": null,
+        "min_net_return": 0.0,
+        "min_sharpe": 0.0
+      }
+    },
+    "integrity": {
+      "truncation_check_sample": 40,
+      "truncation_points": 3
+    },
+    "metrics": {
+      "cash_treatment": "Idle cash earns 0% and the Sharpe excess return is measured against a 0% risk-free rate, so the two assumptions are consistent.",
+      "drawdown_basis": "daily session-close mark-to-market (understates intraday DD)",
+      "periods_per_year": 252,
+      "return_frequency": "daily",
+      "risk_free_rate_annual": 0.0
+    },
+    "parameter_stability": {
+      "local": {
+        "band_mult_abs": 0.25,
+        "entry_z_abs": null,
+        "exit_z_abs": null,
+        "int_rel": 0.2,
+        "stop_atr_abs": 0.25
+      },
+      "min_frac_profitable": 0.7,
+      "min_median_sharpe": 0.5,
+      "mode": "local_perturbation",
+      "neighbor_mode": "single_axis",
+      "perturbation": {
+        "float_rel_step": 0.1,
+        "integer_rel_step": 0.15,
+        "n_per_config": 20,
+        "z_abs": null
+      },
+      "prescreen": {
+        "max_configs": 3000,
+        "per_cluster": 3
+      }
+    },
+    "performance": {
+      "max_drawdown": -0.3,
+      "max_drawdown_source": "src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct",
+      "min_net_return": 0.0,
+      "min_sharpe": 0.75
+    },
+    "research_history": [
+      {
+        "n_configs": 3456,
+        "name": "noise_band NQ v2 (nb_nq_v2)",
+        "note": "Second noise-band round on NQ (momentum filter, entry cap, last-entry cutoff); 374 frozen finalists from 2018-2022, validation not run. This v3 grid was specified after reading those development results."
+      },
+      {
+        "n_configs": 8100,
+        "name": "noise_band NQ v1 (nb_nq_v1)",
+        "note": "First noise-band round on NQ; 757 frozen finalists from 2018-2022, validation not run."
+      },
+      {
+        "n_configs": 128304,
+        "name": "noise_band NQ v5 grid (nb_nq_v5, stopped)",
+        "note": "Stopped by the user in stage 5 (2018-2022 only); every config was backtested on development data and 82,236 passed stage 4, no finalists were frozen."
+      },
+      {
+        "n_configs": 13824,
+        "name": "noise_band ES v4 (nb_es_v4)",
+        "note": "Same family on ES; 326 frozen finalists, 291 passed ES 2023-2024; #17 + #104 lost 1.5% each on ES 2025+. NQ 2018-2022 was their transfer diagnostic."
+      },
+      {
+        "n_configs": 16200,
+        "name": "noise_band ES v3 (nb_es_v3)",
+        "note": "Same family on ES; 268 frozen finalists, 255 passed ES 2023-2024."
+      },
+      {
+        "n_configs": 8100,
+        "name": "noise_band ES v2 (nb_es_v2)",
+        "note": "Same family on ES; 235 frozen finalists, 225 passed ES 2023-2024."
+      },
+      {
+        "n_configs": 8100,
+        "name": "noise_band ES v1 (nb_es_v1)",
+        "note": "Same family on ES; 210 frozen finalists, 196 passed ES 2023-2024."
+      },
+      {
+        "n_configs": 3456,
+        "name": "mean_reversion NQ (mr_nq_v7_1h)",
+        "note": "Different (mean-reversion) family on NQ; 153 frozen candidates, 123 passed 2023-2024."
+      },
+      {
+        "n_configs": 1152,
+        "name": "mean_reversion NQ (mr_nq_v7_15m)",
+        "note": "Different (mean-reversion) family on NQ; 8 frozen candidates, 6 passed 2023-2024."
+      },
+      {
+        "n_configs": 21600,
+        "name": "mean_reversion NQ (mr_nq_v6)",
+        "note": "Different (mean-reversion) family on NQ; 201 frozen candidates, 161 passed 2023-2024."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion NQ (mr_nq_v5)",
+        "note": "Different (mean-reversion) family on NQ; 93 frozen candidates, 38 passed 2023-2024."
+      },
+      {
+        "n_configs": 248832,
+        "name": "ma_crossover v2 grid (ma_v2, SPY)",
+        "note": "Long-only trend-following MA crossover, 5min/15min, SPY."
+      },
+      {
+        "n_configs": 60000,
+        "name": "ma_crossover v1 grid (ma_v1, SPY)",
+        "note": "Long-only trend-following MA crossover, 5min/15min/1h, SPY."
+      },
+      {
+        "n_configs": 24576,
+        "name": "channel_breakout grid (funnel_v1..v4, SPY)",
+        "note": "Channel-breakout grid; four funnel variants with changed thresholds/methods."
+      },
+      {
+        "n_configs": 3888,
+        "name": "donchian_ablation (donchian_v1, SPY/QQQ)",
+        "note": "Full-factorial Donchian intraday ablation, 2018-2026 splits incl. holdout."
+      }
+    ],
+    "seed": 20261030,
+    "strategy": "noise_band_v7",
+    "symbol": "NQ",
+    "time_stability": {
+      "min_profitable_years": 3,
+      "top_trades_frac": 0.05,
+      "top_trades_k": 5
+    },
+    "trade_count": {
+      "min_completed_trades": 100,
+      "min_trades_per_year": 10,
+      "min_years_meeting_floor": 4
+    },
+    "validation": {
+      "max_drawdown": -0.3,
+      "min_completed_trades": 40,
+      "min_net_return": 0.0,
+      "min_sharpe": 0.3
+    },
+    "version": 1
+  },
+  "transfer_symbol": "ES"
+}

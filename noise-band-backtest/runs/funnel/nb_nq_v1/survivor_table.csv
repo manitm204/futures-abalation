@@ -1,0 +1,12 @@
+stage,kind,evaluated,passed,pct_of_universe,pct_of_previous,hard_reject,insufficient_evidence,with_warnings,deduplicated,n_clusters,note
+0 universe,universe,8100,8100,100.0,100.0,,,,,,
+1 backtest integrity,hard_gate,8100,8100,100.0,100.0,0,0,0,,,
+2 trade count & coverage,hard_gate,8100,8088,99.85185185185185,99.85185185185185,12,0,8100,,,
+3 performance & risk,hard_gate,8088,5583,68.92592592592592,69.02818991097922,2505,0,0,,,
+4 parameter stability,hard_gate,5583,5564,68.69135802469135,99.65968117499553,19,0,0,,,
+5 time stability,hard_gate,5564,5542,68.41975308641975,99.60460100647016,22,0,4678,,,
+6 deduplication,dedup,5542,757,9.345679012345679,13.659328762179719,,,,4785,379,best 2 per cluster
+7 execution stress,hard_gate,757,757,9.345679012345679,100.0,0,0,0,,,
+8 frozen validation,hard_gate,,,,,,,,,,not run in `develop`; run the `validate` command on the frozen manifest
+9 DSR / transfer,diagnostic_only,757,,,,,,,,,diagnostic only: unverified: 757
+10 final holdout,explicit_command,,,,,,,,,,not run; `final-test` command only
