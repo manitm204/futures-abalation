@@ -1,0 +1,13 @@
+<p><b>Same test as the other markets, on the 10-year Treasury note.</b> Same 41,472-version v5 grid and funnel as 6E and 6J. Differences:</p>
+<ul><li><b>Session:</b> the old CBOT Treasury pit hours, 08:20–15:00 New York.</li>
+<li><b>Cross-market check on the 30-year bond (ZB)</b>, built for this purpose (2018–2022 only, diagnostic). With no finalists it had nothing to check.</li>
+<li><b>Seven stale days skipped</b> (2018-06-01, 2019-08-30, 2020-02-28, 2021-02-26, 2021-08-31, 2023-02-28, 2023-05-31) by the under-5%-of-normal-volume rule.</li></ul>
+<p>ZN rolls quarterly (35 rolls, back-adjusted). One contract was worth about $110–140k over the period.</p>
+<p><b>Nothing passed: 0 of 41,472 versions reached the finalists.</b> This is the worst result of any market so far.</p>
+<ul><li>Only 1.4% of versions made money on 2018–2022. The median Sharpe was −1.67 and the median profit factor 0.48. Every bar size had a negative median (5-minute −4.22, 15-minute −1.69, 1-hour −0.82).</li>
+<li>No version reached Sharpe 0.75; the best was 0.52, on 3 trades.</li>
+<li>Of the 30,751 versions with enough trades (≥100), only 13 made money. The best was 1-hour SMA 60/15, entry −2, exit −1, hold 10, up bar, no stop: +2.6% over five years, Sharpe 0.38, profit factor 1.28, on 103 trades.</li>
+<li>Even the least-bad corner, 1-hour bars with up-bar confirmation, had only 4% of versions making money (median Sharpe −0.69).</li></ul>
+<p><b>Likely reasons (not tested):</b> a Treasury contract moves only a few ticks within an hour, so the $2.50 commission plus one tick of slippage each way may eat most of the bounce. And 2018–2022 includes the 2022 rate-hike sell-off, when buying dips kept losing.</p>
+<p><b>No validation run.</b> With no finalists there was nothing to score on 2023–2024. The validate step opened the data and logged it but tested no strategy, so ZN 2023–2024 is effectively still fresh and the 2025+ holdout is untouched.</p>
+<p><b>Holding the note lost money too:</b> −6.3% over 2018–2022 and −6.0% over 2023–2024 (rolled, unlevered).</p>

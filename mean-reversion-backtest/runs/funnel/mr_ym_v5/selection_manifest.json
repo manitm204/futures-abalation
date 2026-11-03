@@ -1,0 +1,728 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 40,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 9,
+      "config_id": "cfg_f560ae66ac1e21796546",
+      "dev_net_return": 0.5373749512162889,
+      "dev_order": 20,
+      "dev_sharpe": 0.8868182520764328,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.49701472595384655,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.5,
+        "exit_z": -0.5,
+        "max_holding_bars": 10,
+        "mean_lookback": 30,
+        "mean_type": "sma",
+        "std_lookback": 20,
+        "stop_atr_multiple": "2.0",
+        "symbol": "YM",
+        "timeframe": "1h"
+      },
+      "stability_median_sharpe": 0.7758558942489803
+    },
+    {
+      "cluster": 21,
+      "config_id": "cfg_433b6fba11a24f16ebed",
+      "dev_net_return": 0.4545877682274375,
+      "dev_order": 32,
+      "dev_sharpe": 0.7975749649894559,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.42082376591469384,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.0,
+        "exit_z": 0.0,
+        "max_holding_bars": 10,
+        "mean_lookback": 20,
+        "mean_type": "ema",
+        "std_lookback": 15,
+        "stop_atr_multiple": "2.0",
+        "symbol": "YM",
+        "timeframe": "1h"
+      },
+      "stability_median_sharpe": 0.737423516765065
+    },
+    {
+      "cluster": 17,
+      "config_id": "cfg_2e7d5fbbfd4c9bb1e486",
+      "dev_net_return": 0.37861999999999996,
+      "dev_order": 37,
+      "dev_sharpe": 0.8812763909315097,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.38877613728676197,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.5,
+        "exit_z": -1.0,
+        "max_holding_bars": 10,
+        "mean_lookback": 80,
+        "mean_type": "ema",
+        "std_lookback": 10,
+        "stop_atr_multiple": "none",
+        "symbol": "YM",
+        "timeframe": "1h"
+      },
+      "stability_median_sharpe": 0.7067292221087778
+    },
+    {
+      "cluster": 24,
+      "config_id": "cfg_5a90538e1606bdb27c2c",
+      "dev_net_return": 0.36936499999999994,
+      "dev_order": 43,
+      "dev_sharpe": 0.8029772621970164,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.46900206746352147,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.0,
+        "exit_z": -0.5,
+        "max_holding_bars": 10,
+        "mean_lookback": 40,
+        "mean_type": "sma",
+        "std_lookback": 40,
+        "stop_atr_multiple": "none",
+        "symbol": "YM",
+        "timeframe": "1h"
+      },
+      "stability_median_sharpe": 0.6716676955359941
+    },
+    {
+      "cluster": 17,
+      "config_id": "cfg_391b6bc5d63899d7b2c1",
+      "dev_net_return": 0.3470599999999999,
+      "dev_order": 51,
+      "dev_sharpe": 0.7909156839640962,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.35147975605758736,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.5,
+        "exit_z": -0.5,
+        "max_holding_bars": 10,
+        "mean_lookback": 80,
+        "mean_type": "ema",
+        "std_lookback": 10,
+        "stop_atr_multiple": "none",
+        "symbol": "YM",
+        "timeframe": "1h"
+      },
+      "stability_median_sharpe": 0.5991129552570211
+    },
+    {
+      "cluster": 13,
+      "config_id": "cfg_363c039abc5fc1df2a64",
+      "dev_net_return": 0.4508749999999999,
+      "dev_order": 52,
+      "dev_sharpe": 1.0272842541936114,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.333090569799968,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.0,
+        "exit_z": -0.5,
+        "max_holding_bars": 10,
+        "mean_lookback": 60,
+        "mean_type": "sma",
+        "std_lookback": 25,
+        "stop_atr_multiple": "none",
+        "symbol": "YM",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.5959056525422096
+    },
+    {
+      "cluster": 13,
+      "config_id": "cfg_43edcc38f94f428af7f0",
+      "dev_net_return": 0.504305,
+      "dev_order": 54,
+      "dev_sharpe": 1.081948161587642,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.30982162302064925,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.0,
+        "exit_z": 0.5,
+        "max_holding_bars": 10,
+        "mean_lookback": 60,
+        "mean_type": "sma",
+        "std_lookback": 25,
+        "stop_atr_multiple": "none",
+        "symbol": "YM",
+        "timeframe": "15min"
+      },
+      "stability_median_sharpe": 0.5751548620653781
+    },
+    {
+      "cluster": 36,
+      "config_id": "cfg_f9bd35311bad9e47bb74",
+      "dev_net_return": 0.42596999999999996,
+      "dev_order": 56,
+      "dev_sharpe": 0.879580887428872,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.43584373489112294,
+      "params": {
+        "entry_confirmation": "positive_bar_return",
+        "entry_z": -2.0,
+        "exit_z": -0.5,
+        "max_holding_bars": 10,
+        "mean_lookback": 50,
+        "mean_type": "sma",
+        "std_lookback": 20,
+        "stop_atr_multiple": "none",
+        "symbol": "YM",
+        "timeframe": "1h"
+      },
+      "stability_median_sharpe": 0.5652752873583355
+    },
+    {
+      "cluster": 0,
+      "config_id": "cfg_197e30564b0c53bb1316",
+      "dev_net_return": 0.30600470202302743,
+      "dev_order": 57,
+      "dev_sharpe": 0.7887800997959252,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.13093429437802073,
+      "params": {
+        "entry_confirmation": "none",
+        "entry_z": -2.0,
+        "exit_z": -1.0,
+        "max_holding_bars": 5,
+        "mean_lookback": 60,
+        "mean_type": "sma",
+        "std_lookback": 20,
+        "stop_atr_multiple": "2.0",
+        "symbol": "YM",
+        "timeframe": "1h"
+      },
+      "stability_median_sharpe": 0.5429332036267376
+    }
+  ],
+  "code_version": "5342a94cdc844bb5d1f3b0c2c00705f03b157c96",
+  "config_sha256": "ab0047304657cdd182a1dc73adcd61ef4fda515cbc5e60e33ddd279abef132c3",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "5min",
+      "15min",
+      "1h"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "mr_ym_v5",
+  "frozen_at": "2026-10-22T02:33:10.499302+00:00",
+  "frozen_manifest_sha256": "b53bf80f16a8eb6272c5f9d4069d564e28f453fe9ed283078d825b2a5c42d333",
+  "git_diff_sha256": "1dcfc89b166d6b1785db2a9437db42bbdc082203d71059a22c5f726a13b3271f",
+  "git_dirty": true,
+  "seed": 20261021,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, best 2 per cluster)",
+      "7 execution stress"
+    ],
+    "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": false,
+    "commission_minimum": 0.0,
+    "commission_per_contract": 2.5,
+    "commission_per_share": 0.0,
+    "extended_hours_slippage_multiplier": 1.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "instrument_type": "futures",
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 0.0,
+    "slippage_bps_stop": 0.0,
+    "slippage_ticks_market": 1.0,
+    "slippage_ticks_stop": 1.0,
+    "starting_equity": 1000000.0
+  },
+  "symbol": "YM",
+  "validated_at": "2026-10-22T02:33:36.217244+00:00",
+  "validation_summary": [
+    {
+      "config_id": "cfg_7fa2ef2951433a62f687",
+      "reasons": [
+        "net_return -0.0331 <= 0.0",
+        "sharpe -0.579 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_afcf47ffac20c2a253ab",
+      "reasons": [
+        "net_return -0.0419 <= 0.0",
+        "sharpe -0.637 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_902b60e3299e0d5ddd44",
+      "reasons": [
+        "net_return -0.0156 <= 0.0",
+        "sharpe -0.272 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_054409de204fb71afc60",
+      "reasons": [
+        "net_return -0.0155 <= 0.0",
+        "sharpe -0.317 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_eade9ef930b639bcb952",
+      "reasons": [
+        "net_return -0.0010 <= 0.0",
+        "sharpe 0.004 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0646da42707d07767f71",
+      "reasons": [
+        "sharpe 0.053 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_c591dc3c31486f7b996e",
+      "reasons": [
+        "net_return -0.0076 <= 0.0",
+        "sharpe -0.084 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_95c04f38381465fd59f3",
+      "reasons": [
+        "net_return -0.0235 <= 0.0",
+        "sharpe -0.331 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_237a5111c3f96dc3389a",
+      "reasons": [
+        "net_return -0.0561 <= 0.0",
+        "sharpe -0.889 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_ef6adf074a91f8aa04bc",
+      "reasons": [
+        "net_return -0.0408 <= 0.0",
+        "sharpe -0.641 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_3534970da2c681bd8c06",
+      "reasons": [
+        "net_return -0.0494 <= 0.0",
+        "sharpe -0.756 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_49c6a50d1db17c0103a1",
+      "reasons": [
+        "net_return -0.0004 <= 0.0",
+        "sharpe 0.015 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_08d47ebe20140846c5c2",
+      "reasons": [
+        "net_return -0.0253 <= 0.0",
+        "sharpe -0.355 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5545a804a1188342bd62",
+      "reasons": [
+        "net_return -0.0128 <= 0.0",
+        "sharpe -0.275 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_cddeb12a556594792bb3",
+      "reasons": [
+        "sharpe 0.114 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_bf795a45a0ffed86d733",
+      "reasons": [
+        "sharpe 0.220 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_a317952d913456c2694b",
+      "reasons": [
+        "sharpe 0.212 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_204ec89c0d69027b619d",
+      "reasons": [
+        "net_return -0.0160 <= 0.0",
+        "sharpe -0.188 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_c34bdae333ddbcc303e1",
+      "reasons": [
+        "net_return -0.0009 <= 0.0",
+        "sharpe -0.003 < 0.3",
+        "completed_trades 37 < 40"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_f560ae66ac1e21796546",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_e30cc9fd9dbcc8f76beb",
+      "reasons": [
+        "sharpe 0.245 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_732dcbb850f2b3afff8a",
+      "reasons": [
+        "net_return -0.0345 <= 0.0",
+        "sharpe -0.480 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0b904702e4dfc6d76592",
+      "reasons": [
+        "net_return -0.0202 <= 0.0",
+        "sharpe -0.295 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_904f4c0fa6e6c61c09b8",
+      "reasons": [
+        "completed_trades 37 < 40"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_cee93263239965560080",
+      "reasons": [
+        "net_return -0.0317 <= 0.0",
+        "sharpe -0.464 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2ec9dddb871e81c9eeae",
+      "reasons": [
+        "net_return -0.0323 <= 0.0",
+        "sharpe -0.483 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_18513c68c879d88b6cf8",
+      "reasons": [
+        "net_return -0.0118 <= 0.0",
+        "sharpe -0.278 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0631f7e39bc52d1ba803",
+      "reasons": [
+        "sharpe 0.096 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_bc15db9d29520644599b",
+      "reasons": [
+        "sharpe 0.049 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_55cabc60a4b4fa696b20",
+      "reasons": [
+        "net_return -0.0775 <= 0.0",
+        "sharpe -1.201 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_dcaede6e61b8f743f04a",
+      "reasons": [
+        "net_return -0.0269 <= 0.0",
+        "sharpe -0.358 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_433b6fba11a24f16ebed",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_0ee65541b91130631773",
+      "reasons": [
+        "sharpe 0.266 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_f175f8e882afc416fe86",
+      "reasons": [
+        "sharpe 0.058 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_3fa2337be84196992363",
+      "reasons": [
+        "sharpe 0.060 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_8786c03adbdfe2c359f0",
+      "reasons": [
+        "net_return -0.0049 <= 0.0",
+        "sharpe -0.079 < 0.3",
+        "completed_trades 37 < 40"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2e7d5fbbfd4c9bb1e486",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_e15f37e6fa8af15ef83e",
+      "reasons": [
+        "net_return -0.0384 <= 0.0",
+        "sharpe -0.668 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5413d4676c38b206e175",
+      "reasons": [
+        "net_return -0.0371 <= 0.0",
+        "sharpe -0.645 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_aadb1c5497c047082939",
+      "reasons": [
+        "net_return -0.0008 <= 0.0",
+        "sharpe -0.009 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2a39eaa2890d93de7907",
+      "reasons": [
+        "sharpe 0.044 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_3871122dfd4444c0953c",
+      "reasons": [
+        "net_return -0.0074 <= 0.0",
+        "sharpe -0.117 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5a90538e1606bdb27c2c",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_f4343bd049d6290cb57e",
+      "reasons": [
+        "net_return -0.0112 <= 0.0",
+        "sharpe -0.147 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_ffb50f242bf6fdea6f63",
+      "reasons": [
+        "net_return -0.0357 <= 0.0",
+        "sharpe -0.661 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_f72c98ec11a2e7029d4b",
+      "reasons": [
+        "net_return -0.0102 <= 0.0",
+        "sharpe -0.120 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_62363db03f5ee7e39088",
+      "reasons": [
+        "net_return -0.0103 <= 0.0",
+        "sharpe -0.218 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_9dbaf4670b7b965f93f2",
+      "reasons": [
+        "net_return -0.0075 <= 0.0",
+        "sharpe -0.113 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_d557fbad70138dd9b036",
+      "reasons": [
+        "net_return -0.0373 <= 0.0",
+        "sharpe -0.692 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_e8be7bf203f22a082e45",
+      "reasons": [
+        "net_return -0.0505 <= 0.0",
+        "sharpe -0.542 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_391b6bc5d63899d7b2c1",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_363c039abc5fc1df2a64",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_a86ec5ae01052bbc2ca3",
+      "reasons": [
+        "sharpe 0.055 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_43edcc38f94f428af7f0",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_d18c0c0b3aee8f6e6941",
+      "reasons": [
+        "net_return -0.0318 <= 0.0",
+        "sharpe -0.491 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_f9bd35311bad9e47bb74",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_197e30564b0c53bb1316",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_87f7fc087f93534c5537",
+      "reasons": [
+        "sharpe 0.212 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_05ebed8737d803b867ee",
+      "reasons": [
+        "net_return -0.0300 <= 0.0",
+        "sharpe -0.449 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_04a7f3f47e22e2eb1e6b",
+      "reasons": [
+        "sharpe 0.160 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_040671b905c295f0acd6",
+      "reasons": [
+        "sharpe 0.024 < 0.3"
+      ],
+      "status": "hard_reject"
+    }
+  ]
+}
