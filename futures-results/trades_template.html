@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trade Distributions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #f4f6f8; --surface: #ffffff; --fg: #16202b; --muted: #5a6774; --line: #d8dfe6;
+  --accent: #2f6fb0; --accent-soft: #e3edf8; --pass: #2d7f52; --fail: #b93b35; --fail-soft: #f8e4e2;
+  --is: #8fb3d9; --is-line: #2f6fb0; --ho: #c0602a;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151b; --surface: #17202a; --fg: #e5ebf1; --muted: #95a3b1; --line: #2a3643;
+    --accent: #6ea9e6; --accent-soft: #1b2b3d; --pass: #5cbf89; --fail: #ef7a71; --fail-soft: #3a1c1a;
+    --is: #33506f; --is-line: #6ea9e6; --ho: #f0955c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151b; --surface: #17202a; --fg: #e5ebf1; --muted: #95a3b1; --line: #2a3643;
+  --accent: #6ea9e6; --accent-soft: #1b2b3d; --pass: #5cbf89; --fail: #ef7a71; --fail-soft: #3a1c1a;
+  --is: #33506f; --is-line: #6ea9e6; --ho: #f0955c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 36px 16px 72px; display: flex; flex-direction: column; gap: 44px; }
+section, header { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.15; text-wrap: balance; }
+h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.5rem; font-weight: 700; }
+h3 { font-size: 1.05rem; font-weight: 700; }
+p { margin: 0; max-width: 72ch; }
+a { color: var(--accent); }
+.eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+.mono { font-family: var(--font-mono); }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.88rem; align-items: center; }
+.sw { display: inline-block; width: 14px; height: 10px; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+.sw.is { background: var(--is); border: 1px solid var(--is-line); }
+.sw.ho { background: transparent; border: 2px solid var(--ho); height: 10px; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 0.88rem; }
+.controls button { font: inherit; font-size: 0.85rem; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--fg); cursor: pointer; }
+.controls button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.controls label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+.card-head { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.settings { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+svg.hist { width: 100%; height: auto; display: block; }
+svg.hist text { font-family: var(--font-mono); font-size: 10px; fill: var(--muted); }
+svg.hist .axis { stroke: var(--line); }
+svg.hist .zero { stroke: var(--muted); stroke-dasharray: 3 3; }
+svg.hist .bar-is { fill: var(--is); stroke: var(--is-line); stroke-width: 0.6; }
+svg.hist .bar-is.over { fill: url(#hatch-is); }
+svg.hist .step-ho { fill: none; stroke: var(--ho); stroke-width: 2; }
+svg.hist .nfit-is { fill: none; stroke: var(--is-line); stroke-width: 1.3; stroke-dasharray: 5 3; }
+svg.hist .nfit-ho { fill: none; stroke: var(--ho); stroke-width: 1.3; stroke-dasharray: 5 3; }
+svg.hist .mean-is { stroke: var(--is-line); stroke-width: 1.5; }
+svg.hist .mean-ho { stroke: var(--ho); stroke-width: 1.5; }
+svg.hist .rug-is { stroke: var(--is-line); stroke-opacity: 0.35; }
+svg.hist .rug-ho { stroke: var(--ho); stroke-opacity: 0.8; }
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.84rem; }
+th, td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-weight: 600; color: var(--muted); font-size: 0.76rem; }
+td.ho { color: var(--ho); font-weight: 600; }
+td.bad { color: var(--fail); }
+td.good { color: var(--pass); }
+.mini th, .mini td { padding: 3px 6px; font-size: 0.78rem; }
+.worst { font-size: 0.8rem; color: var(--muted); }
+.worst b { color: var(--fg); font-weight: 600; }
+.callout { background: var(--accent-soft); border-radius: 8px; padding: 12px 14px; font-size: 0.92rem; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const DATA = /*__DATA__*/null;
+
+const $ = (h) => { const t = document.createElement("template"); t.innerHTML = h.trim(); return t.content.firstChild; };
+const pct = (x, d = 2) => (x == null || !isFinite(x)) ? "–" : (x > 0 ? "+" : x < 0 ? "−" : "") + Math.abs(x).toFixed(d) + "%";
+const num = (x, d = 2) => (x == null || !isFinite(x)) ? "–" : (x < 0 ? "−" : "") + Math.abs(x).toFixed(d);
+const money = (x) => (x < 0 ? "−$" : "+$") + (Math.abs(x) / 1000).toFixed(1) + "k";
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const XR = { z_exit: "z exit", time_exit: "time", stop_exit: "stop" };
+
+function quantile(sorted, q) {
+  if (!sorted.length) return NaN;
+  const p = (sorted.length - 1) * q, lo = Math.floor(p), hi = Math.ceil(p);
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (p - lo);
+}
+function stats(tr) {
+  const r = tr.map((t) => t.r), n = r.length;
+  if (!n) return { n: 0 };
+  const s = [...r].sort((a, b) => a - b), mean = r.reduce((a, b) => a + b, 0) / n;
+  const m2 = r.reduce((a, b) => a + (b - mean) ** 2, 0) / n, sd = Math.sqrt(m2);
+  const skew = sd ? r.reduce((a, b) => a + ((b - mean) / sd) ** 3, 0) / n : NaN;
+  const kurt = sd ? r.reduce((a, b) => a + ((b - mean) / sd) ** 4, 0) / n - 3 : NaN;
+  const gp = tr.filter((t) => t.pnl > 0).reduce((a, t) => a + t.pnl, 0), gl = -tr.filter((t) => t.pnl < 0).reduce((a, t) => a + t.pnl, 0);
+  const sum = r.reduce((a, b) => a + b, 0), worst3 = s.slice(0, 3).reduce((a, b) => a + b, 0);
+  const stops = tr.filter((t) => t.x === "stop_exit");
+  return { n, mean, median: quantile(s, 0.5), sd, skew, kurt, win: r.filter((x) => x > 0).length / n, pf: gl ? gp / gl : NaN,
+    worst: s[0], best: s[n - 1], sum, sumEx3: sum - worst3, worst3, gl, stopShare: stops.length / n,
+    stopAvg: stops.length ? stops.reduce((a, t) => a + t.r, 0) / stops.length : NaN, sorted: s };
+}
+
+// ---- histogram ----
+let MODE = "share", NFIT = true;
+function niceStep(span, target) {
+  const raw = span / target, mag = 10 ** Math.floor(Math.log10(raw));
+  return [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw);
+}
+function histSVG(is, ho, opts = {}) {
+  const W = 560, H = opts.h || 230, L = 40, R = 10, T = 12, B = 46;
+  const all = [...is, ...ho].map((t) => t.r).sort((a, b) => a - b);
+  if (!all.length) return "<p class='muted'>No trades.</p>";
+  let lo = quantile(all, 0.005), hi = quantile(all, 0.995);
+  if (hi - lo < 1e-9) { lo -= 0.5; hi += 0.5; }
+  const step = niceStep(hi - lo, opts.bins || 26);
+  lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+  const nb = Math.round((hi - lo) / step);
+  const count = (tr) => {
+    const c = new Array(nb).fill(0);
+    let under = 0, over = 0;
+    for (const t of tr) {
+      let k = Math.floor((t.r - lo) / step);
+      if (t.r < lo) under++; if (t.r >= hi) over++;
+      k = Math.max(0, Math.min(nb - 1, k)); c[k]++;
+    }
+    return { c, under, over };
+  };
+  const ci = count(is), ch = count(ho);
+  const val = (c, n) => MODE === "share" ? c.map((x) => n ? x / n : 0) : c;
+  const vi = val(ci.c, is.length), vh = val(ch.c, ho.length);
+  const si = stats(is), sh = stats(ho);
+  const pdf = (x, s) => Math.exp(-0.5 * ((x - s.mean) / s.sd) ** 2) / (s.sd * Math.sqrt(2 * Math.PI));
+  const scaleN = (s) => MODE === "share" ? step : step * s.n;
+  let ymax = Math.max(...vi, ...vh);
+  if (NFIT) for (const s of [si, sh]) if (s.n > 2 && s.sd) ymax = Math.max(ymax, pdf(s.mean, s) * scaleN(s));
+  ymax = ymax * 1.08 || 1;
+  const x = (v) => L + (v - lo) / (hi - lo) * (W - L - R), y = (v) => T + (H - T - B) * (1 - Math.min(v, ymax) / ymax);
+  const base = H - B;
+  let g = `<svg class="hist" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label || "histogram")}">
+    <defs><pattern id="hatch-is" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="4" height="4" fill="var(--is)"/><line x1="0" y1="0" x2="0" y2="4" stroke="var(--is-line)" stroke-width="1.2"/></pattern></defs>`;
+  // y grid
+  const ystep = niceStep(ymax, 4);
+  for (let v = 0; v <= ymax + 1e-12; v += ystep) {
+    g += `<line class="axis" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke-opacity="0.5"/>
+      <text x="${L - 4}" y="${y(v) + 3}" text-anchor="end">${MODE === "share" ? Math.round(v * 100) + "%" : Math.round(v)}</text>`;
+  }
+  // in-sample bars
+  vi.forEach((v, k) => {
+    if (!v) return;
+    const edge = (k === 0 && ci.under) || (k === nb - 1 && ci.over);
+    g += `<rect class="bar-is${edge ? " over" : ""}" x="${x(lo + k * step) + 0.5}" y="${y(v)}" width="${Math.max(0.5, x(lo + step) - x(lo) - 1)}" height="${base - y(v)}"/>`;
+  });
+  // holdout step outline
+  let d = `M${x(lo)},${base}`;
+  vh.forEach((v, k) => { d += ` L${x(lo + k * step)},${y(v)} L${x(lo + (k + 1) * step)},${y(v)}`; });
+  d += ` L${x(hi)},${base}`;
+  g += `<path class="step-ho" d="${d}"/>`;
+  // normal fits
+  if (NFIT) for (const [s, cls] of [[si, "nfit-is"], [sh, "nfit-ho"]]) {
+    if (s.n < 3 || !s.sd) continue;
+    let p = "";
+    for (let i = 0; i <= 120; i++) { const xv = lo + (hi - lo) * i / 120; p += (i ? " L" : "M") + x(xv).toFixed(1) + "," + y(pdf(xv, s) * scaleN(s)).toFixed(1); }
+    g += `<path class="${cls}" d="${p}"/>`;
+  }
+  // zero + means
+  if (lo < 0 && hi > 0) g += `<line class="zero" x1="${x(0)}" x2="${x(0)}" y1="${T}" y2="${base}"/>`;
+  if (si.n) g += `<line class="mean-is" x1="${x(si.mean)}" x2="${x(si.mean)}" y1="${base}" y2="${base + 7}"/>`;
+  if (sh.n) g += `<line class="mean-ho" x1="${x(sh.mean)}" x2="${x(sh.mean)}" y1="${base}" y2="${base + 7}"/>`;
+  // rug of every trade (clipped to the axis range): in-sample above, holdout below
+  const cx = (v) => x(Math.max(lo, Math.min(hi, v)));
+  g += is.map((t) => `<line class="rug-is" x1="${cx(t.r)}" x2="${cx(t.r)}" y1="${base + 9}" y2="${base + 15}"/>`).join("");
+  g += ho.map((t) => `<line class="rug-ho" x1="${cx(t.r)}" x2="${cx(t.r)}" y1="${base + 17}" y2="${base + 23}"/>`).join("");
+  // x labels
+  const xstep = niceStep(hi - lo, 6);
+  for (let v = Math.ceil(lo / xstep) * xstep; v <= hi + 1e-9; v += xstep)
+    g += `<text x="${x(v)}" y="${H - 8}" text-anchor="middle">${Math.abs(v) < 1e-9 ? "0" : (v > 0 ? "+" : "−") + Math.abs(+v.toFixed(3))}%</text>`;
+  g += `<line class="axis" x1="${L}" x2="${W - R}" y1="${base}" y2="${base}"/></svg>`;
+  const tails = [];
+  const tailTxt = (name, c) => {
+    const p = [];
+    if (c.under) p.push(`${c.under} below ${pct(lo, 2)}`);
+    if (c.over) p.push(`${c.over} above ${pct(hi, 2)}`);
+    return p.length ? `${name}: ${p.join(", ")}` : "";
+  };
+  for (const t of [tailTxt("2018–24", ci), tailTxt("holdout", ch)]) if (t) tails.push(t);
+  const cap = tails.length ? `<div class="worst">Edge bars also hold the tails (${tails.join("; ")}); the ticks underneath show every trade's exact spot, clipped to the axis.</div>` : "";
+  return g + cap;
+}
+
+function miniTable(si, sh) {
+  const row = (lab, f, good) => {
+    const a = f(si), b = f(sh);
+    return `<tr><td>${lab}</td><td>${a}</td><td class="ho">${b}</td></tr>`;
+  };
+  return `<div class="tbl-wrap"><table class="mini"><thead><tr><th></th><th>2018–24</th><th>Holdout</th></tr></thead><tbody>
+    ${row("Trades", (s) => s.n)}
+    ${row("Average trade", (s) => pct(s.mean, 3))}
+    ${row("Median trade", (s) => pct(s.median, 3))}
+    ${row("Spread (std dev)", (s) => num(s.sd, 3) + "%")}
+    ${row("Win rate", (s) => s.n ? Math.round(s.win * 100) + "%" : "–")}
+    ${row("PF", (s) => num(s.pf))}
+    ${row("Worst / best trade", (s) => pct(s.worst) + " / " + pct(s.best))}
+    ${row("Skew", (s) => num(s.skew))}
+    ${row("Fat tails (excess kurtosis)", (s) => num(s.kurt, 1))}
+    ${row("Stop exits: share · avg", (s) => s.n ? Math.round(s.stopShare * 100) + "% · " + pct(s.stopAvg) : "–")}
+    ${row("Sum of trade %", (s) => pct(s.sum, 1))}
+    ${row("Sum without worst 3", (s) => pct(s.sumEx3, 1))}
+  </tbody></table></div>`;
+}
+
+function settingsTxt(p) {
+  const st = p.stop_atr_multiple === "none" ? "no stop" : p.stop_atr_multiple + "× ATR stop";
+  return `${p.mean_type.toUpperCase()} ${p.mean_lookback}/${p.std_lookback} · entry ${p.entry_z} · exit ${p.exit_z} · hold ${p.max_holding_bars} · ${p.entry_confirmation === "none" ? "no confirm" : "up bar"} · ${st}`;
+}
+
+function render() {
+  const S = DATA.strategies;
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  const allIs = S.flatMap((s) => s.is), allHo = S.flatMap((s) => s.ho);
+  app.append($(`<header>
+    <div class="eyebrow">All markets · 12 strategies · per-trade returns</div>
+    <h1>Every trade, 2018–24 against the holdout</h1>
+    <p>Each bar chart shows how one strategy's trades were spread, by the % each trade made or lost. A trade's % is its net P&amp;L, after commissions and slippage, divided by the value of the contracts it bought. That makes it independent of account size and of the combined portfolio's caps. Each strategy runs alone with its frozen settings.</p>
+    <p class="muted mono" style="font-size:0.8rem">2018–24: ${esc(DATA.periods.is)} · Holdout: ${esc(DATA.periods.ho)} · ${esc(DATA.costs)}</p>
+  </header>`));
+
+  const controls = $(`<div class="controls">
+    <span class="muted">Bar height:</span>
+    <button data-mode="share" aria-pressed="${MODE === "share"}">% of trades</button>
+    <button data-mode="count" aria-pressed="${MODE === "count"}">Number of trades</button>
+    <label><input type="checkbox" ${NFIT ? "checked" : ""}> Normal curve with the same average and spread</label>
+  </div>`);
+  controls.querySelectorAll("button").forEach((b) => b.onclick = () => { MODE = b.dataset.mode; render(); });
+  controls.querySelector("input").onchange = (e) => { NFIT = e.target.checked; render(); };
+  const legend = $(`<div class="legend">
+    <span><span class="sw is"></span>2018–24 (filled bars)</span>
+    <span><span class="sw ho"></span>Holdout 2025–26 (orange outline)</span>
+    <span class="muted">Dashed: normal curve · small ticks at the bottom: averages, then each trade</span>
+  </div>`);
+
+  // Pooled
+  const pooled = $(`<section><div class="eyebrow">All 12 pooled</div><h2>Every trade together</h2>
+    <p class="muted">${allIs.length.toLocaleString()} trades in 2018–24 and ${allHo.length.toLocaleString()} in the holdout. Markets with bigger swings, like CL, make up the wide part.</p></section>`);
+  pooled.append(controls, legend);
+  const pc = $(`<div class="card"></div>`);
+  pc.innerHTML = histSVG(allIs, allHo, { h: 260, bins: 40, label: "All strategies pooled" });
+  pc.append($(miniTable(stats(allIs), stats(allHo))));
+  pooled.append(pc);
+  app.append(pooled);
+
+  // Summary table
+  const rows = S.map((s) => {
+    const a = stats(s.is), b = stats(s.ho);
+    const cls = (v) => v < 0 ? "bad" : v > 0 ? "good" : "";
+    const flip = b.sum < 0 && b.sumEx3 > 0;
+    return `<tr><td><b>${esc(s.name)}</b></td>
+      <td>${a.n}</td><td>${pct(a.mean, 3)}</td><td>${num(a.pf)}</td><td>${Math.round(a.win * 100)}%</td>
+      <td class="ho">${b.n}</td><td class="${cls(b.mean)}">${pct(b.mean, 3)}</td><td class="${cls(b.pf - 1)}">${num(b.pf)}</td><td>${b.n ? Math.round(b.win * 100) + "%" : "–"}</td>
+      <td>${pct(b.worst)}</td><td class="${cls(b.sum)}">${pct(b.sum, 1)}</td><td class="${cls(b.sumEx3)}">${pct(b.sumEx3, 1)}${flip ? " ✱" : ""}</td>
+      <td>${b.gl ? Math.round(-b.sorted.slice(0, 3).reduce((x, y) => x + y, 0) / -b.sorted.filter((v) => v < 0).reduce((x, y) => x + y, 0) * 100) + "%" : "–"}</td></tr>`;
+  }).join("");
+  app.append($(`<section><div class="eyebrow">Side by side</div><h2>Did a few big losses sink the holdout?</h2>
+    <p class="muted">“Sum of trade %” adds up each trade's %, a rough total that ignores compounding. “Without worst 3” drops the three worst holdout trades. ✱ marks a strategy whose holdout total turns positive once its 3 worst trades are removed.</p>
+    <div class="card tbl-wrap"><table><thead>
+      <tr><th></th><th colspan="4" style="text-align:center">2018–24</th><th colspan="8" style="text-align:center">Holdout 2025–26</th></tr>
+      <tr><th>Strategy</th><th>Trades</th><th>Avg</th><th>PF</th><th>Win</th><th>Trades</th><th>Avg</th><th>PF</th><th>Win</th><th>Worst</th><th>Sum of trade %</th><th>Without worst 3</th><th>Worst 3 as share of all losses</th></tr>
+    </thead><tbody>${rows}</tbody></table></div></section>`));
+
+  // Cards
+  const sec = $(`<section><div class="eyebrow">Per strategy</div><h2>Each strategy's spread of trades</h2>
+    <p class="muted">The x axis is fitted to each strategy, so compare shapes within a card, not across cards.</p></section>`);
+  sec.append(legend.cloneNode(true));
+  const grid = $(`<div class="grid"></div>`);
+  for (const s of S) {
+    const si = stats(s.is), sh = stats(s.ho);
+    const w = [...s.ho].sort((a, b) => a.r - b.r).slice(0, 3)
+      .map((t) => `<b>${pct(t.r)}</b> ${t.d} (${XR[t.x] || t.x}, ${t.bars} bar${t.bars === 1 ? "" : "s"})`).join(" · ");
+    const card = $(`<div class="card">
+      <div class="card-head"><h3>${esc(s.name)}</h3><span class="settings">${esc(settingsTxt(s.settings))}</span></div>
+    </div>`);
+    card.insertAdjacentHTML("beforeend", histSVG(s.is, s.ho, { label: s.name }));
+    card.insertAdjacentHTML("beforeend", `<div class="worst">Worst holdout trades: ${w || "–"}</div>`);
+    card.insertAdjacentHTML("beforeend", miniTable(si, sh));
+    grid.append(card);
+  }
+  sec.append(grid);
+  app.append(sec);
+
+  // Worst trades overall
+  const worst = S.flatMap((s) => s.ho.map((t) => ({ ...t, name: s.name }))).sort((a, b) => a.pnl - b.pnl).slice(0, 15);
+  app.append($(`<section><div class="eyebrow">Holdout</div><h2>The 15 biggest $ losses in the holdout</h2>
+    <p class="muted">Dollar P&amp;L with each strategy running alone on $1M of full-size contracts.</p>
+    <div class="card tbl-wrap"><table><thead><tr><th>Strategy</th><th>Entry day</th><th>Trade %</th><th>P&amp;L</th><th>Exit</th><th>Bars held</th><th>Entry price</th></tr></thead>
+    <tbody>${worst.map((t) => `<tr><td>${esc(t.name)}</td><td>${t.d}</td><td class="bad">${pct(t.r)}</td><td class="bad">${money(t.pnl)}</td><td>${XR[t.x] || t.x}</td><td>${t.bars}</td><td>${t.px}</td></tr>`).join("")}</tbody></table></div></section>`));
+}
+render();
+</script>
+</body>
+</html>

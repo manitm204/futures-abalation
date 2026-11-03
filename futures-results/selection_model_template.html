@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Selection Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #f4f6f8; --surface: #ffffff; --fg: #16202b; --muted: #5a6774; --line: #d8dfe6;
+  --accent: #2f6fb0; --accent-soft: #e3edf8; --pass: #2d7f52; --fail: #b93b35; --fail-soft: #f8e4e2;
+  --g1: #2f6fb0; --g2: #2d7f52; --g3: #8a5cc2; --g4: #c0602a; --g5: #6b7a88;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151b; --surface: #17202a; --fg: #e5ebf1; --muted: #95a3b1; --line: #2a3643;
+    --accent: #6ea9e6; --accent-soft: #1b2b3d; --pass: #5cbf89; --fail: #ef7a71; --fail-soft: #3a1c1a;
+    --g1: #6ea9e6; --g2: #5cbf89; --g3: #b48ee8; --g4: #f0955c; --g5: #95a3b1; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151b; --surface: #17202a; --fg: #e5ebf1; --muted: #95a3b1; --line: #2a3643;
+  --accent: #6ea9e6; --accent-soft: #1b2b3d; --pass: #5cbf89; --fail: #ef7a71; --fail-soft: #3a1c1a;
+  --g1: #6ea9e6; --g2: #5cbf89; --g3: #b48ee8; --g4: #f0955c; --g5: #95a3b1; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 36px 16px 72px; display: flex; flex-direction: column; gap: 44px; }
+section, header { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.15; text-wrap: balance; }
+h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.5rem; font-weight: 700; }
+p { margin: 0; max-width: 76ch; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+.mono { font-family: var(--font-mono); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.rules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 800px) { .rules { grid-template-columns: 1fr; } }
+.rules .card b { font-family: var(--font-display); }
+.callout { background: var(--accent-soft); border-radius: 8px; padding: 12px 14px; font-size: 0.95rem; }
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.84rem; }
+th, td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-weight: 600; color: var(--muted); font-size: 0.76rem; }
+td.bad { color: var(--fail); }
+td.good { color: var(--pass); }
+tr.base td { color: var(--muted); }
+tr.hl td { font-weight: 600; }
+svg.ic { width: 100%; height: auto; display: block; }
+svg.ic text { font-family: var(--font-mono); font-size: 10.5px; fill: var(--muted); }
+svg.ic text.lab { fill: var(--fg); font-family: var(--font-body); font-size: 11.5px; }
+svg.ic .axis { stroke: var(--line); }
+svg.ic .zero { stroke: var(--muted); }
+svg.ic .ci { stroke-width: 1.5; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.85rem; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: middle; margin-right: 6px; }
+.heat td.c { font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const DATA = /*__DATA__*/null;
+const $ = (h) => { const t = document.createElement("template"); t.innerHTML = h.trim(); return t.content.firstChild; };
+const num = (x, d = 2) => (x == null || !isFinite(x)) ? "–" : (x > 0 ? "+" : x < 0 ? "−" : "") + Math.abs(x).toFixed(d);
+const plain = (x, d = 2) => (x == null || !isFinite(x)) ? "–" : (x < 0 ? "−" : "") + Math.abs(x).toFixed(d);
+const pc = (x) => (x == null || !isFinite(x)) ? "–" : Math.round(x * 100) + "%";
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const GC = { "Training results": "var(--g1)", "Time robustness": "var(--g2)", "Parameter robustness": "var(--g3)", "Funnel checks": "var(--g4)", "Strategy shape": "var(--g5)" };
+const cls = (v, lo = 0) => v == null || !isFinite(v) ? "" : v > lo ? "good" : v < lo ? "bad" : "";
+
+function icChart(rows, key = "ic") {
+  const W = 760, rowH = 21, L = 290, R = 60, T = 22, B = 26, H = T + B + rowH * rows.length;
+  const lo = Math.min(-0.3, ...rows.map((r) => r.ci[0])), hi = Math.max(0.3, ...rows.map((r) => r.ci[1]));
+  const x = (v) => L + (W - L - R) * (v - lo) / (hi - lo);
+  let g = `<svg class="ic" viewBox="0 0 ${W} ${H}" role="img" aria-label="Rank correlation of each input with validation Sharpe">`;
+  for (let v = Math.ceil(lo * 10) / 10; v <= hi + 1e-9; v += 0.1) {
+    const vv = +v.toFixed(1);
+    g += `<line class="axis" x1="${x(vv)}" x2="${x(vv)}" y1="${T - 6}" y2="${H - B}" stroke-opacity="${vv === 0 ? 0 : 0.6}"/><text x="${x(vv)}" y="${H - B + 14}" text-anchor="middle">${num(vv, 1)}</text>`;
+  }
+  g += `<line class="zero" x1="${x(0)}" x2="${x(0)}" y1="${T - 6}" y2="${H - B}"/>`;
+  g += `<text x="${x(lo)}" y="${T - 10}">← worse in validation</text><text x="${x(hi)}" y="${T - 10}" text-anchor="end">better in validation →</text>`;
+  rows.forEach((r, i) => {
+    const y = T + rowH * i + rowH / 2, c = GC[r.group];
+    g += `<text class="lab" x="${L - 10}" y="${y + 4}" text-anchor="end">${esc(r.label)}</text>`;
+    g += `<line class="ci" x1="${x(r.ci[0])}" x2="${x(r.ci[1])}" y1="${y}" y2="${y}" stroke="${c}" stroke-opacity="0.55"/>`;
+    g += `<circle cx="${x(r[key])}" cy="${y}" r="4.5" fill="${c}"/>`;
+    g += `<text x="${W - R + 8}" y="${y + 4}">${num(r[key], 2)}</text>`;
+  });
+  return g + `</svg>`;
+}
+
+function render() {
+  const D = DATA, app = document.getElementById("app");
+  const P = D.population, M = D.models, U = [...D.univariate].sort((a, b) => b.ic - a.ic);
+  const mkts = Object.keys(P.markets);
+  const ridge = M["Ridge regression (all inputs)"], tsh = M["Training Sharpe"], rnd = M["Random choice"];
+
+  app.append($(`<header>
+    <div class="eyebrow">All markets · ${P.n.toLocaleString()} unique finalists · ${mkts.length} markets</div>
+    <h1>Do the training numbers predict validation?</h1>
+    <p>Every finalist the funnel has produced was scored on 2018–22 (training) and then on 2023–24 (validation). This page asks whether any training-period number, or a model built from all of them, picks out the finalists that did better in validation. It compares each one with random choice and with simply ranking by training Sharpe.</p>
+    <p class="muted mono" style="font-size:0.8rem">${P.n_finalists_total.toLocaleString()} finalists across all runs → ${P.n.toLocaleString()} after keeping each market's identical settings once (latest run's copy) · ${P.n_clusters.toLocaleString()} dedup clusters · holdout not used</p>
+  </header>`));
+
+  app.append($(`<section><div class="eyebrow">Method</div><h2>How it's tested</h2>
+    <div class="rules">
+      <div class="card"><b>Within each market</b><p class="muted">The market sets most of the validation result (every 6E finalist failed; most NQ ones passed). So every input and the target are turned into percentile ranks inside their market, and the question is which finalist to pick on a given market.</p></div>
+      <div class="card"><b>One market held out</b><p class="muted">Each model is fit on 6 markets and then ranks the 7th, which it never saw. Scores are averaged over the 7 held-out markets. A rule that only works on the markets it was fit to scores poorly here.</p></div>
+      <div class="card"><b>Neighbours aren't independent</b><p class="muted">Finalists in the same dedup cluster share most of their trades. Intervals come from resampling whole clusters, and the chance test shuffles validation results between clusters rather than between single finalists.</p></div>
+    </div></section>`));
+
+  // Models vs baselines
+  const order = ["Random choice", "Training Sharpe", "Funnel's own order", "Best single input (picked on other markets)",
+    "Ridge regression (all inputs)", "Logistic regression on pass/fail", "Shallow random forest"];
+  const base = new Set(order.slice(0, 3));
+  app.append($(`<section><div class="eyebrow">The answer</div><h2>Models against the baselines</h2>
+    <div class="callout" id="verdict"></div>
+    <div class="card tbl-wrap"><table>
+      <thead><tr><th>How finalists are ranked</th><th>Rank corr. with val. Sharpe</th><th>Chance p</th>
+        <th>Top 10: val. Sharpe</th><th>Top 10: passed</th><th>Top 10: median PF</th>
+        <th>Top 20%: val. Sharpe</th><th>Top 20%: passed</th><th>Top 20%: median PF</th></tr></thead>
+      <tbody>${order.map((k) => { const m = M[k]; return `<tr class="${base.has(k) ? "base" : ""}${k.startsWith("Ridge") ? " hl" : ""}">
+        <td>${esc(k)}</td><td class="${cls(m.ic)}">${num(m.ic, 3)}</td><td>${m.shuffle_ic_p == null ? "–" : plain(m.shuffle_ic_p, 2)}</td>
+        <td class="${cls(m.top10_sharpe - rnd.top10_sharpe)}">${num(m.top10_sharpe)}</td><td>${pc(m.top10_pass)}</td><td>${plain(m.top10_pf)}</td>
+        <td class="${cls(m.top20_sharpe - rnd.top20_sharpe)}">${num(m.top20_sharpe)}</td><td>${pc(m.top20_pass)}</td><td>${plain(m.top20_pf)}</td></tr>`; }).join("")}</tbody>
+    </table>
+    <p class="muted" style="font-size:0.82rem">Scores are averages over the 7 markets, each ranked by a model that never saw it. "Random choice" is the market's average finalist. Green and red mark better or worse than random. <b>Chance p</b> is the share of ${D.shuffle.n} shuffles (validation results swapped between clusters inside each market, ridge refit each time) whose rank correlation was at least as high. A correlation needs to be above about ${num(D.shuffle.ic_p95, 3)} to beat 95% of shuffles.</p></div>
+    <div class="card tbl-wrap heat"><table>
+      <thead><tr><th>Rank correlation in each held-out market</th>${mkts.map((m) => `<th>${m}</th>`).join("")}</tr></thead>
+      <tbody>${order.slice(1).map((k) => `<tr><td>${esc(k)}</td>${mkts.map((m) => { const v = M[k].per_market[m].ic; return `<td class="c ${cls(v)}">${num(v, 2)}</td>`; }).join("")}</tr>`).join("")}</tbody>
+    </table></div></section>`));
+
+  // Univariate
+  const groups = Object.keys(GC);
+  app.append($(`<section><div class="eyebrow">One input at a time</div><h2>Which training numbers line up with validation?</h2>
+    <p>Each dot is the average, over the 7 markets, of the rank correlation between that input and validation Sharpe inside the market. The line is its 95% interval from resampling clusters. 0 means no relationship; ±1 would be a perfect ordering.</p>
+    <div class="legend">${groups.map((g) => `<span><span class="sw" style="background:${GC[g]}"></span>${g}</span>`).join("")}</div>
+    <div class="card">${icChart(U)}</div>
+    <div class="card tbl-wrap"><table>
+      <thead><tr><th>Input</th><th>Rank corr.</th><th>95% interval</th><th>Markets &gt; 0</th><th>p (Holm)</th>
+        <th>Top 20%: val. Sharpe</th><th>Bottom 20%: val. Sharpe</th><th>Top 20%: passed</th><th>Bottom 20%: passed</th><th>Top 20%: med. PF</th><th>Bottom 20%: med. PF</th>
+        <th>Corr. with val. luck %</th></tr></thead>
+      <tbody>${U.map((r) => `<tr><td>${esc(r.label)}</td><td class="${cls(r.ic)}">${num(r.ic, 3)}</td><td>${num(r.ci[0], 2)} to ${num(r.ci[1], 2)}</td>
+        <td>${r.n_pos} / ${r.n_mkts}</td><td>${r.p_holm < 0.001 ? "<0.001" : plain(r.p_holm, 3)}</td>
+        <td class="${cls(r.top20.sharpe - r.bot20.sharpe)}">${num(r.top20.sharpe)}</td><td>${num(r.bot20.sharpe)}</td>
+        <td>${pc(r.top20.pass)}</td><td>${pc(r.bot20.pass)}</td><td>${plain(r.top20.pf)}</td><td>${plain(r.bot20.pf)}</td>
+        <td>${num(r.ic_luck, 3)}</td></tr>`).join("")}</tbody>
+    </table>
+    <p class="muted" style="font-size:0.82rem">Top and bottom 20% are taken inside each market, then pooled. p (Holm) is the two-sided cluster-bootstrap p-value adjusted for testing ${U.length} inputs. It resamples finalists within each market but not the markets themselves, so it is optimistic. Use "Markets &gt; 0" as the stricter check (7 of 7 by chance alone: about 1 in 64, counting either direction). The last column repeats the rank correlation with validation luck % instead of validation Sharpe.</p></div>
+    <div class="card tbl-wrap heat"><table>
+      <thead><tr><th>Rank correlation by market</th>${mkts.map((m) => `<th>${m}</th>`).join("")}</tr></thead>
+      <tbody>${U.map((r) => `<tr><td>${esc(r.label)}</td>${mkts.map((m) => `<td class="c ${cls(r.per_market[m])}">${num(r.per_market[m], 2)}</td>`).join("")}</tr>`).join("")}</tbody>
+    </table></div></section>`));
+
+  // Ridge coefficients
+  const C = [...D.coefs].map((c) => ({ ...c, group: D.features.find((f) => f.feature === c.feature).group, ic: c.coef })).sort((a, b) => b.coef - a.coef);
+  app.append($(`<section><div class="eyebrow">Inside the model</div><h2>Ridge weights, fit on all 7 markets</h2>
+    <p>The weight of each input when all are used together. Inputs are percentile ranks within the market, so the weights are comparable. Many inputs measure nearly the same thing (Sharpe, return and return at 1.5× costs, for example), so the model spreads weight between them, and a single weight shouldn't be read as that input's own effect.</p>
+    <div class="card">${icChart(C, "coef")}</div></section>`));
+
+  // Population
+  app.append($(`<section><div class="eyebrow">Data</div><h2>What went in</h2>
+    <div class="card tbl-wrap"><table>
+      <thead><tr><th>Market</th><th>Unique finalists</th><th>Dedup clusters</th><th>Avg val. Sharpe</th><th>Passed validation</th><th>Median val. PF</th><th>Runs</th></tr></thead>
+      <tbody>${mkts.map((m) => { const r = P.markets[m]; return `<tr><td>${m}</td><td>${r.n}</td><td>${r.clusters}</td><td class="${cls(r.val_sharpe_mean)}">${num(r.val_sharpe_mean)}</td><td>${pc(r.val_pass)}</td><td>${plain(r.val_pf_median)}</td><td class="mono" style="font-size:0.74rem">${esc(r.runs.join(", "))}</td></tr>`; }).join("")}</tbody>
+    </table>
+    <p class="muted" style="font-size:0.82rem">Identical settings that appear in several runs of a market are kept once, from the latest run. The old SPY runs are left out. "Sharpe on the related market" is missing for CL and GC (no transfer market), and the neighbour inputs are missing for 4 old ES v3 finalists; missing values are set to the market's middle rank. Training luck % was computed for this page with ${D.settings.n_sims_train_luck} random-entry runs per bar size and time-in-market level on 2018–22.</p></div></section>`));
+
+  app.append($(`<section><div class="eyebrow">Caveats</div><h2>What this can and can't say</h2>
+    <div class="card"><ul style="margin:0;padding-left:20px">
+      <li><b>Only finalists.</b> Every row already passed the funnel (Sharpe ≥ 0.75, stability, cost stress), so each input's range is narrow. This tests how to choose among finalists, not whether the funnel's cutoffs help.</li>
+      <li><b>One validation period.</b> 2023–24 is one regime. An input that predicts it may not predict the next two years.</li>
+      <li><b>Seven markets.</b> Leave-one-market-out has only 7 folds, and the strategies within a market overlap heavily, so the real sample is much smaller than ${P.n.toLocaleString()}.</li>
+      <li><b>Fitted to validation.</b> Any rule taken from this page is chosen with validation results, so validation can no longer confirm it. That needs data after the holdout.</li>
+    </ul></div></section>`));
+
+  document.getElementById("verdict").innerHTML = VERDICT(D);
+}
+// Plain-language summary, computed from the numbers
+function VERDICT(D) {
+  const M = D.models, r = M["Ridge regression (all inputs)"], t = M["Training Sharpe"], rnd = M["Random choice"];
+  const best = [...D.univariate].sort((a, b) => b.ic - a.ic)[0];
+  const cons = D.univariate.filter((u) => u.n_mkts >= 6 && (u.n_pos >= u.n_mkts - 1 || u.n_pos <= 1)).sort((a, b) => b.ic - a.ic);
+  const cp = (p) => p < 1 / D.shuffle.n ? "&lt;" + plain(1 / D.shuffle.n, 3) : plain(p, 2);
+  return `On markets it never saw, the all-inputs ridge model's rank correlation with validation Sharpe is <b>${num(r.ic, 3)}</b> (chance p ${cp(r.shuffle_ic_p)}), against <b>${num(t.ic, 3)}</b> for training Sharpe alone. Its top 10 per market averaged a validation Sharpe of <b>${num(r.top10_sharpe)}</b>, against ${num(t.top10_sharpe)} for training Sharpe and ${num(rnd.top10_sharpe)} for random choice. The relationship is weak, and most of it comes from NQ and RTY. Inputs with the same sign in at least ${D.univariate[0].n_mkts - 1} of 7 markets: ${cons.map((u) => esc(u.label) + " " + num(u.ic, 2) + " (" + u.n_pos + "/" + u.n_mkts + " positive)").join(", ")}. The cluster-bootstrap p-values in the table treat the 7 markets as fixed, so they overstate significance. How many markets agree is the better guide.`;
+}
+render();
+</script>
+</body>
+</html>

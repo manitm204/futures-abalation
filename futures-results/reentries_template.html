@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Re-entry After Stops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #f4f6f8; --surface: #ffffff; --fg: #16202b; --muted: #5a6774; --line: #d8dfe6;
+  --accent: #2f6fb0; --accent-soft: #e3edf8; --pass: #2d7f52; --fail: #b93b35; --fail-soft: #f8e4e2;
+  --is: #8fb3d9; --is-line: #2f6fb0; --ho: #c0602a;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151b; --surface: #17202a; --fg: #e5ebf1; --muted: #95a3b1; --line: #2a3643;
+    --accent: #6ea9e6; --accent-soft: #1b2b3d; --pass: #5cbf89; --fail: #ef7a71; --fail-soft: #3a1c1a;
+    --is: #33506f; --is-line: #6ea9e6; --ho: #f0955c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151b; --surface: #17202a; --fg: #e5ebf1; --muted: #95a3b1; --line: #2a3643;
+  --accent: #6ea9e6; --accent-soft: #1b2b3d; --pass: #5cbf89; --fail: #ef7a71; --fail-soft: #3a1c1a;
+  --is: #33506f; --is-line: #6ea9e6; --ho: #f0955c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 36px 16px 72px; display: flex; flex-direction: column; gap: 44px; }
+section, header { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.15; text-wrap: balance; }
+h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.5rem; font-weight: 700; }
+h3 { font-size: 1.05rem; font-weight: 700; }
+p { margin: 0; max-width: 72ch; }
+a { color: var(--accent); }
+.eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+.mono { font-family: var(--font-mono); }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.88rem; align-items: center; }
+.sw { display: inline-block; width: 14px; height: 10px; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+.sw.is { background: var(--is); border: 1px solid var(--is-line); }
+.sw.ho { background: transparent; border: 2px solid var(--ho); height: 10px; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 0.88rem; }
+.controls button { font: inherit; font-size: 0.85rem; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--fg); cursor: pointer; }
+.controls button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.controls label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+.card-head { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.settings { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+svg.hist { width: 100%; height: auto; display: block; }
+svg.hist text { font-family: var(--font-mono); font-size: 10px; fill: var(--muted); }
+svg.hist .axis { stroke: var(--line); }
+svg.hist .zero { stroke: var(--muted); stroke-dasharray: 3 3; }
+svg.hist .bar-is { fill: var(--is); stroke: var(--is-line); stroke-width: 0.6; }
+svg.hist .bar-is.over { fill: url(#hatch-is); }
+svg.hist .step-ho { fill: none; stroke: var(--ho); stroke-width: 2; }
+svg.hist .nfit-is { fill: none; stroke: var(--is-line); stroke-width: 1.3; stroke-dasharray: 5 3; }
+svg.hist .nfit-ho { fill: none; stroke: var(--ho); stroke-width: 1.3; stroke-dasharray: 5 3; }
+svg.hist .mean-is { stroke: var(--is-line); stroke-width: 1.5; }
+svg.hist .mean-ho { stroke: var(--ho); stroke-width: 1.5; }
+svg.hist .rug-is { stroke: var(--is-line); stroke-opacity: 0.35; }
+svg.hist .rug-ho { stroke: var(--ho); stroke-opacity: 0.8; }
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.84rem; }
+th, td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-weight: 600; color: var(--muted); font-size: 0.76rem; }
+td.ho { color: var(--ho); font-weight: 600; }
+td.bad { color: var(--fail); }
+td.good { color: var(--pass); }
+.mini th, .mini td { padding: 3px 6px; font-size: 0.78rem; }
+.worst { font-size: 0.8rem; color: var(--muted); }
+.worst b { color: var(--fg); font-weight: 600; }
+.callout { background: var(--accent-soft); border-radius: 8px; padding: 12px 14px; font-size: 0.92rem; }
+svg.bars { width: 100%; height: auto; display: block; }
+svg.bars text { font-family: var(--font-mono); font-size: 10px; fill: var(--muted); }
+svg.bars .axis { stroke: var(--line); }
+svg.bars .zero { stroke: var(--muted); }
+svg.bars .b-is { fill: var(--is); stroke: var(--is-line); stroke-width: 0.8; }
+svg.bars .b-ho { fill: var(--ho); fill-opacity: 0.25; stroke: var(--ho); stroke-width: 1.5; }
+svg.bars .b-re { stroke-width: 2.2; }
+svg.bars text.val { fill: var(--fg); font-size: 10.5px; }
+.rules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 800px) { .rules { grid-template-columns: 1fr; } }
+.rules .card b { font-family: var(--font-display); }
+.tag { font-family: var(--font-mono); font-size: 0.72rem; padding: 1px 6px; border-radius: 4px; background: var(--accent-soft); }
+.tag.no { background: var(--fail-soft); }
+.chain { font-family: var(--font-mono); font-size: 0.78rem; }
+.chain .st { color: var(--fail); }
+details summary { cursor: pointer; color: var(--accent); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const DATA = /*__DATA__*/null;
+
+const $ = (h) => { const t = document.createElement("template"); t.innerHTML = h.trim(); return t.content.firstChild; };
+const pct = (x, d = 2) => (x == null || !isFinite(x)) ? "–" : (x > 0 ? "+" : x < 0 ? "−" : "") + Math.abs(x).toFixed(d) + "%";
+const num = (x, d = 2) => (x == null || !isFinite(x)) ? "–" : (x < 0 ? "−" : "") + Math.abs(x).toFixed(d);
+const money = (x) => (x < 0 ? "−$" : x > 0 ? "+$" : "$") + (Math.abs(x) / 1000).toFixed(1) + "k";
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const XR = { z_exit: "z exit", time_exit: "time", stop_exit: "stop", forced_close: "forced" };
+const PER = { is: "2018–24", ho: "Holdout" };
+let N = 2;
+
+const isRe = (t) => t.prev === "stop_exit" && t.gap != null && t.gap <= N;
+function agg(tr) {
+  const n = tr.length;
+  if (!n) return { n: 0, mean: NaN, win: NaN, pf: NaN, sum: 0, pnl: 0 };
+  const sum = tr.reduce((a, t) => a + t.r, 0);
+  const gp = tr.filter((t) => t.pnl > 0).reduce((a, t) => a + t.pnl, 0), gl = -tr.filter((t) => t.pnl < 0).reduce((a, t) => a + t.pnl, 0);
+  return { n, mean: sum / n, win: tr.filter((t) => t.r > 0).length / n, pf: gl ? gp / gl : (gp ? Infinity : NaN), sum, pnl: gp - gl };
+}
+// A chain: a stopped-out trade followed by one or more re-entries (each within N bars of a stop).
+function chains(tr) {
+  const out = [];
+  for (let i = 0; i < tr.length; i++) {
+    if (isRe(tr[i])) continue;
+    const c = [tr[i]];
+    while (i + 1 < tr.length && isRe(tr[i + 1]) && c[c.length - 1].x === "stop_exit") c.push(tr[++i]);
+    if (c.length > 1) out.push(c);
+  }
+  return out;
+}
+const hasStop = (s) => s.settings.stop_atr_multiple !== "none";
+
+function barChart(s) {
+  const cells = [];
+  for (const k of ["is", "ho"]) {
+    const re = agg(s[k].filter(isRe)), ot = agg(s[k].filter((t) => !isRe(t)));
+    cells.push({ k, lab: "Other trades", a: ot }, { k, lab: "Re-entries", a: re, re: true });
+  }
+  const W = 520, H = 200, L = 44, R = 8, T = 18, B = 44;
+  const vals = cells.map((c) => c.a.mean).filter(isFinite);
+  let ymax = Math.max(0.05, ...vals.map((v) => v)), ymin = Math.min(-0.05, ...vals);
+  const pad = (ymax - ymin) * 0.15; ymax += pad; ymin -= pad;
+  const y = (v) => T + (H - T - B) * (ymax - v) / (ymax - ymin);
+  const slot = (W - L - R) / 4, bw = slot * 0.55;
+  let g = `<svg class="bars" viewBox="0 0 ${W} ${H}" role="img" aria-label="Average trade, re-entries vs other trades">`;
+  const steps = [ymin, 0, ymax].map((v) => +v.toFixed(2));
+  for (const v of new Set([0, +(ymax * 0.7).toFixed(2), +(ymin * 0.7).toFixed(2)]))
+    g += `<line class="axis" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke-opacity="0.5"/><text x="${L - 4}" y="${y(v) + 3}" text-anchor="end">${pct(v, 2)}</text>`;
+  g += `<line class="zero" x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}"/>`;
+  cells.forEach((c, i) => {
+    const cx = L + slot * i + slot / 2;
+    if (c.a.n && isFinite(c.a.mean)) {
+      const top = Math.min(y(c.a.mean), y(0)), h = Math.abs(y(c.a.mean) - y(0));
+      g += `<rect class="${c.k === "is" ? "b-is" : "b-ho"}${c.re ? " b-re" : ""}" x="${cx - bw / 2}" y="${top}" width="${bw}" height="${Math.max(h, 1)}"/>`;
+      g += `<text class="val" x="${cx}" y="${c.a.mean >= 0 ? top - 4 : top + h + 12}" text-anchor="middle">${pct(c.a.mean, 2)}</text>`;
+    } else g += `<text x="${cx}" y="${y(0) - 4}" text-anchor="middle">none</text>`;
+    g += `<text x="${cx}" y="${H - 24}" text-anchor="middle">${c.lab}</text><text x="${cx}" y="${H - 11}" text-anchor="middle">${PER[c.k]} · n=${c.a.n}</text>`;
+  });
+  return g + `</svg>`;
+}
+
+function render() {
+  const S = DATA.strategies, app = document.getElementById("app");
+  app.innerHTML = "";
+  app.append($(`<header>
+    <div class="eyebrow">All markets · 12 strategies · back-to-back trades</div>
+    <h1>Buying the dip again after a stop-out</h1>
+    <p>When a trade is stopped out and the price is still deep below its average, the strategy can buy again almost at once. This page splits each strategy's trades into <b>re-entries</b>, meaning trades that started within ${N} bar${N === 1 ? "" : "s"} of a stop-out, and <b>other trades</b>. It then asks whether buying again caught the rebound or just took another loss.</p>
+    <p class="muted mono" style="font-size:0.8rem">2018–24: ${esc(DATA.periods.is)} · Holdout: ${esc(DATA.periods.ho)} · each strategy runs alone, full contracts on $1M · ${esc(DATA.costs)}</p>
+  </header>`));
+
+  app.append($(`<section><div class="eyebrow">The rules</div><h2>When can it buy again right away?</h2>
+    <div class="rules">
+      <div class="card"><b>Price recovered (z exit)</b><p class="muted">Effectively no. z is above the exit level, so it has to fall back below the entry level on a later close, which is a new dip.</p></div>
+      <div class="card"><b>Max hold reached</b><p class="muted">No. After a time exit, z must first close back above the entry level before another buy.</p></div>
+      <div class="card"><b>Stop-loss hit</b><p class="muted">Yes. There's no re-arm after a stop. If the stop bar, or a later bar, still closes with z at or below the entry level (plus an up bar when that's required), it buys at the next open. 1 bar means the signal came on the stop bar itself.</p></div>
+    </div>
+    <p class="muted">Only the 8 strategies with a stop can do this. The 4 without a stop (NQ 15m #1, YM 15m #9, YM 1h #51, RTY 15m #141) are listed at the bottom as a check.</p></section>`));
+
+  const ctl = $(`<div class="controls"><span class="muted">Count it as a re-entry if it started within</span>
+    ${[1, 2, 3, 5].map((v) => `<button data-n="${v}" aria-pressed="${v === N}">${v} bar${v === 1 ? "" : "s"}</button>`).join("")}
+    <span class="muted">of a stop-out</span></div>`);
+  ctl.querySelectorAll("button").forEach((b) => b.onclick = () => { N = +b.dataset.n; render(); });
+
+  // Pooled over the 8 stop strategies
+  const SS = S.filter(hasStop);
+  const poolRows = ["is", "ho"].map((k) => {
+    const all = SS.flatMap((s) => s[k]), re = agg(all.filter(isRe)), ot = agg(all.filter((t) => !isRe(t)));
+    const ch = SS.flatMap((s) => chains(s[k]));
+    const firstAvg = ch.length ? ch.reduce((a, c) => a + c[0].r, 0) / ch.length : NaN;
+    const reSum = ch.reduce((a, c) => a + c.slice(1).reduce((x, t) => x + t.r, 0), 0);
+    const saved = ch.filter((c) => c.slice(1).reduce((x, t) => x + t.r, 0) > 0).length;
+    return `<tr><td><b>${PER[k]}</b></td>
+      <td>${ot.n}</td><td>${pct(ot.mean, 3)}</td><td>${num(ot.pf)}</td><td>${Math.round(ot.win * 100)}%</td>
+      <td class="ho">${re.n}</td><td class="${re.mean < 0 ? "bad" : "good"}">${pct(re.mean, 3)}</td><td>${num(re.pf)}</td><td>${re.n ? Math.round(re.win * 100) + "%" : "–"}</td><td class="${re.pnl < 0 ? "bad" : "good"}">${money(re.pnl)}</td>
+      <td>${ch.length}</td><td>${pct(firstAvg)}</td><td>${ch.length ? saved + " of " + ch.length : "–"}</td></tr>`;
+  }).join("");
+  const pool = $(`<section><div class="eyebrow">The 8 strategies with a stop, pooled</div><h2>Re-entries against everything else</h2></section>`);
+  pool.append(ctl);
+  pool.append($(`<div class="card tbl-wrap"><table><thead>
+    <tr><th></th><th colspan="4" style="text-align:center">Other trades</th><th colspan="5" style="text-align:center">Re-entries after a stop</th><th colspan="3" style="text-align:center">Chains (stop-out, then buying again)</th></tr>
+    <tr><th>Period</th><th>Trades</th><th>Avg</th><th>PF</th><th>Win</th><th>Trades</th><th>Avg</th><th>PF</th><th>Win</th><th>Total P&amp;L</th><th>Chains</th><th>First trade avg</th><th>Re-entries made money</th></tr>
+  </thead><tbody>${poolRows}</tbody></table></div>`));
+  pool.append($(`<p class="muted">“Total P&amp;L” is what the re-entries made or lost in dollars, each strategy alone on $1M. It's roughly what a rule blocking them would have changed, though without them some later trades would have come at different times. A chain is one stop-out plus the re-entries straight after it. “Re-entries made money” counts chains where the re-entries together finished positive, i.e. buying again won back some of the first loss.</p>`));
+  app.append(pool);
+
+  // Per-strategy table
+  const rows = S.map((s) => ["is", "ho"].map((k, j) => {
+    const re = agg(s[k].filter(isRe)), ot = agg(s[k].filter((t) => !isRe(t))), ch = chains(s[k]);
+    const longest = ch.reduce((a, c) => Math.max(a, c.length), 0);
+    return `<tr>${j ? "" : `<td rowspan="2"><b>${esc(s.name)}</b>${hasStop(s) ? "" : ` <span class="tag no">no stop</span>`}</td>`}<td class="${k === "ho" ? "ho" : ""}">${PER[k]}</td>
+      <td>${ot.n}</td><td>${pct(ot.mean, 3)}</td><td>${num(ot.pf)}</td>
+      <td>${re.n}</td><td class="${re.n ? (re.mean < 0 ? "bad" : "good") : ""}">${pct(re.mean, 3)}</td><td>${num(re.pf)}</td><td>${re.n ? Math.round(re.win * 100) + "%" : "–"}</td>
+      <td class="${re.pnl < 0 ? "bad" : re.pnl > 0 ? "good" : ""}">${re.n ? money(re.pnl) : "–"}</td><td>${ch.length}</td><td>${longest || "–"}</td></tr>`;
+  }).join("")).join("");
+  app.append($(`<section><div class="eyebrow">Per strategy</div><h2>All 12, both periods</h2>
+    <div class="card tbl-wrap"><table><thead>
+      <tr><th></th><th></th><th colspan="3" style="text-align:center">Other trades</th><th colspan="5" style="text-align:center">Re-entries after a stop</th><th colspan="2" style="text-align:center">Chains</th></tr>
+      <tr><th>Strategy</th><th>Period</th><th>Trades</th><th>Avg</th><th>PF</th><th>Trades</th><th>Avg</th><th>PF</th><th>Win</th><th>Total P&amp;L</th><th>Count</th><th>Longest</th></tr>
+    </thead><tbody>${rows}</tbody></table></div></section>`));
+
+  // Cards with charts and chain lists
+  const sec = $(`<section><div class="eyebrow">Charts</div><h2>Average trade: re-entries against other trades</h2>
+    <div class="legend"><span><span class="sw is"></span>2018–24</span><span><span class="sw ho"></span>Holdout</span><span class="muted">Thick outline: re-entries</span></div></section>`);
+  const grid = $(`<div class="grid"></div>`);
+  for (const s of SS) {
+    const card = $(`<div class="card"><div class="card-head"><h3>${esc(s.name)}</h3><span class="settings">${s.settings.stop_atr_multiple}× ATR stop · entry ${s.settings.entry_z} · ${s.settings.entry_confirmation === "none" ? "no confirm" : "up bar"} · hold ${s.settings.max_holding_bars}</span></div></div>`);
+    card.insertAdjacentHTML("beforeend", barChart(s));
+    for (const k of ["ho", "is"]) {
+      const ch = chains(s[k]);
+      if (!ch.length) { card.insertAdjacentHTML("beforeend", `<div class="worst">${PER[k]}: no chains.</div>`); continue; }
+      const show = k === "ho" ? ch : [...ch].sort((a, b) => a.reduce((x, t) => x + t.r, 0) - b.reduce((x, t) => x + t.r, 0)).slice(0, 8);
+      const lines = show.map((c) => `<div class="chain">${c.map((t, i) => `${i ? " → " : ""}<span class="${t.x === "stop_exit" ? "st" : ""}">${pct(t.r)}</span>`).join("")} · total ${pct(c.reduce((x, t) => x + t.r, 0))} · ${esc(c[0].et)}${c.length > 1 ? " to " + esc(c[c.length - 1].xt.slice(5)) : ""}</div>`).join("");
+      card.insertAdjacentHTML("beforeend", `<details${k === "ho" ? " open" : ""}><summary>${PER[k]}: ${ch.length} chain${ch.length === 1 ? "" : "s"}${k === "is" && ch.length > 8 ? " (8 worst shown)" : ""}</summary>${lines}</details>`);
+    }
+    grid.append(card);
+  }
+  sec.append(grid);
+  sec.append($(`<p class="muted">In the chain lists, red marks a trade that ended on its stop. Times are New York bar-open times: the first entry, then the last exit.</p>`));
+  app.append(sec);
+
+  // Check: what follows other exit types
+  const by = (k, why) => S.flatMap((s) => s[k]).filter((t) => t.prev === why && t.gap != null && t.gap <= N).length;
+  app.append($(`<section><div class="eyebrow">Check</div><h2>Fast re-entries after other exits</h2>
+    <p class="muted">Trades starting within ${N} bar${N === 1 ? "" : "s"} of the previous exit, by how that exit happened (all 12 strategies). After a time exit, z must close above the entry level at least once before a new buy, so the earliest re-entry is 2 bars later, on a fresh dip. After a z exit, a 1-bar re-entry needs the price to crash again within the exit bar, which is rare.</p>
+    <div class="card tbl-wrap"><table><thead><tr><th>Previous exit</th><th>2018–24</th><th>Holdout</th></tr></thead><tbody>
+    ${["stop_exit", "z_exit", "time_exit"].map((w) => `<tr><td>${XR[w]}</td><td>${by("is", w)}</td><td class="ho">${by("ho", w)}</td></tr>`).join("")}
+    </tbody></table></div></section>`));
+}
+render();
+</script>
+</body>
+</html>
