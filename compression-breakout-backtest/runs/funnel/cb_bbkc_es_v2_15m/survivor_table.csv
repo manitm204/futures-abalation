@@ -1,0 +1,13 @@
+stage,kind,evaluated,passed,pct_of_universe,pct_of_previous,hard_reject,insufficient_evidence,with_warnings,deduplicated,n_clusters,note
+0 universe,universe,184320,184320,100.0,100.0,,,,,,
+1 backtest integrity,hard_gate,184320,184320,100.0,100.0,0,0,0,,,
+2 trade count & coverage,hard_gate,184320,148961,80.81651475694444,80.81651475694444,35359,0,120101,,,
+3 performance & risk,hard_gate,148961,8524,4.624565972222222,5.7223031531743205,140437,0,0,,,
+4a prescreen,dedup,8524,909,0.4931640625,10.664007508212107,,,,7615,311,8524 > 3000 passed stage 3: best 3 per cluster by development Sharpe go into stage 4 (clustered within direction x entry-type groups)
+4 parameter stability,hard_gate,909,902,0.4893663194444444,99.22992299229924,7,0,0,,,
+5 time stability,hard_gate,902,899,0.4877387152777778,99.66740576496674,3,0,559,,,
+6 deduplication,dedup,899,418,0.2267795138888889,46.49610678531702,,,,481,214,best 2 per cluster
+7 execution stress,hard_gate,418,418,0.2267795138888889,100.0,0,0,5,,,
+8 frozen validation,hard_gate,,,,,,,,,,not run in `develop`; run the `validate` command on the frozen manifest
+9 DSR / transfer,diagnostic_only,418,,,,,,,,,diagnostic only: unverified: 418
+10 final holdout,explicit_command,,,,,,,,,,not run; `final-test` command only

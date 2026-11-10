@@ -1,0 +1,24 @@
+=== cb_bbkc_es_v2_15m develop 2026-11-10T19:27:32Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-10T19:27:54.033507Z"}
+{"n": 184320, "elapsed_s": 16766.8, "event": "prep_built", "level": "info", "timestamp": "2026-11-11T00:07:02.033189Z"}
+{"stage": "1 backtest integrity", "evaluated": 184320, "passed": 184320, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T00:07:05.782521Z"}
+{"stage": "2 trade count & coverage", "evaluated": 184320, "passed": 148961, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T00:07:09.237682Z"}
+{"stage": "3 performance & risk", "evaluated": 148961, "passed": 8524, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T00:07:10.704230Z"}
+{"stage": "4a prescreen", "evaluated": 8524, "passed": 909, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T00:07:13.332009Z"}
+{"reused_from_prep": 360, "backtested": 9605, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-11T00:09:27.560459Z"}
+{"stage": "4 parameter stability", "evaluated": 909, "passed": 902, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T00:09:27.669718Z"}
+{"stage": "5 time stability", "evaluated": 902, "passed": 899, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T00:09:27.683802Z"}
+{"stage": "7 execution stress", "evaluated": 418, "passed": 418, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T00:21:59.342365Z"}
+develop done: 184320 configs -> 418 representatives -> 418 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_es_v2_15m
+=== cb_bbkc_es_v2_15m validate 2026-11-11T00:22:27Z
+validate: 418 frozen -> 285 pass validation (previously-inspected data). Selection manifest sha256 4f71c035712a241f
+=== cb_bbkc_es_v2_15m luck 2026-11-11T00:22:39Z
+cb_bbkc_es_v2_15m: 418 finalists re-run on validation and matched exactly
+cb_bbkc_es_v2_15m 15min|long: 46 levels x 100 sims (long share 1.00, median trade 10 bars)
+cb_bbkc_es_v2_15m 15min|both: 65 levels x 100 sims (long share 0.54, median trade 11 bars)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_es_v2_15m/random_benchmark.json
+=== cb_bbkc_es_v2_15m done 2026-11-11T00:24:11Z
+=== cb_bbkc_es_v2_5m develop 2026-11-11T00:24:11Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-11T00:24:35.999028Z"}
+/home/manit/.pyenv/versions/3.11.9/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 5 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

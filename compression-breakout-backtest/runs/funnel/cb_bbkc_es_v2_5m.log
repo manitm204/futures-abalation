@@ -1,0 +1,20 @@
+=== cb_bbkc_es_v2_5m develop 2026-11-11T01:41:53Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-11T01:42:07.367066Z"}
+{"n": 72576, "event": "prep_reused", "level": "info", "timestamp": "2026-11-11T01:42:08.394709Z"}
+{"stage": "1 backtest integrity", "evaluated": 72576, "passed": 72576, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T01:42:08.804485Z"}
+{"stage": "2 trade count & coverage", "evaluated": 72576, "passed": 47784, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T01:42:09.165135Z"}
+{"stage": "3 performance & risk", "evaluated": 47784, "passed": 2625, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T01:42:09.308683Z"}
+{"stage": "4a prescreen", "evaluated": 2625, "passed": 326, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T01:42:09.489914Z"}
+{"reused_from_prep": 0, "backtested": 3660, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-11T01:43:16.195770Z"}
+{"stage": "4 parameter stability", "evaluated": 326, "passed": 315, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T01:43:16.220703Z"}
+{"stage": "5 time stability", "evaluated": 315, "passed": 306, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T01:43:16.222223Z"}
+{"stage": "7 execution stress", "evaluated": 153, "passed": 153, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T01:49:40.165954Z"}
+develop done: 72576 configs -> 153 representatives -> 153 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_es_v2_5m
+=== cb_bbkc_es_v2_5m validate 2026-11-11T01:49:55Z
+validate: 153 frozen -> 90 pass validation (previously-inspected data). Selection manifest sha256 04ba3f1eb3afed97
+=== cb_bbkc_es_v2_5m luck 2026-11-11T01:50:06Z
+cb_bbkc_es_v2_5m: 153 finalists re-run on validation and matched exactly
+cb_bbkc_es_v2_5m 5min|long: 43 levels x 100 sims (long share 1.00, median trade 13 bars)
+cb_bbkc_es_v2_5m 5min|both: 84 levels x 100 sims (long share 0.56, median trade 26 bars)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_es_v2_5m/random_benchmark.json
+=== cb_bbkc_es_v2_5m done 2026-11-11T01:51:52Z

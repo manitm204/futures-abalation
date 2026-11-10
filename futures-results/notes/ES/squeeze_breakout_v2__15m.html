@@ -1,0 +1,22 @@
+<p><b>ES squeeze round 2, 15-minute bars.</b> 184,320 versions, specified after reading round 1's 2018–2022 <i>and</i> 2023–2024 results:</p>
+<ul><li>Squeeze length 5/10/15/20/25/30/40/50 bars, Keltner width 1.0/1.5/2.0/2.5/3.0 ATR, at least 1/3/5 squeeze bars in a row.</li>
+<li>Close or wick entry; the box stays live 1/3/6/9 bars.</li>
+<li>Stop at the box or 1.5/2.5/3.5 ATR; target 2R/3R/4R/none; long or both ways; EMA(50) filter on/off; minimum box width any/0.5/1.0 ATR.</li></ul>
+<p><b>2023–2024 is not clean for this round.</b> The grid was chosen after seeing round 1 on 2023–2024, so passing validation here is weaker evidence than in round 1. The 2025+ holdout is untouched.</p>
+<p><b>Most versions still lose on 2018–2022.</b> 46% made money (median Sharpe −0.02), and 8,524 cleared the profit gate (Sharpe ≥ 0.75). What helped:</p>
+<ul><li>Long squeezes: length 40 and 50 were 75–76% profitable, lengths 10–25 only 19–38%.</li>
+<li>One squeeze bar is enough: 63% profitable, against 36–38% when 3 or 5 in a row were required.</li>
+<li>Wick entries over closes (53% vs 38%), and a tight stop (1.5 ATR or the box, 51–57%) over a wide one (2.5/3.5 ATR, 37–38%).</li>
+<li>No trend filter did slightly better than EMA(50) (50% vs 41%).</li>
+<li>The target barely mattered: 2R or more is rarely reached before the close (a 2R target closed 8% of trades), so most trades end at the stop or the session close. Setup expiry and minimum box width made no difference.</li></ul>
+<p>418 finalists from 214 groups.</p>
+<p><b>285 of 418 passed 2023–2024, from 149 groups.</b> The median passer made +5.1% over two years at Sharpe 0.83, profit factor 1.26, drawdown −3.2%. Across all 418 the median was +3.7%, Sharpe 0.63, profit factor 1.18. 102 finalists had a 2023–2024 Sharpe of 1.0 or more.</p>
+<ul><li>Holding ES made +41% (Sharpe 1.40, drawdown −11%). The best finalists earned about half of that, at under half the drawdown.</li>
+<li>Tight squeezes still failed: 6 of 16 finalists with width 1.0 passed, against 119 of 172 at 2.0.</li>
+<li>Long-only passed more often (154 of 195) than long-and-short (131 of 223).</li>
+<li>The 2018–2022 ranking said almost nothing about 2023–2024 (rank correlation 0.06), so which finalist ends up on top is largely luck of the draw.</li></ul>
+<p><b>The best versions clearly beat random entries.</b> The median finalist beat 84% of random-entry runs on Sharpe; 103 beat 95% and 34 beat 99%. Random long-only trades did slightly better than random two-way trades in 2023–2024 (median Sharpe 0.18 vs −0.33).</p>
+<ul><li>#354 / #374 (length 5, width 1.5, 1 bar, wick, 1.5-ATR stop, 4R target, long, no trend filter, 0.5-ATR box): +22%, Sharpe 1.84, profit factor 1.41, drawdown −4.6%, beat every random run.</li>
+<li>#275 / #254 (length 40, width 2.5, 1 bar, wick, 2.5-ATR stop, 2R target, both ways, EMA filter, 0.5-ATR box): +15%, Sharpe 1.83, profit factor 1.69, drawdown −3.4%, beat every random run.</li>
+<li>#271 (length 40, width 2.5, close, 1.5-ATR stop, 3R target, both ways, 1-ATR box): +17%, Sharpe 1.82, profit factor 1.52, drawdown −3.0%.</li></ul>
+<p><b>Search-adjusted, nothing is significant.</b> The highest deflated Sharpe is 0.78, below the 0.95 bar, after about 1,650 effective trials across round 1 and this grid. The top 2023–2024 versions have deflated Sharpes of only 0.06–0.10 because their 2018–2022 Sharpe was modest. Many finalists come in near-identical pairs (setup live 1 vs 3 vs 6 bars), so there are fewer distinct ideas than the count suggests.</p>

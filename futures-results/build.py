@@ -1,6 +1,8 @@
 """Build one self-contained results page per strategy family:
   mean reversion/index.html        mean-reversion runs, their portfolios and the all-markets pages
   noise-band breakout/index.html   noise-band breakout runs
+  squeeze breakout/index.html      compression breakout, BB-inside-KC squeeze line
+  nr breakout/index.html           compression breakout, NR-N line
 
 Layout of this folder:
   data/<MARKET>/<strategy>.json   one finished run (written by each project's export script,
@@ -29,9 +31,13 @@ MARKETS = [
 # (folder, page title, header text, which runs belong) -- every page uses template.html.
 FAMILIES = [
     ("mean reversion", "Mean Reversion Funnels", "Mean-reversion strategy funnels",
-     lambda run: not run["strategy_key"].startswith("noise_band")),
+     lambda run: not run["strategy_key"].startswith(("noise_band", "squeeze_breakout", "nr_breakout"))),
     ("noise-band breakout", "Noise-Band Breakout Funnels", "Noise-band breakout strategy funnels",
      lambda run: run["strategy_key"].startswith("noise_band")),
+    ("squeeze breakout", "Squeeze Breakout Funnels", "Squeeze breakout strategy funnels",
+     lambda run: run["strategy_key"].startswith("squeeze_breakout")),
+    ("nr breakout", "NR Breakout Funnels", "NR breakout strategy funnels",
+     lambda run: run["strategy_key"].startswith("nr_breakout")),
 ]
 
 
@@ -47,6 +53,8 @@ def main() -> None:
     template = (HERE / "template.html").read_text()
     for folder, title, brand, belongs in FAMILIES:
         mine = [r for r in runs if belongs(r)]
+        if not mine:  # a family with no runs yet gets no page
+            continue
         # The all-markets tab only appears on a page that has all-markets results.
         markets = [(c, n) for c, n in MARKETS if c != "ALL" or any(r["market"] == "ALL" for r in mine)]
         payload = json.dumps({"markets": [{"code": c, "name": n} for c, n in markets], "runs": mine})
