@@ -1,0 +1,161 @@
+# CL futures (WTI crude oil) volatility-compression breakout, NR-N line: run
+# cb_nr_cl_v1 -- the ONE place every threshold lives. First round of this line on any market
+# (compression_breakout_nr, 16,128 configs): compression = NR-N, the bar's range is the
+# narrowest of the last N = 3 / 4 / 5 / 7 / 10 / 14 / 20 bars, optionally also an inside bar
+# (Crabel's NR4/ID); then the shared breakout axes (5min / 15min bars, entry on a close beyond
+# the box (next open) or a stop at the box edge (wick), setup live 3 / 6 bars after the last NR
+# bar, stop at the far side of the box or 1.0 / 2.0 ATR(14), target 1R / 2R / 3R / none,
+# long / short / both, trend filter none / EMA(50), minimum box width none / 0.5 ATR(14)).
+# Widened before any run (drafts of 6,912 squeeze / 1,152 NR configs were never run) so a
+# rare setting has a chance to show up. No new entries in the last 30 minutes; flat at the
+# session close. CL's day session is
+# 09:00-14:30 NY. See src/strategies/compression_breakout/config.py.
+#
+# Every gate, threshold, data split and cost is identical to the latest noise-band round
+# (noise-band-backtest/configs/funnel/nb_funnel_cl_v2.yaml) EXCEPT:
+#   * strategy / grid, and timeframes 5min/15min
+#   * stage-4 local moves are this line's: NR-N and setup expiry x0.8/x1.2, ATR stop
+#     -/+ 0.25, target -/+ 0.5R, minimum box width -/+ 0.25 ATR (every other setting is held)
+#   * perturbation diagnostics move those bar counts and the float settings by a relative step
+#
+# Thresholds are fixed for the duration of a run and are hashed into every run's
+# outputs. They are NEVER adjusted automatically to hit a survivor count; zero
+# survivors is a valid outcome. Changing a value here is a new research trial
+# and should be recorded under `research_history` below.
+
+version: 1
+strategy: compression_breakout_nr
+symbol: CL
+seed: 20261110
+
+data:
+  clean_root: data/clean
+  development: {start: 2018-01-01, end: 2022-12-31}
+  validation:  {start: 2023-01-01, end: 2024-12-31}
+  # end: null -> the actual available endpoint, recorded at access time.
+  holdout:     {start: 2025-01-01, end: null}
+  timeframes: ["5min", "15min"]
+
+data_history:
+  validation_previously_used_for_selection: false
+  validation_note: >-
+    No compression-breakout strategy has been selected or scored on CL 2023-2024. Other families were validated there (mean-reversion: combined_test, combined_v1, mr_cl_v5, mr_cl_v6, mr_cl_v7, trades_v1), so the period has been looked at by the researcher, but not for this strategy.
+  holdout_previously_inspected: false
+  holdout_note: >-
+    No compression-breakout metrics have been computed on CL 2025+. CL 2025+ bars were read for mean-reversion holdout scoring (combined_v1, mr_cl_v7, trades_v1) per those families' data-access ledgers: different strategy families, so this is still the first test of this strategy, but the researcher has seen how that period treated them.
+
+metrics:
+  return_frequency: daily          # mark-to-market equity at each session close
+  periods_per_year: 252            # Sharpe = mean/std(daily) * sqrt(252)
+  risk_free_rate_annual: 0.0
+  cash_treatment: >-
+    Idle cash earns 0% and the Sharpe excess return is measured against a 0%
+    risk-free rate, so the two assumptions are consistent.
+  drawdown_basis: daily session-close mark-to-market (understates intraday DD)
+
+execution:
+  baseline: configs/execution/futures.yaml   # $2.50/contract/side + 1 tick/side slippage, unlevered whole contracts
+
+integrity:            # stage 1
+  truncation_check_sample: 40
+  truncation_points: 3
+
+trade_count:          # stage 2 -- hard gate
+  min_completed_trades: 100
+  min_trades_per_year: 10
+  min_years_meeting_floor: 4
+
+performance:          # stage 3 -- hard gate
+  min_net_return: 0.0               # strictly greater than
+  min_sharpe: 0.75                  # annualized, daily MTM returns incl. flat days
+  max_drawdown: -0.30
+  max_drawdown_source: src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct
+
+parameter_stability:  # stage 4 -- hard gate
+  mode: local_perturbation          # gate on `local` moves below; grid neighbors are diagnostic only
+  local:
+    int_rel: 0.20                   # NR-N, setup expiry: x0.8 / x1.2, rounded, >= 1 bar away
+    min_box_atr_abs: 0.25           # minimum box width -/+ 0.25 ATR (never below 0)
+    stop_atr_abs: 0.25              # numeric ATR stop -/+ 0.25 (the box stop has no numeric move)
+    target_r_abs: 0.5               # profit target -/+ 0.5R ("none" has no numeric move)
+  neighbor_mode: single_axis        # grid-neighbor diagnostic
+  min_frac_profitable: 0.70         # of the local moves, share with dev net return > 0
+  min_median_sharpe: 0.50           # median dev Sharpe of the local moves
+  prescreen:                        # big grids: fixed before the run, like every gate
+    max_configs: 3000               # if more than this many pass stage 3, cluster them first (stage-6 rules)
+    per_cluster: 3                  # and send only the best 3 per cluster by dev Sharpe into stage 4
+  perturbation:                     # diagnostic only, never a gate
+    n_per_config: 20
+    integer_rel_step: 0.15          # NR-N, setup expiry
+    float_rel_step: 0.10            # ATR stop, target, min box width (relative)
+
+time_stability:       # stage 5 -- light hard gate + diagnostics
+  min_profitable_years: 3
+  top_trades_k: 5
+  top_trades_frac: 0.05
+
+dedup:                # stage 6
+  corr_threshold: 0.80
+  return_basis: monthly
+  linkage: complete
+  reps_per_cluster: 2               # best 2 per cluster; a single-member cluster keeps its 1
+
+execution_stress:     # stage 7
+  gate_cost_multiplier: 1.5         # hard gate: positive dev net return
+  diagnostic_cost_multipliers: [2.0]
+  entry_delay_bars: 1
+  missed_entry_frac: 0.10
+  missed_entry_sims: 100
+  breakeven_max_multiplier: 25.0
+
+validation:           # stage 8 -- hard gate (frozen representatives only)
+  min_net_return: 0.0
+  min_sharpe: 0.30
+  max_drawdown: -0.30
+  min_completed_trades: 40          # project default from 2026-10-22
+
+confidence:           # stage 9 -- diagnostics only
+  dsr_threshold: 0.95
+  dsr_calibration_verified: false
+  effective_trials_method: li_ji
+  serial_dependence: lag1_effective_n
+  transfer_symbol: null             # no related market built yet (e.g. Brent)
+
+holdout:              # stage 10 -- explicit `final-test` command only
+  acceptance:
+    min_net_return: 0.0
+    min_sharpe: 0.0
+    max_drawdown: -0.30
+    min_completed_trades: null
+
+# The sibling compression line, earlier trials on this market (other families) and the SPY
+# breakout / trend studies (the closest prior searches to this family). These count toward the DSR "known prior"
+# sensitivity only.
+research_history:
+  - name: "compression_breakout_bbkc CL v1 (cb_bbkc_cl_v1)"
+    n_configs: 20736
+    note: "Sibling compression line (BB-inside-KC squeeze): same backtester and shared breakout axes; both v1 grids were fixed together, before any compression-breakout result was seen."
+  - name: "mean_reversion CL (mr_cl_v5)"
+    n_configs: 41472
+    note: "Different (mean-reversion) family on CL; 75 frozen candidates, 7 passed 2023-2024."
+  - name: "mean_reversion CL (mr_cl_v6)"
+    n_configs: 17280
+    note: "Different (mean-reversion) family on CL; 82 frozen candidates, 4 passed 2023-2024."
+  - name: "mean_reversion CL (mr_cl_v7)"
+    n_configs: 16128
+    note: "Different (mean-reversion) family on CL; 150 frozen candidates, 11 passed 2023-2024."
+  - name: "noise_band CL (nb_cl_v2)"
+    n_configs: 7680
+    note: "Different (noise-band intraday momentum) family on CL; 1 frozen candidates."
+  - name: "channel_breakout grid (funnel_v1..v4, SPY)"
+    n_configs: 24576
+    note: "Closest prior search: channel breakout, SPY; four funnel variants with changed thresholds/methods."
+  - name: "donchian_ablation (donchian_v1, SPY/QQQ)"
+    n_configs: 3888
+    note: "Closest prior search: full-factorial Donchian intraday breakout ablation, 2018-2026 splits incl. holdout."
+  - name: "ma_crossover v2 grid (ma_v2, SPY)"
+    n_configs: 248832
+    note: "Long-only trend-following MA crossover, 5min/15min, SPY."
+  - name: "ma_crossover v1 grid (ma_v1, SPY)"
+    n_configs: 60000
+    note: "Long-only trend-following MA crossover, 5min/15min/1h, SPY."
