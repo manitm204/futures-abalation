@@ -1,4 +1,10 @@
-# Volatility-Compression Breakout Screening Funnel
+# BB-inside-KC Squeeze Breakout Screening Funnel
+
+The Bollinger-Bands-inside-Keltner-Channel (TTM-style) squeeze line of the volatility-compression
+breakout study. Its sibling, the NR-N (narrowest-range) line, lives in `../nr-squeeze-backtest/`:
+same backtester, funnel and costs, its own configs, runs and data-access ledger. Results:
+`../futures-results/bb-kc squeeze/index.html`. (This folder was `compression-breakout-backtest`
+until 2026-11-11; run ids keep their `cb_bbkc_` prefix, and older run outputs record the old path.)
 
 Intraday futures breakouts that only trade **out of a volatility squeeze**. Same funnel,
 thresholds, data splits and costs as the mean-reversion study (`../mean-reversion-backtest/`)

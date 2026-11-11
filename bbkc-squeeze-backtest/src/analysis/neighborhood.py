@@ -461,3 +461,12 @@ LATTICE_CB_BBKC_V3_15M = Lattice({
     "target_r": ["1.5", "2.5", "3.0", "none"],
     "min_box_atr": [0.0, 0.5],
 }, FIXED_AXES_CB)
+# Squeeze v4 (YM), 15-minute bars.
+LATTICE_CB_BBKC_V4_15M = Lattice({
+    "squeeze_length": [15, 25, 35, 45],
+    "kc_mult": [1.5, 2.0, 2.5, 3.0, 3.5],
+    "min_squeeze_bars": [1, 4],
+    "setup_expiry_bars": [1, 4],
+    "target_r": ["1.0", "2.5", "none"],
+    "min_box_atr": [0.0],
+}, FIXED_AXES_CB)

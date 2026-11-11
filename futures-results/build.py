@@ -1,8 +1,8 @@
 """Build one self-contained results page per strategy family:
   mean reversion/index.html        mean-reversion runs, their portfolios and the all-markets pages
   noise-band breakout/index.html   noise-band breakout runs
-  squeeze breakout/index.html      compression breakout, BB-inside-KC squeeze line
-  nr breakout/index.html           compression breakout, NR-N line
+  bb-kc squeeze/index.html         BB-inside-KC squeeze breakout (../bbkc-squeeze-backtest/)
+  nr squeeze/index.html            NR-N squeeze breakout (../nr-squeeze-backtest/)
 
 Layout of this folder:
   data/<MARKET>/<strategy>.json   one finished run (written by each project's export script,
@@ -34,9 +34,9 @@ FAMILIES = [
      lambda run: not run["strategy_key"].startswith(("noise_band", "squeeze_breakout", "nr_breakout"))),
     ("noise-band breakout", "Noise-Band Breakout Funnels", "Noise-band breakout strategy funnels",
      lambda run: run["strategy_key"].startswith("noise_band")),
-    ("squeeze breakout", "Squeeze Breakout Funnels", "Squeeze breakout strategy funnels",
+    ("bb-kc squeeze", "BB-inside-KC Squeeze Funnels", "BB-inside-KC squeeze strategy funnels",
      lambda run: run["strategy_key"].startswith("squeeze_breakout")),
-    ("nr breakout", "NR Breakout Funnels", "NR breakout strategy funnels",
+    ("nr squeeze", "NR-N Squeeze Funnels", "NR-N squeeze strategy funnels",
      lambda run: run["strategy_key"].startswith("nr_breakout")),
 ]
 

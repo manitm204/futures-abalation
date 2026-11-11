@@ -9,6 +9,7 @@ its own rounds; the YAML's `strategy` picks the line's parameter space:
 `compression_breakout_nr` (NR-N, v1 = 16,128 configs). Squeeze v2 has one grid per bar
 size: `compression_breakout_bbkc_v2_5m` (72,576) and `compression_breakout_bbkc_v2_15m` (184,320).
 Squeeze v3 (NQ) likewise: `compression_breakout_bbkc_v3_5m` (27,648) and `compression_breakout_bbkc_v3_15m` (28,800).
+Squeeze v4 (YM): `compression_breakout_bbkc_v4_15m` (3,840).
 All thresholds live in the YAML (hashed into every output).
 
 Commands (each is a separate, explicit step):
@@ -44,6 +45,7 @@ import polars as pl
 import typer
 
 from src.analysis.neighborhood import (LATTICE_CB_BBKC_V1, LATTICE_CB_BBKC_V2_5M, LATTICE_CB_BBKC_V2_15M, LATTICE_CB_BBKC_V3_5M, LATTICE_CB_BBKC_V3_15M,
+                                     LATTICE_CB_BBKC_V4_15M,
                                        LATTICE_CB_NR_V1, NeighborhoodStats, neighborhood_stats)
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.data.aggregation import AGG_INTERVAL_MINUTES, aggregate_bars
@@ -83,6 +85,7 @@ from src.experiments.funnel_config import (
     load_funnel_config,
 )
 from src.experiments.funnel_prep import Job, build_dev_records, run_jobs
+from src.experiments.job_checkpoint import run_jobs_checkpointed
 from src.experiments.funnel_robustness import (
     breakeven_multiplier,
     interval_overlap,
@@ -91,12 +94,13 @@ from src.experiments.funnel_robustness import (
     quantile,
 )
 from src.experiments.cb_grid import (cb_grid_bbkc, cb_grid_bbkc_v2_5m, cb_grid_bbkc_v2_15m, cb_grid_bbkc_v3_5m,
-                                     cb_grid_bbkc_v3_15m, cb_grid_nr)
+                                     cb_grid_bbkc_v3_15m, cb_grid_bbkc_v4_15m, cb_grid_nr)
 from src.experiments.cb_integrity import CHECKS, truncation_invariance
 from src.strategies.compression_breakout.backtest import CBParams
 from src.strategies.compression_breakout.config import (NRBreakoutConfig, SqueezeBreakoutConfig,
                                                         SqueezeBreakoutV2_5mConfig, SqueezeBreakoutV2_15mConfig,
-                                                        SqueezeBreakoutV3_5mConfig, SqueezeBreakoutV3_15mConfig)
+                                                        SqueezeBreakoutV3_5mConfig, SqueezeBreakoutV3_15mConfig,
+                                                        SqueezeBreakoutV4_15mConfig)
 from src.utils.hashing import canonical_json
 from src.utils.logging import configure_logging, get_logger
 from src.utils.seeds import derive_seed
@@ -137,6 +141,12 @@ SPACES = {
     },
     "compression_breakout_bbkc_v3_15m": {
         "grid": cb_grid_bbkc_v3_15m, "cls": SqueezeBreakoutV3_15mConfig, "lattice": LATTICE_CB_BBKC_V3_15M,
+        "perturb": perturbations_cb, "local": local_perturbations_cb,
+        "keys": ("symbol", "timeframe", "compression", "squeeze_length", "kc_mult", "min_squeeze_bars",
+                 *CB_SHARED_KEYS),
+    },
+    "compression_breakout_bbkc_v4_15m": {
+        "grid": cb_grid_bbkc_v4_15m, "cls": SqueezeBreakoutV4_15mConfig, "lattice": LATTICE_CB_BBKC_V4_15M,
         "perturb": perturbations_cb, "local": local_perturbations_cb,
         "keys": ("symbol", "timeframe", "compression", "squeeze_length", "kc_mult", "min_squeeze_bars",
                  *CB_SHARED_KEYS),
@@ -240,8 +250,15 @@ def develop(
     config: Path = typer.Option(DEFAULT_FUNNEL_CONFIG),
     out_dir: Path = typer.Option(OUT_ROOT),
     reuse_prep: bool = typer.Option(True, help="Reuse records if the prep fingerprint matches"),
+    resume: bool = typer.Option(True, help="Reuse backtests saved in <run>/checkpoints/ by an earlier, "
+                                           "stopped run of the same config (stages 4, 6, 7, transfer)"),
 ) -> None:
-    """Stages 1-7 (+ stage-9 diagnostics) on development data only."""
+    """Stages 1-7 (+ stage-9 diagnostics) on development data only.
+
+    Pausing: stop the process at any time. The development backtests (after stage 1) and the
+    slow later steps (stage-4 local moves, stage-6 trade intervals, perturbations, stage-7
+    execution stress, the transfer check) are saved as they finish; running the same command
+    again redoes only what was not saved."""
     configure_logging()
     t0 = time.time()
     fcfg = load_funnel_config(config)
@@ -294,6 +311,12 @@ def develop(
         np.save(ret_path, R)
         atomic_write_json(meta_path, {"fingerprint": fp, "n": len(records), "built_s": round(time.time() - t0, 1)})
         logger.info("prep_built", n=len(records), elapsed_s=round(time.time() - t0, 1))
+    ck = exp / "checkpoints"
+
+    def run_ck(name, jobs, fr=frames):
+        return run_jobs_checkpointed(jobs, fr, fcfg=fcfg, exec_config=ec, n_workers=n_workers, root=ck,
+                                     name=name, fingerprint=fp, resume=resume)
+
     days = np.unique(frames[f"{sym}|{fcfg.data.timeframes[0]}"]["session_date_ny"].to_numpy()
                      .astype("datetime64[D]"))
     days = days[(days >= np.datetime64(dev.start)) & (days <= np.datetime64(dev.end))]
@@ -385,7 +408,7 @@ def develop(
                     lres[f"{c}|loc|{lab}"] = {"metrics": {k: hit[f"dev_{k}"] for k in LOCAL_METRICS}}
                 else:
                     ljobs.append(Job(f"{c}|loc|{lab}", p, dev.start, dev.end))
-        lres.update(run_jobs(ljobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers))
+        lres.update(run_ck("s4_local_moves", ljobs))
         logger.info("stage4_local_moves", reused_from_prep=len(lres) - len(ljobs), backtested=len(ljobs))
         stab = {}
         for c, mv in lmoves.items():
@@ -442,7 +465,7 @@ def develop(
     iv_ids = sorted({*rep_of.values(), *(c for v in ov_members.values() for c in v)})
     ijobs = [Job(f"{c}|iv", _params(by_id[c]), dev.start, dev.end, return_series=True) for c in iv_ids]
     ivs = {k.split("|")[0]: v["intervals"] for k, v in
-           run_jobs(ijobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers).items()}
+           run_ck("s6_intervals", ijobs).items()}
     # Per-cluster correlations from standardized rows (no n x n matrix; same values as correlation_matrix).
     Zm = standardized_rows(M5) if ids5 else None
     Zd = standardized_rows(R[rows5]) if ids5 else None
@@ -483,7 +506,7 @@ def develop(
         for k, p in enumerate(SPACE["perturb"](_params(r), config_id=r["config_id"], base_seed=fcfg.seed,
                                             pcfg=ps.perturbation)):
             pjobs.append(Job(f"{r['config_id']}|p{k}", p, dev.start, dev.end))
-    pres = run_jobs(pjobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
+    pres = run_ck("s6_perturbations", pjobs)
     for r in reps:
         ms = [pres[f"{r['config_id']}|p{k}"]["metrics"] for k in range(ps.perturbation.n_per_config)]
         sh = [m["sharpe"] for m in ms]
@@ -506,7 +529,7 @@ def develop(
         sjobs.append(Job(f"{c}|delay", p, dev.start, dev.end, entry_delay_bars=st.entry_delay_bars))
         sjobs += [Job(f"{c}|miss|{k}", p, dev.start, dev.end, missed_entry_frac=st.missed_entry_frac,
                       seed=derive_seed(fcfg.seed, "missed", c, str(k))) for k in range(st.missed_entry_sims)]
-    sres = run_jobs(sjobs, frames, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
+    sres = run_ck("s7_execution_stress", sjobs)
 
     def _s7(r):
         c = r["config_id"]
@@ -582,8 +605,8 @@ def develop(
     qqq = conf.transfer_symbol
     if qqq and s7:
         qframes, _ = _frames(fcfg, qqq, "development", command="develop:transfer", experiment_id=experiment_id)
-        qres = run_jobs([Job(f"{r['config_id']}|qqq", _params(r, qqq), dev.start, dev.end) for r in s7],
-                        qframes, fcfg=fcfg, exec_config=ec, n_workers=n_workers)
+        qres = run_ck("s9_transfer", [Job(f"{r['config_id']}|qqq", _params(r, qqq), dev.start, dev.end) for r in s7],
+                      qframes)
         for r in s7:
             m = qres[f"{r['config_id']}|qqq"]["metrics"]
             r["qqq_dev_net_return"], r["qqq_dev_sharpe"], r["qqq_dev_max_drawdown"] = (

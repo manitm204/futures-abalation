@@ -4,8 +4,8 @@ site renders (../futures-results/), the same shape as
 
 One file per (market, strategy line, version): futures-results/data/<MARKET>/<key>.json.
 Re-running overwrites that file only. Then rebuild the pages:  python ../futures-results/build.py
-(squeeze runs go to "futures-results/squeeze breakout/index.html", NR runs to
-"futures-results/nr breakout/index.html").
+(BB-inside-KC squeeze runs go to "futures-results/bb-kc squeeze/index.html", NR-N runs to
+"futures-results/nr squeeze/index.html").
 
 Works after `develop` alone (validation columns are then empty and stage 8 shows "not
 run") and again after `validate` and the luck benchmark. Reads only development and
@@ -28,7 +28,7 @@ import polars as pl
 import typer
 
 from src.data.futures import session_spec
-from src.experiments.cb_grid import AXES_BBKC_V1, AXES_BBKC_V2_5M, AXES_BBKC_V2_15M, AXES_BBKC_V3_5M, AXES_BBKC_V3_15M, AXES_NR_V1
+from src.experiments.cb_grid import AXES_BBKC_V1, AXES_BBKC_V2_5M, AXES_BBKC_V2_15M, AXES_BBKC_V3_5M, AXES_BBKC_V3_15M, AXES_BBKC_V4_15M, AXES_NR_V1
 from src.experiments.funnel_config import load_execution_config, load_funnel_config
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -37,16 +37,18 @@ app = typer.Typer(add_completion=False)
 
 # strategy -> (axes, file-key prefix, tab label prefix, heat-map axes (rows, cols))
 SPACES = {
-    "compression_breakout_bbkc": (AXES_BBKC_V1, "squeeze_breakout", "Squeeze breakout", ("squeeze_length", "kc_mult")),
-    "compression_breakout_bbkc_v2_5m": (AXES_BBKC_V2_5M, "squeeze_breakout", "Squeeze breakout",
+    "compression_breakout_bbkc": (AXES_BBKC_V1, "squeeze_breakout", "BB/KC squeeze", ("squeeze_length", "kc_mult")),
+    "compression_breakout_bbkc_v2_5m": (AXES_BBKC_V2_5M, "squeeze_breakout", "BB/KC squeeze",
                                         ("squeeze_length", "kc_mult")),
-    "compression_breakout_bbkc_v2_15m": (AXES_BBKC_V2_15M, "squeeze_breakout", "Squeeze breakout",
+    "compression_breakout_bbkc_v2_15m": (AXES_BBKC_V2_15M, "squeeze_breakout", "BB/KC squeeze",
                                          ("squeeze_length", "kc_mult")),
-    "compression_breakout_bbkc_v3_5m": (AXES_BBKC_V3_5M, "squeeze_breakout", "Squeeze breakout",
+    "compression_breakout_bbkc_v3_5m": (AXES_BBKC_V3_5M, "squeeze_breakout", "BB/KC squeeze",
                                          ("squeeze_length", "kc_mult")),
-    "compression_breakout_bbkc_v3_15m": (AXES_BBKC_V3_15M, "squeeze_breakout", "Squeeze breakout",
+    "compression_breakout_bbkc_v3_15m": (AXES_BBKC_V3_15M, "squeeze_breakout", "BB/KC squeeze",
                                          ("squeeze_length", "kc_mult")),
-    "compression_breakout_nr": (AXES_NR_V1, "nr_breakout", "NR breakout", ("nr_lookback", "target_r")),
+    "compression_breakout_bbkc_v4_15m": (AXES_BBKC_V4_15M, "squeeze_breakout", "BB/KC squeeze",
+                                         ("squeeze_length", "kc_mult")),
+    "compression_breakout_nr": (AXES_NR_V1, "nr_breakout", "NR-N squeeze", ("nr_lookback", "target_r")),
 }
 MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini Dow", "RTY": "E-mini Russell 2000",
                 "CL": "Crude oil", "GC": "Gold", "6E": "Euro FX", "6J": "Japanese yen", "ZN": "10-year T-note",
@@ -122,7 +124,7 @@ def main(
     config: Path = typer.Option(...),
     market_name: str = typer.Option("", help="Default: the market's usual name"),
     key: str = typer.Option("", help="File name / tab id under data/<MARKET>/ (default: <line>_breakout_<version>)"),
-    label: str = typer.Option("", help="Strategy tab label (default: Squeeze breakout - <version>)"),
+    label: str = typer.Option("", help="Strategy tab label (default: BB/KC squeeze or NR-N squeeze - <version>)"),
     variant: str = typer.Option("", help="Optional variant id (e.g. 15m) when one strategy tab holds several runs"),
     variant_label: str = typer.Option("", help="Button text for the variant (default: the variant id)"),
     out_root: Path = typer.Option(SITE_ROOT / "data"),
@@ -366,9 +368,9 @@ def main(
             "rules": [
                 {"label": "Enter", "text": compress_rule + f" The box stays live for "
                                            f"{_words([str(x) for x in axes['setup_expiry_bars']])} bars after the last "
-                                           f"compression bar, and can be required to be at least "
-                                           f"{_words(boxes)} × ATR(14) wide (narrower boxes leave too little room "
-                                           "after costs). "
+                                           f"compression bar" + (f", and can be required to be at least {_words(boxes)} × ATR(14) wide "
+                                                                 "(narrower boxes leave too little room after costs). "
+                                                                 if boxes else " (any box width). ") +
                                            "Close entry: a bar closes outside the box, filled at the next bar's open. "
                                            "Wick entry: a stop order rests at the box edge and fills the moment price "
                                            "trades through it, at the worse of the bar's open and the edge. The first "
@@ -428,7 +430,7 @@ def main(
               if fcfg.data_history.validation_previously_used_for_selection else []),
             "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead.",
         ],
-        "source": f"compression-breakout-backtest/runs/funnel/{experiment_id}/ · {config.as_posix()}",
+        "source": f"bbkc-squeeze-backtest/runs/funnel/{experiment_id}/ · {config.as_posix()}",
     }
     path = out_root / sym / (f"{key}__{variant}.json" if variant else f"{key}.json")
     path.parent.mkdir(parents=True, exist_ok=True)

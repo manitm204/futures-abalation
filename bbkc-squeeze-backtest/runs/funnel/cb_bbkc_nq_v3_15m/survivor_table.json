@@ -1,0 +1,125 @@
+[
+  {
+    "evaluated": 28800,
+    "kind": "universe",
+    "passed": 28800,
+    "pct_of_previous": 100.0,
+    "pct_of_universe": 100.0,
+    "stage": "0 universe"
+  },
+  {
+    "evaluated": 28800,
+    "hard_reject": 0,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 28800,
+    "pct_of_previous": 100.0,
+    "pct_of_universe": 100.0,
+    "stage": "1 backtest integrity",
+    "with_warnings": 0
+  },
+  {
+    "evaluated": 28800,
+    "hard_reject": 7776,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 21024,
+    "pct_of_previous": 73.0,
+    "pct_of_universe": 73.0,
+    "stage": "2 trade count & coverage",
+    "with_warnings": 18736
+  },
+  {
+    "evaluated": 21024,
+    "hard_reject": 15720,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 5304,
+    "pct_of_previous": 25.228310502283104,
+    "pct_of_universe": 18.416666666666668,
+    "stage": "3 performance & risk",
+    "with_warnings": 0
+  },
+  {
+    "deduplicated": 4224,
+    "evaluated": 5304,
+    "kind": "dedup",
+    "n_clusters": 372,
+    "note": "5304 > 2000 passed stage 3: best 3 per cluster by development Sharpe go into stage 4",
+    "passed": 1080,
+    "pct_of_previous": 20.361990950226243,
+    "pct_of_universe": 3.75,
+    "stage": "4a prescreen"
+  },
+  {
+    "evaluated": 1080,
+    "hard_reject": 4,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 1076,
+    "pct_of_previous": 99.62962962962963,
+    "pct_of_universe": 3.736111111111111,
+    "stage": "4 parameter stability",
+    "with_warnings": 0
+  },
+  {
+    "evaluated": 1076,
+    "hard_reject": 9,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 1067,
+    "pct_of_previous": 99.1635687732342,
+    "pct_of_universe": 3.704861111111111,
+    "stage": "5 time stability",
+    "with_warnings": 801
+  },
+  {
+    "deduplicated": 500,
+    "evaluated": 1067,
+    "kind": "dedup",
+    "n_clusters": 288,
+    "note": "best 2 per cluster",
+    "passed": 567,
+    "pct_of_previous": 53.139643861293344,
+    "pct_of_universe": 1.96875,
+    "stage": "6 deduplication"
+  },
+  {
+    "evaluated": 567,
+    "hard_reject": 0,
+    "insufficient_evidence": 0,
+    "kind": "hard_gate",
+    "passed": 567,
+    "pct_of_previous": 100.0,
+    "pct_of_universe": 1.96875,
+    "stage": "7 execution stress",
+    "with_warnings": 4
+  },
+  {
+    "evaluated": null,
+    "kind": "hard_gate",
+    "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+    "passed": null,
+    "pct_of_previous": null,
+    "pct_of_universe": null,
+    "stage": "8 frozen validation"
+  },
+  {
+    "evaluated": 567,
+    "kind": "diagnostic_only",
+    "note": "diagnostic only: unverified: 567",
+    "passed": null,
+    "pct_of_previous": null,
+    "pct_of_universe": null,
+    "stage": "9 DSR / transfer"
+  },
+  {
+    "evaluated": null,
+    "kind": "explicit_command",
+    "note": "not run; `final-test` command only",
+    "passed": null,
+    "pct_of_previous": null,
+    "pct_of_universe": null,
+    "stage": "10 final holdout"
+  }
+]

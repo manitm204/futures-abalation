@@ -1,0 +1,130 @@
+{
+  "curves": {
+    "15min|both": [
+      {
+        "actual_exposure": 0.14003558982724107,
+        "exposure_pct": 14,
+        "frac_profitable": 0.17,
+        "mean_return": -0.03150586249999649,
+        "mean_sharpe": -0.7402537459595134,
+        "mean_trades": 161.83,
+        "median_return": -0.029637499999996875,
+        "median_sharpe": -0.7525872780387798,
+        "p10_return": -0.07344174999999688,
+        "p10_sharpe": -1.6916429082953046,
+        "p90_return": 0.006895250000005214,
+        "p90_sharpe": 0.20998004350616756
+      }
+    ],
+    "15min|long": [
+      {
+        "actual_exposure": 0.04015273967524283,
+        "exposure_pct": 4,
+        "frac_profitable": 0.24,
+        "mean_return": -0.011966512499998846,
+        "mean_sharpe": -0.5685498354430272,
+        "mean_trades": 47.42,
+        "median_return": -0.012826874999997961,
+        "median_sharpe": -0.6117101896917971,
+        "p10_return": -0.03391087499999903,
+        "p10_sharpe": -1.4041928734420783,
+        "p90_return": 0.008298625000001711,
+        "p90_sharpe": 0.34896806999019053
+      }
+    ]
+  },
+  "data_access": {
+    "actual_last_session": "2024-12-31",
+    "command": "random_benchmark",
+    "experiment_id": "cb_bbkc_6j_v4_15m",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 84,
+    "partition_fingerprint": "b7d703f54e6cbad7",
+    "phase": "validation",
+    "phase_end": "2024-12-31",
+    "rows": 2418069,
+    "symbol": "6J"
+  },
+  "experiment_id": "cb_bbkc_6j_v4_15m",
+  "finalists": [
+    {
+      "config_id": "cfg_6fc38fe604119cb22061",
+      "dev_order": 1,
+      "direction": "both",
+      "exposure": 0.1431007636983762,
+      "exposure_level": 14,
+      "group": "15min|both",
+      "luck_pct_return": 0.86,
+      "luck_pct_sharpe": 0.88,
+      "net_return": 0.004635762057219495,
+      "sharpe": 0.13790373293764488,
+      "status": "hard_reject",
+      "timeframe": "15min"
+    },
+    {
+      "config_id": "cfg_16c539cc8db1be5264c6",
+      "dev_order": 2,
+      "direction": "both",
+      "exposure": 0.14132127233632386,
+      "exposure_level": 14,
+      "group": "15min|both",
+      "luck_pct_return": 0.9,
+      "luck_pct_sharpe": 0.89,
+      "net_return": 0.006954450699962367,
+      "sharpe": 0.20367257199316796,
+      "status": "hard_reject",
+      "timeframe": "15min"
+    },
+    {
+      "config_id": "cfg_178362b49ace82bdcf88",
+      "dev_order": 3,
+      "direction": "long",
+      "exposure": 0.04129902869429821,
+      "exposure_level": 4,
+      "group": "15min|long",
+      "luck_pct_return": 0.37,
+      "luck_pct_sharpe": 0.36,
+      "net_return": -0.01856680140914979,
+      "sharpe": -0.8599571113652447,
+      "status": "hard_reject",
+      "timeframe": "15min"
+    }
+  ],
+  "group_levels": {
+    "15min|both": [
+      14
+    ],
+    "15min|long": [
+      4
+    ]
+  },
+  "groups": {
+    "15min|both": {
+      "direction": "both",
+      "mean_trade_bars": 11.730886850152904,
+      "median_trade_bars": 9.0,
+      "n_pool_trades": 327,
+      "p_long": 0.5168195718654435,
+      "timeframe": "15min"
+    },
+    "15min|long": {
+      "direction": "long",
+      "mean_trade_bars": 11.36734693877551,
+      "median_trade_bars": 8.0,
+      "n_pool_trades": 49,
+      "p_long": 1.0,
+      "timeframe": "15min"
+    }
+  },
+  "levels": [
+    4,
+    14
+  ],
+  "method": "Per bar size and direction setting: random intraday trades on random sessions at random times, never overlapping and always closed by the session's last bar, covering the target share of the validation window's bars. Trade lengths are drawn from that group's own validation trades; each trade is long with the group's actual long share (1.0 for long-only, 0.0 for short-only), else short. Same fills, slippage, commission and whole-contract sizing as the strategy; scored with the same daily-Sharpe and time-in-market code.",
+  "n_sims": 100,
+  "window": [
+    "2023-01-01",
+    "2024-12-31"
+  ]
+}

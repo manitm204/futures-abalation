@@ -217,3 +217,28 @@ class SqueezeBreakoutV3_15mConfig(_BreakoutConfig):
     stop: Literal["box", "1.0", "2.0"] = "box"
     target_r: Literal["1.5", "2.5", "3.0", "none"] = "2.5"
     direction: Literal["long", "both"] = "both"
+
+
+# --- compression_breakout_bbkc v4 (YM; 15-minute bars only) -----------------------------------
+# Specified by the user (2026-11-11) after reading the ES v2 and NQ v3 squeeze results
+# (development, validation and holdout). First squeeze run on YM. 3,840 configs.
+V4_15M_SQUEEZE_LENGTHS: tuple[int, ...] = (15, 25, 35, 45)
+V4_15M_KC_MULTS: tuple[float, ...] = (1.5, 2.0, 2.5, 3.0, 3.5)
+V4_15M_MIN_SQUEEZE_BARS: tuple[int, ...] = (1, 4)
+V4_15M_SETUP_EXPIRIES: tuple[int, ...] = (1, 4)
+V4_15M_STOPS: tuple[str, ...] = ("box", "1.5")
+V4_15M_TARGETS: tuple[str, ...] = ("1.0", "2.5", "none")
+V4_15M_MIN_BOX_ATRS: tuple[float, ...] = (0.0,)
+
+
+class SqueezeBreakoutV4_15mConfig(_BreakoutConfig):
+    timeframe: Literal["15min"] = "15min"
+    compression: Literal["bbkc"] = "bbkc"
+    squeeze_length: Literal[15, 25, 35, 45] = 25
+    kc_mult: Literal[1.5, 2.0, 2.5, 3.0, 3.5] = 2.5
+    min_squeeze_bars: Literal[1, 4] = 1
+    setup_expiry_bars: Literal[1, 4] = 1
+    stop: Literal["box", "1.5"] = "box"
+    target_r: Literal["1.0", "2.5", "none"] = "2.5"
+    direction: Literal["long", "both"] = "both"
+    min_box_atr: Literal[0.0] = 0.0

@@ -1,0 +1,104 @@
+{
+  "calibration_verified": false,
+  "effective_trials": {
+    "li_ji": 462.000000000001,
+    "n_components_95": 178,
+    "n_series": 3840,
+    "participation_ratio": 19.419336379381985,
+    "rank_bound_T": 1258
+  },
+  "n_configs_with_defined_sharpe": 3840,
+  "primary_method": "li_ji",
+  "research_history": [
+    {
+      "n_configs": 20736,
+      "name": "compression_breakout_bbkc ES v1 (cb_bbkc_es_v1)",
+      "note": "Same line on ES, 5min + 15min. This grid was specified after its results."
+    },
+    {
+      "n_configs": 184320,
+      "name": "compression_breakout_bbkc_v2_15m ES (cb_bbkc_es_v2_15m)",
+      "note": "Same line on ES; 2 tested on 2025+. This grid was specified after its results."
+    },
+    {
+      "n_configs": 72576,
+      "name": "compression_breakout_bbkc_v2_5m ES (cb_bbkc_es_v2_5m)",
+      "note": "Same line on ES. This grid was specified after its results."
+    },
+    {
+      "n_configs": 28800,
+      "name": "compression_breakout_bbkc_v3_15m NQ (cb_bbkc_nq_v3_15m)",
+      "note": "Same line on NQ; 1 tested on 2025+. This grid was specified after its results."
+    },
+    {
+      "n_configs": 27648,
+      "name": "compression_breakout_bbkc_v3_5m NQ (cb_bbkc_nq_v3_5m)",
+      "note": "Same line on NQ; 1 tested on 2025+. This grid was specified after its results."
+    },
+    {
+      "n_configs": 3840,
+      "name": "compression_breakout_bbkc_v4_15m YM (cb_bbkc_ym_v4_15m)",
+      "note": "This exact grid on YM; 59 frozen, 37 passed 2023-2024, #8 failed the 2025+ holdout. This grid was specified after its results."
+    },
+    {
+      "n_configs": 16128,
+      "name": "compression_breakout_nr CL v1 (cb_nr_cl_v1)",
+      "note": "Sibling compression line (NR-N): same backtester and shared breakout axes; both v1 grids were fixed together, before any compression-breakout result was seen."
+    },
+    {
+      "n_configs": 41472,
+      "name": "mean_reversion CL (mr_cl_v5)",
+      "note": "Different (mean-reversion) family on CL; 75 frozen candidates, 7 passed 2023-2024."
+    },
+    {
+      "n_configs": 17280,
+      "name": "mean_reversion CL (mr_cl_v6)",
+      "note": "Different (mean-reversion) family on CL; 82 frozen candidates, 4 passed 2023-2024."
+    },
+    {
+      "n_configs": 16128,
+      "name": "mean_reversion CL (mr_cl_v7)",
+      "note": "Different (mean-reversion) family on CL; 150 frozen candidates, 11 passed 2023-2024."
+    },
+    {
+      "n_configs": 7680,
+      "name": "noise_band CL (nb_cl_v2)",
+      "note": "Different (noise-band intraday momentum) family on CL; 1 frozen candidates."
+    },
+    {
+      "n_configs": 24576,
+      "name": "channel_breakout grid (funnel_v1..v4, SPY)",
+      "note": "Closest prior search: channel breakout, SPY; four funnel variants with changed thresholds/methods."
+    },
+    {
+      "n_configs": 3888,
+      "name": "donchian_ablation (donchian_v1, SPY/QQQ)",
+      "note": "Closest prior search: full-factorial Donchian intraday breakout ablation, 2018-2026 splits incl. holdout."
+    },
+    {
+      "n_configs": 248832,
+      "name": "ma_crossover v2 grid (ma_v2, SPY)",
+      "note": "Long-only trend-following MA crossover, 5min/15min, SPY."
+    },
+    {
+      "n_configs": 60000,
+      "name": "ma_crossover v1 grid (ma_v1, SPY)",
+      "note": "Long-only trend-following MA crossover, 5min/15min/1h, SPY."
+    }
+  ],
+  "serial_dependence": "lag1_effective_n",
+  "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+  "trial_count_options": {
+    "li_ji": 462.000000000001,
+    "participation_ratio": 19.419336379381985,
+    "raw": 3840.0,
+    "raw_plus_known_prior": 777744.0
+  },
+  "unresolved": [
+    "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+    "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+    "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+    "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+  ],
+  "variance_of_trial_sharpes_per_period": 0.0006690512212235639
+}

@@ -1,0 +1,30 @@
+=== cb_bbkc_nq_v3_15m develop 2026-11-11T14:40:00Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-11T14:40:06.334063Z"}
+{"n": 28800, "elapsed_s": 202.8, "event": "prep_built", "level": "info", "timestamp": "2026-11-11T14:43:23.872255Z"}
+{"stage": "1 backtest integrity", "evaluated": 28800, "passed": 28800, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T14:43:24.191135Z"}
+{"stage": "2 trade count & coverage", "evaluated": 28800, "passed": 21024, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T14:43:24.399626Z"}
+{"stage": "3 performance & risk", "evaluated": 21024, "passed": 5304, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T14:43:24.478561Z"}
+{"stage": "4a prescreen", "evaluated": 5304, "passed": 1080, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T14:43:25.442367Z"}
+{"reused_from_prep": 562, "backtested": 11448, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-11T14:45:01.622868Z"}
+{"stage": "4 parameter stability", "evaluated": 1080, "passed": 1076, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T14:45:01.698033Z"}
+{"stage": "5 time stability", "evaluated": 1076, "passed": 1067, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T14:45:01.704047Z"}
+{"stage": "7 execution stress", "evaluated": 567, "passed": 567, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T14:57:17.349275Z"}
+develop done: 28800 configs -> 567 representatives -> 567 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_nq_v3_15m
+=== cb_bbkc_nq_v3_15m validate 2026-11-11T14:57:34Z
+validate: 567 frozen -> 439 pass validation (previously-inspected data). Selection manifest sha256 4349ac3f9b30130c
+=== cb_bbkc_nq_v3_15m luck 2026-11-11T14:57:52Z
+cb_bbkc_nq_v3_15m: 567 finalists re-run on validation and matched exactly
+cb_bbkc_nq_v3_15m 15min|long: 39 levels x 100 sims (long share 1.00, median trade 8 bars)
+cb_bbkc_nq_v3_15m 15min|both: 60 levels x 100 sims (long share 0.57, median trade 8 bars)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_nq_v3_15m/random_benchmark.json
+=== cb_bbkc_nq_v3_15m done 2026-11-11T14:59:09Z
+=== cb_bbkc_nq_v3_5m develop 2026-11-11T14:59:09Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-11T14:59:24.753645Z"}
+{"n": 27648, "elapsed_s": 606.7, "event": "prep_built", "level": "info", "timestamp": "2026-11-11T15:09:16.985495Z"}
+{"stage": "1 backtest integrity", "evaluated": 27648, "passed": 27648, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T15:09:17.269570Z"}
+{"stage": "2 trade count & coverage", "evaluated": 27648, "passed": 24962, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T15:09:17.463513Z"}
+{"stage": "3 performance & risk", "evaluated": 24962, "passed": 4488, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T15:09:17.559201Z"}
+{"stage": "4a prescreen", "evaluated": 4488, "passed": 858, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T15:09:18.080810Z"}
+{"reused_from_prep": 0, "backtested": 9130, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-11T15:18:24.434109Z"}
+{"stage": "4 parameter stability", "evaluated": 858, "passed": 850, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T15:18:24.737907Z"}
+{"stage": "5 time stability", "evaluated": 850, "passed": 847, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T15:18:24.761700Z"}

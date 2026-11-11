@@ -178,3 +178,34 @@ def cb_grid_bbkc_v3_5m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
 
 def cb_grid_bbkc_v3_15m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
     return _grid(symbols, AXES_BBKC_V3_15M, SqueezeBreakoutV3_15mConfig)
+
+
+# --- squeeze v4 (YM): 15-minute bars only -----------------------------------------------------
+from src.strategies.compression_breakout.config import (  # noqa: E402
+    V4_15M_KC_MULTS,
+    V4_15M_MIN_BOX_ATRS,
+    V4_15M_MIN_SQUEEZE_BARS,
+    V4_15M_SETUP_EXPIRIES,
+    V4_15M_SQUEEZE_LENGTHS,
+    V4_15M_STOPS,
+    V4_15M_TARGETS,
+    SqueezeBreakoutV4_15mConfig,
+)
+
+AXES_BBKC_V4_15M: dict[str, tuple] = {
+    "timeframe": ("15min",),
+    "squeeze_length": V4_15M_SQUEEZE_LENGTHS,
+    "kc_mult": V4_15M_KC_MULTS,
+    "min_squeeze_bars": V4_15M_MIN_SQUEEZE_BARS,
+    "entry_type": ENTRY_TYPES,
+    "setup_expiry_bars": V4_15M_SETUP_EXPIRIES,
+    "stop": V4_15M_STOPS,
+    "target_r": V4_15M_TARGETS,
+    "direction": V3_DIRECTIONS,
+    "trend_filter": TREND_FILTERS,
+    "min_box_atr": V4_15M_MIN_BOX_ATRS,
+}
+
+
+def cb_grid_bbkc_v4_15m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_BBKC_V4_15M, SqueezeBreakoutV4_15mConfig)

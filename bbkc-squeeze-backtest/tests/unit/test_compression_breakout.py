@@ -447,10 +447,16 @@ def test_off_grid_kc_mult_is_not_cached():
     assert all(1.3712 not in k for k in keys) and any(1.5 in k for k in keys)
 
 
+# Each squeeze line lives in its own project; the v1 configs of both are checked together.
+LINE_CONFIGS = {"bbkc": Path("../bbkc-squeeze-backtest/configs/funnel"), "nr": Path("../nr-squeeze-backtest/configs/funnel")}
+
+
 def test_market_configs_load_and_share_every_threshold():
     shared = []
     for line, key in LINES.items():
-        paths = sorted(CONFIGS.glob(f"cb_{line}_funnel_*_v1.yaml"))
+        paths = sorted(LINE_CONFIGS[line].glob(f"cb_{line}_funnel_*_v1.yaml"))
+        if not paths:
+            pytest.skip(f"the {line} project is not next to this one")
         assert {p.name.split("_")[3] for p in paths} == MARKETS
         dumps = []
         for path in paths:
@@ -475,7 +481,7 @@ def test_market_configs_load_and_share_every_threshold():
 
 
 def test_dev_record_through_the_funnel_family(tmp_path):
-    f = load_funnel_config(CONFIGS / "cb_nr_funnel_es_v1.yaml")
+    f = load_funnel_config(CONFIGS / "cb_bbkc_funnel_es_v1.yaml")
     bars = _walk(seed=12, n_days=60)
     cfg = NRBreakoutConfig(symbol="SPY", timeframe="15min", nr_lookback=4)
     ce = ConfigEntry(config=cfg, config_id="abc")
@@ -548,3 +554,63 @@ def test_v3_grids_one_per_bar_size():
     p = CBParams.from_config(SqueezeBreakoutV3_15mConfig(symbol="NQ", stop="2.0", target_r="1.5", min_box_atr=0.5))
     assert (p.stop_atr, p.target_r, p.min_box_atr) == (2.0, 1.5, 0.5)
     assert CBParams.from_config(SqueezeBreakoutV3_5mConfig(symbol="NQ", squeeze_length=1)).squeeze_length == 1
+
+
+# --- resumable develop steps (src/experiments/job_checkpoint.py) ------------------------------
+
+def test_checkpointed_jobs_resume_and_match_run_jobs(tmp_path, monkeypatch):
+    from src.experiments import job_checkpoint as jc
+    from src.experiments.funnel_prep import Job, run_jobs
+    fcfg = load_funnel_config(CONFIGS / "cb_bbkc_funnel_es_v1.yaml")
+    bars = _walk(seed=3, n_days=30)
+    frames = {"SPY|15min": bars}
+    d0, d1 = bars["session_date_ny"].min(), bars["session_date_ny"].max()
+    jobs = [Job(f"j{k}|cost|{m}", _p(nr_lookback=k), d0, d1, cost_multiplier=m) for k in (3, 4, 5) for m in (1.0, 2.0)]
+    jobs.append(Job("j4|miss|0", _p(nr_lookback=4), d0, d1, missed_entry_frac=0.5, seed=7))
+    ref = run_jobs(jobs, frames, fcfg=fcfg, exec_config=EC, n_workers=1)
+    kw = dict(fcfg=fcfg, exec_config=EC, n_workers=1, root=tmp_path, name="s7", fingerprint="f" * 64)
+
+    # First run "crashes" after 3 results; with SAVE_EVERY_S = 0 each one was already saved.
+    monkeypatch.setattr(jc, "SAVE_EVERY_S", 0.0)
+    real, n = jc.fp._job_worker, {"k": 0}
+
+    def flaky(job):
+        n["k"] += 1
+        if n["k"] > 3:
+            raise KeyboardInterrupt
+        return real(job)
+    monkeypatch.setattr(jc.fp, "_job_worker", flaky)
+    with pytest.raises(KeyboardInterrupt):
+        jc.run_jobs_checkpointed(jobs, frames, **kw)
+    saved = jc._load(tmp_path / "s7" / ("f" * 16))
+    assert len(saved) == 3
+
+    # Resume runs only the other 4 and returns exactly what run_jobs does.
+    monkeypatch.setattr(jc.fp, "_job_worker", real)
+    calls = []
+    monkeypatch.setattr(jc.fp, "_job_worker", lambda job: calls.append(job.key) or real(job))
+    out = jc.run_jobs_checkpointed(jobs, frames, **kw)
+    assert len(calls) == 4 and set(out) == set(ref)
+    for k in ref:
+        assert out[k]["metrics"] == ref[k]["metrics"] and out[k]["key"] == k
+
+    # Same backtest under a new label is reused; a changed setting or fingerprint is not.
+    calls.clear()
+    relabel = [Job("other", jobs[0].params, d0, d1)]
+    assert jc.run_jobs_checkpointed(relabel, frames, **kw)["other"]["metrics"] == ref[jobs[0].key]["metrics"]
+    assert calls == []
+    jc.run_jobs_checkpointed([Job("x", jobs[0].params, d0, d1, cost_multiplier=1.5)], frames, **kw)
+    jc.run_jobs_checkpointed(relabel, frames, **{**kw, "fingerprint": "e" * 64})
+    assert len(calls) == 2
+
+
+def test_v4_ym_grid():
+    from src.experiments.cb_grid import AXES_BBKC_V4_15M, cb_grid_bbkc_v4_15m
+    from src.strategies.compression_breakout.config import SqueezeBreakoutV4_15mConfig
+    assert variants_per_symbol(AXES_BBKC_V4_15M) == 3_840
+    g = cb_grid_bbkc_v4_15m(("YM",))
+    assert {c.config.timeframe for c in g} == {"15min"} and {c.config.min_box_atr for c in g} == {0.0}
+    with pytest.raises(ValueError):
+        SqueezeBreakoutV4_15mConfig(symbol="YM", stop="1.0")  # stops are box / 1.5 ATR
+    p = CBParams.from_config(SqueezeBreakoutV4_15mConfig(symbol="YM", stop="1.5", target_r="1.0"))
+    assert (p.stop_atr, p.target_r, p.squeeze_length) == (1.5, 1.0, 25)

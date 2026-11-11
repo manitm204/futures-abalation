@@ -1,0 +1,175 @@
+=== cb_bbkc_rty_v4_15m develop 2026-11-11T19:19:13Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-11T19:19:21.368708Z"}
+{"n": 3840, "elapsed_s": 51.6, "event": "prep_built", "level": "info", "timestamp": "2026-11-11T19:20:06.395121Z"}
+{"stage": "1 backtest integrity", "evaluated": 3840, "passed": 3840, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:20:06.445609Z"}
+{"stage": "2 trade count & coverage", "evaluated": 3840, "passed": 3441, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:20:06.475171Z"}
+{"stage": "3 performance & risk", "evaluated": 3441, "passed": 369, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:20:06.490891Z"}
+{"step": "s4_local_moves", "total": 3653, "saved": 0, "to_run": 3653, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:20:06.738641Z"}
+{"step": "s4_local_moves", "saved": 3461, "of": 3653, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:20:53.227534Z"}
+{"reused_from_prep": 0, "backtested": 3653, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-11T19:20:53.233350Z"}
+{"stage": "4 parameter stability", "evaluated": 369, "passed": 364, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:20:53.260734Z"}
+{"stage": "5 time stability", "evaluated": 364, "passed": 364, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:20:53.262755Z"}
+{"step": "s6_intervals", "total": 364, "saved": 0, "to_run": 364, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:20:53.295058Z"}
+{"step": "s6_intervals", "saved": 364, "of": 364, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:21:01.538636Z"}
+{"step": "s6_perturbations", "total": 4300, "saved": 0, "to_run": 4300, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:21:01.945153Z"}
+{"step": "s6_perturbations", "saved": 4300, "of": 4300, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:22:01.340992Z"}
+{"step": "s7_execution_stress", "total": 24295, "saved": 0, "to_run": 24295, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:22:01.830554Z"}
+{"step": "s7_execution_stress", "saved": 4241, "of": 24295, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:23:01.969636Z"}
+{"step": "s7_execution_stress", "saved": 8705, "of": 24295, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:24:02.037037Z"}
+{"step": "s7_execution_stress", "saved": 12141, "of": 24295, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:25:02.452901Z"}
+{"step": "s7_execution_stress", "saved": 16017, "of": 24295, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:26:02.509794Z"}
+{"step": "s7_execution_stress", "saved": 18933, "of": 24295, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:27:02.594633Z"}
+{"step": "s7_execution_stress", "saved": 22029, "of": 24295, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:28:02.674634Z"}
+{"step": "s7_execution_stress", "saved": 24295, "of": 24295, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:28:47.038293Z"}
+{"stage": "7 execution stress", "evaluated": 215, "passed": 215, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:28:47.346067Z"}
+{"step": "s9_transfer", "total": 215, "saved": 0, "to_run": 215, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:28:52.897907Z"}
+{"step": "s9_transfer", "saved": 215, "of": 215, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:29:01.943352Z"}
+develop done: 3840 configs -> 215 representatives -> 215 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_rty_v4_15m
+=== cb_bbkc_rty_v4_15m validate 2026-11-11T19:29:02Z
+validate: 215 frozen -> 17 pass validation (previously-inspected data). Selection manifest sha256 5bece57cb1864138
+=== cb_bbkc_rty_v4_15m luck 2026-11-11T19:29:21Z
+cb_bbkc_rty_v4_15m: 215 finalists re-run on validation and matched exactly
+cb_bbkc_rty_v4_15m 15min|long: 32 levels x 100 sims (long share 1.00, median trade 6 bars)
+cb_bbkc_rty_v4_15m 15min|both: 61 levels x 100 sims (long share 0.49, median trade 6 bars)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_rty_v4_15m/random_benchmark.json
+=== cb_bbkc_rty_v4_15m done 2026-11-11T19:31:29Z
+=== cb_bbkc_cl_v4_15m develop 2026-11-11T19:31:29Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-11T19:31:41.054200Z"}
+{"n": 3840, "elapsed_s": 72.9, "event": "prep_built", "level": "info", "timestamp": "2026-11-11T19:32:44.949713Z"}
+{"stage": "1 backtest integrity", "evaluated": 3840, "passed": 3840, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:32:45.025475Z"}
+{"stage": "2 trade count & coverage", "evaluated": 3840, "passed": 3336, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:32:45.113320Z"}
+{"stage": "3 performance & risk", "evaluated": 3336, "passed": 88, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:32:45.159906Z"}
+{"step": "s4_local_moves", "total": 906, "saved": 0, "to_run": 906, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:32:45.453353Z"}
+{"step": "s4_local_moves", "saved": 885, "of": 906, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:33:02.778882Z"}
+{"reused_from_prep": 0, "backtested": 906, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-11T19:33:02.780381Z"}
+{"stage": "4 parameter stability", "evaluated": 88, "passed": 80, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:33:02.794038Z"}
+{"stage": "5 time stability", "evaluated": 80, "passed": 80, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:33:02.795045Z"}
+{"step": "s6_intervals", "total": 80, "saved": 0, "to_run": 80, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:33:02.807581Z"}
+{"step": "s6_intervals", "saved": 80, "of": 80, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:33:08.837919Z"}
+{"step": "s6_perturbations", "total": 1000, "saved": 0, "to_run": 1000, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:33:09.030014Z"}
+{"step": "s6_perturbations", "saved": 1000, "of": 1000, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:33:33.466864Z"}
+{"step": "s7_execution_stress", "total": 5650, "saved": 0, "to_run": 5650, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:33:33.881085Z"}
+{"step": "s7_execution_stress", "saved": 2329, "of": 5650, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:34:34.035165Z"}
+{"step": "s7_execution_stress", "saved": 4937, "of": 5650, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:35:34.099522Z"}
+{"step": "s7_execution_stress", "saved": 5650, "of": 5650, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:35:50.904022Z"}
+{"stage": "7 execution stress", "evaluated": 50, "passed": 50, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:35:51.022679Z"}
+develop done: 3840 configs -> 50 representatives -> 50 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_cl_v4_15m
+=== cb_bbkc_cl_v4_15m validate 2026-11-11T19:35:57Z
+validate: 50 frozen -> 6 pass validation (previously-inspected data). Selection manifest sha256 e882acdf45206f10
+=== cb_bbkc_cl_v4_15m luck 2026-11-11T19:36:11Z
+cb_bbkc_cl_v4_15m: 50 finalists re-run on validation and matched exactly
+cb_bbkc_cl_v4_15m 15min|long: 13 levels x 100 sims (long share 1.00, median trade 10 bars)
+cb_bbkc_cl_v4_15m 15min|both: 40 levels x 100 sims (long share 0.51, median trade 6 bars)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_cl_v4_15m/random_benchmark.json
+=== cb_bbkc_cl_v4_15m done 2026-11-11T19:38:10Z
+=== cb_bbkc_gc_v4_15m develop 2026-11-11T19:38:10Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-11T19:38:23.052084Z"}
+{"n": 3840, "elapsed_s": 96.8, "event": "prep_built", "level": "info", "timestamp": "2026-11-11T19:39:49.521314Z"}
+{"stage": "1 backtest integrity", "evaluated": 3840, "passed": 3840, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:39:49.624182Z"}
+{"stage": "2 trade count & coverage", "evaluated": 3840, "passed": 3216, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:39:49.726014Z"}
+{"stage": "3 performance & risk", "evaluated": 3216, "passed": 71, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:39:49.769765Z"}
+{"step": "s4_local_moves", "total": 658, "saved": 0, "to_run": 658, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:39:50.103837Z"}
+{"step": "s4_local_moves", "saved": 645, "of": 658, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:40:12.995741Z"}
+{"reused_from_prep": 0, "backtested": 658, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-11T19:40:12.998801Z"}
+{"stage": "4 parameter stability", "evaluated": 71, "passed": 67, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:40:13.027769Z"}
+{"stage": "5 time stability", "evaluated": 67, "passed": 67, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:40:13.030120Z"}
+{"step": "s6_intervals", "total": 67, "saved": 0, "to_run": 67, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:40:13.054119Z"}
+{"step": "s6_intervals", "saved": 67, "of": 67, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:40:23.107751Z"}
+{"step": "s6_perturbations", "total": 860, "saved": 0, "to_run": 860, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:40:23.346238Z"}
+{"step": "s6_perturbations", "saved": 860, "of": 860, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:40:42.075051Z"}
+{"step": "s7_execution_stress", "total": 4859, "saved": 0, "to_run": 4859, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:40:42.267327Z"}
+{"step": "s7_execution_stress", "saved": 4685, "of": 4859, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:41:42.366804Z"}
+{"step": "s7_execution_stress", "saved": 4859, "of": 4859, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:41:44.659802Z"}
+{"stage": "7 execution stress", "evaluated": 43, "passed": 43, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:41:44.713719Z"}
+develop done: 3840 configs -> 43 representatives -> 43 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_gc_v4_15m
+=== cb_bbkc_gc_v4_15m validate 2026-11-11T19:41:46Z
+validate: 43 frozen -> 12 pass validation (previously-inspected data). Selection manifest sha256 3042d146e3b30ac1
+=== cb_bbkc_gc_v4_15m luck 2026-11-11T19:41:55Z
+cb_bbkc_gc_v4_15m: 43 finalists re-run on validation and matched exactly
+cb_bbkc_gc_v4_15m 15min|long: 15 levels x 100 sims (long share 1.00, median trade 7 bars)
+cb_bbkc_gc_v4_15m 15min|both: 32 levels x 100 sims (long share 0.50, median trade 9 bars)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_gc_v4_15m/random_benchmark.json
+=== cb_bbkc_gc_v4_15m done 2026-11-11T19:42:38Z
+=== cb_bbkc_6e_v4_15m develop 2026-11-11T19:42:38Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-11T19:42:50.153743Z"}
+{"n": 3840, "elapsed_s": 68.8, "event": "prep_built", "level": "info", "timestamp": "2026-11-11T19:43:49.937701Z"}
+{"stage": "1 backtest integrity", "evaluated": 3840, "passed": 3840, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:43:50.003509Z"}
+{"stage": "2 trade count & coverage", "evaluated": 3840, "passed": 3264, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:43:50.060589Z"}
+{"stage": "3 performance & risk", "evaluated": 3264, "passed": 40, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:43:50.085315Z"}
+{"step": "s4_local_moves", "total": 398, "saved": 0, "to_run": 398, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:43:50.284570Z"}
+{"step": "s4_local_moves", "saved": 392, "of": 398, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:44:06.945217Z"}
+{"reused_from_prep": 0, "backtested": 398, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-11T19:44:06.946476Z"}
+{"stage": "4 parameter stability", "evaluated": 40, "passed": 40, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:44:06.959296Z"}
+{"stage": "5 time stability", "evaluated": 40, "passed": 40, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:44:06.960417Z"}
+{"step": "s6_intervals", "total": 40, "saved": 0, "to_run": 40, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:44:06.972677Z"}
+{"step": "s6_intervals", "saved": 40, "of": 40, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:44:12.684876Z"}
+{"step": "s6_perturbations", "total": 460, "saved": 0, "to_run": 460, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:44:12.772497Z"}
+{"step": "s6_perturbations", "saved": 460, "of": 460, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:44:26.628435Z"}
+{"step": "s7_execution_stress", "total": 2599, "saved": 0, "to_run": 2599, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:44:26.766136Z"}
+{"step": "s7_execution_stress", "saved": 2599, "of": 2599, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:45:08.562825Z"}
+{"stage": "7 execution stress", "evaluated": 23, "passed": 23, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:45:08.603107Z"}
+{"step": "s9_transfer", "total": 23, "saved": 0, "to_run": 23, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:45:14.014987Z"}
+{"step": "s9_transfer", "saved": 23, "of": 23, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:45:19.935128Z"}
+develop done: 3840 configs -> 23 representatives -> 23 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_6e_v4_15m
+=== cb_bbkc_6e_v4_15m validate 2026-11-11T19:45:20Z
+validate: 23 frozen -> 2 pass validation (previously-inspected data). Selection manifest sha256 d1bbdfd2cf8a2fca
+=== cb_bbkc_6e_v4_15m luck 2026-11-11T19:45:30Z
+cb_bbkc_6e_v4_15m: 23 finalists re-run on validation and matched exactly
+cb_bbkc_6e_v4_15m 15min|long: 9 levels x 100 sims (long share 1.00, median trade 11 bars)
+cb_bbkc_6e_v4_15m 15min|both: 27 levels x 100 sims (long share 0.49, median trade 11 bars)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_6e_v4_15m/random_benchmark.json
+=== cb_bbkc_6e_v4_15m done 2026-11-11T19:45:59Z
+=== cb_bbkc_6j_v4_15m develop 2026-11-11T19:45:59Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-11T19:46:10.535550Z"}
+{"n": 3840, "elapsed_s": 66.4, "event": "prep_built", "level": "info", "timestamp": "2026-11-11T19:47:08.175798Z"}
+{"stage": "1 backtest integrity", "evaluated": 3840, "passed": 3840, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:47:08.232782Z"}
+{"stage": "2 trade count & coverage", "evaluated": 3840, "passed": 3258, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:47:08.280646Z"}
+{"stage": "3 performance & risk", "evaluated": 3258, "passed": 4, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:47:08.303581Z"}
+{"step": "s4_local_moves", "total": 35, "saved": 0, "to_run": 35, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:47:08.466366Z"}
+{"step": "s4_local_moves", "saved": 35, "of": 35, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:47:13.518652Z"}
+{"reused_from_prep": 0, "backtested": 35, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-11T19:47:13.518976Z"}
+{"stage": "4 parameter stability", "evaluated": 4, "passed": 3, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:47:13.520685Z"}
+{"stage": "5 time stability", "evaluated": 3, "passed": 3, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:47:13.520930Z"}
+{"step": "s6_intervals", "total": 3, "saved": 0, "to_run": 3, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:47:13.525794Z"}
+{"step": "s6_intervals", "saved": 3, "of": 3, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:47:13.791734Z"}
+{"step": "s6_perturbations", "total": 60, "saved": 0, "to_run": 60, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:47:13.800339Z"}
+{"step": "s6_perturbations", "saved": 60, "of": 60, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:47:19.645513Z"}
+{"step": "s7_execution_stress", "total": 339, "saved": 0, "to_run": 339, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:47:19.666456Z"}
+{"step": "s7_execution_stress", "saved": 339, "of": 339, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:47:28.528981Z"}
+{"stage": "7 execution stress", "evaluated": 3, "passed": 3, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:47:28.533170Z"}
+{"step": "s9_transfer", "total": 3, "saved": 0, "to_run": 3, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:47:30.162888Z"}
+{"step": "s9_transfer", "saved": 3, "of": 3, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:47:30.408422Z"}
+develop done: 3840 configs -> 3 representatives -> 3 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_6j_v4_15m
+=== cb_bbkc_6j_v4_15m validate 2026-11-11T19:47:31Z
+validate: 3 frozen -> 0 pass validation (previously-inspected data). Selection manifest sha256 1a2224f236470c83
+=== cb_bbkc_6j_v4_15m luck 2026-11-11T19:47:35Z
+cb_bbkc_6j_v4_15m: 3 finalists re-run on validation and matched exactly
+cb_bbkc_6j_v4_15m 15min|long: 1 levels x 100 sims (long share 1.00, median trade 8 bars)
+cb_bbkc_6j_v4_15m 15min|both: 1 levels x 100 sims (long share 0.52, median trade 9 bars)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_6j_v4_15m/random_benchmark.json
+=== cb_bbkc_6j_v4_15m done 2026-11-11T19:47:39Z
+=== cb_bbkc_zn_v4_15m develop 2026-11-11T19:47:39Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-11T19:47:50.893597Z"}
+{"n": 3840, "elapsed_s": 73.5, "event": "prep_built", "level": "info", "timestamp": "2026-11-11T19:48:55.171877Z"}
+{"stage": "1 backtest integrity", "evaluated": 3840, "passed": 3840, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:48:55.228458Z"}
+{"stage": "2 trade count & coverage", "evaluated": 3840, "passed": 3420, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:48:55.275172Z"}
+{"stage": "3 performance & risk", "evaluated": 3420, "passed": 0, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:48:55.298561Z"}
+{"reused_from_prep": 0, "backtested": 0, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-11T19:48:55.482434Z"}
+{"stage": "4 parameter stability", "evaluated": 0, "passed": 0, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:48:55.482680Z"}
+{"stage": "5 time stability", "evaluated": 0, "passed": 0, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:48:55.482754Z"}
+{"stage": "7 execution stress", "evaluated": 0, "passed": 0, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:48:55.482910Z"}
+develop done: 3840 configs -> 0 representatives -> 0 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_zn_v4_15m
+=== cb_bbkc_zn_v4_15m validate 2026-11-11T19:48:56Z
+validate: 0 frozen -> 0 pass validation (previously-inspected data). Selection manifest sha256 1b537a4a4413e7bf
+=== cb_bbkc_zn_v4_15m luck 2026-11-11T19:49:00Z
+cb_bbkc_zn_v4_15m: 0 finalists re-run on validation and matched exactly
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/compression-breakout-backtest/runs/funnel/cb_bbkc_zn_v4_15m/random_benchmark.json
+=== cb_bbkc_zn_v4_15m done 2026-11-11T19:49:03Z
+=== cb_bbkc_es_v4_15m develop 2026-11-11T19:49:03Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-11T19:49:14.224961Z"}
+{"n": 3840, "elapsed_s": 75.9, "event": "prep_built", "level": "info", "timestamp": "2026-11-11T19:50:21.262089Z"}
+{"stage": "1 backtest integrity", "evaluated": 3840, "passed": 3840, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:50:21.319519Z"}
+{"stage": "2 trade count & coverage", "evaluated": 3840, "passed": 3529, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:50:21.363981Z"}
+{"stage": "3 performance & risk", "evaluated": 3529, "passed": 400, "event": "stage_done", "level": "info", "timestamp": "2026-11-11T19:50:21.386579Z"}
+{"step": "s4_local_moves", "total": 3925, "saved": 0, "to_run": 3925, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-11T19:50:21.750635Z"}
+{"step": "s4_local_moves", "saved": 4, "of": 3925, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-11T19:50:26.060114Z"}

@@ -1,0 +1,417 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 40,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 10,
+      "config_id": "cfg_a82cf5223fff935bbf3f",
+      "dev_net_return": 0.21833500000006234,
+      "dev_order": 6,
+      "dev_sharpe": 0.9208805564747025,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.7106409823293658,
+      "params": {
+        "compression": "bbkc",
+        "direction": "both",
+        "entry_type": "wick",
+        "kc_mult": 3.5,
+        "min_box_atr": 0.0,
+        "min_squeeze_bars": 4,
+        "setup_expiry_bars": 4,
+        "squeeze_length": 25,
+        "stop": "box",
+        "symbol": "GC",
+        "target_r": "none",
+        "timeframe": "15min",
+        "trend_filter": "ema50"
+      },
+      "stability_median_sharpe": 0.8880639658345592
+    }
+  ],
+  "code_version": "36bde5f6ce840cd00fa45af75cdb3de4b71385d6",
+  "config_sha256": "bdeb654f290810ba505df919e4cf5edd48286daeb78ac8c9126bf65e0408d47d",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "15min"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "cb_bbkc_gc_v4_15m",
+  "frozen_at": "2026-11-11T19:41:44.713917+00:00",
+  "frozen_manifest_sha256": "d76e486f43011ade131fd65a040b8278454bd18e8a90d9614447dfb0326144ac",
+  "git_diff_sha256": "99d2740b62665468fe36a7b28a375a31836aad811db800395ade2904461a4b88",
+  "git_dirty": true,
+  "holdout_selection": {
+    "parent_manifest": "runs/funnel/cb_bbkc_gc_v4_15m/selection_manifest.json",
+    "parent_manifest_sha256_file": "54146e00ce84a699c2d0c3c3bdd19e2de550fccc6c3f7903549345815466cc6b",
+    "plan": "Score each on 2025+ with the config acceptance rules.",
+    "rationale": "Picked by holistic review across RTY/CL/GC/6E/6J/ZN/ZB v4 finalists (dev/val Sharpe and PF, beats-luck, local and perturbation stability, cost/delay stress, profitable years, distinctness); 5 chosen: GC #6, RTY #101/#199/#80, CL #25. Chosen using development and 2023-2024 data only.",
+    "selected_at": "2026-11-11T20:06:50.874919+00:00",
+    "selected_by": "user, 2026-11-11, before any holdout access",
+    "selected_dev_orders": [
+      6
+    ]
+  },
+  "seed": 20261112,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, best 2 per cluster)",
+      "7 execution stress"
+    ],
+    "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": false,
+    "commission_minimum": 0.0,
+    "commission_per_contract": 2.5,
+    "commission_per_share": 0.0,
+    "extended_hours_slippage_multiplier": 1.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "instrument_type": "futures",
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 0.0,
+    "slippage_bps_stop": 0.0,
+    "slippage_ticks_market": 1.0,
+    "slippage_ticks_stop": 1.0,
+    "starting_equity": 1000000.0
+  },
+  "symbol": "GC",
+  "validated_at": "2026-11-11T19:41:55.134921+00:00",
+  "validation_summary": [
+    {
+      "config_id": "cfg_cf08b02b3732c2784912",
+      "reasons": [
+        "net_return -0.0200 <= 0.0",
+        "sharpe -0.340 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_4953355f68c9dd67e054",
+      "reasons": [
+        "net_return -0.0149 <= 0.0",
+        "sharpe -0.250 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_34e9bc4460b90d32795f",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_6e71bc95008e35a8e981",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_a7eca098a79345ffdf16",
+      "reasons": [
+        "net_return -0.0353 <= 0.0",
+        "sharpe -0.495 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_a82cf5223fff935bbf3f",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_00807624b052291970f8",
+      "reasons": [
+        "net_return -0.0156 <= 0.0",
+        "sharpe -0.362 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5837420cea08689a9477",
+      "reasons": [
+        "sharpe 0.081 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_22569d43df27faf691b4",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_5540d780d6c8d5543a49",
+      "reasons": [
+        "net_return -0.0308 <= 0.0",
+        "sharpe -0.583 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0fb5a29aa73d85f27147",
+      "reasons": [
+        "sharpe 0.085 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_a76d5ec56c0eb4f3d294",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_7e34639beb6a824ded40",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_90b42f2f579478c40c72",
+      "reasons": [
+        "sharpe 0.071 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_52b12ead58d9f90248f9",
+      "reasons": [
+        "net_return -0.0178 <= 0.0",
+        "sharpe -0.360 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_d0e47a5e623342d66021",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_2fad26cd388f0ac2a40c",
+      "reasons": [
+        "net_return -0.0072 <= 0.0",
+        "sharpe -0.159 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_b59670163a94cd2f286c",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_eaee1d7cdfb65b455c60",
+      "reasons": [
+        "net_return -0.0024 <= 0.0",
+        "sharpe -0.030 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_62de0616597af30647f3",
+      "reasons": [
+        "net_return -0.0025 <= 0.0",
+        "sharpe -0.029 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_d8de2e2ee54e60d80891",
+      "reasons": [
+        "net_return -0.0238 <= 0.0",
+        "sharpe -0.494 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_4b3c18f0b5365dbba410",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_c76adf78cad119c4b577",
+      "reasons": [
+        "net_return -0.0392 <= 0.0",
+        "sharpe -0.550 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_d8e0a041da8ee8ac7f39",
+      "reasons": [
+        "net_return -0.0410 <= 0.0",
+        "sharpe -0.581 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_a3fc516e0312fe827ded",
+      "reasons": [
+        "net_return -0.0385 <= 0.0",
+        "sharpe -0.840 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2f56aebf89e20631795a",
+      "reasons": [
+        "net_return -0.0436 <= 0.0",
+        "sharpe -0.831 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_137e865c6028b9fc0804",
+      "reasons": [
+        "net_return -0.0317 <= 0.0",
+        "sharpe -0.448 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_6ebd3b8038b5ab239e3e",
+      "reasons": [
+        "net_return -0.0236 <= 0.0",
+        "sharpe -0.636 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_649e20d847ca0e1b99ca",
+      "reasons": [
+        "sharpe 0.085 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0d188678bba5df656460",
+      "reasons": [
+        "net_return -0.0136 <= 0.0",
+        "sharpe -0.263 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2ad04a62592babdb0a29",
+      "reasons": [
+        "sharpe 0.144 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_d002c720cf7a4ee18246",
+      "reasons": [
+        "net_return -0.0422 <= 0.0",
+        "sharpe -1.190 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_91bec73433aa92b42f74",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_6ed2111e9ad02fbc1e87",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_48cc98b2bd7d1301eda7",
+      "reasons": [
+        "net_return -0.0074 <= 0.0",
+        "sharpe -0.171 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_5befbb82284c3b94ec87",
+      "reasons": [
+        "net_return -0.0079 <= 0.0",
+        "sharpe -0.150 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_4b04864b34f7d6387197",
+      "reasons": [
+        "sharpe 0.201 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_303af190a669825a1849",
+      "reasons": [
+        "net_return -0.0445 <= 0.0",
+        "sharpe -1.264 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_6d5c985e741d129c99c6",
+      "reasons": [
+        "net_return -0.0163 <= 0.0",
+        "sharpe -0.195 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_9e06b1808ff576a9e70c",
+      "reasons": [
+        "sharpe 0.164 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_0060063cb7dfc1671381",
+      "reasons": [
+        "net_return -0.0223 <= 0.0",
+        "sharpe -0.278 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_4d5d79c45ce7dd683496",
+      "reasons": [
+        "sharpe 0.087 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_2acb64f9b331d01ad489",
+      "reasons": [],
+      "status": "pass"
+    }
+  ]
+}

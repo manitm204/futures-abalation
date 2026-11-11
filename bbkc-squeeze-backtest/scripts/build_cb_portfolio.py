@@ -5,7 +5,7 @@ The compression-breakout copy of ../noise-band-backtest/scripts/build_nb_portfol
 page ("portfolio" kind on the results site), same shared-account rules, same period
 switcher. Differences from that one:
   * legs are compression-breakout finalists (`--leg RUN:ORDER`, config
-    configs/funnel/<run with "_es_" -> "_funnel_es_">.yaml, e.g. cb_bbkc_es_v2_15m ->
+    configs/funnel/<line>_funnel_<rest>.yaml, e.g. cb_bbkc_es_v2_15m ->
     cb_bbkc_funnel_es_v2_15m.yaml), simulated with the compression-breakout backtester;
   * the luck benchmark is the noise band's (src/experiments/nb_random_entry.py), as in
     run_cb_random_benchmark.py:
@@ -160,7 +160,8 @@ def main(
     specs = []
     for spec in leg:
         run_id, order = spec.split(":")
-        cfg_path = PROJECT_ROOT / "configs" / "funnel" / f"{run_id.replace('_es_', '_funnel_es_', 1)}.yaml"
+        line, rest = run_id.split("_", 2)[:2], run_id.split("_", 2)[2]  # cb_bbkc_nq_v3_15m -> cb_bbkc_funnel_nq_v3_15m
+        cfg_path = PROJECT_ROOT / "configs" / "funnel" / f"{'_'.join(line)}_funnel_{rest}.yaml"
         fc = load_funnel_config(cfg_path)
         _select_space(fc)  # _params builds configs of this run's grid
         cands = {c["dev_order"]: c for c in json.loads((runs_root / run_id / "frozen_representatives.json").read_text())["candidates"]}
@@ -169,7 +170,8 @@ def main(
                       "params": _params(c["params"]), "tf": c["params"]["timeframe"]})
     fcfg = specs[0]["fcfg"]
     for sp in specs[1:]:
-        if sp["fcfg"].symbol != fcfg.symbol or sp["fcfg"].data != fcfg.data:
+        same = sp["fcfg"].data.model_dump(exclude={"timeframes"}) == fcfg.data.model_dump(exclude={"timeframes"})
+        if sp["fcfg"].symbol != fcfg.symbol or not same:  # legs may use different bar sizes
             raise typer.BadParameter("all legs must share one market and the same data windows")
     tfs = sorted({sp["tf"] for sp in specs}, key=AGG_INTERVAL_MINUTES.get)
     multi_tf = len(tfs) > 1
@@ -181,7 +183,10 @@ def main(
     prior_access = None
     if holdout:
         accepted = dict(a.split("=", 1) for a in ([accept_config_change] if accept_config_change else []))
-        prior_access = sum(e.get("phase") == "holdout" and e.get("symbol") == fcfg.symbol for e in read_ledger(DEFAULT_LEDGER))
+        # The final-test of these same frozen runs is not an earlier look at a different selection.
+        prior_access = sum(e.get("phase") == "holdout" and e.get("symbol") == fcfg.symbol
+                           and not (e.get("command") == "final-test" and e.get("experiment_id") in runs)
+                           for e in read_ledger(DEFAULT_LEDGER))
         shas = []
         for run_id in runs:
             sp = next(x for x in specs if x["run"] == run_id)
@@ -399,7 +404,7 @@ def main(
         "days": [str(d) for d in days], "periods": {k: {"range": list(v), "label": labels[k]} for k, v in periods.items()},
         "legs": legs, "combined": combined, "hold": hold,
         "data_access": info,
-        "source": " · ".join([f"compression-breakout-backtest/runs/funnel/{r}/" for r in runs]
+        "source": " · ".join([f"bbkc-squeeze-backtest/runs/funnel/{r}/" for r in runs]
                              + sorted({sp["config"].relative_to(PROJECT_ROOT).as_posix() for sp in specs})
                              + ["scripts/build_cb_portfolio.py"]),
     }
