@@ -1,12 +1,13 @@
 """Dump frozen strategies' runs for the cross-family ES page (scripts/build_es_combined.py).
 
-Family-neutral: run it from inside EITHER project (mean-reversion-backtest or
-noise-band-backtest) with that project's venv and PYTHONPATH=. -- it imports that
-project's own `src` / `scripts`:
+Family-neutral: run it from inside the family's project (mean-reversion-backtest,
+noise-band-backtest or bbkc-squeeze-backtest) with that project's venv and
+PYTHONPATH=. -- it imports that project's own `src` / `scripts`:
 
   python ../noise-band-backtest/scripts/dump_family_runs.py FAMILY RUN PHASE OUT.npz ORDER [ORDER ...]
 
-FAMILY mr | nb, RUN a funnel run id (configs/funnel/<mr|nb>_funnel_<run>.yaml),
+FAMILY mr | nb | cb, RUN a funnel run id (configs/funnel/<mr|nb>_funnel_<run>.yaml; for cb,
+cb_bbkc_es_v2_15m -> configs/funnel/cb_bbkc_funnel_es_v2_15m.yaml, cb_bbkc_nq_v3_5m -> cb_bbkc_funnel_nq_v3_5m.yaml),
 PHASE full (development + validation, 2018 .. validation end) | holdout (2025+;
 needs the run's frozen selection manifest, goes through authorize_holdout_access and
 is ledgered as command `cross_family_holdout`).
@@ -44,21 +45,36 @@ def main(fam: str, run_id: str, phase: str, out: str, orders: list[int]) -> None
         from src.experiments.random_entry import simulate_random_entries
         from src.strategies.mean_reversion.backtest import MRData as Data
         from src.strategies.mean_reversion.backtest import simulate_mean_reversion as simulate
-    else:
+    elif fam == "nb":
         from scripts.run_nb_funnel import _params, _select_space, _sha
         from src.experiments.nb_random_entry import simulate_random_intraday
         from src.strategies.noise_band.backtest import NBData as Data
         from src.strategies.noise_band.backtest import simulate_noise_band as simulate
-    fcfg = load_funnel_config(Path(f"configs/funnel/{fam}_funnel_{run_id.removeprefix(fam + '_')}.yaml"))
+    else:  # compression breakout: the noise band's intraday random method, as on its own portfolio page
+        from scripts.run_cb_funnel import _params, _select_space, _sha
+        from src.experiments.nb_random_entry import simulate_random_intraday
+        from src.strategies.compression_breakout.backtest import CBData as Data
+        from src.strategies.compression_breakout.backtest import simulate_compression_breakout as simulate
+    # cb: <line>_<rest> -> <line>_funnel_<rest> (cb_bbkc_nq_v3_15m -> cb_bbkc_funnel_nq_v3_15m)
+    cfg_path = Path(f"configs/funnel/{'_'.join(run_id.split('_', 2)[:2])}_funnel_{run_id.split('_', 2)[2]}.yaml" if fam == "cb"
+                    else f"configs/funnel/{fam}_funnel_{run_id.removeprefix(fam + '_')}.yaml")
+    fcfg = load_funnel_config(cfg_path)
     _select_space(fcfg)
     ec = load_execution_config(fcfg)
     exp = Path("runs/funnel") / run_id
     cands = {c["dev_order"]: c for c in json.loads((exp / "frozen_representatives.json").read_text())["candidates"]}
-    tag = f"{run_id} (ES cross-family page)"
+    tag = f"{run_id} ({fcfg.symbol} cross-family page)"
     if phase == "holdout":
         sel = json.loads((exp / "selection_manifest.json").read_text())
         if fcfg.config_sha256() != sel["config_sha256"]:
-            raise SystemExit(f"{run_id}: config changed since the manifest was frozen")
+            # An exact copy of the config as frozen (written when only bookkeeping changed afterwards) is accepted
+            # if its hash matches; it must agree with the live config on everything a backtest reads.
+            frozen = cfg_path.with_suffix(".as_frozen.yaml")
+            ff = load_funnel_config(frozen) if frozen.exists() else None
+            if ff is None or ff.config_sha256() != sel["config_sha256"] or \
+                    ff.model_dump(exclude={"research_history"}) != fcfg.model_dump(exclude={"research_history"}):
+                raise SystemExit(f"{run_id}: config changed since the manifest was frozen")
+            print(f"{run_id}: using {frozen.name} (hash matches the frozen manifest; only research_history differs)")
         auth = authorize_holdout_access(manifest_sha256=hashlib.sha256(_sha(sel).encode()).hexdigest(), confirm=True,
                                         command="cross_family_holdout")
         bars, info = load_phase_bars(fcfg, fcfg.symbol, "holdout", command="cross_family_holdout", experiment_id=tag,
@@ -91,7 +107,7 @@ def main(fam: str, run_id: str, phase: str, out: str, orders: list[int]) -> None
         inw = (d.session_date[sim.entry_idx] >= s64) & (d.session_date[sim.entry_idx] <= e64)
         step = np.timedelta64(AGG_INTERVAL_MINUTES[tf], "m")
         rng = np.random.default_rng([fcfg.seed, o])  # the family portfolio page's seed for this strategy
-        if fam == "nb":
+        if fam in ("nb", "cb"):
             pool = (sim.exit_idx[inw] - sim.entry_idx[inw] + 1).astype(np.int64)
             p_long = float(np.mean(sim.side[inw] > 0))
         rand = []

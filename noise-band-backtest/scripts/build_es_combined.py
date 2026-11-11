@@ -1,8 +1,9 @@
-"""One market's chosen strategies together: its mean-reversion legs and noise-band legs,
-each strategy in its own fixed sleeve (`--market`, presets in PRESETS below):
-  ES: mr_es_v6_1h #8 + #15 and nb_es_v4 #17 + #104, 25% each;
-  NQ: mr_nq_v7_15m #1 + mr_nq_v7_1h #119 at 25% each and nb_nq_v2 #1 at 50%
-      (half the account per strategy family).
+"""One market's chosen strategies together: its mean-reversion, noise-band and (ES)
+squeeze-breakout legs, each strategy in its own fixed sleeve (`--market`, presets in PRESETS below):
+  ES: mr_es_v6_1h #8 + #15, nb_es_v4 #17 + #104 and cb_bbkc_es_v2_15m #12 + #50, a third of the
+      account per family (1/6 per strategy);
+  NQ: mr_nq_v7_15m #1 + mr_nq_v7_1h #119, nb_nq_v2 #1 and cb_bbkc_nq_v3_15m #7 + cb_bbkc_nq_v3_5m #13,
+      a third of the account per family (1/6 per MR or squeeze strategy, 1/3 for NB #1).
 
 Writes futures-results/data/<MARKET>/combined_families_v1.json and
 futures-results/<market>_combined.html (es_combined_template.html with the data inlined).
@@ -15,6 +16,9 @@ solo run scaled to the sleeve (as if sized in micro contracts: a $250k sleeve ca
 hold one whole ES contract), so a combination's equity is the average of its strategies'
 solo equity curves. Random-entry comparison: random run i of each strategy (that
 family's own method, at the strategy's own time in market) combined the same way.
+
+Any number of families: each gets its own group ("mr", "nb", "cb"), and the page shows
+every pair of families' correlation and overlap.
 
 Data: the per-family dumps from scripts/dump_family_runs.py, run inside each project
 with its own venv. `full` (2018 .. validation end) is re-dumped on every run; the holdout
@@ -41,58 +45,75 @@ from src.analysis.daily_performance import _drawdown, _sharpe
 NB_ROOT = Path(__file__).resolve().parents[1]
 ROOT = NB_ROOT.parent
 MR_ROOT = ROOT / "mean-reversion-backtest"
+CB_ROOT = ROOT / "bbkc-squeeze-backtest"
+ROOTS = {"mr": MR_ROOT, "nb": NB_ROOT, "cb": CB_ROOT}
 SITE = ROOT / "futures-results"
 CACHE = NB_ROOT / "runs" / "cross_family"
 DUMP = NB_ROOT / "scripts" / "dump_family_runs.py"
 PRESETS = {
     "ES": {
-        "legs": [("mr", "mr_es_v6_1h", 8), ("mr", "mr_es_v6_1h", 15), ("nb", "nb_es_v4", 17), ("nb", "nb_es_v4", 104)],
-        "weights": [0.25, 0.25, 0.25, 0.25],
-        "groups": {"mr": "Mean-reversion pair (#8 + #15)", "nb": "Noise-band pair (#17 + #104)", "all": "All 4 together"},
-        "text": {"all_short": "All 4", "all_word": "all four", "count_word": "four", "mr_short": "MR pair",
-                 "nb_short": "NB pair", "mr_w": "50/50", "nb_w": "50/50", "all_w": "25% each",
-                 "lede_legs": "The two chosen mean-reversion strategies and the two chosen noise-band strategies",
-                 "sleeve_desc": "$250,000 of a $1,000,000 account for all four together, or half the account each within a pair",
-                 "sleeve_small": "a $250,000 sleeve can't hold one whole ES contract",
-                 "holdout_caveat": "Each pair was frozen before its own holdout test and is unchanged here. But both holdout "
-                                   "results had been seen before this page combined them, so this view is a description, "
-                                   "not a fresh test: don't use it to pick a mix.",
-                 "val_caveat": "Not clean for either family: both pairs were picked with their 2023–2024 results in view "
-                               "(the noise-band pair directly on them). It shows how they held up, not proof."},
-        "runs_src": "mean-reversion-backtest/runs/funnel/mr_es_v6_1h/ · noise-band-backtest/runs/funnel/nb_es_v4/",
+        "legs": [("mr", "mr_es_v6_1h", 8), ("mr", "mr_es_v6_1h", 15), ("nb", "nb_es_v4", 17), ("nb", "nb_es_v4", 104),
+                 ("cb", "cb_bbkc_es_v2_15m", 12), ("cb", "cb_bbkc_es_v2_15m", 50)],
+        "weights": [1 / 6] * 6,
+        "groups": {"mr": "Mean-reversion pair (#8 + #15)", "nb": "Noise-band pair (#17 + #104)",
+                   "cb": "Squeeze pair (15m #12 + #50)", "all": "All 6 together"},
+        "text": {"all_short": "All 6", "all_word": "all six", "count_word": "six", "mr_short": "MR pair",
+                 "nb_short": "NB pair", "cb_short": "Squeeze pair", "mr_w": "50/50", "nb_w": "50/50", "cb_w": "50/50",
+                 "all_w": "1/6 each (a third per family)",
+                 "lede_legs": "The two chosen mean-reversion, two noise-band and two squeeze-breakout strategies",
+                 "sleeve_desc": "$166,667 of a $1,000,000 account for all six together (a third per family), or half "
+                                "the account each within a pair",
+                 "sleeve_small": "a $166,667 sleeve can't hold one whole ES contract",
+                 "holdout_caveat": "Each pair was frozen before its own holdout test and is unchanged here. But all three "
+                                   "holdout results had been seen before this page combined them (the squeeze pair's "
+                                   "#50 roughly broke even), so this view is a description, not a fresh test: don't use "
+                                   "it to pick a mix.",
+                 "val_caveat": "Not clean for any family: every pair was picked with its 2023–2024 results in view "
+                               "(the noise-band and squeeze pairs directly on them). It shows how they held up, not proof."},
+        "runs_src": "mean-reversion-backtest/runs/funnel/mr_es_v6_1h/ · noise-band-backtest/runs/funnel/nb_es_v4/ · "
+                    "bbkc-squeeze-backtest/runs/funnel/cb_bbkc_es_v2_15m/",
         "out": "es_combined.html",
     },
     "NQ": {
-        "legs": [("mr", "mr_nq_v7_15m", 1), ("mr", "mr_nq_v7_1h", 119), ("nb", "nb_nq_v2", 1)],
-        "weights": [0.25, 0.25, 0.50],
-        "groups": {"mr": "Mean-reversion pair (15m #1 + 1h #119)", "nb": "Noise-band #1", "all": "All 3 together"},
-        "text": {"all_short": "All 3", "all_word": "all three", "count_word": "three", "mr_short": "MR pair",
-                 "nb_short": "NB #1", "mr_w": "50/50", "nb_w": "alone", "all_w": "25% / 25% / 50%",
-                 "lede_legs": "The two chosen mean-reversion strategies and the chosen noise-band strategy",
-                 "sleeve_desc": "half the $1,000,000 account per strategy family: $250,000 for each mean-reversion "
-                                "strategy and $500,000 for the noise-band strategy (the pair alone splits 50/50)",
-                 "sleeve_small": "a $250,000 sleeve can't hold one whole NQ contract",
+        "legs": [("mr", "mr_nq_v7_15m", 1), ("mr", "mr_nq_v7_1h", 119), ("nb", "nb_nq_v2", 1),
+                 ("cb", "cb_bbkc_nq_v3_15m", 7), ("cb", "cb_bbkc_nq_v3_5m", 13)],
+        "weights": [1 / 6, 1 / 6, 1 / 3, 1 / 6, 1 / 6],
+        "groups": {"mr": "Mean-reversion pair (15m #1 + 1h #119)", "nb": "Noise-band #1",
+                   "cb": "Squeeze pair (15m #7 + 5m #13)", "all": "All 5 together"},
+        "text": {"all_short": "All 5", "all_word": "all five", "count_word": "five", "mr_short": "MR pair",
+                 "nb_short": "NB #1", "cb_short": "Squeeze pair", "mr_w": "50/50", "nb_w": "alone", "cb_w": "50/50",
+                 "all_w": "a third per family (1/6 per MR or squeeze strategy, 1/3 for NB #1)",
+                 "lede_legs": "The two chosen mean-reversion strategies, the chosen noise-band strategy and the two "
+                              "chosen squeeze-breakout strategies",
+                 "sleeve_desc": "a third of the $1,000,000 account per strategy family: $166,667 for each "
+                                "mean-reversion and squeeze strategy and $333,333 for the noise-band strategy (a pair "
+                                "alone splits 50/50)",
+                 "sleeve_small": "a $166,667 sleeve can't hold one whole NQ contract",
                  "holdout_caveat": "Each family's strategies were frozen before their own holdout test and are unchanged "
-                                   "here. But both holdout results had been seen before this page combined them, and the "
-                                   "50/50 family split was chosen afterwards, so this view is a description, not a fresh "
-                                   "test: don't use it to pick a mix.",
-                 "val_caveat": "Not clean for either family: both were picked with their 2023–2024 results in view "
-                               "(the noise-band strategy directly on them). It shows how they held up, not proof."},
-        "runs_src": "mean-reversion-backtest/runs/funnel/mr_nq_v7_15m/ + mr_nq_v7_1h/ · noise-band-backtest/runs/funnel/nb_nq_v2/",
+                                   "here. But all three holdout results had been seen before this page combined them "
+                                   "(the mean-reversion pair lost), and the third-per-family split was chosen "
+                                   "afterwards, so this view is a description, not a fresh test: don't use it to pick a mix.",
+                 "val_caveat": "Not clean for any family: every one was picked with its 2023–2024 results in view "
+                               "(the noise-band and squeeze strategies directly on them). It shows how they held up, "
+                               "not proof."},
+        "runs_src": "mean-reversion-backtest/runs/funnel/mr_nq_v7_15m/ + mr_nq_v7_1h/ · noise-band-backtest/runs/funnel/nb_nq_v2/ · "
+                    "bbkc-squeeze-backtest/runs/funnel/cb_bbkc_nq_v3_15m/ + cb_bbkc_nq_v3_5m/",
         "out": "nq_combined.html",
     },
 }
 LEGS: list = PRESETS["ES"]["legs"]
 WEIGHTS: list = PRESETS["ES"]["weights"]
-FAMILY = {"mr": "Mean reversion", "nb": "Noise-band breakout"}
+FAMILY = {"mr": "Mean reversion", "nb": "Noise-band breakout", "cb": "BB/KC squeeze"}
+SHORT = {"mr": "MR", "nb": "NB", "cb": "SQ"}
 QS = (0.05, 0.10, 0.50, 0.90, 0.95)
 app = typer.Typer(add_completion=False)
 
 
-def _dump(phase: str) -> None:
+def _dump(phase: str, only: set | None = None) -> None:
+    """Dump every leg's run for `phase`, or only the runs in `only`."""
     CACHE.mkdir(parents=True, exist_ok=True)
-    for fam, root in (("mr", MR_ROOT), ("nb", NB_ROOT)):
-        runs = sorted({r for f, r, _ in LEGS if f == fam})
+    for fam, root in ROOTS.items():
+        runs = sorted({r for f, r, _ in LEGS if f == fam and (only is None or r in only)})
         for run in runs:
             orders = [str(o) for f, r, o in LEGS if f == fam and r == run]
             out = CACHE / f"{phase}_{run}.npz"
@@ -155,9 +176,9 @@ def _build_phase(P: dict, periods: dict) -> dict:
             m[np.searchsorted(ref, a, "left"):np.searchsorted(ref, b, "left")] = True
         occ[k] = m
     ref_day = ref.astype("datetime64[D]")
+    fams = _families()
     groups = {k: [k] for k in keys}
-    groups.update({"mr": [k for k in keys if k.startswith("mr")], "nb": [k for k in keys if k.startswith("nb")],
-                   "all": keys})
+    groups.update({f: [k for k in keys if k.startswith(f)] for f in fams} | {"all": keys})
     wt = dict(zip(keys, WEIGHTS))
 
     def mix(src, ks):  # fixed sleeves: "all" uses the preset weights, a family splits its money equally
@@ -167,7 +188,7 @@ def _build_phase(P: dict, periods: dict) -> dict:
     rcurves = {g: mix(rnd, ks) for g, ks in groups.items()}
     hold = z["hold"]
     rets = {k: eq[k][1:] / eq[k][:-1] - 1 for k in keys}
-    gret = {g: curves[g][1:] / curves[g][:-1] - 1 for g in ("mr", "nb")}
+    gret = {g: curves[g][1:] / curves[g][:-1] - 1 for g in fams}
     months = days.astype("datetime64[M]")
 
     out_p = {}
@@ -196,22 +217,24 @@ def _build_phase(P: dict, periods: dict) -> dict:
                 "mean_max_drawdown": float(np.mean([x["max_drawdown"] for x in rst])),
                 "band": {f"p{int(q * 100)}": np.round(np.quantile(rs, q, axis=0), 4).tolist() for q in QS}
                         | {"mean": np.round(rs.mean(axis=0), 4).tolist()}}}
-        o_mr = np.logical_or.reduce([occ[k] for k in groups["mr"]]) & bars
-        o_nb = np.logical_or.reduce([occ[k] for k in groups["nb"]]) & bars
+        of = {f: np.logical_or.reduce([occ[k] for k in groups[f]]) & bars for f in fams}
+        n_fam = np.sum([of[f] for f in fams], axis=0)
         n_open = np.sum([occ[k] & bars for k in keys], axis=0)
         sl = slice(a, b + 1)
         mk = months[sl]
         um = np.unique(mk)
-        mon = {g: np.array([np.prod(1 + gret[g][sl][mk == m]) - 1 for m in um]) for g in ("mr", "nb")}
+        mon = {g: np.array([np.prod(1 + gret[g][sl][mk == m]) - 1 for m in um]) for g in fams}
         out_p[pk] = {
             "groups": per,
             "hold": _stats(hold[a:b + 2]),
+            # Family matrices in `fams` order; [i][j] of "while" = share of family i's time in market that j is in too.
             "corr": {"legs": [[_corr(rets[x][sl], rets[y][sl]) for y in keys] for x in keys],
-                     "families_daily": _corr(gret["mr"][sl], gret["nb"][sl]),
-                     "families_monthly": _corr(mon["mr"], mon["nb"])},
-            "overlap": {"both_families": float((o_mr & o_nb).sum() / bars.sum()),
-                        "nb_while_mr": float((o_mr & o_nb).sum() / o_mr.sum()) if o_mr.any() else None,
-                        "mr_while_nb": float((o_mr & o_nb).sum() / o_nb.sum()) if o_nb.any() else None,
+                     "families_daily": [[_corr(gret[x][sl], gret[y][sl]) for y in fams] for x in fams],
+                     "families_monthly": [[_corr(mon[x], mon[y]) for y in fams] for x in fams]},
+            "overlap": {"multi_family": float((n_fam >= 2).sum() / bars.sum()),
+                        "while": [[float((of[x] & of[y]).sum() / of[x].sum()) if of[x].any() else None for y in fams]
+                                  for x in fams],
+                        "pair_time": [[float((of[x] & of[y]).sum() / bars.sum()) for y in fams] for x in fams],
                         "open_count": [float(((n_open == i) & bars).sum() / bars.sum()) for i in range(len(keys) + 1)]},
         }
     return {
@@ -225,6 +248,11 @@ def _build_phase(P: dict, periods: dict) -> dict:
     }
 
 
+def _families() -> list[str]:
+    """Families in the order their legs are listed."""
+    return list(dict.fromkeys(f for f, _, _ in LEGS))
+
+
 @app.command()
 def main(market: str = typer.Option("ES", help=f"One of {sorted(PRESETS)}"),
          refresh_holdout: bool = typer.Option(False, "--refresh-holdout"),
@@ -235,10 +263,11 @@ def main(market: str = typer.Option("ES", help=f"One of {sorted(PRESETS)}"),
     pre = PRESETS[market]
     LEGS, WEIGHTS = pre["legs"], pre["weights"]
     _dump("full")
-    if refresh_holdout or not all((CACHE / f"holdout_{r}.npz").exists() for r in {r for _, r, _ in LEGS}):
+    missing = {r for _, r, _ in LEGS if not (CACHE / f"holdout_{r}.npz").exists()}
+    if refresh_holdout or missing:
         if not confirm_holdout_access:
             raise typer.BadParameter("The holdout dump needs --confirm-holdout-access (ledgered holdout read).")
-        _dump("holdout")
+        _dump("holdout", None if refresh_holdout else missing)  # only the uncached runs unless --refresh-holdout
     full, hol = _load("full"), _load("holdout")
     days = np.asarray(full["z"]["days"])
     n_dev = int((days <= np.datetime64(full["meta"]["dev_end"], "D")).sum())
@@ -249,7 +278,7 @@ def main(market: str = typer.Option("ES", help=f"One of {sorted(PRESETS)}"),
         m = full["meta"]["legs"][f"{fam}{o}"]
         legs.append({"key": f"{fam}{o}", "family": FAMILY[fam], "family_key": fam, "run_id": run, "order": o,
                      "timeframe": m["timeframe"], "config_id": m["config_id"][:8], "params": m["params"],
-                     "name": f"{'MR' if fam == 'mr' else 'NB'} #{o} ({m['timeframe'].replace('min', 'm')})"})
+                     "name": f"{SHORT[fam]} #{o} ({m['timeframe'].replace('min', 'm')})"})
     w = out_full["window"]
     doc = {
         "kind": "es_combined", "symbol": market, "name": f"{market} strategies together",
@@ -257,7 +286,8 @@ def main(market: str = typer.Option("ES", help=f"One of {sorted(PRESETS)}"),
         "starting_equity": full["meta"]["starting_equity"], "n_sims": full["meta"]["n_sims"],
         "legs": [{**leg, "weight": w} for leg, w in zip(legs, WEIGHTS)],
         "groups": pre["groups"],
-        "group_n": {"mr": sum(f == "mr" for f, _, _ in LEGS), "nb": sum(f == "nb" for f, _, _ in LEGS), "all": len(LEGS)},
+        "families": [{"key": f, "label": FAMILY[f], "n": sum(x == f for x, _, _ in LEGS)} for f in _families()],
+        "group_n": {f: sum(x == f for x, _, _ in LEGS) for f in _families()} | {"all": len(LEGS)},
         "text": pre["text"],
         "sleeves": {"all": min(WEIGHTS), "pair": 0.5},
         "phases": {
@@ -274,8 +304,10 @@ def main(market: str = typer.Option("ES", help=f"One of {sorted(PRESETS)}"),
     html.write_text(tpl.replace("/*__DATA__*/null", json.dumps(doc, separators=(",", ":")).replace("</", "<\\/")))
     for pk, P in [("all", out_full["periods"]["all"]), ("holdout", out_hold["periods"]["holdout"])]:
         s = P["groups"]["all"]
+        fc = P["corr"]["families_daily"]
+        pairs = ", ".join(f"{a}-{b} {fc[i][j]:.2f}" for i, a in enumerate(_families()) for j, b in enumerate(_families()) if i < j)
         typer.echo(f"{pre['text']['all_short']} {pk}: return {s['stats']['net_return']:+.1%}, Sharpe {s['stats']['sharpe']:.2f}, "
-                   f"beats {s['luck']['pct_sharpe']:.0%} of random; families corr {P['corr']['families_daily']:.2f}")
+                   f"beats {s['luck']['pct_sharpe']:.0%} of random; family corr (daily) {pairs}")
     typer.echo(f"wrote {js} and {html}")
 
 

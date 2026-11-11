@@ -11,7 +11,7 @@
 :root {
   --bg: #f4f6f8; --surface: #ffffff; --fg: #16202b; --muted: #5a6774; --line: #d8dfe6;
   --accent: #2f6fb0; --accent-soft: #e3edf8; --pass: #2d7f52; --fail: #b93b35; --fail-soft: #f8e4e2;
-  --mr: #7a4fb5; --nb: #c0602a; --hold: #7d8a96; --band: #c9d9eb; --band2: #e3edf8;
+  --mr: #7a4fb5; --nb: #c0602a; --cb: #1e8572; --hold: #7d8a96; --band: #c9d9eb; --band2: #e3edf8;
   --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
   --font-body: "Public Sans", "Segoe UI", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -21,13 +21,13 @@
   :root:not([data-theme="light"]) {
     --bg: #0f151b; --surface: #17202a; --fg: #e5ebf1; --muted: #95a3b1; --line: #2a3643;
     --accent: #6ea9e6; --accent-soft: #1b2b3d; --pass: #5cbf89; --fail: #ef7a71; --fail-soft: #3a1c1a;
-    --mr: #b08ae6; --nb: #f0955c; --hold: #8d9aa6; --band: #24405e; --band2: #1b2b3d; color-scheme: dark;
+    --mr: #b08ae6; --nb: #f0955c; --cb: #4cc4ac; --hold: #8d9aa6; --band: #24405e; --band2: #1b2b3d; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0f151b; --surface: #17202a; --fg: #e5ebf1; --muted: #95a3b1; --line: #2a3643;
   --accent: #6ea9e6; --accent-soft: #1b2b3d; --pass: #5cbf89; --fail: #ef7a71; --fail-soft: #3a1c1a;
-  --mr: #b08ae6; --nb: #f0955c; --hold: #8d9aa6; --band: #24405e; --band2: #1b2b3d; color-scheme: dark;
+  --mr: #b08ae6; --nb: #f0955c; --cb: #4cc4ac; --hold: #8d9aa6; --band: #24405e; --band2: #1b2b3d; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
@@ -65,7 +65,7 @@ td.pos { color: var(--pass); } td.neg { color: var(--fail); }
 tr.grp td { font-weight: 600; background: var(--accent-soft); }
 tr.bench td { color: var(--muted); }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: baseline; }
-.dot.mr { background: var(--mr); } .dot.nb { background: var(--nb); }
+.dot.mr { background: var(--mr); } .dot.nb { background: var(--nb); } .dot.cb { background: var(--cb); }
 svg.chart { width: 100%; height: auto; display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 svg.chart text { font-family: var(--font-mono); font-size: 11px; fill: var(--muted); }
 svg.chart .grid { stroke: var(--line); } svg.chart .zero { stroke: var(--muted); stroke-dasharray: 3 3; }
@@ -74,10 +74,11 @@ svg.chart .rmean { fill: none; stroke: var(--accent); stroke-width: 1; stroke-da
 svg.chart .all { fill: none; stroke: var(--accent); stroke-width: 2.6; }
 svg.chart .mr { fill: none; stroke: var(--mr); stroke-width: 1.6; }
 svg.chart .nb { fill: none; stroke: var(--nb); stroke-width: 1.6; }
+svg.chart .cb { fill: none; stroke: var(--cb); stroke-width: 1.6; }
 svg.chart .hold { fill: none; stroke: var(--hold); stroke-width: 1.4; stroke-dasharray: 6 4; }
 .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.86rem; align-items: center; }
 .legend i { display: inline-block; width: 18px; height: 0; border-top: 3px solid; margin-right: 6px; vertical-align: middle; }
-.legend i.all { border-color: var(--accent); } .legend i.mr { border-color: var(--mr); } .legend i.nb { border-color: var(--nb); }
+.legend i.all { border-color: var(--accent); } .legend i.mr { border-color: var(--mr); } .legend i.nb { border-color: var(--nb); } .legend i.cb { border-color: var(--cb); }
 .legend i.hold { border-color: var(--hold); border-top-style: dashed; }
 .legend i.band { height: 10px; border: 0; background: var(--band); }
 .cm td.c { font-family: var(--font-mono); }
@@ -101,6 +102,10 @@ const int = (x) => x == null ? "–" : Math.round(x).toLocaleString("en-US");
 const tone = (x) => x == null ? "" : x > 0 ? "pos" : x < 0 ? "neg" : "";
 
 const TX = DATA.text, SYM = DATA.symbol;
+const FAMS = DATA.families.map((f) => f.key);  // family keys in leg order: "mr", "nb", "cb"
+const FLABEL = Object.fromEntries(DATA.families.map((f) => [f.key, f.label]));
+const short = (f) => TX[f + "_short"];
+const famPairs = () => FAMS.flatMap((x, i) => FAMS.slice(i + 1).map((y, j) => [i, i + 1 + j]));
 document.title = `${SYM} Strategies Together`;
 const PERIODS = [["full", "all"], ["full", "dev"], ["full", "val"], ["holdout", "holdout"]];
 let CUR = (() => { const h = location.hash.slice(1); return PERIODS.find(([, p]) => p === h) ? h : "holdout"; })();
@@ -111,6 +116,14 @@ const settingsText = (l) => {
     return `${p.timeframe} ${p.mean_type.toUpperCase()} ${p.mean_lookback}/${p.std_lookback}, entry z ${p.entry_z}, exit z ${p.exit_z}, ` +
       `hold ≤ ${p.max_holding_bars} bars, ${p.entry_confirmation === "none" ? "no confirmation" : "up-bar confirmation"}, ` +
       `${p.stop_atr_multiple === "none" ? "no stop" : String(p.stop_atr_multiple).replace(".0", "") + "× ATR stop"}, long only`;
+  }
+  if (l.family_key === "cb") {
+    const n = (v) => String(v).replace(/\.0$/, "");
+    return `${p.timeframe} bars, squeeze length ${p.squeeze_length}, Keltner ${n(p.kc_mult)}× ATR, ≥ ${p.min_squeeze_bars} squeeze bar${p.min_squeeze_bars > 1 ? "s" : ""}, ` +
+      `${p.entry_type} entry, setup live ${p.setup_expiry_bars} bar${p.setup_expiry_bars > 1 ? "s" : ""}, ` +
+      `${p.stop === "box" ? "box stop" : n(p.stop) + "× ATR stop"}, ${p.target_r === "none" ? "no target" : n(p.target_r) + "R target"}, ` +
+      `${{long: "long only", short: "short only", both: "long + short"}[p.direction]}, ${p.trend_filter === "ema50" ? "EMA(50) trend filter" : "no trend filter"}` +
+      (+p.min_box_atr ? `, box ≥ ${n(p.min_box_atr)}× ATR` : "");
   }
   const cap = p.max_entries_per_session ?? "none";
   return `${p.timeframe} bars, band lookback ${p.band_lookback} days × ${p.band_mult}, check every ${p.check_minutes} min, ` +
@@ -124,10 +137,10 @@ const settingsText = (l) => {
 function chart(ph, P) {
   const [a, b] = rangeOf(ph, P), days = ph.days.slice(a, b + 1), n = days.length;
   const rb = (c) => { const s = c.slice(a, b + 2), z = s[0]; return s.map((v) => v / z - 1); };
-  const S = { all: rb(ph.curves.all), mr: rb(ph.curves.mr), nb: rb(ph.curves.nb), hold: rb(ph.hold) };
+  const S = { all: rb(ph.curves.all), hold: rb(ph.hold), ...Object.fromEntries(FAMS.map((f) => [f, rb(ph.curves[f])])) };
   const B = ph.periods[P].groups.all.luck.band, bd = Object.fromEntries(Object.entries(B).map(([k, v]) => [k, v.map((x) => x - 1)]));
   const W = 900, H = 330, L = 56, R = 14, T = 14, Bm = 30;
-  const allv = [...S.all, ...S.mr, ...S.nb, ...S.hold, ...bd.p5, ...bd.p95].filter(isFinite);
+  const allv = [...S.all, ...FAMS.flatMap((f) => S[f]), ...S.hold, ...bd.p5, ...bd.p95].filter(isFinite);
   let lo = Math.min(0, ...allv), hi = Math.max(0, ...allv);
   const span = hi - lo, ys = span > 1 ? 0.2 : span > 0.4 ? 0.1 : span > 0.15 ? 0.05 : 0.02;
   lo = Math.floor(lo / ys) * ys; hi = Math.ceil(hi / ys) * ys;
@@ -143,10 +156,10 @@ function chart(ph, P) {
     ${xt.map(([i, t]) => `<text x="${X(i)}" y="${H - 9}">${t}</text>`).join("")}
     <polygon points="${area(bd.p95, bd.p5)}" class="b5"/><polygon points="${area(bd.p90, bd.p10)}" class="b10"/>
     <polyline points="${pts(bd.mean).join(" ")}" class="rmean"/>
-    <polyline points="${pts(S.hold).join(" ")}" class="hold"/><polyline points="${pts(S.mr).join(" ")}" class="mr"/>
-    <polyline points="${pts(S.nb).join(" ")}" class="nb"/><polyline points="${pts(S.all).join(" ")}" class="all"/>
+    <polyline points="${pts(S.hold).join(" ")}" class="hold"/>${FAMS.map((f) => `<polyline points="${pts(S[f]).join(" ")}" class="${f}"/>`).join("")}
+    <polyline points="${pts(S.all).join(" ")}" class="all"/>
   </svg>
-  <div class="legend"><span><i class="all"></i>${esc(DATA.groups.all)}</span><span><i class="mr"></i>${esc(DATA.groups.mr)}</span><span><i class="nb"></i>${esc(DATA.groups.nb)}</span><span><i class="hold"></i>Holding ${SYM}</span><span><i class="band"></i>${esc(TX.all_short)} at random entries, 10th–90th pct (lighter: 5th–95th)</span></div>`;
+  <div class="legend"><span><i class="all"></i>${esc(DATA.groups.all)}</span>${FAMS.map((f) => `<span><i class="${f}"></i>${esc(DATA.groups[f])}</span>`).join("")}<span><i class="hold"></i>Holding ${SYM}</span><span><i class="band"></i>${esc(TX.all_short)} at random entries, 10th–90th pct (lighter: 5th–95th)</span></div>`;
 }
 const rangeOf = (ph, P) => ph.ranges[P];
 
@@ -155,18 +168,20 @@ function render() {
   const legs = DATA.legs, all = G.all, L = all.luck, K = R.corr, O = R.overlap;
   const lname = Object.fromEntries(legs.map((l) => [l.key, l.name]));
   const tabs = `<div class="tabs" role="tablist"><span class="muted">Show:</span>${PERIODS.map(([pk, p]) => `<button type="button" data-p="${p}" aria-pressed="${p === P}">${esc(DATA.phases[pk].labels[p])}</button>`).join("")}</div>`;
-  const pairExp = G.mr.stats.exposure, nbExp = G.nb.stats.exposure;
+  const famCorr = famPairs().map(([i, j]) => K.families_daily[i][j]);
+  const avgCorr = famCorr.length ? famCorr.reduce((a, b) => a + b, 0) / famCorr.length : null;
+  const pairList = (M) => famPairs().map(([i, j]) => `${esc(short(FAMS[i]))} vs ${esc(short(FAMS[j]))} ${num(M[i][j])}`).join(" · ");
   const head = `<header>
-    <span class="eyebrow">${SYM} · mean reversion + noise-band breakout · fixed sleeves</span>
+    <span class="eyebrow">${SYM} · ${FAMS.map((f) => esc(FLABEL[f].toLowerCase())).join(" + ")} · fixed sleeves</span>
     <h1>${SYM} strategies together: ${pct(all.stats.net_return)}, Sharpe ${num(all.stats.sharpe)} · ${esc(label)}</h1>
     <p class="lede">${esc(TX.lede_legs)}, unchanged since they were frozen, each trading its own sleeve: ${esc(TX.sleeve_desc)}. Nothing is shared or rebalanced between sleeves. Each combination is compared with ${DATA.n_sims} random-entry runs built the same way: one random trade stream per strategy, at that strategy's own time in market.</p>
     ${tabs}
     <div class="cards">
       <div><b>${pct(all.stats.net_return)}</b><span>${esc(TX.all_word)} together, ${esc(label)}</span></div>
-      <div><b>${num(all.stats.sharpe)}</b><span>Sharpe together<br><small>${esc(TX.mr_short)} ${num(G.mr.stats.sharpe)} · ${esc(TX.nb_short)} ${num(G.nb.stats.sharpe)}</small></span></div>
+      <div><b>${num(all.stats.sharpe)}</b><span>Sharpe together<br><small>${FAMS.map((f) => `${esc(short(f))} ${num(G[f].stats.sharpe)}`).join(" · ")}</small></span></div>
       <div class="${L.pct_sharpe >= 0.95 ? "ok" : L.pct_sharpe < 0.5 ? "bad" : ""}"><b>${pctu(L.pct_sharpe, 0)}</b><span>of random runs beaten on Sharpe</span></div>
-      <div><b>${num(K.families_daily)}</b><span>correlation, ${esc(TX.mr_short)} vs ${esc(TX.nb_short)} (daily)</span></div>
-      <div><b>${pctu(all.stats.exposure, 0)}</b><span>in the market together<br><small>${esc(TX.mr_short)} ${pctu(pairExp, 0)} · ${esc(TX.nb_short)} ${pctu(nbExp, 0)}</small></span></div>
+      <div><b>${num(avgCorr)}</b><span>${famCorr.length > 1 ? "average correlation between families (daily)" : "correlation between the families (daily)"}${famCorr.length > 1 ? `<br><small>${pairList(K.families_daily)}</small>` : ""}</span></div>
+      <div><b>${pctu(all.stats.exposure, 0)}</b><span>in the market together<br><small>${FAMS.map((f) => `${esc(short(f))} ${pctu(G[f].stats.exposure, 0)}`).join(" · ")}</small></span></div>
     </div>
   </header>`;
 
@@ -183,8 +198,7 @@ function render() {
       <thead><tr><th></th>${cols.map(([, l]) => `<th>${l}</th>`).join("")}<th class="sep" title="Share of random-entry runs with a lower Sharpe">Beats luck: Sharpe</th><th title="Share of random-entry runs with a lower return">Return</th><th class="sep">Random avg return</th><th>Random avg Sharpe</th></tr></thead>
       <tbody>
         ${legs.map((l) => row(l.name + " alone", G[l.key], "", `<span class="dot ${l.family_key}"></span>`)).join("")}
-        ${DATA.group_n.mr > 1 ? row(DATA.groups.mr + ", " + TX.mr_w, G.mr, "", '<span class="dot mr"></span>') : ""}
-        ${DATA.group_n.nb > 1 ? row(DATA.groups.nb + ", " + TX.nb_w, G.nb, "", '<span class="dot nb"></span>') : ""}
+        ${FAMS.filter((f) => DATA.group_n[f] > 1).map((f) => row(DATA.groups[f] + ", " + TX[f + "_w"], G[f], "", `<span class="dot ${f}"></span>`)).join("")}
         ${row(DATA.groups.all + ", " + TX.all_w, G.all, "grp")}
         <tr class="bench"><td>Holding ${SYM} (rolled, unlevered)</td><td class="${tone(H.net_return)}">${pct(H.net_return)}</td><td>${pct(H.cagr)}</td><td>${num(H.sharpe)}</td><td>${pct(H.max_drawdown)}</td><td>${pctu(H.vol)}</td><td>–</td><td>–</td><td>–</td><td>100%</td><td class="sep"></td><td></td><td class="sep"></td><td></td></tr>
       </tbody></table></div>
@@ -197,20 +211,20 @@ function render() {
     ${chart(ph, P)}
   </section>`;
 
-  const shares = O.open_count, colors = ["var(--line)", "var(--band)", "var(--accent)", "var(--mr)", "var(--nb)"];
+  const shares = O.open_count, colors = shares.map((_, i) => i === 0 ? "var(--line)" : `color-mix(in srgb, var(--accent) ${Math.round(25 + 75 * (i - 1) / Math.max(1, shares.length - 2))}%, var(--band))`);
   const expRows = legs.map((l) => `<tr><td><span class="dot ${l.family_key}"></span>${esc(l.name)}</td><td>${pctu(G[l.key].stats.exposure)}</td></tr>`).join("");
   const timeSec = `<section>
     <span class="eyebrow">Time in market · ${esc(label)}</span>
-    <h2>${pctu(all.stats.exposure, 1)} of the time with ${esc(TX.all_word)}, up from ${pctu(pairExp, 1)} (${esc(TX.mr_short)}) and ${pctu(nbExp, 1)} (${esc(TX.nb_short)})</h2>
-    <p class="muted">Added up, the ${esc(TX.count_word)} strategies' times in market come to ${pctu(all.stats.sum_exposure, 1)}, but they overlap, so together they cover ${pctu(all.stats.exposure, 1)}. The two families are in at the same moment ${pctu(O.both_families, 1)} of the time: when mean reversion has a position open, the noise band also has one ${pctu(O.nb_while_mr, 0)} of the time. With separate sleeves, a sleeve whose strategy is flat sits in cash.</p>
+    <h2>${pctu(all.stats.exposure, 1)} of the time with ${esc(TX.all_word)}, up from ${FAMS.map((f) => `${pctu(G[f].stats.exposure, 1)} (${esc(short(f))})`).join(FAMS.length > 2 ? ", " : " and ")}</h2>
+    <p class="muted">Added up, the ${esc(TX.count_word)} strategies' times in market come to ${pctu(all.stats.sum_exposure, 1)}, but they overlap, so together they cover ${pctu(all.stats.exposure, 1)}. ${FAMS.length > 2 ? "Two or more families" : "The two families"} are in at the same moment ${pctu(O.multi_family, 1)} of the time${FAMS.length > 1 ? `: when ${esc(FLABEL[FAMS[0]].toLowerCase())} has a position open, ${famPairs().filter(([i]) => i === 0).map(([, j]) => `${esc(FLABEL[FAMS[j]].toLowerCase())} also has one ${pctu(O.while[0][j], 0)} of the time`).join(" and ")}` : ""}. With separate sleeves, a sleeve whose strategy is flat sits in cash.</p>
     <div class="two">
       <div class="tbl-wrap"><table><thead><tr><th>Strategy or combination</th><th>In market</th></tr></thead><tbody>
         ${expRows}
-        <tr><td><span class="dot mr"></span>${esc(DATA.groups.mr)}</td><td>${pctu(pairExp)}</td></tr>
-        ${DATA.group_n.nb > 1 ? `<tr><td><span class="dot nb"></span>${esc(DATA.groups.nb)}</td><td>${pctu(nbExp)}</td></tr>` : ""}
+        ${FAMS.filter((f) => DATA.group_n[f] > 1).map((f) => `<tr><td><span class="dot ${f}"></span>${esc(DATA.groups[f])}</td><td>${pctu(G[f].stats.exposure)}</td></tr>`).join("")}
         <tr class="grp"><td>${esc(DATA.groups.all)}</td><td>${pctu(all.stats.exposure)}</td></tr>
         <tr class="bench"><td>The ${esc(TX.count_word)} added up (double-counts overlap)</td><td>${pctu(all.stats.sum_exposure)}</td></tr>
-        <tr class="bench"><td>Both families in at once</td><td>${pctu(O.both_families)}</td></tr>
+        <tr class="bench"><td>${FAMS.length > 2 ? "Two or more families" : "Both families"} in at once</td><td>${pctu(O.multi_family)}</td></tr>
+        ${FAMS.length > 2 ? famPairs().map(([i, j]) => `<tr class="bench"><td>${esc(short(FAMS[i]))} and ${esc(short(FAMS[j]))} in at once</td><td>${pctu(O.pair_time[i][j])}</td></tr>`).join("") : ""}
       </tbody></table></div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <h3>How many strategies have a position open</h3>
@@ -226,8 +240,8 @@ function render() {
   const shade = (v) => v == null ? "" : `background: color-mix(in srgb, ${v >= 0 ? "var(--accent)" : "var(--fail)"} ${Math.round(Math.abs(v) * 55)}%, transparent)`;
   const corrSec = `<section>
     <span class="eyebrow">How they move together · ${esc(label)}</span>
-    <h2>Correlation: ${cc(K.families_daily)} between the two families</h2>
-    <p class="muted">Daily returns of each strategy's own run. Mean reversion buys after a drop and the breakout follows the move, so they tend to make and lose money on different days. Monthly, the two families correlate ${cc(K.families_monthly)}.</p>
+    <h2>${FAMS.length > 2 ? `Correlation between families: ${pairList(K.families_daily)}` : `Correlation: ${cc(K.families_daily[0][1])} between the two families`}</h2>
+    <p class="muted">Daily returns of each strategy's own run. Mean reversion buys after a drop and the breakouts follow the move, so they tend to make and lose money on different days. Monthly, the families correlate ${FAMS.length > 2 ? pairList(K.families_monthly) : cc(K.families_monthly[0][1])}.</p>
     <div class="tbl-wrap cm"><table><thead><tr><th></th>${legs.map((l) => `<th>${esc(l.name)}</th>`).join("")}</tr></thead>
       <tbody>${legs.map((l, i) => `<tr><td><span class="dot ${l.family_key}"></span>${esc(l.name)}</td>${legs.map((_, j) => `<td class="c" style="${i === j ? "" : shade(cm[i][j])}">${i === j ? "1" : cc(cm[i][j])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
   </section>`;
@@ -239,7 +253,7 @@ function render() {
     <h2>Calendar-year returns</h2>
     <div class="tbl-wrap"><table><thead><tr><th></th>${yrsFull.map((y) => `<th>${y}${+y >= 2023 ? " ·val" : ""}</th>`).join("")}<th class="sep"></th>${yrsHold.map((y) => `<th>${y} ·holdout${y === DATA.phases.holdout.window[1].slice(0, 4) ? " (to " + DATA.phases.holdout.window[1].slice(5) + ")" : ""}</th>`).join("")}</tr></thead>
       <tbody>${legs.map((l) => yr(`<span class="dot ${l.family_key}"></span>${esc(l.name)}`, l.key)).join("")}
-        ${DATA.group_n.mr > 1 ? yr('<span class="dot mr"></span>' + esc(DATA.groups.mr), "mr") : ""}${DATA.group_n.nb > 1 ? yr('<span class="dot nb"></span>' + esc(DATA.groups.nb), "nb") : ""}
+        ${FAMS.filter((f) => DATA.group_n[f] > 1).map((f) => yr(`<span class="dot ${f}"></span>` + esc(DATA.groups[f]), f)).join("")}
         ${yr(esc(DATA.groups.all), "all", "grp")}${yr("Holding " + SYM, "hold", "bench")}</tbody></table></div>
     <p class="muted">2018–2024 is one continuous run; the holdout is scored separately from 2025-01-01, as on the strategies' own holdout pages.</p>
   </section>`;
@@ -256,7 +270,7 @@ function render() {
       ? `<p><b>Holdout (${esc(DATA.phases.holdout.window[0])} to ${esc(DATA.phases.holdout.window[1])}).</b> ${esc(TX.holdout_caveat)}</p>`
       : P === "val"
       ? `<p><b>Validation 2023–2024.</b> ${esc(TX.val_caveat)}</p>`
-      : `<p><b>${P === "dev" ? "In-sample." : "Mostly in-sample."}</b> 2018–2022 is the development data both families' strategies were picked from, out of thousands of versions, so strong numbers there are expected. The holdout tab is the least biased view.</p>`}
+      : `<p><b>${P === "dev" ? "In-sample." : "Mostly in-sample."}</b> 2018–2022 is the development data every family's strategies were picked from, out of thousands of versions, so strong numbers there are expected. The holdout tab is the least biased view.</p>`}
     <p><b>Sleeves.</b> Each strategy keeps its own fixed slice of the account and grows or shrinks with its own results; idle sleeves sit in cash (earning 0%). A sleeve tracks its strategy's full-account run scaled down, as if sized in micro contracts: ${esc(TX.sleeve_small)}. Costs are each strategy's own (commission and slippage per contract).</p>
   </div></section>`;
 
