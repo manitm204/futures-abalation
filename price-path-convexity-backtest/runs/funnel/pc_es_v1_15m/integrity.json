@@ -1,0 +1,46 @@
+{
+  "audit_notes": [
+    "Signal at bar k from the closes of bars k-N+1..k only (N = lookback, over the RTH bar series across sessions): paper = (midpoint - mean) / midpoint, midpoint = (P1 + PN) / 2 (Gulen & Woeppel's convexity); atr = (midpoint - mean) / ATR(14)[k]; maxgap = the signed line-minus-path gap of largest magnitude / ATR(14)[k]; reversal (control) = (PN - P1) / ATR(14)[k].",
+    "z_k = (S_k - mean(S over the last z_lookback bars, k included)) / population sd of the same; NaN during warm-up.",
+    "Decision at bar k's close: short on a fresh cross z_k >= entry_z (z_{k-1} was not), long on a fresh cross z_k <= -entry_z. A HIGH signal always fades to SHORT. A signal while a position is open is dropped, never queued.",
+    "Filters known at bar k: quadrant late = only against the window's net move PN - P1, early = only with it; |PN - P1| >= min_move_atr x ATR(14)[k]; direction; emaN needs close_k > EMA(N)_k for a long, < for a short; no decision on the session's last bar or less than 30 minutes before its last close.",
+    "Entry fills at the NEXT bar's open with market slippage; the fill bar must be in the decision's session.",
+    "Stop (optional) = open -/+ stop x ATR(14) of the bar before the fill, live intrabar from the entry bar, filled at the worse of the bar's open and the stop with stop slippage. Hold half = ceil(N/2) bars, full = N bars: closed at the close of bar entry + H - 1; session = the session's last close. Every position still open on the session's last bar is closed at that bar's CLOSE; nothing is held overnight.",
+    "Long and short: P&L = side x (exit fill - entry fill) x quantity - commissions; sizing is the mean-reversion funnel's (as many whole contracts as equity covers at full contract value, unlevered, compounding).",
+    "Development backtests run on data physically truncated at the development end; the final session's trade is closed at the last development bar and flagged forced (not counted as completed).",
+    "Sharpe: daily session-close mark-to-market returns over every trading day (flat days = 0), sqrt(252) annualization, rf = 0, idle cash earns 0."
+  ],
+  "checks_per_config": [
+    "signal_not_fresh_cross",
+    "side_not_per_signal",
+    "quadrant_not_allowed",
+    "net_move_below_minimum",
+    "direction_not_allowed",
+    "entry_against_trend",
+    "entry_inside_last_entry_cutoff",
+    "signal_skipped_while_flat",
+    "entry_not_next_bar_same_session",
+    "entry_fill_better_than_market",
+    "exit_before_entry",
+    "position_held_overnight",
+    "stop_not_per_rule",
+    "stop_exit_without_touch",
+    "stop_fill_better_than_rule",
+    "exit_not_at_first_touch",
+    "time_exit_not_per_rule",
+    "held_past_time_stop",
+    "eod_exit_not_at_session_close",
+    "exit_fill_better_than_market",
+    "overlapping_positions",
+    "position_exceeds_equity",
+    "forced_close_not_final_trade",
+    "commission_below_minimum"
+  ],
+  "cut_fractions": [
+    0.3,
+    0.6000000000000001,
+    0.9
+  ],
+  "failures": {},
+  "truncation_sample": 40
+}

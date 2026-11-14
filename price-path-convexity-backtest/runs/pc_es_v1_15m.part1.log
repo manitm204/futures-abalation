@@ -1,0 +1,26 @@
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-16T17:58:19.142956Z"}
+{"n": 186624, "elapsed_s": 899.8, "event": "prep_built", "level": "info", "timestamp": "2026-11-16T18:13:10.235607Z"}
+{"stage": "1 backtest integrity", "evaluated": 186624, "passed": 186624, "event": "stage_done", "level": "info", "timestamp": "2026-11-16T18:13:12.951822Z"}
+{"stage": "2 trade count & coverage", "evaluated": 186624, "passed": 117465, "event": "stage_done", "level": "info", "timestamp": "2026-11-16T18:13:14.896536Z"}
+{"stage": "3 performance & risk", "evaluated": 117465, "passed": 1216, "event": "stage_done", "level": "info", "timestamp": "2026-11-16T18:13:15.528869Z"}
+{"step": "s4_local_moves", "total": 11059, "saved": 0, "to_run": 11059, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-16T18:13:19.341776Z"}
+{"step": "s4_local_moves", "saved": 7055, "of": 11059, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-16T18:14:19.516505Z"}
+{"step": "s4_local_moves", "saved": 10428, "of": 11059, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-16T18:15:05.385881Z"}
+{"reused_from_prep": 0, "backtested": 11059, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-16T18:15:05.433856Z"}
+{"stage": "4 parameter stability", "evaluated": 1216, "passed": 1149, "event": "stage_done", "level": "info", "timestamp": "2026-11-16T18:15:05.668091Z"}
+{"stage": "5 time stability", "evaluated": 1149, "passed": 1003, "event": "stage_done", "level": "info", "timestamp": "2026-11-16T18:15:05.683018Z"}
+{"step": "s6_intervals", "total": 979, "saved": 0, "to_run": 979, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-16T18:15:05.847102Z"}
+{"step": "s6_intervals", "saved": 979, "of": 979, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-16T18:15:29.251330Z"}
+{"step": "s6_perturbations", "total": 6380, "saved": 0, "to_run": 6380, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-16T18:15:30.520851Z"}
+Exception in thread Thread-4:
+Traceback (most recent call last):
+  File "/home/manit/.pyenv/versions/3.11.9/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+    self.run()
+  File "/home/manit/.pyenv/versions/3.11.9/lib/python3.11/concurrent/futures/process.py", line 347, in run
+    self.terminate_broken(cause)
+  File "/home/manit/.pyenv/versions/3.11.9/lib/python3.11/concurrent/futures/process.py", line 499, in terminate_broken
+    work_item.future.set_exception(bpe)
+  File "/home/manit/.pyenv/versions/3.11.9/lib/python3.11/concurrent/futures/_base.py", line 559, in set_exception
+    raise InvalidStateError('{}: {!r}'.format(self._state, self))
+concurrent.futures._base.InvalidStateError: CANCELLED: <Future at 0x752e5239d090 state=cancelled>
+{"step": "s6_perturbations", "saved": 1320, "of": 6380, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-16T18:16:25.388059Z"}
