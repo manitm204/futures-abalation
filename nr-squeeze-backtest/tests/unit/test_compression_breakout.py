@@ -614,3 +614,173 @@ def test_v4_ym_grid():
         SqueezeBreakoutV4_15mConfig(symbol="YM", stop="1.0")  # stops are box / 1.5 ATR
     p = CBParams.from_config(SqueezeBreakoutV4_15mConfig(symbol="YM", stop="1.5", target_r="1.0"))
     assert (p.stop_atr, p.target_r, p.squeeze_length) == (1.5, 1.0, 25)
+
+
+# --- NR-N v2 (15-minute bars, 207,360 configs) -------------------------------------------------
+
+def test_nr_v2_grid_and_config():
+    from src.experiments.cb_grid import AXES_NR_V2_15M, cb_grid_nr_v2_15m
+    from src.strategies.compression_breakout.config import NRBreakoutV2_15mConfig
+    assert variants_per_symbol(AXES_NR_V2_15M) == 207_360
+    g = cb_grid_nr_v2_15m(("ES",))
+    assert len(g) == 207_360 and len({ce.config_id for ce in g}) == len(g)
+    assert {ce.config.timeframe for ce in g} == {"15min"}
+    assert {ce.config.trend_filter for ce in g} == {"none", "ema20", "ema50", "ema200"}
+    with pytest.raises(Exception):
+        NRBreakoutV2_15mConfig(symbol="ES", timeframe="5min")
+    p = CBParams.from_config(NRBreakoutV2_15mConfig(symbol="ES", nr_lookback=5, min_nr_bars=2))
+    assert (p.min_nr_bars, p.min_run) == (2, 2)
+    assert CBParams.from_config(NRBreakoutConfig(symbol="ES")).min_nr_bars is None  # v1 unchanged
+    assert P.min_run == 1
+
+
+def test_min_nr_bars_needs_consecutive_nr_bars():
+    # Bars 5-6 are a two-bar NR-4 run: it is live with min_nr_bars 1 and 2.
+    two = _ohlc([_plain_day({**SQUEEZE, **BREAK_UP})])
+    for m in (1, 2):
+        _, sim = _sim(two, _p(min_nr_bars=m))
+        assert sim.signal_idx.tolist() == [7]
+    # A single NR bar (bar 6 only) trades with min 1 and not with min 2.
+    one = _ohlc([_plain_day({6: SQUEEZE[6], **BREAK_UP})])
+    _, sim1 = _sim(one, _p(min_nr_bars=1))
+    _, sim2 = _sim(one, _p(min_nr_bars=2))
+    assert sim1.signal_idx.tolist() == [7] and len(sim2.signal_idx) == 0
+
+
+@pytest.mark.parametrize("trend", ["ema20", "ema50", "ema200"])
+def test_ema_length_trend_filters_and_integrity(trend):
+    bars = _walk(seed=21, n_days=80)
+    data = CBData(bars)
+    for m in (1, 2):
+        p = _p(trend_filter=trend, min_nr_bars=m, entry_type="wick", nr_lookback=3)
+        sim = simulate_compression_breakout(data, p, exec_config=EC, starting_equity=1e5)
+        assert len(sim.entry_idx) > 0
+        assert check_sim_integrity(sim, data, EC, p) == []
+        span = int(trend[3:])
+        ema = data.ema(span)
+        j = sim.signal_idx - 1  # wick: last close before the order fills
+        c = data.close[j]
+        assert np.all(np.where(sim.side > 0, c > ema[j], c < ema[j]))
+    # The integrity check notices a trade against a longer EMA's trend.
+    p20, p200 = _p(trend_filter="ema20", nr_lookback=3), _p(trend_filter="ema200", nr_lookback=3)
+    sim20 = simulate_compression_breakout(data, p20, exec_config=EC, starting_equity=1e5)
+    sim200 = simulate_compression_breakout(data, p200, exec_config=EC, starting_equity=1e5)
+    if set(sim20.signal_idx.tolist()) - set(sim200.signal_idx.tolist()):
+        assert "entry_against_trend" in check_sim_integrity(sim20, data, EC, p200)
+    with pytest.raises(ValueError):
+        simulate_compression_breakout(data, _p(trend_filter="sma50"), exec_config=EC, starting_equity=1e5)
+
+
+def test_nr_v2_local_moves_include_min_nr_bars():
+    lcfg = SimpleNamespace(int_rel=0.2, kc_mult_abs=0.25, stop_atr_abs=0.25, target_r_abs=0.5, min_box_atr_abs=0.25)
+    one = {k for k, _ in local_perturbations_cb(_p(nr_lookback=7, min_nr_bars=1), lcfg) if k.startswith("min_nr")}
+    two = {k for k, _ in local_perturbations_cb(_p(nr_lookback=7, min_nr_bars=2), lcfg) if k.startswith("min_nr")}
+    assert one == {"min_nr_bars=2"} and two == {"min_nr_bars=1", "min_nr_bars=3"}
+    assert not any(k.startswith("min_nr") for k, _ in local_perturbations_cb(_p(nr_lookback=7), lcfg))
+
+
+def test_nr_v2_es_yaml_loads():
+    f = load_funnel_config(CONFIGS / "cb_nr_funnel_es_v2_15m.yaml")
+    assert f.strategy == "compression_breakout_nr_v2_15m" and f.data.timeframes == ["15min"]
+
+
+# --- NR-N v3 (15-minute bars, 145,152 configs): range cap and time stop -----------------------
+
+def test_nr_v3_grid_and_config():
+    from src.experiments.cb_grid import AXES_NR_V3_15M, cb_grid_nr_v3_15m
+    from src.strategies.compression_breakout.config import NRBreakoutV3_15mConfig
+    assert variants_per_symbol(AXES_NR_V3_15M) == 145_152
+    g = cb_grid_nr_v3_15m(("ES",))
+    assert len(g) == 145_152 and len({ce.config_id for ce in g}) == len(g)
+    p = CBParams.from_config(NRBreakoutV3_15mConfig(symbol="ES", max_range_atr="0.5", max_hold_bars=4))
+    assert (p.max_range_atr, p.max_hold_bars) == (0.5, 4)
+    p0 = CBParams.from_config(NRBreakoutV3_15mConfig(symbol="ES"))
+    assert (p0.max_range_atr, p0.max_hold_bars) == (None, None)
+    assert CBParams.from_config(NRBreakoutV2_15mConfig_()).max_hold_bars is None  # v2 unchanged
+
+
+def NRBreakoutV2_15mConfig_():
+    from src.strategies.compression_breakout.config import NRBreakoutV2_15mConfig
+    return NRBreakoutV2_15mConfig(symbol="ES")
+
+
+def test_range_cap_drops_wide_nr_bars():
+    bars = _walk(seed=5, n_days=40)
+    data = CBData(bars)
+    base = data.compression(_p(nr_lookback=3))
+    capped = data.compression(_p(nr_lookback=3, max_range_atr=0.5))
+    atr = data.atr(14)
+    assert (capped <= base).all() and capped.sum() < base.sum()
+    with np.errstate(invalid="ignore"):
+        expect = base & (data.bar_range <= 0.5 * atr)
+    assert np.array_equal(capped, expect)
+    assert np.array_equal(capped, independent_compression(data, _p(nr_lookback=3, max_range_atr=0.5)))
+    assert np.array_equal(data.compression(_p(nr_lookback=3)), base)  # cache keys kept apart
+
+
+def test_time_stop_exits_at_close_of_nth_bar():
+    # Long breakout at bar 7 (close entry fills at bar 8's open), then flat drift: no stop/target.
+    day = _plain_day({**SQUEEZE, 7: (100.0, 100.4, 99.98, 100.3)})
+    for i in range(8, 26):
+        w = 0.02 + 0.002 * i  # widening ranges: after bar 8 no bar is NR, so one setup only
+        day[i] = (100.3, 100.3 + w, 100.3 - w, 100.3 + 0.001 * i)
+    bars = _ohlc([day])
+    p = _p(target_r=None, max_hold_bars=4)
+    data, sim = _sim(bars, p)
+    assert sim.entry_idx.tolist() == [8] and sim.exit_idx.tolist() == [12]
+    assert sim.exit_reason.tolist() == ["time_exit"]
+    assert data.close[12] - 0.05 < sim.exit_px[0] <= data.close[12]  # the bar's close, less sell slippage
+    assert check_sim_integrity(sim, data, EC, p) == []
+    _, sim0 = _sim(bars, _p(target_r=None))
+    # one-day data: the session close is the data's last bar, so it is flagged forced
+    assert sim0.exit_reason.tolist() == ["forced_close"] and sim0.exit_idx.tolist() == [25]
+    # A time stop past the session close leaves the session-close exit in charge.
+    _, sim_l = _sim(bars, _p(target_r=None, max_hold_bars=40))
+    assert sim_l.exit_reason.tolist() == ["forced_close"]
+    # The checker catches a trade held past its time stop.
+    assert "held_past_time_stop" in check_sim_integrity(sim0, data, EC, p)
+
+
+def test_time_stop_and_range_cap_integrity_on_random_walks():
+    bars = _walk(seed=31, n_days=80)
+    data = CBData(bars)
+    n_time = 0
+    for et in ("close", "wick"):
+        for hold in (4, 8):
+            p = _p(entry_type=et, nr_lookback=3, max_hold_bars=hold, max_range_atr=0.8, min_nr_bars=2,
+                   target_r=4.0, trend_filter="ema200")
+            sim = simulate_compression_breakout(data, p, exec_config=EC, starting_equity=1e5)
+            assert len(sim.entry_idx) > 0
+            assert check_sim_integrity(sim, data, EC, p) == []
+            assert (sim.exit_idx - sim.entry_idx <= hold).all()
+            n_time += int((sim.exit_reason == "time_exit").sum())
+    assert n_time > 0
+
+
+def test_nr_v3_local_moves():
+    lcfg = SimpleNamespace(int_rel=0.2, kc_mult_abs=0.25, stop_atr_abs=0.25, target_r_abs=0.5, min_box_atr_abs=0.25,
+                           max_range_atr_abs=0.1)
+    mv = dict(local_perturbations_cb(_p(nr_lookback=10, min_nr_bars=1, max_range_atr=0.5, max_hold_bars=4), lcfg))
+    assert {k for k in mv if k.startswith(("max_range", "max_hold"))} == {
+        "max_range_atr=0.4", "max_range_atr=0.6", "max_hold_bars=3", "max_hold_bars=5"}
+    off = dict(local_perturbations_cb(_p(nr_lookback=10, min_nr_bars=1), lcfg))
+    assert not any(k.startswith(("max_range", "max_hold")) for k in off)
+
+
+def test_nr_v3_es_yaml_loads():
+    f = load_funnel_config(CONFIGS / "cb_nr_funnel_es_v3_15m.yaml")
+    assert f.strategy == "compression_breakout_nr_v3_15m" and f.parameter_stability.local.max_range_atr_abs == 0.1
+
+
+def test_nr_v4_grid_config_and_yamls():
+    from src.experiments.cb_grid import AXES_NR_V4_15M, cb_grid_nr_v4_15m
+    from src.strategies.compression_breakout.config import NRBreakoutV4_15mConfig
+    assert variants_per_symbol(AXES_NR_V4_15M) == 2_304
+    g = cb_grid_nr_v4_15m(("NQ",))
+    assert len(g) == 2_304 and len({ce.config_id for ce in g}) == len(g)
+    p = CBParams.from_config(NRBreakoutV4_15mConfig(symbol="NQ", stop="1.5", target_r="3.5", max_range_atr="0.5"))
+    assert (p.stop_atr, p.target_r, p.max_range_atr, p.max_hold_bars, p.entry_type) == (1.5, 3.5, 0.5, None, "wick")
+    for sym in ("nq", "ym", "rty", "cl", "gc", "6e", "6j", "zn", "zb"):
+        f = load_funnel_config(CONFIGS / f"cb_nr_funnel_{sym}_v4_15m.yaml")
+        assert f.strategy == "compression_breakout_nr_v4_15m" and f.symbol == sym.upper()
+        assert f.confidence.transfer_symbol == "ES"

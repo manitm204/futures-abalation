@@ -96,6 +96,7 @@ class LocalPerturbationCfg(_Frozen):
     kc_mult_abs: float | None = None    # compression breakout: Keltner multiple
     target_r_abs: float | None = None   # compression breakout: profit target in R
     min_box_atr_abs: float | None = None  # compression breakout: minimum box width in ATR
+    max_range_atr_abs: float | None = None  # NR v3: NR-bar range cap in ATR
 
 
 class PrescreenCfg(_Frozen):

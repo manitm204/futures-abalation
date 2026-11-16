@@ -209,3 +209,103 @@ AXES_BBKC_V4_15M: dict[str, tuple] = {
 
 def cb_grid_bbkc_v4_15m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
     return _grid(symbols, AXES_BBKC_V4_15M, SqueezeBreakoutV4_15mConfig)
+
+
+# --- NR-N v2: 15-minute bars only, 207,360 configs --------------------------------------------
+from src.strategies.compression_breakout.config import (  # noqa: E402
+    V2_NR_LOOKBACKS,
+    V2_NR_MIN_BOX_ATRS,
+    V2_NR_MIN_NR_BARS,
+    V2_NR_SETUP_EXPIRIES,
+    V2_NR_STOPS,
+    V2_NR_TARGETS,
+    V2_NR_TREND_FILTERS,
+    NRBreakoutV2_15mConfig,
+)
+
+AXES_NR_V2_15M: dict[str, tuple] = {
+    "timeframe": ("15min",),
+    "nr_lookback": V2_NR_LOOKBACKS,
+    "inside_bar": INSIDE_BARS,
+    "min_nr_bars": V2_NR_MIN_NR_BARS,
+    "entry_type": ENTRY_TYPES,
+    "setup_expiry_bars": V2_NR_SETUP_EXPIRIES,
+    "stop": V2_NR_STOPS,
+    "target_r": V2_NR_TARGETS,
+    "direction": DIRECTIONS,
+    "trend_filter": V2_NR_TREND_FILTERS,
+    "min_box_atr": V2_NR_MIN_BOX_ATRS,
+}
+
+
+def cb_grid_nr_v2_15m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_NR_V2_15M, NRBreakoutV2_15mConfig)
+
+
+# --- NR-N v3: 15-minute bars only, 145,152 configs --------------------------------------------
+from src.strategies.compression_breakout.config import (  # noqa: E402
+    V3_NR_DIRECTIONS,
+    V3_NR_LOOKBACKS,
+    V3_NR_MAX_HOLD_BARS,
+    V3_NR_MAX_RANGE_ATRS,
+    V3_NR_MIN_BOX_ATRS,
+    V3_NR_MIN_NR_BARS,
+    V3_NR_SETUP_EXPIRIES,
+    V3_NR_STOPS,
+    V3_NR_TARGETS,
+    V3_NR_TREND_FILTERS,
+    NRBreakoutV3_15mConfig,
+)
+
+AXES_NR_V3_15M: dict[str, tuple] = {
+    "timeframe": ("15min",),
+    "nr_lookback": V3_NR_LOOKBACKS,
+    "inside_bar": INSIDE_BARS,
+    "min_nr_bars": V3_NR_MIN_NR_BARS,
+    "entry_type": ENTRY_TYPES,
+    "setup_expiry_bars": V3_NR_SETUP_EXPIRIES,
+    "stop": V3_NR_STOPS,
+    "target_r": V3_NR_TARGETS,
+    "direction": V3_NR_DIRECTIONS,
+    "trend_filter": V3_NR_TREND_FILTERS,
+    "min_box_atr": V3_NR_MIN_BOX_ATRS,
+    "max_range_atr": V3_NR_MAX_RANGE_ATRS,
+    "max_hold_bars": V3_NR_MAX_HOLD_BARS,
+}
+
+
+def cb_grid_nr_v3_15m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_NR_V3_15M, NRBreakoutV3_15mConfig)
+
+
+# --- NR-N v4: 15-minute bars only, 2,304 configs (NQ, YM) -------------------------------------
+from src.strategies.compression_breakout.config import (  # noqa: E402
+    V4_NR_DIRECTIONS,
+    V4_NR_LOOKBACKS,
+    V4_NR_MAX_RANGE_ATRS,
+    V4_NR_MIN_BOX_ATRS,
+    V4_NR_STOPS,
+    V4_NR_TARGETS,
+    V4_NR_TREND_FILTERS,
+    NRBreakoutV4_15mConfig,
+)
+
+AXES_NR_V4_15M: dict[str, tuple] = {
+    "timeframe": ("15min",),
+    "nr_lookback": V4_NR_LOOKBACKS,
+    "inside_bar": INSIDE_BARS,
+    "min_nr_bars": (1,),
+    "entry_type": ("wick",),
+    "setup_expiry_bars": (1,),
+    "stop": V4_NR_STOPS,
+    "target_r": V4_NR_TARGETS,
+    "direction": V4_NR_DIRECTIONS,
+    "trend_filter": V4_NR_TREND_FILTERS,
+    "min_box_atr": V4_NR_MIN_BOX_ATRS,
+    "max_range_atr": V4_NR_MAX_RANGE_ATRS,
+    "max_hold_bars": (0,),
+}
+
+
+def cb_grid_nr_v4_15m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_NR_V4_15M, NRBreakoutV4_15mConfig)

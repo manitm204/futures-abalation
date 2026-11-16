@@ -42,6 +42,8 @@ from src.strategies.noise_band.backtest import EOD_EXIT, FORCED
 # Exits that can fill at any time inside (or at the end of) their bar free capital only from that bar's END:
 # a stop, a compression-breakout target, and the session-close exit, which fills at the last bar's close.
 _END_OF_BAR_EXITS = (STOP_EXIT, TARGET_EXIT, EOD_EXIT, FORCED)
+# The NR v3 time stop is also called "time_exit" (like mean reversion's, which fills at its bar's open)
+# but fills at its bar's CLOSE: compression-breakout callers pass end_of_bar_extra=("time_exit",).
 # Per-trade arrays only some families carry (compression breakout), filtered with the rest.
 _EXTRA = ("side", "target_level", "entry_base", "box_hi", "box_lo", "run_start")
 
@@ -71,16 +73,18 @@ def _take(sim: SimResult, keep: np.ndarray, qty: np.ndarray, com: np.ndarray, pn
 
 
 def share_account(sims: list[SimResult], data: MRData | list[MRData], costs: CostModel, starting_equity: float, *,
-                  bar_minutes: int | list[int] = 0, per_trade: float = 0.75, cap: float = 1.0) -> SharedAccountResult:
+                  bar_minutes: int | list[int] = 0, per_trade: float = 0.75, cap: float = 1.0,
+                  end_of_bar_extra: tuple[str, ...] = ()) -> SharedAccountResult:
     """One market: `data` / `bar_minutes` one per strategy, or a single value shared by all."""
     return share_account_multi(sims, data, costs, starting_equity, bar_minutes=bar_minutes, per_trade=per_trade,
-                               total_cap=cap)
+                               total_cap=cap, end_of_bar_extra=end_of_bar_extra)
 
 
 def share_account_multi(sims: list[SimResult], data: MRData | list[MRData], costs: CostModel | list[CostModel],
                         starting_equity: float, *, bar_minutes: int | list[int] = 0, per_trade: float = 0.75,
                         total_cap: float = 1.0, market: list[str] | None = None, market_cap: float | None = None,
-                        group: list[str | None] | None = None, group_cap: float | None = None) -> SharedAccountResult:
+                        group: list[str | None] | None = None, group_cap: float | None = None,
+                        end_of_bar_extra: tuple[str, ...] = ()) -> SharedAccountResult:
     """Several strategies, possibly on several markets, in one account.
 
     `costs` (multiplier, commission) may differ per strategy, e.g. micro contracts. A trade's budget is
@@ -132,7 +136,7 @@ def share_account_multi(sims: list[SimResult], data: MRData | list[MRData], cost
         q = k * cm.multiplier
         pnl = _side(sim)[t] * (sim.exit_px[t] - sim.entry_px[t]) * q - 2 * k * per_c
         x = int(sim.exit_idx[t])
-        free_at = d.bar_open[x] + (np.timedelta64(mins[s], "m") if sim.exit_reason[t] in _END_OF_BAR_EXITS else np.timedelta64(0, "m"))
+        free_at = d.bar_open[x] + (np.timedelta64(mins[s], "m") if sim.exit_reason[t] in (*_END_OF_BAR_EXITS, *end_of_bar_extra) else np.timedelta64(0, "m"))
         open_.append((free_at, k * per, pnl, mkts[s], grps[s]))
         peak["total"] = max(peak["total"], sum(o[1] for o in open_) / cash)
         peak["market"] = max(peak["market"], sum(o[1] for o in open_ if o[3] == mkts[s]) / cash)

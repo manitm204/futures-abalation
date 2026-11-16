@@ -57,6 +57,10 @@ def main() -> None:
             continue
         # The all-markets tab only appears on a page that has all-markets results.
         markets = [(c, n) for c, n in MARKETS if c != "ALL" or any(r["market"] == "ALL" for r in mine)]
+        # A page whose all-markets runs all share one market_name (e.g. "Holdout results") shows that as the tab name.
+        all_names = {r["market_name"] for r in mine if r["market"] == "ALL"}
+        if len(all_names) == 1:
+            markets = [(c, next(iter(all_names)) if c == "ALL" else n) for c, n in markets]
         payload = json.dumps({"markets": [{"code": c, "name": n} for c, n in markets], "runs": mine})
         html = (template.replace("<title>Futures Strategy Funnels</title>", f"<title>{title}</title>")
                 .replace('<div class="brand">Futures strategy funnels</div>', f'<div class="brand">{brand}</div>')

@@ -6,7 +6,7 @@ PYTHONPATH=. -- it imports that project's own `src` / `scripts`:
 
   python ../noise-band-backtest/scripts/dump_family_runs.py FAMILY RUN PHASE OUT.npz ORDER [ORDER ...]
 
-FAMILY mr | nb | cb, RUN a funnel run id (configs/funnel/<mr|nb>_funnel_<run>.yaml; for cb,
+FAMILY mr | nb | cb | nr (nr = NR-N squeeze, run from nr-squeeze-backtest; same code as cb), RUN a funnel run id (configs/funnel/<mr|nb>_funnel_<run>.yaml; for cb,
 cb_bbkc_es_v2_15m -> configs/funnel/cb_bbkc_funnel_es_v2_15m.yaml, cb_bbkc_nq_v3_5m -> cb_bbkc_funnel_nq_v3_5m.yaml),
 PHASE full (development + validation, 2018 .. validation end) | holdout (2025+;
 needs the run's frozen selection manifest, goes through authorize_holdout_access and
@@ -56,7 +56,7 @@ def main(fam: str, run_id: str, phase: str, out: str, orders: list[int]) -> None
         from src.strategies.compression_breakout.backtest import CBData as Data
         from src.strategies.compression_breakout.backtest import simulate_compression_breakout as simulate
     # cb: <line>_<rest> -> <line>_funnel_<rest> (cb_bbkc_nq_v3_15m -> cb_bbkc_funnel_nq_v3_15m)
-    cfg_path = Path(f"configs/funnel/{'_'.join(run_id.split('_', 2)[:2])}_funnel_{run_id.split('_', 2)[2]}.yaml" if fam == "cb"
+    cfg_path = Path(f"configs/funnel/{'_'.join(run_id.split('_', 2)[:2])}_funnel_{run_id.split('_', 2)[2]}.yaml" if fam in ("cb", "nr")
                     else f"configs/funnel/{fam}_funnel_{run_id.removeprefix(fam + '_')}.yaml")
     fcfg = load_funnel_config(cfg_path)
     _select_space(fcfg)
@@ -107,7 +107,7 @@ def main(fam: str, run_id: str, phase: str, out: str, orders: list[int]) -> None
         inw = (d.session_date[sim.entry_idx] >= s64) & (d.session_date[sim.entry_idx] <= e64)
         step = np.timedelta64(AGG_INTERVAL_MINUTES[tf], "m")
         rng = np.random.default_rng([fcfg.seed, o])  # the family portfolio page's seed for this strategy
-        if fam in ("nb", "cb"):
+        if fam in ("nb", "cb", "nr"):
             pool = (sim.exit_idx[inw] - sim.entry_idx[inw] + 1).astype(np.int64)
             p_long = float(np.mean(sim.side[inw] > 0))
         rand = []

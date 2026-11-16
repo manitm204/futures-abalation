@@ -239,7 +239,7 @@ def perturbations_cb(p: CBParams, *, config_id: str, base_seed: int, pcfg: Pertu
     (never below 2) and the setup expiry (never below 1) by a non-zero integer of up to
     `integer_rel_step` (at least 1 bar); the Keltner multiple (>= 0.25), an ATR stop (>= 0.25),
     a profit target (>= 0.25R) and a non-zero minimum box width by up to +/- `float_rel_step`
-    RELATIVE. The box stop, "no target", no minimum box width, min_squeeze_bars, inside_bar,
+    RELATIVE. The box stop, "no target", no minimum box width, min_squeeze_bars, min_nr_bars, inside_bar,
     timeframe, entry type, direction, trend filter and symbol are never perturbed."""
     rng = np.random.default_rng(derive_seed(base_seed, "perturb", config_id))
     rel = pcfg.float_rel_step if pcfg.float_rel_step is not None else pcfg.integer_rel_step
@@ -276,7 +276,7 @@ def perturbations_cb(p: CBParams, *, config_id: str, base_seed: int, pcfg: Pertu
 def local_perturbations_cb(p: CBParams, lcfg) -> list[tuple[str, CBParams]]:
     """Stage-4 local test for the compression breakout: move ONE setting at a time, down and
     up, everything else held. Bar counts the config's compression type uses (squeeze length
-    and min squeeze bars, or NR-N) and the setup expiry go to round(v x (1 -/+ int_rel)) (half
+    and min squeeze bars, or NR-N and min NR bars when set) and the setup expiry go to round(v x (1 -/+ int_rel)) (half
     rounds up), at least one bar away (squeeze length >= 2, NR-N >= 2, the others >= 1); the
     Keltner multiple by -/+ kc_mult_abs (>= 0.25); an ATR stop by -/+ stop_atr_abs (>= 0.25);
     a profit target by -/+ target_r_abs (>= 0.25R); the minimum box width by -/+
@@ -301,6 +301,14 @@ def local_perturbations_cb(p: CBParams, lcfg) -> list[tuple[str, CBParams]]:
         add("min_squeeze_bars", ints(p.min_squeeze_bars, 1), "min_squeeze_bars")
     else:
         add("nr_lookback", ints(p.nr_lookback, 2), "nr_lookback")
+        if p.min_nr_bars is not None:  # an axis only in NR rounds that set it (v2 on)
+            add("min_nr_bars", ints(p.min_nr_bars, 1), "min_nr_bars")
+        if p.max_range_atr is not None:  # NR v3 range cap; "off" has no numeric neighbor
+            step = lcfg.max_range_atr_abs if lcfg.max_range_atr_abs is not None else 0.1
+            add("max_range_atr", (max(0.1, round(p.max_range_atr - step, 6)),
+                                  round(p.max_range_atr + step, 6)), "max_range_atr")
+    if p.max_hold_bars:  # time stop (NR v3); "none" has no numeric neighbor
+        add("max_hold_bars", ints(p.max_hold_bars, 1), "max_hold_bars")
     add("setup_expiry_bars", ints(p.setup_expiry_bars, 1), "setup_expiry_bars")
     if p.stop_atr is not None:
         add("stop_atr", (max(0.25, round(p.stop_atr - lcfg.stop_atr_abs, 6)),

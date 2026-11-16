@@ -1,0 +1,149 @@
+# RTY futures (E-mini Russell 2000) volatility-compression breakout, NR-N line, round 4: run
+# cb_nr_rty_v4_15m -- the ONE place every threshold lives.
+# (compression_breakout_nr_v4_15m, 2,304 configs, 15-minute bars only): NR-N with
+# N = 2/3/4/8/16/50, inside bar off/on, 1 NR bar, wick entry (stop at the box edge), setup live
+# 1 bar, stop box / 1.0 / 1.5 ATR(14), target 1R/2R/3.5R/none, long / both, trend filter
+# none / EMA(200), minimum box width any / 0.3 ATR(14), NR bar range cap off / 0.5 ATR(14),
+# no time stop. Specified by the user (2026-11-13) after reading NR v3 on ES (cb_nr_es_v3_15m).
+# No new entries in the last 30 minutes; flat at the session close. RTY's day session is
+# 09:30-16:00 NY. See src/strategies/compression_breakout/config.py.
+#
+# Every gate, threshold, data split and cost is identical to NR v3 on ES
+# (configs/funnel/cb_nr_funnel_es_v3_15m.yaml) EXCEPT the strategy / grid, the symbol and the
+# transfer symbol (ES). NQ / YM ran this same grid first (cb_nr_nq_v4_15m, cb_nr_ym_v4_15m). Stage-4 local moves: NR-N, min NR bars and setup expiry x0.8/x1.2
+# (>= 1 bar away), NR range cap -/+ 0.1 ATR, ATR stop -/+ 0.25, target -/+ 0.5R, minimum box
+# width -/+ 0.25 ATR ("off" / "none" have no numeric neighbor; every other setting held).
+#
+# Thresholds are fixed for the duration of a run and are hashed into every run's
+# outputs. They are NEVER adjusted automatically to hit a survivor count; zero
+# survivors is a valid outcome. Changing a value here is a new research trial
+# and should be recorded under `research_history` below.
+
+version: 1
+strategy: compression_breakout_nr_v4_15m
+symbol: RTY
+seed: 20261117
+
+data:
+  clean_root: data/clean
+  development: {start: 2018-01-01, end: 2022-12-31}
+  validation:  {start: 2023-01-01, end: 2024-12-31}
+  # end: null -> the actual available endpoint, recorded at access time.
+  holdout:     {start: 2025-01-01, end: null}
+  timeframes: ["15min"]
+
+data_history:
+  validation_previously_used_for_selection: true
+  validation_note: >-
+    RTY 2023-2024 was used to select BB/KC squeeze strategies (cb_bbkc_rty_v4_15m) and mean-reversion strategies; no NR-N strategy has been selected on RTY. This grid was chosen after reading NR v2/v3 on ES; it was run on RTY after its NQ / YM v4 results were seen.
+  holdout_previously_inspected: true
+  holdout_note: >-
+    RTY 2025+ was read for BB/KC squeeze holdout scoring (cb_bbkc_rty_v4_15m) and mean-reversion holdout scoring per the data-access ledgers. No NR-N metrics have been computed on RTY 2025+.
+
+metrics:
+  return_frequency: daily          # mark-to-market equity at each session close
+  periods_per_year: 252            # Sharpe = mean/std(daily) * sqrt(252)
+  risk_free_rate_annual: 0.0
+  cash_treatment: >-
+    Idle cash earns 0% and the Sharpe excess return is measured against a 0%
+    risk-free rate, so the two assumptions are consistent.
+  drawdown_basis: daily session-close mark-to-market (understates intraday DD)
+
+execution:
+  baseline: configs/execution/futures.yaml   # $2.50/contract/side + 1 tick/side slippage, unlevered whole contracts
+
+integrity:            # stage 1
+  truncation_check_sample: 40
+  truncation_points: 3
+
+trade_count:          # stage 2 -- hard gate
+  min_completed_trades: 100
+  min_trades_per_year: 10
+  min_years_meeting_floor: 4
+
+performance:          # stage 3 -- hard gate
+  min_net_return: 0.0               # strictly greater than
+  min_sharpe: 0.75                  # annualized, daily MTM returns incl. flat days
+  max_drawdown: -0.30
+  max_drawdown_source: src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct
+
+parameter_stability:  # stage 4 -- hard gate
+  mode: local_perturbation          # gate on `local` moves below; grid neighbors are diagnostic only
+  local:
+    int_rel: 0.20                   # NR-N, min NR bars, setup expiry: x0.8 / x1.2, rounded, >= 1 bar away
+    min_box_atr_abs: 0.25           # minimum box width -/+ 0.25 ATR (never below 0)
+    max_range_atr_abs: 0.1          # NR range cap -/+ 0.1 ATR (never below 0.1; "off" has no move)
+    stop_atr_abs: 0.25              # numeric ATR stop -/+ 0.25 (the box stop has no numeric move)
+    target_r_abs: 0.5               # profit target -/+ 0.5R ("none" has no numeric move)
+  neighbor_mode: single_axis        # grid-neighbor diagnostic
+  min_frac_profitable: 0.70         # of the local moves, share with dev net return > 0
+  min_median_sharpe: 0.50           # median dev Sharpe of the local moves
+  prescreen:                        # big grids: fixed before the run, like every gate
+    max_configs: 3000               # if more than this many pass stage 3, cluster them first (stage-6 rules)
+    per_cluster: 3                  # and send only the best 3 per cluster by dev Sharpe into stage 4
+  perturbation:                     # diagnostic only, never a gate
+    n_per_config: 20
+    integer_rel_step: 0.15          # NR-N, setup expiry
+    float_rel_step: 0.10            # ATR stop, target, min box width (relative)
+
+time_stability:       # stage 5 -- light hard gate + diagnostics
+  min_profitable_years: 3
+  top_trades_k: 5
+  top_trades_frac: 0.05
+
+dedup:                # stage 6
+  corr_threshold: 0.80
+  return_basis: monthly
+  linkage: complete
+  reps_per_cluster: 2               # best 2 per cluster; a single-member cluster keeps its 1
+
+execution_stress:     # stage 7
+  gate_cost_multiplier: 1.5         # hard gate: positive dev net return
+  diagnostic_cost_multipliers: [2.0]
+  entry_delay_bars: 1
+  missed_entry_frac: 0.10
+  missed_entry_sims: 100
+  breakeven_max_multiplier: 25.0
+
+validation:           # stage 8 -- hard gate (frozen representatives only)
+  min_net_return: 0.0
+  min_sharpe: 0.30
+  max_drawdown: -0.30
+  min_completed_trades: 40          # project default from 2026-10-22
+
+confidence:           # stage 9 -- diagnostics only
+  dsr_threshold: 0.95
+  dsr_calibration_verified: false
+  effective_trials_method: li_ji
+  serial_dependence: lag1_effective_n
+  transfer_symbol: ES                # unchanged rules, development period only
+
+holdout:              # stage 10 -- explicit `final-test` command only
+  acceptance:
+    min_net_return: 0.0
+    min_sharpe: 0.0
+    max_drawdown: -0.30
+    min_completed_trades: null
+
+# The sibling compression line, earlier trials on this market (other families) and the SPY
+# breakout / trend studies (the closest prior searches to this family). These count toward the DSR "known prior"
+# sensitivity only.
+research_history:
+  - name: "compression_breakout_nr_v4_15m NQ + YM (cb_nr_nq_v4_15m, cb_nr_ym_v4_15m)"
+    n_configs: 4608
+    note: "Same grid on NQ and YM; 645 / 553 passed 2023-2024. Seen before this run."
+  - name: "compression_breakout_nr_v3_15m ES (cb_nr_es_v3_15m)"
+    n_configs: 145152
+    note: "Same line on ES 15m; 666 frozen, 608 passed 2023-2024. This grid was specified after its results."
+  - name: "compression_breakout_nr_v2_15m ES (cb_nr_es_v2_15m)"
+    n_configs: 207360
+    note: "Same line on ES 15m; 1,118 frozen, 691 passed 2023-2024."
+  - name: "compression_breakout_bbkc_v4_15m RTY"
+    n_configs: 3840
+    note: "Sibling line (BB/KC squeeze) round 4."
+  - name: "compression_breakout_bbkc_v3 NQ (cb_bbkc_nq_v3_5m + _15m)"
+    n_configs: 56448
+    note: "Sibling line (BB/KC squeeze) on NQ, 5m + 15m."
+  - name: "compression_breakout_bbkc_v2_15m ES (cb_bbkc_es_v2_15m)"
+    n_configs: 184320
+    note: "Sibling line (BB/KC squeeze) on ES 15m."

@@ -55,7 +55,7 @@ FAMILIES = {
     "noise_band": Family(NBData, simulate_noise_band, nb_integrity.check_sim_integrity,
                          ("trail_exit", "eod_exit", "stop_exit")),
     "compression_breakout": Family(CBData, simulate_compression_breakout, cb_integrity.check_sim_integrity,
-                                   ("target_exit", "eod_exit", "stop_exit")),
+                                   ("target_exit", "eod_exit", "stop_exit", "time_exit")),
 }
 
 

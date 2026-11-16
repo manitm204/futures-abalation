@@ -470,3 +470,33 @@ LATTICE_CB_BBKC_V4_15M = Lattice({
     "target_r": ["1.0", "2.5", "none"],
     "min_box_atr": [0.0],
 }, FIXED_AXES_CB)
+# NR-N v2, 15-minute bars. min_nr_bars is ordered (1 < 2); inside_bar stays categorical, and so
+# does the trend filter (none / EMA 20 / 50 / 200).
+LATTICE_CB_NR_V2_15M = Lattice({
+    "nr_lookback": [2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20, 30],
+    "min_nr_bars": [1, 2],
+    "setup_expiry_bars": [1, 3, 6],
+    "target_r": ["1.0", "2.0", "3.0", "5.0", "none"],
+    "min_box_atr": [0.0, 0.3, 0.75],
+}, [*FIXED_AXES_CB, "inside_bar"])
+# NR-N v3, 15-minute bars. The range cap orders off (widest) after 0.8; the time stop orders
+# 4 < 8 < none (0). inside_bar and the trend filter stay categorical.
+LATTICE_CB_NR_V3_15M = Lattice({
+    "nr_lookback": [2, 3, 5, 10, 25, 50, 80],
+    "min_nr_bars": [1, 2, 4],
+    "setup_expiry_bars": [1, 3],
+    "target_r": ["1.0", "2.5", "4.0", "none"],
+    "min_box_atr": [0.0, 0.3, 0.5],
+    "max_range_atr": ["0.5", "0.8", "off"],
+    "max_hold_bars": [4, 8, 0],
+}, [*FIXED_AXES_CB, "inside_bar"])
+# NR-N v4, 15-minute bars (NQ, YM): single-value axes kept so every grid key is on the lattice.
+LATTICE_CB_NR_V4_15M = Lattice({
+    "nr_lookback": [2, 3, 4, 8, 16, 50],
+    "min_nr_bars": [1],
+    "setup_expiry_bars": [1],
+    "target_r": ["1.0", "2.0", "3.5", "none"],
+    "min_box_atr": [0.0, 0.3],
+    "max_range_atr": ["0.5", "off"],
+    "max_hold_bars": [0],
+}, [*FIXED_AXES_CB, "inside_bar"])

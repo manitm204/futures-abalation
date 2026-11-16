@@ -10,6 +10,8 @@ its own rounds; the YAML's `strategy` picks the line's parameter space:
 size: `compression_breakout_bbkc_v2_5m` (72,576) and `compression_breakout_bbkc_v2_15m` (184,320).
 Squeeze v3 (NQ) likewise: `compression_breakout_bbkc_v3_5m` (27,648) and `compression_breakout_bbkc_v3_15m` (28,800).
 Squeeze v4 (YM): `compression_breakout_bbkc_v4_15m` (3,840).
+NR-N v2 (15m only): `compression_breakout_nr_v2_15m` (207,360). NR-N v3: `compression_breakout_nr_v3_15m` (145,152).
+NR-N v4 (NQ, YM): `compression_breakout_nr_v4_15m` (2,304).
 All thresholds live in the YAML (hashed into every output).
 
 Commands (each is a separate, explicit step):
@@ -46,7 +48,7 @@ import typer
 
 from src.analysis.neighborhood import (LATTICE_CB_BBKC_V1, LATTICE_CB_BBKC_V2_5M, LATTICE_CB_BBKC_V2_15M, LATTICE_CB_BBKC_V3_5M, LATTICE_CB_BBKC_V3_15M,
                                      LATTICE_CB_BBKC_V4_15M,
-                                       LATTICE_CB_NR_V1, NeighborhoodStats, neighborhood_stats)
+                                       LATTICE_CB_NR_V1, LATTICE_CB_NR_V2_15M, LATTICE_CB_NR_V3_15M, LATTICE_CB_NR_V4_15M, NeighborhoodStats, neighborhood_stats)
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.data.aggregation import AGG_INTERVAL_MINUTES, aggregate_bars
 from src.experiments.data_access import (
@@ -94,10 +96,11 @@ from src.experiments.funnel_robustness import (
     quantile,
 )
 from src.experiments.cb_grid import (cb_grid_bbkc, cb_grid_bbkc_v2_5m, cb_grid_bbkc_v2_15m, cb_grid_bbkc_v3_5m,
-                                     cb_grid_bbkc_v3_15m, cb_grid_bbkc_v4_15m, cb_grid_nr)
+                                     cb_grid_bbkc_v3_15m, cb_grid_bbkc_v4_15m, cb_grid_nr,
+                                     cb_grid_nr_v2_15m, cb_grid_nr_v3_15m, cb_grid_nr_v4_15m)
 from src.experiments.cb_integrity import CHECKS, truncation_invariance
 from src.strategies.compression_breakout.backtest import CBParams
-from src.strategies.compression_breakout.config import (NRBreakoutConfig, SqueezeBreakoutConfig,
+from src.strategies.compression_breakout.config import (NRBreakoutConfig, NRBreakoutV2_15mConfig, NRBreakoutV3_15mConfig, NRBreakoutV4_15mConfig, SqueezeBreakoutConfig,
                                                         SqueezeBreakoutV2_5mConfig, SqueezeBreakoutV2_15mConfig,
                                                         SqueezeBreakoutV3_5mConfig, SqueezeBreakoutV3_15mConfig,
                                                         SqueezeBreakoutV4_15mConfig)
@@ -155,6 +158,24 @@ SPACES = {
         "grid": cb_grid_nr, "cls": NRBreakoutConfig, "lattice": LATTICE_CB_NR_V1,
         "perturb": perturbations_cb, "local": local_perturbations_cb,
         "keys": ("symbol", "timeframe", "compression", "nr_lookback", "inside_bar", *CB_SHARED_KEYS),
+    },
+    "compression_breakout_nr_v2_15m": {
+        "grid": cb_grid_nr_v2_15m, "cls": NRBreakoutV2_15mConfig, "lattice": LATTICE_CB_NR_V2_15M,
+        "perturb": perturbations_cb, "local": local_perturbations_cb,
+        "keys": ("symbol", "timeframe", "compression", "nr_lookback", "inside_bar", "min_nr_bars",
+                 *CB_SHARED_KEYS),
+    },
+    "compression_breakout_nr_v3_15m": {
+        "grid": cb_grid_nr_v3_15m, "cls": NRBreakoutV3_15mConfig, "lattice": LATTICE_CB_NR_V3_15M,
+        "perturb": perturbations_cb, "local": local_perturbations_cb,
+        "keys": ("symbol", "timeframe", "compression", "nr_lookback", "inside_bar", "min_nr_bars",
+                 *CB_SHARED_KEYS, "max_range_atr", "max_hold_bars"),
+    },
+    "compression_breakout_nr_v4_15m": {
+        "grid": cb_grid_nr_v4_15m, "cls": NRBreakoutV4_15mConfig, "lattice": LATTICE_CB_NR_V4_15M,
+        "perturb": perturbations_cb, "local": local_perturbations_cb,
+        "keys": ("symbol", "timeframe", "compression", "nr_lookback", "inside_bar", "min_nr_bars",
+                 *CB_SHARED_KEYS, "max_range_atr", "max_hold_bars"),
     },
 }
 SPACE = SPACES["compression_breakout_bbkc"]
@@ -689,7 +710,7 @@ def _manifest(fcfg, ec, prov, experiment_id, cands, by_id, cluster_of) -> dict:
     }
 
 
-SLIM_KEYS = ["config_id", "dedup_cluster", "full_n_target_exits", "full_n_eod_exits", "full_n_stop_exits", "dev_n_completed_trades", "dev_net_return", "dev_cagr",
+SLIM_KEYS = ["config_id", "dedup_cluster", "full_n_target_exits", "full_n_eod_exits", "full_n_stop_exits", "full_n_time_exits", "dev_n_completed_trades", "dev_net_return", "dev_cagr",
              "dev_sharpe", "dev_max_drawdown", "dev_max_dd_duration_days", "dev_profit_factor", "dev_exposure",
              "dev_turnover_annual", "dev_n_profitable_years", "dev_excl_best_year_return", "dev_excl_best_year_sharpe",
              "dev_best_year", "dev_best_year_contribution", "dev_top_k_trades_contribution",
@@ -715,10 +736,10 @@ def _slim(r: dict) -> dict:
 
 AUDIT_NOTES = [
     "Compression at bar k uses bars through k only: bbkc = 2 x population sd(close, L) < kc_mult x Wilder ATR(L) (Bollinger 2 sd inside a Keltner channel, both centred on SMA(L)); nr = the bar's high-low range is the narrowest of the last N bars (ties count), and with inside_bar also inside the previous bar's range. Indicators run over the RTH bar series across sessions.",
-    "A run is a maximal stretch of consecutive compression bars inside one session (never continued across the open); its box through bar r is [min low, max high] of its bars up to r. The decision at bar k uses the run holding the last compression bar r <= k-1 of k's session, live when k - r <= setup_expiry_bars, the run is at least min_squeeze_bars long (NR: 1) and the box is at least min_box_atr x ATR(14)[r] wide, so the box never includes the decision bar. A box too narrow to be live never consumes its run.",
+    "A run is a maximal stretch of consecutive compression bars inside one session (never continued across the open); its box through bar r is [min low, max high] of its bars up to r. The decision at bar k uses the run holding the last compression bar r <= k-1 of k's session, live when k - r <= setup_expiry_bars, the run is at least min_squeeze_bars long (NR: min_nr_bars, 1 unless the round sets it) and the box is at least min_box_atr x ATR(14)[r] wide, so the box never includes the decision bar. A box too narrow to be live never consumes its run.",
     "Breakout: close entries need close_k beyond the box and fill at the NEXT bar's open (market slippage); wick entries are a stop order at the box edge, filled on bar k at the worse of its open and the edge (stop slippage); a wick bar through both edges is ambiguous and not traded. The fill bar must be in the decision's session.",
     "The FIRST breakout of a run decides and consumes it, traded or not (wrong direction, trend filter, inside the last 30 minutes, a position already open, a missed entry). Each setup is one decision.",
-    "Filters known at the decision: ema50 needs close > EMA(50) for a long / < for a short (close entries at bar k, wick entries at bar k-1); no decision on the session's last bar or less than 30 minutes before its last close.",
+    "Filters known at the decision: emaN (ema20 / ema50 / ema200) needs close > EMA(N) for a long / < for a short (close entries at bar k, wick entries at bar k-1); no decision on the session's last bar or less than 30 minutes before its last close.",
     "Stop = the far side of the box, or entry price -/+ k x ATR(14) using the ATR known before the fill bar; R = entry price (before slippage) to stop; target = entry +/- target_r x R. Stop and target are live intrabar from the entry bar; a bar touching both counts as the stop; on a wick entry's own bar only the stop is checked, and a touch there counts (conservative). Stops fill at the worse of open and stop, targets at the better of open and target (a gap through it), each with slippage.",
     "Every position still open on the session's last bar is closed at that bar's CLOSE (market-on-close with the same slippage); nothing is held overnight. Stop and target take precedence over the close.",
     "Long and short: P&L = side x (exit fill - entry fill) x quantity - commissions; sizing is the mean-reversion funnel's (as many whole contracts as equity covers at full contract value, unlevered, compounding).",

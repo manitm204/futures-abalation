@@ -1,0 +1,450 @@
+{
+  "data_access": {
+    "actual_last_session": "2022-12-30",
+    "command": "develop",
+    "experiment_id": "cb_nr_6e_v4_15m",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 60,
+    "partition_fingerprint": "1149933767f42109",
+    "phase": "development",
+    "phase_end": "2022-12-31",
+    "rows": 1737321,
+    "symbol": "6E"
+  },
+  "data_history": {
+    "holdout_note": "No compression-breakout or other-family holdout metrics have been computed on 6E 2025+ per the data-access ledgers.",
+    "holdout_previously_inspected": false,
+    "validation_note": "6E 2023-2024 was used to select BB/KC squeeze strategies (cb_bbkc_6e_v4_15m) and mean-reversion strategies; no NR-N strategy has been selected on 6E. This grid was chosen after reading NR v2/v3 on ES; it was run on 6E after its NQ / YM / RTY / CL v4 results were seen.",
+    "validation_previously_used_for_selection": true
+  },
+  "dsr": {
+    "calibration_verified": false,
+    "effective_trials": {
+      "li_ji": 291.99999999999955,
+      "n_components_95": 119,
+      "n_series": 2304,
+      "participation_ratio": 12.706301893505275,
+      "rank_bound_T": 1259
+    },
+    "n_configs_with_defined_sharpe": 2304,
+    "primary_method": "li_ji",
+    "research_history": [
+      {
+        "n_configs": 9216,
+        "name": "compression_breakout_nr_v4_15m NQ / YM / RTY / CL",
+        "note": "Same grid on NQ, YM, RTY and CL; 645 / 553 / 136 / 20 passed 2023-2024. Seen before this run."
+      },
+      {
+        "n_configs": 145152,
+        "name": "compression_breakout_nr_v3_15m ES (cb_nr_es_v3_15m)",
+        "note": "Same line on ES 15m; 666 frozen, 608 passed 2023-2024. This grid was specified after its results."
+      },
+      {
+        "n_configs": 207360,
+        "name": "compression_breakout_nr_v2_15m ES (cb_nr_es_v2_15m)",
+        "note": "Same line on ES 15m; 1,118 frozen, 691 passed 2023-2024."
+      },
+      {
+        "n_configs": 3840,
+        "name": "compression_breakout_bbkc_v4_15m 6E",
+        "note": "Sibling line (BB/KC squeeze) round 4."
+      },
+      {
+        "n_configs": 56448,
+        "name": "compression_breakout_bbkc_v3 NQ (cb_bbkc_nq_v3_5m + _15m)",
+        "note": "Sibling line (BB/KC squeeze) on NQ, 5m + 15m."
+      },
+      {
+        "n_configs": 184320,
+        "name": "compression_breakout_bbkc_v2_15m ES (cb_bbkc_es_v2_15m)",
+        "note": "Sibling line (BB/KC squeeze) on ES 15m."
+      }
+    ],
+    "serial_dependence": "lag1_effective_n",
+    "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+    "trial_count_options": {
+      "li_ji": 291.99999999999955,
+      "participation_ratio": 12.706301893505275,
+      "raw": 2304.0,
+      "raw_plus_known_prior": 608640.0
+    },
+    "unresolved": [
+      "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+      "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+      "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+      "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+    ],
+    "variance_of_trial_sharpes_per_period": 0.0018749019549937592
+  },
+  "elapsed_s": 57.4,
+  "experiment_id": "cb_nr_6e_v4_15m",
+  "frozen_manifest_sha256": "9c6aa085282a4f28b4590156d27f36e923ecc5e563540ed743a1c060fa102795",
+  "instrument_type": "futures",
+  "integrity": {
+    "checks_per_config": [
+      "box_not_from_prior_compression_run",
+      "setup_not_live",
+      "not_first_breakout_of_run",
+      "entry_signal_condition_not_met",
+      "direction_not_allowed",
+      "entry_against_trend",
+      "entry_inside_last_entry_cutoff",
+      "entry_not_after_signal_same_session",
+      "exit_before_entry",
+      "position_held_overnight",
+      "entry_fill_better_than_market",
+      "stop_not_per_rule",
+      "target_not_per_rule",
+      "stop_exit_without_touch",
+      "stop_fill_better_than_rule",
+      "target_exit_without_touch",
+      "target_fill_better_than_rule",
+      "target_taken_when_stop_touched",
+      "exit_not_at_first_touch",
+      "eod_exit_not_at_session_close",
+      "time_exit_not_per_rule",
+      "held_past_time_stop",
+      "exit_fill_better_than_market",
+      "overlapping_positions",
+      "position_exceeds_equity",
+      "forced_close_not_final_trade",
+      "commission_below_minimum"
+    ],
+    "cut_fractions": [
+      0.3,
+      0.6000000000000001,
+      0.9
+    ],
+    "failures": {},
+    "truncation_sample": 40
+  },
+  "mode": "development_only",
+  "n_configs": 2304,
+  "n_frozen_candidates": 14,
+  "provenance": {
+    "available_data_endpoint_per_manifest": {
+      "6E": "2026-10-16",
+      "ES": "2026-10-16"
+    },
+    "config_path": "configs/funnel/cb_nr_funnel_6e_v4_15m.yaml",
+    "config_sha256": "b2e79935edd7247ebbfc5ecdd23ad6c5807acbe320c5500f15f59effc003c519",
+    "created_at": "2026-11-14T02:17:17.194971+00:00",
+    "data_manifests": {
+      "6E": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3055554,
+        "schema_version": "1.0.0"
+      },
+      "ES": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3099325,
+        "schema_version": "1.0.0"
+      }
+    },
+    "git_commit": "278b87465dd401b00b631f31d923a4ab8f566664",
+    "git_diff_sha256": "234dce23ae0e624cba239e56124f0f4ae70f94e982873fb05316b6bff09b82da",
+    "git_dirty": true,
+    "seed": 20261121
+  },
+  "rejection_reason_counts": {
+    "s1:hard_reject:integrity:box_not_from_prior_compression_run": 1512,
+    "s1:hard_reject:integrity:entry_fill_better_than_market": 1416,
+    "s1:hard_reject:integrity:entry_signal_condition_not_met": 1024,
+    "s1:hard_reject:integrity:eod_exit_not_at_session_close": 226,
+    "s1:hard_reject:integrity:exit_not_at_first_touch": 338,
+    "s1:hard_reject:integrity:not_first_breakout_of_run": 1128,
+    "s1:hard_reject:integrity:stop_exit_without_touch": 444,
+    "s1:hard_reject:integrity:stop_fill_better_than_rule": 474,
+    "s1:hard_reject:integrity:stop_not_per_rule": 1444,
+    "s1:hard_reject:integrity:target_not_per_rule": 1086,
+    "s1:hard_reject:integrity:target_taken_when_stop_touched": 8,
+    "s2:hard_reject:completed_trades": 96,
+    "s2:hard_reject:years_with_>=10_trades": 24,
+    "s3:hard_reject:net_return": 342,
+    "s3:hard_reject:sharpe": 634,
+    "s4:hard_reject:local_frac_profitable": 2
+  },
+  "survivor_table": [
+    {
+      "evaluated": 2304,
+      "kind": "universe",
+      "passed": 2304,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "0 universe"
+    },
+    {
+      "evaluated": 2304,
+      "hard_reject": 1512,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 792,
+      "pct_of_previous": 34.375,
+      "pct_of_universe": 34.375,
+      "stage": "1 backtest integrity",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 792,
+      "hard_reject": 96,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 696,
+      "pct_of_previous": 87.87878787878788,
+      "pct_of_universe": 30.208333333333332,
+      "stage": "2 trade count & coverage",
+      "with_warnings": 693
+    },
+    {
+      "evaluated": 696,
+      "hard_reject": 634,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 62,
+      "pct_of_previous": 8.908045977011493,
+      "pct_of_universe": 2.6909722222222223,
+      "stage": "3 performance & risk",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 62,
+      "hard_reject": 2,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 60,
+      "pct_of_previous": 96.7741935483871,
+      "pct_of_universe": 2.6041666666666665,
+      "stage": "4 parameter stability",
+      "with_warnings": 30
+    },
+    {
+      "evaluated": 60,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 60,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 2.6041666666666665,
+      "stage": "5 time stability",
+      "with_warnings": 55
+    },
+    {
+      "deduplicated": 46,
+      "evaluated": 60,
+      "kind": "dedup",
+      "n_clusters": 8,
+      "note": "best 2 per cluster",
+      "passed": 14,
+      "pct_of_previous": 23.333333333333332,
+      "pct_of_universe": 0.6076388888888888,
+      "stage": "6 deduplication"
+    },
+    {
+      "evaluated": 14,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 14,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 0.6076388888888888,
+      "stage": "7 execution stress",
+      "with_warnings": 10
+    },
+    {
+      "evaluated": null,
+      "kind": "hard_gate",
+      "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "8 frozen validation"
+    },
+    {
+      "evaluated": 14,
+      "kind": "diagnostic_only",
+      "note": "diagnostic only: unverified: 14",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "9 DSR / transfer"
+    },
+    {
+      "evaluated": null,
+      "kind": "explicit_command",
+      "note": "not run; `final-test` command only",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "10 final holdout"
+    }
+  ],
+  "symbol": "6E",
+  "thresholds": {
+    "confidence": {
+      "dsr_calibration_verified": false,
+      "dsr_threshold": 0.95,
+      "effective_trials_method": "li_ji",
+      "serial_dependence": "lag1_effective_n",
+      "transfer_symbol": "ES"
+    },
+    "data": {
+      "clean_root": "data/clean",
+      "development": {
+        "end": "2022-12-31",
+        "start": "2018-01-01"
+      },
+      "holdout": {
+        "end": null,
+        "start": "2025-01-01"
+      },
+      "timeframes": [
+        "15min"
+      ],
+      "validation": {
+        "end": "2024-12-31",
+        "start": "2023-01-01"
+      }
+    },
+    "data_history": {
+      "holdout_note": "No compression-breakout or other-family holdout metrics have been computed on 6E 2025+ per the data-access ledgers.",
+      "holdout_previously_inspected": false,
+      "validation_note": "6E 2023-2024 was used to select BB/KC squeeze strategies (cb_bbkc_6e_v4_15m) and mean-reversion strategies; no NR-N strategy has been selected on 6E. This grid was chosen after reading NR v2/v3 on ES; it was run on 6E after its NQ / YM / RTY / CL v4 results were seen.",
+      "validation_previously_used_for_selection": true
+    },
+    "dedup": {
+      "corr_threshold": 0.8,
+      "linkage": "complete",
+      "reps_per_cluster": 2,
+      "return_basis": "monthly"
+    },
+    "execution": {
+      "baseline": "configs/execution/futures.yaml"
+    },
+    "execution_stress": {
+      "breakeven_max_multiplier": 25.0,
+      "diagnostic_cost_multipliers": [
+        2.0
+      ],
+      "entry_delay_bars": 1,
+      "gate_cost_multiplier": 1.5,
+      "missed_entry_frac": 0.1,
+      "missed_entry_sims": 100
+    },
+    "holdout": {
+      "acceptance": {
+        "max_drawdown": -0.3,
+        "min_completed_trades": null,
+        "min_net_return": 0.0,
+        "min_sharpe": 0.0
+      }
+    },
+    "integrity": {
+      "truncation_check_sample": 40,
+      "truncation_points": 3
+    },
+    "metrics": {
+      "cash_treatment": "Idle cash earns 0% and the Sharpe excess return is measured against a 0% risk-free rate, so the two assumptions are consistent.",
+      "drawdown_basis": "daily session-close mark-to-market (understates intraday DD)",
+      "periods_per_year": 252,
+      "return_frequency": "daily",
+      "risk_free_rate_annual": 0.0
+    },
+    "parameter_stability": {
+      "local": {
+        "band_mult_abs": null,
+        "entry_z_abs": null,
+        "exit_z_abs": null,
+        "int_rel": 0.2,
+        "kc_mult_abs": null,
+        "max_range_atr_abs": 0.1,
+        "min_box_atr_abs": 0.25,
+        "stop_atr_abs": 0.25,
+        "target_r_abs": 0.5
+      },
+      "min_frac_profitable": 0.7,
+      "min_median_sharpe": 0.5,
+      "mode": "local_perturbation",
+      "neighbor_mode": "single_axis",
+      "perturbation": {
+        "float_rel_step": 0.1,
+        "integer_rel_step": 0.15,
+        "n_per_config": 20,
+        "z_abs": null
+      },
+      "prescreen": {
+        "max_configs": 3000,
+        "per_cluster": 3
+      }
+    },
+    "performance": {
+      "max_drawdown": -0.3,
+      "max_drawdown_source": "src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct",
+      "min_net_return": 0.0,
+      "min_sharpe": 0.75
+    },
+    "research_history": [
+      {
+        "n_configs": 9216,
+        "name": "compression_breakout_nr_v4_15m NQ / YM / RTY / CL",
+        "note": "Same grid on NQ, YM, RTY and CL; 645 / 553 / 136 / 20 passed 2023-2024. Seen before this run."
+      },
+      {
+        "n_configs": 145152,
+        "name": "compression_breakout_nr_v3_15m ES (cb_nr_es_v3_15m)",
+        "note": "Same line on ES 15m; 666 frozen, 608 passed 2023-2024. This grid was specified after its results."
+      },
+      {
+        "n_configs": 207360,
+        "name": "compression_breakout_nr_v2_15m ES (cb_nr_es_v2_15m)",
+        "note": "Same line on ES 15m; 1,118 frozen, 691 passed 2023-2024."
+      },
+      {
+        "n_configs": 3840,
+        "name": "compression_breakout_bbkc_v4_15m 6E",
+        "note": "Sibling line (BB/KC squeeze) round 4."
+      },
+      {
+        "n_configs": 56448,
+        "name": "compression_breakout_bbkc_v3 NQ (cb_bbkc_nq_v3_5m + _15m)",
+        "note": "Sibling line (BB/KC squeeze) on NQ, 5m + 15m."
+      },
+      {
+        "n_configs": 184320,
+        "name": "compression_breakout_bbkc_v2_15m ES (cb_bbkc_es_v2_15m)",
+        "note": "Sibling line (BB/KC squeeze) on ES 15m."
+      }
+    ],
+    "seed": 20261121,
+    "strategy": "compression_breakout_nr_v4_15m",
+    "symbol": "6E",
+    "time_stability": {
+      "min_profitable_years": 3,
+      "top_trades_frac": 0.05,
+      "top_trades_k": 5
+    },
+    "trade_count": {
+      "min_completed_trades": 100,
+      "min_trades_per_year": 10,
+      "min_years_meeting_floor": 4
+    },
+    "validation": {
+      "max_drawdown": -0.3,
+      "min_completed_trades": 40,
+      "min_net_return": 0.0,
+      "min_sharpe": 0.3
+    },
+    "version": 1
+  },
+  "transfer_symbol": "ES"
+}

@@ -13,7 +13,7 @@ bars up to r.
 
 Setups: at bar k the active run is the one holding the last compression bar r <= k-1 of
 the same session. It is live when k - r <= setup_expiry_bars and the run (through r) is at
-least min_squeeze_bars long (NR: 1) and its box is at least min_box_atr x ATR(14)[r] wide.
+least min_squeeze_bars long (NR: min_nr_bars, default 1) and its box is at least min_box_atr x ATR(14)[r] wide.
 So the box a decision uses is built only from bars BEFORE the decision bar:
     entry_type = close : breakout at bar k when close_k > box high (long) / < box low (short)
     entry_type = wick  : breakout at bar k when high_k > box high / low_k < box low (a stop
@@ -26,7 +26,7 @@ position already open, a missed entry). This keeps one setup = one decision.
 Execution assumptions (audited by src/experiments/cb_integrity.py):
   * long and/or short (`direction`), one position at a time, compounding equity, no leverage;
     every position is closed by the session's last bar (nothing is held overnight);
-  * filters, all known at the decision: trend_filter = ema50 needs close > EMA(50) for a long
+  * filters, all known at the decision: trend_filter = emaN needs close > EMA(N) for a long
     and < for a short (close entries: at bar k; wick entries: at bar k-1, the last close
     before the order can fill); no decision on the session's last bar or less than
     `last_entry_cutoff` minutes before the session's last close;
@@ -45,6 +45,10 @@ Execution assumptions (audited by src/experiments/cb_integrity.py):
     fills at the stop;
   * session-close exit: a position still open on the session's last bar is closed at that
     bar's CLOSE (market-on-close with market slippage); stop and target take precedence;
+  * time stop (max_hold_bars = N, NR v3 on): a position still open at the close of bar
+    entry + N is closed at that close with market slippage; stop and target on that bar take
+    precedence, and the session close comes first if it is earlier;
+  * NR v3 max_range_atr = x: an NR bar also needs high - low <= x * ATR(14) of that bar;
   * every fill pays adverse slippage + commission; sizing is the mean-reversion funnel's
     (as many whole contracts as equity covers at full contract value);
   * a position closed on the data's final bar by the session-close rule is flagged forced
@@ -67,11 +71,13 @@ from src.strategies.compression_breakout.config import (
     BB_STD,
     LAST_ENTRY_CUTOFF_MINUTES,
     TREND_EMA,
+    trend_ema_span,
 )
 from src.strategies.mean_reversion.backtest import CostModel, scale_variable_costs  # noqa: F401  (re-export)
 from src.utils.config_models import ExecutionConfig
 
 TARGET_EXIT, EOD_EXIT, STOP_EXIT, FORCED = "target_exit", "eod_exit", "stop_exit", "forced_close"
+TIME_EXIT = "time_exit"  # time stop (max_hold_bars): the close of the Nth bar after entry
 
 
 def _cacheable(kc_mult: float) -> bool:
@@ -148,11 +154,14 @@ class CBData:
             return m.astype(float), v.astype(float)
         return self._get(("sma_sd", length), calc)
 
+    def ema(self, span: int) -> np.ndarray:
+        return self._get(("ema", span), lambda: pl.Series(self.close)
+                         .ewm_mean(span=span, adjust=False, min_samples=span)
+                         .fill_null(np.nan).to_numpy().astype(float))
+
     @property
     def ema_trend(self) -> np.ndarray:
-        return self._get(("ema", TREND_EMA), lambda: pl.Series(self.close)
-                         .ewm_mean(span=TREND_EMA, adjust=False, min_samples=TREND_EMA)
-                         .fill_null(np.nan).to_numpy().astype(float))
+        return self.ema(TREND_EMA)
 
     @property
     def bar_range(self) -> np.ndarray:
@@ -173,6 +182,8 @@ class CBData:
             # cache cannot grow without bound (the noise-band funnel ran out of memory that way).
             return self._get(key, calc, cache=_cacheable(p.kc_mult))
         if p.compression == "nr":
+            cap = p.max_range_atr
+
             def calc():
                 rng = self.bar_range
                 mn = pl.Series(rng).rolling_min(window_size=p.nr_lookback, min_samples=p.nr_lookback)
@@ -183,8 +194,11 @@ class CBData:
                     inside = np.zeros(self.n, dtype=bool)
                     inside[1:] = (self.high[1:] <= self.high[:-1]) & (self.low[1:] >= self.low[:-1])
                     out &= inside
+                if cap is not None:  # absolute quiet too: range <= cap x ATR(14) at the bar
+                    with np.errstate(invalid="ignore"):
+                        out &= rng <= cap * self.atr(ATR_PERIOD)  # NaN ATR -> False
                 return out
-            return self._get(("comp", *self._comp_key(p)), calc)
+            return self._get(("comp", *self._comp_key(p)), calc, cache=cap is None or _cacheable(cap))
         raise ValueError(f"Unknown compression {p.compression!r}")
 
     def runs(self, p: "CBParams") -> dict[str, np.ndarray]:
@@ -212,13 +226,15 @@ class CBData:
             before = np.concatenate([[-1], last[:-1]]) if n else last
             before = np.where(before >= self.sess_start, before, -1)
             return {"run_start": run_start, "box_hi": box_hi, "box_lo": box_lo, "last_before": before}
-        return self._get(key, calc, cache=p.compression == "nr" or _cacheable(p.kc_mult))
+        cache = (p.max_range_atr is None or _cacheable(p.max_range_atr)) if p.compression == "nr" else _cacheable(p.kc_mult)
+        return self._get(key, calc, cache=cache)
 
     @staticmethod
     def _comp_key(p: "CBParams") -> tuple:
         if p.compression == "bbkc":
             return ("bbkc", p.squeeze_length, round(p.kc_mult, 9))
-        return ("nr", p.nr_lookback, bool(p.inside_bar))
+        cap = None if p.max_range_atr is None else round(p.max_range_atr, 9)
+        return ("nr", p.nr_lookback, bool(p.inside_bar), cap)
 
 
 @dataclass(frozen=True)
@@ -244,6 +260,9 @@ class CBParams:
     min_box_atr: float = 0.0    # the box must be at least this x ATR(14) wide (0 = any)
     inside_bar: bool = False    # NR only: the NR bar must also be an inside bar
     last_entry_cutoff: int = LAST_ENTRY_CUTOFF_MINUTES
+    min_nr_bars: int | None = None  # NR only: NR bars in a row before the box counts (None = 1, not an axis)
+    max_range_atr: float | None = None  # NR only: each NR bar's range must be <= this x ATR(14) (None = off)
+    max_hold_bars: int | None = None    # time stop: exit at the close of bar entry + N (None / 0 = none)
 
     @classmethod
     def from_config(cls, cfg) -> "CBParams":
@@ -252,11 +271,16 @@ class CBParams:
                    None if kc is None else float(kc), getattr(cfg, "min_squeeze_bars", None),
                    getattr(cfg, "nr_lookback", None), cfg.entry_type, cfg.setup_expiry_bars,
                    cfg.stop_atr_value, cfg.target_r_value, cfg.direction, cfg.trend_filter,
-                   float(cfg.min_box_atr), bool(getattr(cfg, "inside_bar", False)))
+                   float(cfg.min_box_atr), bool(getattr(cfg, "inside_bar", False)),
+                   min_nr_bars=getattr(cfg, "min_nr_bars", None),
+                   max_range_atr=getattr(cfg, "max_range_atr_value", None),
+                   max_hold_bars=getattr(cfg, "max_hold_bars", None) or None)
 
     @property
     def min_run(self) -> int:
-        return self.min_squeeze_bars if self.compression == "bbkc" else 1
+        if self.compression == "bbkc":
+            return self.min_squeeze_bars
+        return self.min_nr_bars or 1
 
 
 def as_params(cfg) -> CBParams:
@@ -299,8 +323,7 @@ def setups(data: CBData, p: CBParams) -> dict[str, np.ndarray]:
         raise ValueError(f"Unknown entry_type {p.entry_type!r}")
     if p.direction not in ("long", "short", "both"):
         raise ValueError(f"Unknown direction {p.direction!r}")
-    if p.trend_filter not in ("none", "ema50"):
-        raise ValueError(f"Unknown trend_filter {p.trend_filter!r}")
+    span = trend_ema_span(p.trend_filter)  # raises on an unknown filter
     ru = data.runs(p)
     lb = ru["last_before"]
     k = np.arange(data.n)
@@ -326,9 +349,9 @@ def setups(data: CBData, p: CBParams) -> dict[str, np.ndarray]:
         ok &= side > 0
     elif p.direction == "short":
         ok &= side < 0
-    if p.trend_filter == "ema50":
+    if span is not None:
         j = ks if p.entry_type == "close" else ks - 1
-        ema, c = data.ema_trend[j], data.close[j]
+        ema, c = data.ema(span)[j], data.close[j]
         ok &= np.where(side > 0, c > ema, c < ema)  # NaN EMA -> False
     to_close = data.tod[data.sess_end[ks]] - data.tod[ks]  # bar close to the session's last close, minutes
     ok &= ~data.is_last[ks] & (to_close >= p.last_entry_cutoff)
@@ -399,6 +422,7 @@ def simulate_compression_breakout(
             continue
         seq += 1
         L = int(data.sess_end[e])
+        T = e + p.max_hold_bars if p.max_hold_bars else n  # time-stop bar (after the stop / target checks)
         side = "long" if d > 0 else "short"
         x_action = "sell" if d > 0 else "buy"
         entry_fill = Fill(order_id=f"e{seq}", symbol=p.symbol, side=side, quantity=qty, fill_price=fill_px,
@@ -417,6 +441,9 @@ def simulate_compression_breakout(
             if j == L:
                 exit_px, why = costs.fill(c[j], x_action), (FORCED if j == n - 1 else EOD_EXIT)
                 break
+            if j == T:
+                exit_px, why = costs.fill(c[j], x_action), TIME_EXIT
+                break
         x = j
         forced = why == FORCED
         exit_fill = Fill(order_id=f"x{seq}", symbol=p.symbol, side=side, quantity=qty, fill_price=exit_px,
@@ -425,7 +452,8 @@ def simulate_compression_breakout(
         commissions = entry_fill.commission + exit_fill.commission
         realized = d * (exit_px - fill_px) * qty - commissions
         reason = {TARGET_EXIT: ExitReason.TAKE_PROFIT, EOD_EXIT: ExitReason.SESSION_EXIT,
-                  STOP_EXIT: ExitReason.STOP_LOSS, FORCED: ExitReason.SESSION_EXIT}[why]
+                  STOP_EXIT: ExitReason.STOP_LOSS, FORCED: ExitReason.SESSION_EXIT,
+                  TIME_EXIT: ExitReason.TIME_EXIT}[why]
         trades.append(Trade(
             trade_id=f"t{seq}", config_id="", symbol=p.symbol, side=side, entry_order_id=entry_fill.order_id,
             entry_fill=entry_fill, quantity=qty, stop_price=stop,

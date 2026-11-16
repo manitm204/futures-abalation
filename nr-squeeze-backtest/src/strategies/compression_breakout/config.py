@@ -77,6 +77,15 @@ TREND_EMA = 50
 ATR_PERIOD = 14
 
 
+def trend_ema_span(trend_filter: str) -> int | None:
+    """EMA length of a trend filter ("none" -> None, "ema50" -> 50, ...)."""
+    if trend_filter == "none":
+        return None
+    if trend_filter.startswith("ema") and trend_filter[3:].isdigit() and int(trend_filter[3:]) >= 2:
+        return int(trend_filter[3:])
+    raise ValueError(f"Unknown trend_filter {trend_filter!r}")
+
+
 class _BreakoutConfig(FrozenModel):
     """Settings every compression line shares."""
 
@@ -242,3 +251,106 @@ class SqueezeBreakoutV4_15mConfig(_BreakoutConfig):
     target_r: Literal["1.0", "2.5", "none"] = "2.5"
     direction: Literal["long", "both"] = "both"
     min_box_atr: Literal[0.0] = 0.0
+
+
+# --- compression_breakout_nr v2 (15-minute bars only, 207,360 configs) ----------------------
+# Specified by the user (2026-11-13) as a wide ~200k NR-N grid on 15-minute bars, before any NR-N
+# run had been made (cb_nr_*_v1 was never run). Two axes are new to the NR line:
+#   min_nr_bars   : 1 / 2 NR bars in a row before the box counts (2 = a narrowing pair: the
+#                   second bar is no wider than the first, as both are the narrowest of N)
+#   trend_filter  : EMA length 20 / 50 / 200 bars (or none) instead of EMA(50) only
+# NR-2 is "no wider than the previous bar"; NR-30 reaches about one session back on 15m bars.
+V2_NR_LOOKBACKS: tuple[int, ...] = (2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20, 30)
+V2_NR_MIN_NR_BARS: tuple[int, ...] = (1, 2)
+V2_NR_SETUP_EXPIRIES: tuple[int, ...] = (1, 3, 6)
+V2_NR_STOPS: tuple[str, ...] = ("box", "1.0", "1.5", "2.5")
+V2_NR_TARGETS: tuple[str, ...] = ("1.0", "2.0", "3.0", "5.0", "none")
+V2_NR_TREND_FILTERS: tuple[str, ...] = ("none", "ema20", "ema50", "ema200")
+V2_NR_MIN_BOX_ATRS: tuple[float, ...] = (0.0, 0.3, 0.75)
+
+
+class NRBreakoutV2_15mConfig(_BreakoutConfig):
+    timeframe: Literal["15min"] = "15min"
+    compression: Literal["nr"] = "nr"
+    nr_lookback: Literal[2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20, 30] = 7
+    inside_bar: bool = False
+    min_nr_bars: Literal[1, 2] = 1
+    setup_expiry_bars: Literal[1, 3, 6] = 3
+    stop: Literal["box", "1.0", "1.5", "2.5"] = "box"
+    target_r: Literal["1.0", "2.0", "3.0", "5.0", "none"] = "2.0"
+    trend_filter: Literal["none", "ema20", "ema50", "ema200"] = "none"
+    min_box_atr: Literal[0.0, 0.3, 0.75] = 0.0
+
+
+# --- compression_breakout_nr v3 (15-minute bars only, 145,152 configs) ----------------------
+# Specified by the user (2026-11-13) after reading NR v2's development and validation results
+# (cb_nr_es_v2_15m). Two axes are new:
+#   max_range_atr : every NR bar must also have high - low <= this x ATR(14) at that bar
+#                   ("off" = relative narrowness only). Absolute vs relative quiet.
+#   max_hold_bars : time stop -- close at the close of the Nth bar after the entry bar unless
+#                   the stop / target / session close came first (0 = no time stop).
+# NR-50 / NR-80 reach about two / three sessions back on 15m bars.
+V3_NR_LOOKBACKS: tuple[int, ...] = (2, 3, 5, 10, 25, 50, 80)
+V3_NR_MIN_NR_BARS: tuple[int, ...] = (1, 2, 4)
+V3_NR_SETUP_EXPIRIES: tuple[int, ...] = (1, 3)
+V3_NR_STOPS: tuple[str, ...] = ("box", "1.0")
+V3_NR_TARGETS: tuple[str, ...] = ("1.0", "2.5", "4.0", "none")
+V3_NR_DIRECTIONS: tuple[str, ...] = ("long", "both")
+V3_NR_TREND_FILTERS: tuple[str, ...] = ("none", "ema200")
+V3_NR_MIN_BOX_ATRS: tuple[float, ...] = (0.0, 0.3, 0.5)
+V3_NR_MAX_RANGE_ATRS: tuple[str, ...] = ("off", "0.5", "0.8")
+V3_NR_MAX_HOLD_BARS: tuple[int, ...] = (0, 4, 8)
+
+
+class NRBreakoutV3_15mConfig(_BreakoutConfig):
+    timeframe: Literal["15min"] = "15min"
+    compression: Literal["nr"] = "nr"
+    nr_lookback: Literal[2, 3, 5, 10, 25, 50, 80] = 10
+    inside_bar: bool = False
+    min_nr_bars: Literal[1, 2, 4] = 1
+    setup_expiry_bars: Literal[1, 3] = 1
+    stop: Literal["box", "1.0"] = "box"
+    target_r: Literal["1.0", "2.5", "4.0", "none"] = "2.5"
+    direction: Literal["long", "both"] = "both"
+    trend_filter: Literal["none", "ema200"] = "none"
+    min_box_atr: Literal[0.0, 0.3, 0.5] = 0.0
+    max_range_atr: Literal["off", "0.5", "0.8"] = "off"
+    max_hold_bars: Literal[0, 4, 8] = 0
+
+    @property
+    def max_range_atr_value(self) -> float | None:
+        return None if self.max_range_atr == "off" else float(self.max_range_atr)
+
+
+# --- compression_breakout_nr v4 (15-minute bars only, 2,304 configs) ------------------------
+# Specified by the user (2026-11-13) after reading NR v3 on ES (cb_nr_es_v3_15m), for the
+# other markets (NQ, YM first). Wick entry, 1 NR bar, setup live 1 bar and no time stop are
+# fixed; the NR range cap is off / 0.5 ATR(14).
+V4_NR_LOOKBACKS: tuple[int, ...] = (2, 3, 4, 8, 16, 50)
+V4_NR_STOPS: tuple[str, ...] = ("box", "1.0", "1.5")
+V4_NR_TARGETS: tuple[str, ...] = ("1.0", "2.0", "3.5", "none")
+V4_NR_DIRECTIONS: tuple[str, ...] = ("long", "both")
+V4_NR_TREND_FILTERS: tuple[str, ...] = ("none", "ema200")
+V4_NR_MIN_BOX_ATRS: tuple[float, ...] = (0.0, 0.3)
+V4_NR_MAX_RANGE_ATRS: tuple[str, ...] = ("off", "0.5")
+
+
+class NRBreakoutV4_15mConfig(_BreakoutConfig):
+    timeframe: Literal["15min"] = "15min"
+    compression: Literal["nr"] = "nr"
+    nr_lookback: Literal[2, 3, 4, 8, 16, 50] = 8
+    inside_bar: bool = False
+    min_nr_bars: Literal[1] = 1
+    entry_type: Literal["wick"] = "wick"
+    setup_expiry_bars: Literal[1] = 1
+    stop: Literal["box", "1.0", "1.5"] = "box"
+    target_r: Literal["1.0", "2.0", "3.5", "none"] = "2.0"
+    direction: Literal["long", "both"] = "both"
+    trend_filter: Literal["none", "ema200"] = "none"
+    min_box_atr: Literal[0.0, 0.3] = 0.0
+    max_range_atr: Literal["off", "0.5"] = "off"
+    max_hold_bars: Literal[0] = 0
+
+    @property
+    def max_range_atr_value(self) -> float | None:
+        return None if self.max_range_atr == "off" else float(self.max_range_atr)

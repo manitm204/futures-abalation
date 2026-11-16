@@ -28,7 +28,7 @@ import polars as pl
 import typer
 
 from src.data.futures import session_spec
-from src.experiments.cb_grid import AXES_BBKC_V1, AXES_BBKC_V2_5M, AXES_BBKC_V2_15M, AXES_BBKC_V3_5M, AXES_BBKC_V3_15M, AXES_BBKC_V4_15M, AXES_NR_V1
+from src.experiments.cb_grid import AXES_BBKC_V1, AXES_BBKC_V2_5M, AXES_BBKC_V2_15M, AXES_BBKC_V3_5M, AXES_BBKC_V3_15M, AXES_BBKC_V4_15M, AXES_NR_V1, AXES_NR_V2_15M, AXES_NR_V3_15M, AXES_NR_V4_15M
 from src.experiments.funnel_config import load_execution_config, load_funnel_config
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -49,6 +49,9 @@ SPACES = {
     "compression_breakout_bbkc_v4_15m": (AXES_BBKC_V4_15M, "squeeze_breakout", "BB/KC squeeze",
                                          ("squeeze_length", "kc_mult")),
     "compression_breakout_nr": (AXES_NR_V1, "nr_breakout", "NR-N squeeze", ("nr_lookback", "target_r")),
+    "compression_breakout_nr_v2_15m": (AXES_NR_V2_15M, "nr_breakout", "NR-N squeeze", ("nr_lookback", "target_r")),
+    "compression_breakout_nr_v3_15m": (AXES_NR_V3_15M, "nr_breakout", "NR-N squeeze", ("nr_lookback", "target_r")),
+    "compression_breakout_nr_v4_15m": (AXES_NR_V4_15M, "nr_breakout", "NR-N squeeze", ("nr_lookback", "target_r")),
 }
 MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini Dow", "RTY": "E-mini Russell 2000",
                 "CL": "Crude oil", "GC": "Gold", "6E": "Euro FX", "6J": "Japanese yen", "ZN": "10-year T-note",
@@ -56,14 +59,16 @@ MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini
 LABELS = {
     "timeframe": "Bar size", "squeeze_length": "Squeeze length (bars)", "kc_mult": "Keltner width (× ATR)",
     "min_squeeze_bars": "Min squeeze bars", "nr_lookback": "NR-N (bars)", "inside_bar": "Inside bar",
+    "min_nr_bars": "Min NR bars in a row",
+    "max_range_atr": "NR bar range ≤ (× ATR)", "max_hold_bars": "Time stop (bars)",
     "entry_type": "Entry", "setup_expiry_bars": "Setup live for (bars)", "stop": "Stop",
     "target_r": "Target (× risk)", "direction": "Direction", "trend_filter": "Trend filter",
     "min_box_atr": "Min box width (× ATR)",
 }
 SHORT = {"timeframe": "Bar", "squeeze_length": "Len", "kc_mult": "KC", "min_squeeze_bars": "Min",
-         "nr_lookback": "N", "inside_bar": "ID", "entry_type": "Entry", "setup_expiry_bars": "Live",
+         "nr_lookback": "N", "inside_bar": "ID", "min_nr_bars": "Min", "max_range_atr": "Rng", "max_hold_bars": "Hold", "entry_type": "Entry", "setup_expiry_bars": "Live",
          "stop": "Stop", "target_r": "Target", "direction": "Side", "trend_filter": "Trend", "min_box_atr": "Box"}
-MOVES = {"squeeze_length": "Length", "kc_mult": "KC", "min_squeeze_bars": "Min bars", "nr_lookback": "N",
+MOVES = {"squeeze_length": "Length", "kc_mult": "KC", "min_squeeze_bars": "Min bars", "nr_lookback": "N", "min_nr_bars": "Min bars", "max_range_atr": "Range", "max_hold_bars": "Hold",
          "setup_expiry_bars": "Live", "stop_atr": "Stop", "target_r": "Target", "min_box_atr": "Box"}
 
 
@@ -74,10 +79,14 @@ def _val(axis: str, v) -> str:
         return "none" if v == "none" else f"{float(v):g}R"
     if axis == "min_box_atr":
         return "any" if float(v) == 0 else f"{float(v):g}"
+    if axis == "max_range_atr":
+        return "off" if v == "off" else f"{float(v):g} ATR"
+    if axis == "max_hold_bars":
+        return "none" if int(v) == 0 else f"{int(v)} bars"
     if axis == "inside_bar":
         return "on" if v in (True, "true", "True") else "off"
     if axis == "trend_filter":
-        return {"none": "none", "ema50": "EMA 50"}[v]
+        return "none" if v == "none" else f"EMA {v[3:]}"
     if isinstance(v, float):
         return f"{v:g}"
     return str(v)
@@ -293,7 +302,8 @@ def main(
             "dev": _metrics(lambda k: d.get(f"dev_{k}")),
             "val": _metrics(lambda k: v["metrics"].get(k)) if v else None,
             "status": v["status"] if v else "pending", "reasons": v["reasons"] if v else [],
-            "exits": {"target": d["full_n_target_exits"], "eod": d["full_n_eod_exits"], "stop": d["full_n_stop_exits"]},
+            "exits": {"target": d["full_n_target_exits"], "eod": d["full_n_eod_exits"], "stop": d["full_n_stop_exits"],
+                      "time": d.get("full_n_time_exits", 0)},
             "stress_1_5x": _num(d.get("stress_cost_1.5x_net_return")),
             "breakeven_cost_x": _num(d.get("breakeven_cost_multiplier")),
             "transfer_sharpe": _num(d.get("qqq_dev_sharpe")),
@@ -397,10 +407,13 @@ def main(
         "luck": luck,
         "finalists": finalists,
         "short_labels": SHORT,
-        "exit_labels": [["target", "target", "profit target"], ["eod", "close", "session close"], ["stop", "stop", "stop"]],
+        "exit_labels": [["target", "target", "profit target"], ["eod", "close", "session close"], ["stop", "stop", "stop"],
+                        *([["time", "time", "time stop"]] if "max_hold_bars" in axes else [])],
         "local_moves": [[k, MOVES[k]] for k in (["squeeze_length", "kc_mult", "min_squeeze_bars"] if squeeze
-                                                  else ["nr_lookback"])
-                        + ["setup_expiry_bars", "stop_atr", "target_r", "min_box_atr"]],
+                                                  else ["nr_lookback", *(["min_nr_bars"] if "min_nr_bars" in axes else []),
+                                                        *(["max_range_atr"] if "max_range_atr" in axes else [])])
+                        + ["setup_expiry_bars", "stop_atr", "target_r", "min_box_atr",
+                           *(["max_hold_bars"] if "max_hold_bars" in axes else [])]],
         "benchmark": {"label": f"Holding {sym} (rolled, unlevered)", **_buy_and_hold(fcfg, sym)},
         "transfer_symbol": fcfg.confidence.transfer_symbol,
         "dsr": {"effective_trials": dsr["effective_trials"]["li_ji"], "raw_trials": dsr["trial_count_options"]["raw"]},

@@ -498,13 +498,24 @@ function renderRun(r) {
 
 
 // Chart and stats-table helpers shared by the pair and all-markets portfolio pages.
+// Settings text for a compression-breakout (NR-N or BB/KC squeeze) leg on an all-markets page.
+function cbStg(o) {
+  const n = v => String(v).replace(/\.0$/, "");
+  const sig = o.compression === "nr"
+    ? `NR-${o.nr_lookback}${o.inside_bar ? " + inside bar" : ""}${o.max_range_atr && o.max_range_atr !== "off" ? `, range ≤ ${n(o.max_range_atr)}× ATR` : ""}`
+    : `squeeze ${o.squeeze_length}, KC ${n(o.kc_mult)}×`;
+  return `${o.timeframe} ${sig}, ${o.entry_type} entry, ${o.stop === "box" ? "box stop" : n(o.stop) + "× ATR stop"}, ` +
+    `${o.target_r === "none" ? "no target" : n(o.target_r) + "R target"}${o.max_hold_bars ? `, ${o.max_hold_bars}-bar time stop` : ""}, ` +
+    `${{long: "long only", short: "short only", both: "long + short"}[o.direction]}, ${o.trend_filter === "none" ? "no trend filter" : "EMA(" + String(o.trend_filter).slice(3) + ")"}` +
+    `${+o.min_box_atr ? `, box ≥ ${n(o.min_box_atr)}× ATR` : ""}`;
+}
 function chartKit(r, P) {
   const PER = r.periods, [a, b] = PER[P].range;
   const days = r.days.slice(a, b + 1), n = days.length;
   const vIdx = P === "all" ? days.findIndex(d => d >= r.validation_start) : -1;
   const yr = PER[P].label;
   const rebase = eq => { const s = eq.slice(a, b + 2), z = s[0]; return s.map(v => v / z); };
-  const stg = (o) => `${o.timeframe} ${o.mean_type.toUpperCase()} ${o.mean_lookback}/${o.std_lookback}, entry ${o.entry_z}, exit ${o.exit_z}, hold ${o.max_holding_bars}, ${o.entry_confirmation === "none" ? "no confirmation" : "up bar"}, ${o.stop_atr_multiple === "none" ? "no stop" : o.stop_atr_multiple.replace(".0", "") + "× ATR stop"}`;
+  const stg = (o) => o.compression ? cbStg(o) : `${o.timeframe} ${o.mean_type.toUpperCase()} ${o.mean_lookback}/${o.std_lookback}, entry ${o.entry_z}, exit ${o.exit_z}, hold ${o.max_holding_bars}, ${o.entry_confirmation === "none" ? "no confirmation" : "up bar"}, ${o.stop_atr_multiple === "none" ? "no stop" : o.stop_atr_multiple.replace(".0", "") + "× ATR stop"}`;
   const W = 760, H = 300, PAD = {l: 52, r: 14, t: 14, b: 28};
   const X = i => PAD.l + i / Math.max(1, n) * (W - PAD.l - PAD.r);
   const xTicks = () => { const t = []; days.forEach((d, i) => { const k = n > 600 ? d.slice(0, 4) : d.slice(0, 7); const prev = i ? (n > 600 ? days[i - 1].slice(0, 4) : days[i - 1].slice(0, 7)) : null;
@@ -666,9 +677,9 @@ function renderCombined(r, pk) {
   const tabs = `<div class="period-bar"><span class="muted">Show:</span>${Object.entries(PER0).map(([k, v]) => `<button type="button" class="subtab" data-period="${k}" aria-current="${k === P}">${esc(v.label)}</button>`).join("")}</div>`;
   const prior = r.prior_holdout_accesses ? Object.values(r.prior_holdout_accesses).reduce((x, y) => x + y, 0) : 0;
   const head = `<header class="run">
-    <span class="eyebrow">All markets · ${esc(r.strategy_name)} · ${esc(r.generated_at.slice(0, 10))}</span>
-    <h1>All markets: ${r.legs.length} strategies in one account, ${esc(yr)}</h1>
-    <p class="lede">Every market's chosen mean-reversion pair (${M.map(m => esc(m.code)).join(", ")}), unchanged since it was frozen, traded together in one $${fmt.n(r.starting_equity)} account under fixed deployment rules. Compared with ${r.n_sims} random-entry runs (one random trade stream per strategy at its own time in market, through the same rules) and with holding all ${M.length} markets equally.</p>
+    <span class="eyebrow">${esc(r.market_name)} · ${esc(r.strategy_name)} · ${esc(r.generated_at.slice(0, 10))}</span>
+    <h1>${esc(r.market_name)}: ${r.legs.length} strategies in one account, ${esc(yr)}</h1>
+    <p class="lede">${r.lede ? esc(r.lede) : `Every market's chosen mean-reversion pair (${M.map(m => esc(m.code)).join(", ")}), unchanged since it was frozen, traded together in one $${fmt.n(r.starting_equity)} account under fixed deployment rules. Compared with ${r.n_sims} random-entry runs (one random trade stream per strategy at its own time in market, through the same rules) and with holding all ${M.length} markets equally.`}</p>
     ${r.holdout ? "" : tabs}
     <div class="verdict v4">
       ${card(fmt.pct(CP.stats.net_return), `together, ${esc(yr)}`)}
@@ -679,12 +690,12 @@ function renderCombined(r, pk) {
   </header>`;
   const caveat = `<section><div class="callout">
     ${r.holdout
-      ? `<p><b>Not a fresh test.</b> Every market's holdout had already been scored for its own pair (${prior} earlier holdout runs across these markets), and the CL pair was changed after its first holdout result. This page shows how the same strategies do together under fixed rules, as a check, not as independent proof. The rules were set before this combined run.</p>`
+      ? r.holdout_caveat ? `<p>${r.holdout_caveat}</p>` : `<p><b>Not a fresh test.</b> Every market's holdout had already been scored for its own pair (${prior} earlier holdout runs across these markets), and the CL pair was changed after its first holdout result. This page shows how the same strategies do together under fixed rules, as a check, not as independent proof. The rules were set before this combined run.</p>`
       : P === "val"
       ? `<p><b>Validation only.</b> Every strategy here was chosen with its market's 2023–2024 results in view, so this stretch is largely in-sample too.</p>`
       : `<p><b>In-sample.</b> These ${r.legs.length} strategies were picked from tens of thousands of versions on 2018–2022 and checked on 2023–2024, so a strong result here is expected. The holdout tab is the real check.</p>`}
     <p><b>Deployment rules</b>, fixed before this run: micro contracts (1/10 size: ${M.map(m => esc(m.micro)).join(", ")}), $${mx(R.micro_commission)} per micro per side plus ${mx(R.slippage_ticks)} tick of slippage each way. Each trade gets ${pc(R.per_trade)} of the account balance (contract value at entry). Open positions may not exceed ${pc(R.market_cap)} of the balance in any one market, ${pc(R.group_cap)} across the ${esc(R.group_name)} futures (${R.group.join(", ")}) together, and ${pc(R.total_cap)} in total (no leverage). A trade that hits a cap gets what is left in whole micros, or is skipped. Largest open position seen: ${pc(C.peak.total)} in total, ${pc(C.peak.market)} in one market, ${pc(C.peak.group)} across the index group.</p>
-    <p class="muted">Micro contracts trade at the same prices as the full contracts. MCL and MGC have existed only since 2021 and MES/MNQ/MYM/M2K since 2019, so earlier years are a stand-in for what they would have done.</p>
+    <p class="muted">${r.contracts_note ? esc(r.contracts_note) : "Micro contracts trade at the same prices as the full contracts. MCL and MGC have existed only since 2021 and MES/MNQ/MYM/M2K since 2019, so earlier years are a stand-in for what they would have done."}</p>
   </div></section>`;
   const mcurve = m => m.pnl_curve.slice(a, b + 2).map(v => v - m.pnl_curve[a]);
   const marketChart = () => {

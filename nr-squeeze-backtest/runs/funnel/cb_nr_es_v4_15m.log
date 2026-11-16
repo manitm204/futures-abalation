@@ -1,0 +1,19 @@
+=== cb_nr_es_v4_15m develop 2026-11-14T01:58:39Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-14T01:58:45.387991Z"}
+{"n": 2304, "elapsed_s": 24.4, "event": "prep_built", "level": "info", "timestamp": "2026-11-14T01:59:04.970159Z"}
+{"stage": "1 backtest integrity", "evaluated": 2304, "passed": 2304, "event": "stage_done", "level": "info", "timestamp": "2026-11-14T01:59:04.990943Z"}
+{"stage": "2 trade count & coverage", "evaluated": 2304, "passed": 2304, "event": "stage_done", "level": "info", "timestamp": "2026-11-14T01:59:05.006731Z"}
+{"stage": "3 performance & risk", "evaluated": 2304, "passed": 889, "event": "stage_done", "level": "info", "timestamp": "2026-11-14T01:59:05.014715Z"}
+{"step": "s4_local_moves", "total": 7266, "saved": 0, "to_run": 7266, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-14T01:59:05.315317Z"}
+Exception in thread Thread-2:
+Traceback (most recent call last):
+  File "/home/manit/.pyenv/versions/3.11.9/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+    self.run()
+  File "/home/manit/.pyenv/versions/3.11.9/lib/python3.11/concurrent/futures/process.py", line 347, in run
+    self.terminate_broken(cause)
+  File "/home/manit/.pyenv/versions/3.11.9/lib/python3.11/concurrent/futures/process.py", line 499, in terminate_broken
+    work_item.future.set_exception(bpe)
+  File "/home/manit/.pyenv/versions/3.11.9/lib/python3.11/concurrent/futures/_base.py", line 559, in set_exception
+    raise InvalidStateError('{}: {!r}'.format(self._state, self))
+concurrent.futures._base.InvalidStateError: CANCELLED: <Future at 0x7e72484d56d0 state=cancelled>
+{"step": "s4_local_moves", "saved": 708, "of": 7266, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-14T01:59:18.332326Z"}

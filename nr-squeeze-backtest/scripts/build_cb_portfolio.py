@@ -105,13 +105,21 @@ def _settings_text(p: dict) -> str:
     tgt = "no target" if p["target_r"] in (None, "none") else f"{float(p['target_r']):g}R target"
     side = {"long": "long only", "short": "short only", "both": "long + short"}[p["direction"]]
     box = "any box width" if not float(p["min_box_atr"]) else f"box at least {float(p['min_box_atr']):g} ATR wide"
-    trend = "EMA(50) trend filter" if p["trend_filter"] == "ema50" else "no trend filter"
+    trend = "no trend filter" if p["trend_filter"] == "none" else f"EMA({p['trend_filter'][3:]}) trend filter"
+    tail = f"{p['entry_type']} entry, setup live {p['setup_expiry_bars']} bar(s), {stop}, {tgt}"
+    if p.get("compression") == "nr":
+        cap = "" if p.get("max_range_atr", "off") == "off" else f", NR bar range at most {float(p['max_range_atr']):g} ATR"
+        hold = f", {p['max_hold_bars']}-bar time stop" if p.get("max_hold_bars") else ""
+        return (f"{p['timeframe'].replace('min', 'm')} bars, NR-{p['nr_lookback']}"
+                f"{' + inside bar' if p['inside_bar'] else ''}, at least {p['min_nr_bars']} NR bar(s){cap}, "
+                f"{tail}{hold}, {side}, {trend}, {box}, flat at the close")
     return (f"{p['timeframe'].replace('min', 'm')} bars, BB({p['squeeze_length']}) inside KC × {float(p['kc_mult']):g}, "
-            f"at least {p['min_squeeze_bars']} squeeze bar(s), {p['entry_type']} entry, setup live "
-            f"{p['setup_expiry_bars']} bar(s), {stop}, {tgt}, {side}, {trend}, {box}, flat at the close")
+            f"at least {p['min_squeeze_bars']} squeeze bar(s), {tail}, {side}, {trend}, {box}, flat at the close")
 
 
 def _notes(fcfg, holdout: bool, prior_access, n_sims: int, n_legs: int = 2, runs: tuple[str, ...] = ()) -> dict:
+    line = "NR-N" if any(r.startswith("cb_nr_") for r in runs) else "squeeze-breakout"
+    sib = f"The sibling BB/KC squeeze line was scored on {fcfg.symbol} 2025+ before. " if line == "NR-N" else ""
     """Page text that differs from the mean-reversion pair pages."""
     one = n_legs == 1
     them, were = ("this one", "was") if one else (f"these {n_legs}", "were")
@@ -123,11 +131,11 @@ def _notes(fcfg, holdout: bool, prior_access, n_sims: int, n_legs: int = 2, runs
            "results (Sharpe, beats-luck, overlap with each other) as well as 2018–2022, and the grid itself was "
            "chosen after reading round 1 on 2023–2024, so 2023–2024 is in-sample for the choice. It shows the "
            "strategies held up; it can't prove it. The untouched test is the 2025+ holdout tab.")
-    hold = ((f"<b>First squeeze-breakout look at the {fcfg.symbol} holdout.</b> No compression-breakout strategy had "
-             f"been scored on {fcfg.symbol} 2025 onward before this run, and only {them}, frozen beforehand, {were} "
-             f"run, so there's no selection among holdout results. The mean-reversion and noise-band families were "
-             f"scored on {fcfg.symbol} 2025+ earlier (different strategies; the noise-band pair lost), so the "
-             "researcher has seen how that period treated them.")
+    hold = ((f"<b>First {line} look at the {fcfg.symbol} holdout.</b> No {line} strategy had "
+             f"been scored on {fcfg.symbol} 2025 onward before this run (apart from the final-test of these same frozen picks), and only {them}, frozen beforehand, {were} "
+             f"run, so there's no selection among holdout results. {sib}Other strategy families may have been "
+             f"scored on {fcfg.symbol} 2025+ earlier (see the data-access ledgers), so the researcher may have seen "
+             "how that period treated them.")
             if not prior_access else
             (f"<b>Not a clean test: the compression-breakout holdout for {fcfg.symbol} was used {prior_access} time(s) "
              "before this run.</b> Treat these numbers as a check, not independent proof."))
@@ -260,7 +268,8 @@ def main(
 
     def account(sims):
         """One shared account: re-size the trade lists, equity = start + every strategy's P&L."""
-        sa = share_account(sims, ds, costs, eq0, bar_minutes=mins, per_trade=per_trade, cap=cap)
+        sa = share_account(sims, ds, costs, eq0, bar_minutes=mins, per_trade=per_trade, cap=cap,
+                           end_of_bar_extra=("time_exit",))  # the NR time stop fills at its bar's close
         eq = eq0 + np.sum([daily_equity(sm, d, 0.0) for sm, d in zip(sa.sims, ds)], axis=0)
         e0 = float(eq[prior[-1]]) if len(prior) else eq0
         return sa, np.concatenate([[e0], eq[dmask]])
@@ -404,7 +413,7 @@ def main(
         "days": [str(d) for d in days], "periods": {k: {"range": list(v), "label": labels[k]} for k, v in periods.items()},
         "legs": legs, "combined": combined, "hold": hold,
         "data_access": info,
-        "source": " · ".join([f"bbkc-squeeze-backtest/runs/funnel/{r}/" for r in runs]
+        "source": " · ".join([f"{PROJECT_ROOT.name}/runs/funnel/{r}/" for r in runs]
                              + sorted({sp["config"].relative_to(PROJECT_ROOT).as_posix() for sp in specs})
                              + ["scripts/build_cb_portfolio.py"]),
     }

@@ -11,7 +11,7 @@
 :root {
   --bg: #f4f6f8; --surface: #ffffff; --fg: #16202b; --muted: #5a6774; --line: #d8dfe6;
   --accent: #2f6fb0; --accent-soft: #e3edf8; --pass: #2d7f52; --fail: #b93b35; --fail-soft: #f8e4e2;
-  --mr: #7a4fb5; --nb: #c0602a; --cb: #1e8572; --hold: #7d8a96; --band: #c9d9eb; --band2: #e3edf8;
+  --mr: #7a4fb5; --nb: #c0602a; --cb: #1e8572; --nr: #b0436a; --hold: #7d8a96; --band: #c9d9eb; --band2: #e3edf8;
   --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
   --font-body: "Public Sans", "Segoe UI", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -21,13 +21,13 @@
   :root:not([data-theme="light"]) {
     --bg: #0f151b; --surface: #17202a; --fg: #e5ebf1; --muted: #95a3b1; --line: #2a3643;
     --accent: #6ea9e6; --accent-soft: #1b2b3d; --pass: #5cbf89; --fail: #ef7a71; --fail-soft: #3a1c1a;
-    --mr: #b08ae6; --nb: #f0955c; --cb: #4cc4ac; --hold: #8d9aa6; --band: #24405e; --band2: #1b2b3d; color-scheme: dark;
+    --mr: #b08ae6; --nb: #f0955c; --cb: #4cc4ac; --nr: #ec8bad; --hold: #8d9aa6; --band: #24405e; --band2: #1b2b3d; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0f151b; --surface: #17202a; --fg: #e5ebf1; --muted: #95a3b1; --line: #2a3643;
   --accent: #6ea9e6; --accent-soft: #1b2b3d; --pass: #5cbf89; --fail: #ef7a71; --fail-soft: #3a1c1a;
-  --mr: #b08ae6; --nb: #f0955c; --cb: #4cc4ac; --hold: #8d9aa6; --band: #24405e; --band2: #1b2b3d; color-scheme: dark;
+  --mr: #b08ae6; --nb: #f0955c; --cb: #4cc4ac; --nr: #ec8bad; --hold: #8d9aa6; --band: #24405e; --band2: #1b2b3d; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
@@ -65,7 +65,7 @@ td.pos { color: var(--pass); } td.neg { color: var(--fail); }
 tr.grp td { font-weight: 600; background: var(--accent-soft); }
 tr.bench td { color: var(--muted); }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: baseline; }
-.dot.mr { background: var(--mr); } .dot.nb { background: var(--nb); } .dot.cb { background: var(--cb); }
+.dot.mr { background: var(--mr); } .dot.nb { background: var(--nb); } .dot.cb { background: var(--cb); } .dot.nr { background: var(--nr); }
 svg.chart { width: 100%; height: auto; display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 svg.chart text { font-family: var(--font-mono); font-size: 11px; fill: var(--muted); }
 svg.chart .grid { stroke: var(--line); } svg.chart .zero { stroke: var(--muted); stroke-dasharray: 3 3; }
@@ -75,10 +75,11 @@ svg.chart .all { fill: none; stroke: var(--accent); stroke-width: 2.6; }
 svg.chart .mr { fill: none; stroke: var(--mr); stroke-width: 1.6; }
 svg.chart .nb { fill: none; stroke: var(--nb); stroke-width: 1.6; }
 svg.chart .cb { fill: none; stroke: var(--cb); stroke-width: 1.6; }
+svg.chart .nr { fill: none; stroke: var(--nr); stroke-width: 1.6; }
 svg.chart .hold { fill: none; stroke: var(--hold); stroke-width: 1.4; stroke-dasharray: 6 4; }
 .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.86rem; align-items: center; }
 .legend i { display: inline-block; width: 18px; height: 0; border-top: 3px solid; margin-right: 6px; vertical-align: middle; }
-.legend i.all { border-color: var(--accent); } .legend i.mr { border-color: var(--mr); } .legend i.nb { border-color: var(--nb); } .legend i.cb { border-color: var(--cb); }
+.legend i.all { border-color: var(--accent); } .legend i.mr { border-color: var(--mr); } .legend i.nb { border-color: var(--nb); } .legend i.cb { border-color: var(--cb); } .legend i.nr { border-color: var(--nr); }
 .legend i.hold { border-color: var(--hold); border-top-style: dashed; }
 .legend i.band { height: 10px; border: 0; background: var(--band); }
 .cm td.c { font-family: var(--font-mono); }
@@ -102,7 +103,7 @@ const int = (x) => x == null ? "–" : Math.round(x).toLocaleString("en-US");
 const tone = (x) => x == null ? "" : x > 0 ? "pos" : x < 0 ? "neg" : "";
 
 const TX = DATA.text, SYM = DATA.symbol;
-const FAMS = DATA.families.map((f) => f.key);  // family keys in leg order: "mr", "nb", "cb"
+const FAMS = DATA.families.map((f) => f.key);  // family keys in leg order: "mr", "nb", "cb", "nr"
 const FLABEL = Object.fromEntries(DATA.families.map((f) => [f.key, f.label]));
 const short = (f) => TX[f + "_short"];
 const famPairs = () => FAMS.flatMap((x, i) => FAMS.slice(i + 1).map((y, j) => [i, i + 1 + j]));
@@ -123,6 +124,16 @@ const settingsText = (l) => {
       `${p.entry_type} entry, setup live ${p.setup_expiry_bars} bar${p.setup_expiry_bars > 1 ? "s" : ""}, ` +
       `${p.stop === "box" ? "box stop" : n(p.stop) + "× ATR stop"}, ${p.target_r === "none" ? "no target" : n(p.target_r) + "R target"}, ` +
       `${{long: "long only", short: "short only", both: "long + short"}[p.direction]}, ${p.trend_filter === "ema50" ? "EMA(50) trend filter" : "no trend filter"}` +
+      (+p.min_box_atr ? `, box ≥ ${n(p.min_box_atr)}× ATR` : "");
+  }
+  if (l.family_key === "nr") {
+    const n = (v) => String(v).replace(/\.0$/, "");
+    return `${p.timeframe} bars, NR-${p.nr_lookback}${p.inside_bar ? " + inside bar" : ""}, ≥ ${p.min_nr_bars} NR bar${p.min_nr_bars > 1 ? "s" : ""}` +
+      (p.max_range_atr && p.max_range_atr !== "off" ? `, NR bar range ≤ ${n(p.max_range_atr)}× ATR` : "") +
+      `, ${p.entry_type} entry, setup live ${p.setup_expiry_bars} bar${p.setup_expiry_bars > 1 ? "s" : ""}, ` +
+      `${p.stop === "box" ? "box stop" : n(p.stop) + "× ATR stop"}, ${p.target_r === "none" ? "no target" : n(p.target_r) + "R target"}` +
+      (p.max_hold_bars ? `, ${p.max_hold_bars}-bar time stop` : "") +
+      `, ${{long: "long only", short: "short only", both: "long + short"}[p.direction]}, ${p.trend_filter === "none" ? "no trend filter" : "EMA(" + p.trend_filter.slice(3) + ") trend filter"}` +
       (+p.min_box_atr ? `, box ≥ ${n(p.min_box_atr)}× ATR` : "");
   }
   const cap = p.max_entries_per_session ?? "none";

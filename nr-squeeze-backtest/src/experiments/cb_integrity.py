@@ -27,7 +27,7 @@ from src.strategies.compression_breakout.backtest import (
     as_params,
     simulate_compression_breakout,
 )
-from src.strategies.compression_breakout.config import ATR_PERIOD, BB_STD, TREND_EMA
+from src.strategies.compression_breakout.config import ATR_PERIOD, BB_STD, trend_ema_span
 from src.utils.config_models import ExecutionConfig
 
 _EPS = 1e-9
@@ -38,7 +38,8 @@ CHECKS = ["box_not_from_prior_compression_run", "setup_not_live", "not_first_bre
           "position_held_overnight", "entry_fill_better_than_market", "stop_not_per_rule",
           "target_not_per_rule", "stop_exit_without_touch", "stop_fill_better_than_rule",
           "target_exit_without_touch", "target_fill_better_than_rule", "target_taken_when_stop_touched",
-          "exit_not_at_first_touch", "eod_exit_not_at_session_close", "exit_fill_better_than_market",
+          "exit_not_at_first_touch", "eod_exit_not_at_session_close", "time_exit_not_per_rule",
+          "held_past_time_stop", "exit_fill_better_than_market",
           "overlapping_positions", "position_exceeds_equity", "forced_close_not_final_trade",
           "commission_below_minimum"]
 
@@ -64,6 +65,10 @@ def independent_compression(data: CBData, p) -> np.ndarray:
         prev_h = np.concatenate([[np.inf], data.high[:-1]])
         prev_l = np.concatenate([[-np.inf], data.low[:-1]])
         out &= (data.high <= prev_h) & (data.low >= prev_l) & (np.arange(len(rng)) > 0)
+    cap = getattr(p, "max_range_atr", None)
+    if cap is not None:
+        with np.errstate(invalid="ignore"):
+            out &= rng <= cap * data.atr(ATR_PERIOD) + 1e-12
     return out
 
 
@@ -88,7 +93,9 @@ def check_sim_integrity(sim: SimResult, data: CBData, exec_config: ExecutionConf
         return []
     p = as_params(cfg)
     comp = independent_compression(data, p)
-    ema = pd.Series(data.close).ewm(span=TREND_EMA, adjust=False, min_periods=TREND_EMA).mean().to_numpy()
+    span = trend_ema_span(p.trend_filter)
+    ema = (None if span is None else
+           pd.Series(data.close).ewm(span=span, adjust=False, min_periods=span).mean().to_numpy())
     wick = p.entry_type == "wick"
     atr14 = data.atr(ATR_PERIOD)
 
@@ -125,7 +132,7 @@ def check_sim_integrity(sim: SimResult, data: CBData, exec_config: ExecutionConf
                     and any(broke(k2, b_h, b_l))):
                 issues.add("not_first_breakout_of_run")
                 break
-        if p.trend_filter == "ema50":
+        if ema is not None:
             j = k - 1 if wick else k
             if not (np.isfinite(ema[j]) and (c[j] > ema[j] if d > 0 else c[j] < ema[j])):
                 issues.add("entry_against_trend")
@@ -172,11 +179,19 @@ def check_sim_integrity(sim: SimResult, data: CBData, exec_config: ExecutionConf
             best = max(o[x], tgt) if d > 0 else min(o[x], tgt)
             if d * (best - sim.exit_px[t]) < -_EPS:
                 issues.add("target_fill_better_than_rule")
+        elif why == "time_exit":
+            if (not p.max_hold_bars or x != e + p.max_hold_bars or x >= data.sess_end[e] or stop_hit(x)
+                    or (tgt_hit(x) and not (intrabar and x == e))):
+                issues.add("time_exit_not_per_rule")
+            if d * (c[x] - sim.exit_px[t]) < -_EPS:
+                issues.add("exit_fill_better_than_market")
         else:  # eod_exit / forced_close
             if x != data.sess_end[e] or stop_hit(x) or (tgt_hit(x) and not (intrabar and x == e)):
                 issues.add("eod_exit_not_at_session_close")
             if d * (c[x] - sim.exit_px[t]) < -_EPS:
                 issues.add("exit_fill_better_than_market")
+        if p.max_hold_bars and x > e + p.max_hold_bars:
+            issues.add("held_past_time_stop")
         if x < e:
             issues.add("exit_before_entry")
         if data.sess[x] != data.sess[e]:
