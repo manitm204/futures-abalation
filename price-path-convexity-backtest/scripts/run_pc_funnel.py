@@ -4,7 +4,7 @@ Same stages, thresholds and commands as the mean-reversion, noise-band and squee
 (../nr-squeeze-backtest/scripts/run_cb_funnel.py); only the base strategy
 (src/strategies/path_convexity/) and its grids (src/experiments/pc_grid.py) differ. The YAML's
 `strategy` picks the parameter space: `path_convexity_v1_15m` (186,624 configs) or
-`path_convexity_v1_5m` (186,624). All thresholds live in the YAML (hashed into every output).
+`path_convexity_v1_5m` (186,624); v2 (15m only): `path_convexity_v2_15m` (82,944). All thresholds live in the YAML (hashed into every output).
 
 Commands (each is a separate, explicit step):
   develop     stages 1-7 on DEVELOPMENT data only (2018-2022; later bars are never
@@ -38,7 +38,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.analysis.neighborhood import LATTICE_PC_V1_5M, LATTICE_PC_V1_15M, NeighborhoodStats, neighborhood_stats
+from src.analysis.neighborhood import LATTICE_PC_V1_5M, LATTICE_PC_V1_15M, LATTICE_PC_V2_15M, NeighborhoodStats, neighborhood_stats
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.data.aggregation import AGG_INTERVAL_MINUTES, aggregate_bars
 from src.experiments.data_access import (
@@ -85,10 +85,10 @@ from src.experiments.funnel_robustness import (
     perturbations_pc,
     quantile,
 )
-from src.experiments.pc_grid import pc_grid_v1_5m, pc_grid_v1_15m
+from src.experiments.pc_grid import pc_grid_v1_5m, pc_grid_v1_15m, pc_grid_v2_15m
 from src.experiments.pc_integrity import CHECKS, truncation_invariance
 from src.strategies.path_convexity.backtest import PCParams
-from src.strategies.path_convexity.config import ConvexityV1_5mConfig, ConvexityV1_15mConfig
+from src.strategies.path_convexity.config import ConvexityV1_5mConfig, ConvexityV1_15mConfig, ConvexityV2_15mConfig
 from src.utils.hashing import canonical_json
 from src.utils.logging import configure_logging, get_logger
 from src.utils.seeds import derive_seed
@@ -110,6 +110,10 @@ SPACES = {
     },
     "path_convexity_v1_5m": {
         "grid": pc_grid_v1_5m, "cls": ConvexityV1_5mConfig, "lattice": LATTICE_PC_V1_5M,
+        "perturb": perturbations_pc, "local": local_perturbations_pc, "keys": PC_KEYS,
+    },
+    "path_convexity_v2_15m": {
+        "grid": pc_grid_v2_15m, "cls": ConvexityV2_15mConfig, "lattice": LATTICE_PC_V2_15M,
         "perturb": perturbations_pc, "local": local_perturbations_pc, "keys": PC_KEYS,
     },
 }

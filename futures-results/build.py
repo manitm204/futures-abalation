@@ -3,6 +3,7 @@
   noise-band breakout/index.html   noise-band breakout runs
   bb-kc squeeze/index.html         BB-inside-KC squeeze breakout (../bbkc-squeeze-backtest/)
   nr squeeze/index.html            NR-N squeeze breakout (../nr-squeeze-backtest/)
+  price-path convexity/index.html  price-path convexity fade (../price-path-convexity-backtest/)
 
 Layout of this folder:
   data/<MARKET>/<strategy>.json   one finished run (written by each project's export script,
@@ -31,13 +32,15 @@ MARKETS = [
 # (folder, page title, header text, which runs belong) -- every page uses template.html.
 FAMILIES = [
     ("mean reversion", "Mean Reversion Funnels", "Mean-reversion strategy funnels",
-     lambda run: not run["strategy_key"].startswith(("noise_band", "squeeze_breakout", "nr_breakout"))),
+     lambda run: not run["strategy_key"].startswith(("noise_band", "squeeze_breakout", "nr_breakout", "path_convexity"))),
     ("noise-band breakout", "Noise-Band Breakout Funnels", "Noise-band breakout strategy funnels",
      lambda run: run["strategy_key"].startswith("noise_band")),
     ("bb-kc squeeze", "BB-inside-KC Squeeze Funnels", "BB-inside-KC squeeze strategy funnels",
      lambda run: run["strategy_key"].startswith("squeeze_breakout")),
     ("nr squeeze", "NR-N Squeeze Funnels", "NR-N squeeze strategy funnels",
      lambda run: run["strategy_key"].startswith("nr_breakout")),
+    ("price-path convexity", "Price-Path Convexity Funnels", "Price-path convexity strategy funnels",
+     lambda run: run["strategy_key"].startswith("path_convexity")),
 ]
 
 

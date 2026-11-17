@@ -115,3 +115,32 @@ class ConvexityV1_15mConfig(_ConvexityConfig):
 
 class ConvexityV1_5mConfig(_ConvexityConfig):
     timeframe: Literal["5min"] = "5min"
+
+
+# --- path_convexity v2 (15-minute bars, 82,944 configs) ---------------------------------------
+# Specified by the user (2026-11-16) after reading v1's ES 15m DEVELOPMENT results
+# (pc_es_v1_15m; validation not run): short look-backs, a larger minimum net move, one trend
+# filter, the ATR-gap form dropped, wider stop range. Run on ES first.
+V2_LOOKBACKS: tuple[int, ...] = (5, 8, 11, 15, 20, 50)
+V2_SIGNAL_FORMS: tuple[str, ...] = ("paper", "maxgap", "reversal")
+V2_Z_LOOKBACKS: tuple[int, ...] = (150, 500)
+V2_ENTRY_ZS: tuple[float, ...] = (0.5, 0.75, 1.0, 1.5)
+V2_QUADRANTS: tuple[str, ...] = ("all", "early", "late")
+V2_MIN_MOVE_ATRS: tuple[float, ...] = (0.0, 1.0, 2.0, 3.0)
+V2_DIRECTIONS: tuple[str, ...] = ("long", "short", "both")
+V2_HOLDS: tuple[str, ...] = ("half", "full")
+V2_STOPS: tuple[str, ...] = ("none", "1.5", "2.5", "3.5")
+V2_TREND_FILTERS: tuple[str, ...] = ("none", "ema50")
+
+
+class ConvexityV2_15mConfig(_ConvexityConfig):
+    timeframe: Literal["15min"] = "15min"
+    lookback: Literal[5, 8, 11, 15, 20, 50] = 8
+    signal_form: Literal["paper", "maxgap", "reversal"] = "paper"
+    z_lookback: Literal[150, 500] = 500
+    entry_z: Literal[0.5, 0.75, 1.0, 1.5] = 1.0
+    min_move_atr: Literal[0.0, 1.0, 2.0, 3.0] = 0.0
+    hold: Literal["half", "full"] = "full"
+    stop: Literal["none", "1.5", "2.5", "3.5"] = "none"
+    trend_filter: Literal["none", "ema50"] = "none"
+

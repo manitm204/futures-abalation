@@ -1,19 +1,16 @@
-"""Export a finished compression-breakout funnel run to the JSON format the shared results
-site renders (../futures-results/), the same shape as
-../noise-band-backtest/scripts/export_results_json.py writes.
+"""Export a finished price-path convexity funnel run to the JSON format the shared results
+site renders (../futures-results/), the same shape as the squeeze and noise-band exporters write.
 
-One file per (market, strategy line, version): futures-results/data/<MARKET>/<key>.json.
+One file per (market, version, bar size): futures-results/data/<MARKET>/path_convexity_<version>.json.
 Re-running overwrites that file only. Then rebuild the pages:  python ../futures-results/build.py
-(BB-inside-KC squeeze runs go to "futures-results/bb-kc squeeze/index.html", NR-N runs to
-"futures-results/nr squeeze/index.html").
+(runs go to "futures-results/price-path convexity/index.html").
 
-Works after `develop` alone (validation columns are then empty and stage 8 shows "not
-run") and again after `validate` and the luck benchmark. Reads only development and
-validation outputs; holdout data is never touched.
+Works after `develop` alone (validation columns are then empty and stage 8 shows "not run") and
+again after `validate`. Reads only development and validation outputs; holdout data is never touched.
 
 Usage:
-  PYTHONPATH=. python scripts/export_results_json.py --experiment-id cb_bbkc_es_v1 \
-      --config configs/funnel/cb_bbkc_funnel_es_v1.yaml
+  PYTHONPATH=. python scripts/export_results_json.py --experiment-id pc_es_v1_15m \
+      --config configs/funnel/pc_funnel_es_v1_15m.yaml --variant 15m
 """
 
 from __future__ import annotations
@@ -28,7 +25,7 @@ import polars as pl
 import typer
 
 from src.data.futures import session_spec
-from src.experiments.cb_grid import AXES_BBKC_V1, AXES_BBKC_V2_5M, AXES_BBKC_V2_15M, AXES_BBKC_V3_5M, AXES_BBKC_V3_15M, AXES_BBKC_V4_15M, AXES_NR_V1, AXES_NR_V2_15M, AXES_NR_V3_15M, AXES_NR_V4_15M
+from src.experiments.pc_grid import AXES_PC_V1_5M, AXES_PC_V1_15M, AXES_PC_V2_15M
 from src.experiments.funnel_config import load_execution_config, load_funnel_config
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -37,56 +34,37 @@ app = typer.Typer(add_completion=False)
 
 # strategy -> (axes, file-key prefix, tab label prefix, heat-map axes (rows, cols))
 SPACES = {
-    "compression_breakout_bbkc": (AXES_BBKC_V1, "squeeze_breakout", "BB/KC squeeze", ("squeeze_length", "kc_mult")),
-    "compression_breakout_bbkc_v2_5m": (AXES_BBKC_V2_5M, "squeeze_breakout", "BB/KC squeeze",
-                                        ("squeeze_length", "kc_mult")),
-    "compression_breakout_bbkc_v2_15m": (AXES_BBKC_V2_15M, "squeeze_breakout", "BB/KC squeeze",
-                                         ("squeeze_length", "kc_mult")),
-    "compression_breakout_bbkc_v3_5m": (AXES_BBKC_V3_5M, "squeeze_breakout", "BB/KC squeeze",
-                                         ("squeeze_length", "kc_mult")),
-    "compression_breakout_bbkc_v3_15m": (AXES_BBKC_V3_15M, "squeeze_breakout", "BB/KC squeeze",
-                                         ("squeeze_length", "kc_mult")),
-    "compression_breakout_bbkc_v4_15m": (AXES_BBKC_V4_15M, "squeeze_breakout", "BB/KC squeeze",
-                                         ("squeeze_length", "kc_mult")),
-    "compression_breakout_nr": (AXES_NR_V1, "nr_breakout", "NR-N squeeze", ("nr_lookback", "target_r")),
-    "compression_breakout_nr_v2_15m": (AXES_NR_V2_15M, "nr_breakout", "NR-N squeeze", ("nr_lookback", "target_r")),
-    "compression_breakout_nr_v3_15m": (AXES_NR_V3_15M, "nr_breakout", "NR-N squeeze", ("nr_lookback", "target_r")),
-    "compression_breakout_nr_v4_15m": (AXES_NR_V4_15M, "nr_breakout", "NR-N squeeze", ("nr_lookback", "target_r")),
+    "path_convexity_v1_15m": (AXES_PC_V1_15M, "path_convexity", "Price-path convexity", ("lookback", "entry_z")),
+    "path_convexity_v1_5m": (AXES_PC_V1_5M, "path_convexity", "Price-path convexity", ("lookback", "entry_z")),
+    "path_convexity_v2_15m": (AXES_PC_V2_15M, "path_convexity", "Price-path convexity", ("lookback", "entry_z")),
 }
 MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini Dow", "RTY": "E-mini Russell 2000",
                 "CL": "Crude oil", "GC": "Gold", "6E": "Euro FX", "6J": "Japanese yen", "ZN": "10-year T-note",
                 "ZB": "30-year T-bond"}
 LABELS = {
-    "timeframe": "Bar size", "squeeze_length": "Squeeze length (bars)", "kc_mult": "Keltner width (× ATR)",
-    "min_squeeze_bars": "Min squeeze bars", "nr_lookback": "NR-N (bars)", "inside_bar": "Inside bar",
-    "min_nr_bars": "Min NR bars in a row",
-    "max_range_atr": "NR bar range ≤ (× ATR)", "max_hold_bars": "Time stop (bars)",
-    "entry_type": "Entry", "setup_expiry_bars": "Setup live for (bars)", "stop": "Stop",
-    "target_r": "Target (× risk)", "direction": "Direction", "trend_filter": "Trend filter",
-    "min_box_atr": "Min box width (× ATR)",
+    "timeframe": "Bar size", "lookback": "Look-back N (bars)", "signal_form": "Signal form",
+    "z_lookback": "z-score history (bars)", "entry_z": "Entry |z|", "quadrant": "Quadrant",
+    "min_move_atr": "Min net move (× ATR)", "direction": "Direction", "hold": "Hold", "stop": "Stop",
+    "trend_filter": "Trend filter",
 }
-SHORT = {"timeframe": "Bar", "squeeze_length": "Len", "kc_mult": "KC", "min_squeeze_bars": "Min",
-         "nr_lookback": "N", "inside_bar": "ID", "min_nr_bars": "Min", "max_range_atr": "Rng", "max_hold_bars": "Hold", "entry_type": "Entry", "setup_expiry_bars": "Live",
-         "stop": "Stop", "target_r": "Target", "direction": "Side", "trend_filter": "Trend", "min_box_atr": "Box"}
-MOVES = {"squeeze_length": "Length", "kc_mult": "KC", "min_squeeze_bars": "Min bars", "nr_lookback": "N", "min_nr_bars": "Min bars", "max_range_atr": "Range", "max_hold_bars": "Hold",
-         "setup_expiry_bars": "Live", "stop_atr": "Stop", "target_r": "Target", "min_box_atr": "Box"}
+SHORT = {"timeframe": "Bar", "lookback": "N", "signal_form": "Form", "z_lookback": "zHist", "entry_z": "z",
+         "quadrant": "Quad", "min_move_atr": "Move", "direction": "Side", "hold": "Hold", "stop": "Stop",
+         "trend_filter": "Trend"}
+MOVES = {"lookback": "N", "z_lookback": "z hist", "entry_z": "Entry z", "stop_atr": "Stop", "min_move_atr": "Min move"}
+FORM_NAMES = {"paper": "paper", "atr": "ATR gap", "maxgap": "max gap", "reversal": "control"}
 
 
 def _val(axis: str, v) -> str:
     if axis == "stop":
-        return "box" if v == "box" else f"{float(v):g} ATR"
-    if axis == "target_r":
-        return "none" if v == "none" else f"{float(v):g}R"
-    if axis == "min_box_atr":
-        return "any" if float(v) == 0 else f"{float(v):g}"
-    if axis == "max_range_atr":
-        return "off" if v == "off" else f"{float(v):g} ATR"
-    if axis == "max_hold_bars":
-        return "none" if int(v) == 0 else f"{int(v)} bars"
-    if axis == "inside_bar":
-        return "on" if v in (True, "true", "True") else "off"
+        return "none" if v == "none" else f"{float(v):g} ATR"
+    if axis == "min_move_atr":
+        return "any" if float(v) == 0 else f"{float(v):g} ATR"
     if axis == "trend_filter":
         return "none" if v == "none" else f"EMA {v[3:]}"
+    if axis == "signal_form":
+        return FORM_NAMES.get(v, v)
+    if axis == "hold":
+        return {"half": "N/2 bars", "full": "N bars", "session": "to close"}.get(v, v)
     if isinstance(v, float):
         return f"{v:g}"
     return str(v)
@@ -132,21 +110,26 @@ def main(
     experiment_id: str = typer.Option(...),
     config: Path = typer.Option(...),
     market_name: str = typer.Option("", help="Default: the market's usual name"),
-    key: str = typer.Option("", help="File name / tab id under data/<MARKET>/ (default: <line>_breakout_<version>)"),
-    label: str = typer.Option("", help="Strategy tab label (default: BB/KC squeeze or NR-N squeeze - <version>)"),
+    key: str = typer.Option("", help="File name / tab id under data/<MARKET>/ (default: path_convexity_<version>)"),
+    label: str = typer.Option("", help="Strategy tab label (default: Price-path convexity · <version>)"),
     variant: str = typer.Option("", help="Optional variant id (e.g. 15m) when one strategy tab holds several runs"),
     variant_label: str = typer.Option("", help="Button text for the variant (default: the variant id)"),
     out_root: Path = typer.Option(SITE_ROOT / "data"),
 ) -> None:
     fcfg = load_funnel_config(config)
     ec = load_execution_config(fcfg)
+    run_dir = PROJECT_ROOT / "runs" / "funnel" / experiment_id
+    hfiles = sorted(run_dir.glob("holdout_results_*.json"))
+    picks = sorted({c.get("dev_order") for hf in hfiles for c in json.loads(hf.read_text()).get("results", [])})
+    holdout_line = (f"Holdout (2025 onward) was run once for {', '.join(f'#{o}' for o in picks)}; the results are on "
+                    "this market's separate holdout tab." if picks else
+                    "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead.")
     if fcfg.strategy not in SPACES:
-        raise typer.BadParameter(f"exporter knows the compression-breakout lines {sorted(SPACES)} only")
+        raise typer.BadParameter(f"exporter knows the convexity spaces {sorted(SPACES)} only")
     axes, key_prefix, label_prefix, (heat_r, heat_c) = SPACES[fcfg.strategy]
     axes = {"timeframe": axes["timeframe"], **axes}  # bar size first, as on the other families' pages
-    squeeze = fcfg.strategy.startswith("compression_breakout_bbkc")
     sym = fcfg.symbol
-    version = experiment_id.rsplit("_", 1)[-1]
+    version = next(x for x in experiment_id.split("_") if x.startswith("v") and x[1:].isdigit())
     key = key or f"{key_prefix}_{version}"
     label = label or f"{label_prefix} · {version}"
     exp = PROJECT_ROOT / "runs" / "funnel" / experiment_id
@@ -182,17 +165,16 @@ def main(
     distinct = len({(r["dev_n_completed_trades"], round(r["dev_net_return"], 10), round(r["dev_sharpe"], 10))
                     for r in by_id.values()})
     lo = ps.local
-    nudges = ((f"squeeze length, minimum squeeze bars and setup expiry by ±{lo.int_rel:.0%} (rounded, at least one "
-               f"bar), Keltner width by ±{lo.kc_mult_abs:g}") if squeeze else
-              f"NR-N and setup expiry by ±{lo.int_rel:.0%} (rounded, at least one bar)")
-    nudges += (f", an ATR stop by ±{lo.stop_atr_abs:g}, the target by ±{lo.target_r_abs:g}R and the minimum box "
-               f"width by ±{lo.min_box_atr_abs:g} ATR (the box stop and \"no target\" have nothing to nudge)")
+    nudges = (f"look-back N and the z-score history by ±{lo.int_rel:.0%} (rounded, at least one bar), the entry "
+              f"|z| by ±{lo.entry_z_abs:g}, an ATR stop by ±{lo.stop_atr_abs:g} and the minimum net move by "
+              f"±{lo.min_move_atr_abs:g} ATR (\"no stop\" has nothing to nudge)")
     funnel = [
         {"name": "Start", "sub": "every combination", "n": n,
          "why": f"All {n:,} versions backtested once on {dev_w.start.year}–{dev_w.end.year} data."},
         {"name": "1 · Integrity", "sub": "no cheating", "n": st["1"]["passed"],
-         "why": f"Per-trade checks on every version: the box came only from earlier bars, the breakout was the "
-                f"squeeze's first, fills were never better than the market, nothing was held overnight. Plus "
+         "why": f"Per-trade checks on every version: the signal was recomputed independently and each entry was a "
+                f"fresh cross on the right side with every filter met, no qualifying signal was skipped while flat, "
+                f"fills were never better than the market, nothing was held overnight. Plus "
                 f"{summary['integrity']['truncation_sample']} random versions re-run on cut-off data. "
                 f"{n - st['1']['passed']:,} failed."},
         {"name": "2 · Enough trades", "sub": f"≥{tc.min_completed_trades} trades, spread out", "n": st["2"]["passed"],
@@ -261,7 +243,7 @@ def main(
                          "n_survivors": int((g["s7_status"] == "pass").sum())})
         ablation.append({"axis": ax, "label": LABELS[ax], "values": rows})
 
-    # ---- random-entry ("luck") benchmark, if run (scripts/run_cb_random_benchmark.py) ----
+    # ---- random-entry ("luck") benchmark, if run (scripts/run_pc_random_benchmark.py) ----
     luck_path = exp / "random_benchmark.json"
     luck_raw = json.loads(luck_path.read_text()) if luck_path.exists() and val else None
     luck_by_id = {f["config_id"]: f for f in luck_raw["finalists"]} if luck_raw else {}
@@ -302,8 +284,7 @@ def main(
             "dev": _metrics(lambda k: d.get(f"dev_{k}")),
             "val": _metrics(lambda k: v["metrics"].get(k)) if v else None,
             "status": v["status"] if v else "pending", "reasons": v["reasons"] if v else [],
-            "exits": {"target": d["full_n_target_exits"], "eod": d["full_n_eod_exits"], "stop": d["full_n_stop_exits"],
-                      "time": d.get("full_n_time_exits", 0)},
+            "exits": {"time": d["full_n_time_exits"], "eod": d["full_n_eod_exits"], "stop": d["full_n_stop_exits"]},
             "stress_1_5x": _num(d.get("stress_cost_1.5x_net_return")),
             "breakeven_cost_x": _num(d.get("breakeven_cost_multiplier")),
             "transfer_sharpe": _num(d.get("qqq_dev_sharpe")),
@@ -341,25 +322,7 @@ def main(
 
     def _words(xs: list[str], last: str = "or") -> str:
         return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + f" {last} " + xs[-1]
-    atr_stops = [f"{float(x):g}" for x in axes["stop"] if x != "box"]
-    targets = [f"{float(x):g}" for x in axes["target_r"] if x != "none"]
-    boxes = [f"{float(x):g}" for x in axes["min_box_atr"] if float(x) > 0]
-    sides = {("long", "both"): "Long only or both ways", ("long", "short", "both"): "Long, short or both"}.get(
-        tuple(axes["direction"]), _words([str(x) for x in axes["direction"]]).capitalize())
-    if squeeze:
-        what = ("Bollinger Bands (2 standard deviations of the last L closes) sitting inside a Keltner Channel "
-                "(the same average ± a multiple of ATR) mark a squeeze: price is moving less than its usual range.")
-        formula = "squeeze when 2 × stdev(close, L) < Keltner width × ATR(L); box = high / low of the squeeze bars"
-        compress_rule = ("A bar is a squeeze bar when the Bollinger Bands over the last L bars fit inside the Keltner "
-                         "Channel. A run of squeeze bars (at least the minimum, never across the open) makes a box: "
-                         "its highest high and lowest low.")
-    else:
-        what = ("A narrow-range bar marks the quiet: its high-to-low range is the smallest of the last N bars, "
-                "optionally also inside the previous bar (Crabel's NR4/ID).")
-        formula = "NR-N when high − low ≤ the smallest range of the last N bars; box = high / low of the NR bars"
-        compress_rule = ("A bar is an NR bar when its range is the narrowest of the last N bars (and, with the inside-"
-                         "bar option, inside the previous bar). A run of NR bars (never across the open) makes a box: "
-                         "its highest high and lowest low.")
+    sides = "Long, short or both"
     dsr = summary["dsr"]
     out = {
         "market": sym, "market_name": market_name or MARKET_NAMES.get(sym, sym),
@@ -370,35 +333,40 @@ def main(
         "run_id": experiment_id, "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "periods": {"dev": [str(dev_w.start), str(dev_w.end)], "val": [str(val_w.start), str(val_w.end)]},
         "strategy": {
-            "summary": ("Trade the breakout after the market goes quiet, flat by the close. " + what + " The first "
-                        "close (or touch) outside that quiet range decides the direction: above goes long, below goes "
-                        "short. A stop at the other side of the box or a fixed ATR distance, an optional profit target, "
-                        "and everything closed at the session's last close."),
-            "formula": formula,
+            "summary": ("Fade (or follow) the shape of the recent move, flat by the close. Price-path convexity "
+                        "(Gulen & Woeppel, JFQA 2025, Purdue) measures when a move happened inside a window: draw a "
+                        "straight line from the window's first close to its last, and see whether the path sagged "
+                        "below it (convex: an up-move came late) or bulged above it (concave: it came early). The "
+                        "paper finds high convexity predicts lower returns on daily data; everything here is "
+                        "intraday, so it is an extrapolation. A plain N-bar reversal runs alongside as the control."),
+            "formula": "convexity = ((P1 + PN)/2 − mean(P1..PN)) / ((P1 + PN)/2); high z → short, low z → long",
             "rules": [
-                {"label": "Enter", "text": compress_rule + f" The box stays live for "
-                                           f"{_words([str(x) for x in axes['setup_expiry_bars']])} bars after the last "
-                                           f"compression bar" + (f", and can be required to be at least {_words(boxes)} × ATR(14) wide "
-                                                                 "(narrower boxes leave too little room after costs). "
-                                                                 if boxes else " (any box width). ") +
-                                           "Close entry: a bar closes outside the box, filled at the next bar's open. "
-                                           "Wick entry: a stop order rests at the box edge and fills the moment price "
-                                           "trades through it, at the worse of the bar's open and the edge. The first "
-                                           "breakout uses up the box, even when a filter blocks the trade (wrong "
-                                           "direction, against the EMA(50) trend, a position already open, or the "
-                                           "last 30 minutes of the session)."},
-                {"label": "Exit", "text": f"Stop at the far side of the box, or {_words(atr_stops)} × ATR(14) from "
-                                          f"the entry. Optional target at {_words(targets)} times that risk. Both are "
-                                          "live inside each "
-                                          "bar; a bar touching both counts as the stop. Anything still open is closed "
-                                          "at the session's last close."},
+                {"label": "Signal", "text": "Over the last N closes: " + "; ".join(
+                    {"paper": "paper = the formula above",
+                     "atr": "ATR gap = the same average line-minus-path gap ÷ ATR(14)",
+                     "maxgap": "max gap = the single largest line-minus-path gap ÷ ATR(14)",
+                     "reversal": "control = (PN − P1) ÷ ATR(14), the plain N-bar return"}[f]
+                    for f in axes["signal_form"])
+                    + f". Each is turned into a z-score against its own last "
+                      f"{_words([str(z) for z in axes['z_lookback']], 'or')} bars."},
+                {"label": "Enter", "text": "A fresh cross of z above +entry goes short; below −entry goes long, "
+                                           "filled at the next bar's open. Quadrant: all = every signal (the paper); "
+                                           "late = only fades of the window's net move; early = only trades with it. "
+                                           f"Optional: the net move must be at least {_words([f'{m:g}' for m in axes['min_move_atr'] if m], 'or')} × ATR(14); "
+                                           f"an {_words(['EMA(' + t[3:] + ')' for t in axes['trend_filter'] if t != 'none'], 'or')} "
+                                           "trend filter (longs above, shorts below). No entries in the last "
+                                           "30 minutes; a signal while a position is open is dropped."},
+                {"label": "Exit", "text": f"Time exit after {_words([_val('hold', h).replace(' bars', '') for h in axes['hold'] if h != 'session'], 'or')} bars at that bar's close"
+                                          f"{', or hold to the session close' if 'session' in axes['hold'] else ''}; "
+                                          f"optional stop {_words([s_ for s_ in axes['stop'] if s_ != 'none'], 'or')} × ATR(14) from the entry, live inside "
+                                          "each bar. Anything still open is closed at the session's last close."},
                 {"label": "Size", "text": f"{sides}; one position at a time, never held overnight. As many "
                                           f"whole {sym} contracts as the account covers at full contract value (no "
                                           f"leverage), starting from ${ec.starting_equity:,.0f}."},
             ],
             "axes": [{"label": LABELS[ax], "values": [_val(ax, v) for v in vals]} for ax, vals in axes.items()],
             "grid_size": n,
-            "length_note": "All lengths are in bars of the chosen bar size; the minimum box width is in ATR(14).",
+            "length_note": "All lengths are in bars of the chosen bar size; the move and stop are in ATR(14).",
         },
         "funnel": funnel,
         "stable": {"n": s4.height, "axes": stable, "by_timeframe": stable_by_tf},
@@ -407,43 +375,38 @@ def main(
         "luck": luck,
         "finalists": finalists,
         "short_labels": SHORT,
-        "exit_labels": [["target", "target", "profit target"], ["eod", "close", "session close"], ["stop", "stop", "stop"],
-                        *([["time", "time", "time stop"]] if "max_hold_bars" in axes else [])],
-        "local_moves": [[k, MOVES[k]] for k in (["squeeze_length", "kc_mult", "min_squeeze_bars"] if squeeze
-                                                  else ["nr_lookback", *(["min_nr_bars"] if "min_nr_bars" in axes else []),
-                                                        *(["max_range_atr"] if "max_range_atr" in axes else [])])
-                        + ["setup_expiry_bars", "stop_atr", "target_r", "min_box_atr",
-                           *(["max_hold_bars"] if "max_hold_bars" in axes else [])]],
+        "exit_labels": [["time", "time", "time exit"], ["eod", "close", "session close"], ["stop", "stop", "stop"]],
+        "local_moves": [[k, MOVES[k]] for k in ("lookback", "z_lookback", "entry_z", "stop_atr", "min_move_atr")],
         "benchmark": {"label": f"Holding {sym} (rolled, unlevered)", **_buy_and_hold(fcfg, sym)},
         "transfer_symbol": fcfg.confidence.transfer_symbol,
         "dsr": {"effective_trials": dsr["effective_trials"]["li_ji"], "raw_trials": dsr["trial_count_options"]["raw"]},
         "assumptions": [
             f"Data: Databento CME continuous front month ({sym}.v.0), 1-minute bars aggregated to "
             f"{_words([t.replace('min', ' minutes') for t in fcfg.data.timeframes], 'and')}. "
-            "Rolls are back-adjusted so the roll gap is not treated as a price move; the box, stop and target are "
-            "point distances, so the adjustment does not change them.",
+            "Rolls are back-adjusted so the roll gap is not treated as a price move. The ATR gap, max gap and "
+            "reversal signals are point distances; the paper form divides by a back-adjusted price level, so its "
+            "scale drifts slightly with the roll adjustment (the rolling z-score absorbs most of it).",
             f"Day session only: {session_spec(sym).label} on NYSE trading days. Overnight Globex trading is not used "
             "and nothing is held overnight.",
             f"Costs: {ec.slippage_ticks_market:g} tick slippage per side (stops and wick entries too) and "
             f"${ec.commission_per_contract:.2f} commission per contract per side, including the session-close exit.",
-            "Indicators (Bollinger, Keltner, ATR, EMA, NR) run over the day-session bars across days, so the overnight "
-            "gap enters the first bars of each session. A squeeze or NR run never carries over from the day before.",
-            "Bar data can't order events inside a bar: a bar that touches both the stop and the target counts as the "
-            "stop, and on a wick entry's own bar only the stop is checked. Both choices make results worse, not better.",
-            "Targets fill at the target price with slippage, as if they were market orders at the touch.",
-            "Each trade uses the whole account in whole contracts with no leverage, the same as the mean-reversion "
-            "and noise-band runs; the stop changes where the trade exits, not how big it is.",
+            "Windows (up to 96 bars) and the z-score history run over the day-session bars across days, so the "
+            "overnight gap shows up as a jump between two closes inside a window. Positions never cross sessions.",
+            "The paper tested convexity on daily closes with 5- to 21-day holds. Every look-back here is intraday, "
+            "so the whole grid is an extrapolation of the paper.",
+            "The reversal control is extreme almost only in the direction of its own move, so for it quadrant "
+            "\"late\" nearly equals \"all\" and \"early\" rarely trades. Hold \"N bars\" equals \"to close\" once N "
+            "exceeds the bars left in the session.",
+            "Each trade uses the whole account in whole contracts with no leverage, the same as the other families; "
+            "the stop changes where the trade exits, not how big it is.",
             "Sharpe uses daily mark-to-market returns (√252), with idle cash earning 0%. Time in market is the share "
             "of bars with an open position.",
-            *(["Squeeze length 1 is not a squeeze: the standard deviation of one close is 0, so every bar counts. The "
-               "run starts at the session open and never ends, so the box is the day's high and low so far and the "
-               "trade is a break of the day's range, at most once a session."] if 1 in axes.get("squeeze_length", ()) else []),
-            *(["This grid was chosen after reading the previous round's 2023–2024 results, so 2023–2024 is largely "
-               "in-sample here; only the 2025+ holdout is an untouched test."]
+            *(["Other strategy families were already selected on this market's 2023–2024 data, so 2023–2024 is "
+               "not untouched; only the 2025+ holdout is."]
               if fcfg.data_history.validation_previously_used_for_selection else []),
-            "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead.",
+            holdout_line,
         ],
-        "source": f"bbkc-squeeze-backtest/runs/funnel/{experiment_id}/ · {config.as_posix()}",
+        "source": f"price-path-convexity-backtest/runs/funnel/{experiment_id}/ · {config.as_posix()}",
     }
     path = out_root / sym / (f"{key}__{variant}.json" if variant else f"{key}.json")
     path.parent.mkdir(parents=True, exist_ok=True)

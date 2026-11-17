@@ -265,3 +265,17 @@ def test_dev_record_runs():
     cfg = ConvexityV1_15mConfig(symbol="ES", lookback=8, signal_form="atr", z_lookback=250)
     rec, rets = build_dev_record(ConfigEntry(cfg, "abc"), PCData(b), fcfg=f, exec_config=FUT)
     assert rec["integrity_issues"] == "" and len(rets) == len(PCData(b).days)
+
+
+def test_v2_grid_lattice_and_config():
+    from src.analysis.neighborhood import LATTICE_PC_V2_15M
+    from src.experiments.pc_grid import AXES_PC_V2_15M, pc_grid_v2_15m
+    assert variants_per_symbol(AXES_PC_V2_15M) == 82_944
+    assert len(pc_grid_v2_15m(("ES",))) == 82_944
+    for ax, vals in AXES_PC_V2_15M.items():
+        if ax in LATTICE_PC_V2_15M.ordered:
+            assert set(vals) == set(LATTICE_PC_V2_15M.ordered[ax]), ax
+        else:
+            assert ax in LATTICE_PC_V2_15M.fixed, ax
+    f = load_funnel_config(Path("configs/funnel/pc_funnel_es_v2_15m.yaml"))
+    assert f.strategy == "path_convexity_v2_15m"
