@@ -1,0 +1,972 @@
+{
+ "market": "ZN",
+ "market_name": "10-year T-note",
+ "strategy_key": "path_convexity_v3",
+ "strategy_name": "Price-path convexity \u00b7 v3",
+ "variant": "15m",
+ "variant_label": "15m",
+ "stability_mode": "local_perturbation",
+ "validation_rules": {
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3,
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40
+ },
+ "run_id": "pc_zn_v3_15m",
+ "generated_at": "2026-11-17T14:18:38+00:00",
+ "periods": {
+  "dev": [
+   "2018-01-01",
+   "2022-12-31"
+  ],
+  "val": [
+   "2023-01-01",
+   "2024-12-31"
+  ]
+ },
+ "strategy": {
+  "summary": "Fade (or follow) the shape of the recent move, flat by the close. Price-path convexity (Gulen & Woeppel, JFQA 2025, Purdue) measures when a move happened inside a window: draw a straight line from the window's first close to its last, and see whether the path sagged below it (convex: an up-move came late) or bulged above it (concave: it came early). The paper finds high convexity predicts lower returns on daily data; everything here is intraday, so it is an extrapolation. A plain N-bar reversal runs alongside as the control.",
+  "formula": "convexity = ((P1 + PN)/2 \u2212 mean(P1..PN)) / ((P1 + PN)/2); high z \u2192 short, low z \u2192 long",
+  "rules": [
+   {
+    "label": "Signal",
+    "text": "Over the last N closes: paper = the formula above; max gap = the single largest line-minus-path gap \u00f7 ATR(14); control = (PN \u2212 P1) \u00f7 ATR(14), the plain N-bar return. Each is turned into a z-score against its own last 25 or 250 bars."
+   },
+   {
+    "label": "Enter",
+    "text": "A fresh cross of z above +entry goes short; below \u2212entry goes long, filled at the next bar's open. Quadrant: all = every signal (the paper); late = only fades of the window's net move; early = only trades with it. Optional: the net move must be at least 1, 2 or 3 \u00d7 ATR(14); an EMA(50) trend filter (longs above, shorts below). No entries in the last 30 minutes; a signal while a position is open is dropped."
+   },
+   {
+    "label": "Exit",
+    "text": "Time exit after N/2, N or 1.5N bars at that bar's close; optional stop 2.0, 3.0 or 4.0 \u00d7 ATR(14) from the entry, live inside each bar. Anything still open is closed at the session's last close."
+   },
+   {
+    "label": "Size",
+    "text": "Long, short or both; one position at a time, never held overnight. As many whole ZN contracts as the account covers at full contract value (no leverage), starting from $1,000,000."
+   }
+  ],
+  "axes": [
+   {
+    "label": "Bar size",
+    "values": [
+     "15min"
+    ]
+   },
+   {
+    "label": "Look-back N (bars)",
+    "values": [
+     "5",
+     "10",
+     "15",
+     "20",
+     "50"
+    ]
+   },
+   {
+    "label": "Signal form",
+    "values": [
+     "paper",
+     "max gap",
+     "control"
+    ]
+   },
+   {
+    "label": "z-score history (bars)",
+    "values": [
+     "25",
+     "250"
+    ]
+   },
+   {
+    "label": "Entry |z|",
+    "values": [
+     "0.5",
+     "0.75",
+     "1",
+     "1.5"
+    ]
+   },
+   {
+    "label": "Quadrant",
+    "values": [
+     "all",
+     "early",
+     "late"
+    ]
+   },
+   {
+    "label": "Min net move (\u00d7 ATR)",
+    "values": [
+     "any",
+     "1 ATR",
+     "2 ATR",
+     "3 ATR"
+    ]
+   },
+   {
+    "label": "Direction",
+    "values": [
+     "long",
+     "short",
+     "both"
+    ]
+   },
+   {
+    "label": "Hold",
+    "values": [
+     "N/2 bars",
+     "N bars",
+     "1.5N bars"
+    ]
+   },
+   {
+    "label": "Stop",
+    "values": [
+     "none",
+     "2 ATR",
+     "3 ATR",
+     "4 ATR"
+    ]
+   },
+   {
+    "label": "Trend filter",
+    "values": [
+     "none",
+     "EMA 50"
+    ]
+   }
+  ],
+  "grid_size": 103680,
+  "length_note": "All lengths are in bars of the chosen bar size; the move and stop are in ATR(14)."
+ },
+ "funnel": [
+  {
+   "name": "Start",
+   "sub": "every combination",
+   "n": 103680,
+   "why": "All 103,680 versions backtested once on 2018\u20132022 data."
+  },
+  {
+   "name": "1 \u00b7 Integrity",
+   "sub": "no cheating",
+   "n": 103680,
+   "why": "Per-trade checks on every version: the signal was recomputed independently and each entry was a fresh cross on the right side with every filter met, no qualifying signal was skipped while flat, fills were never better than the market, nothing was held overnight. Plus 40 random versions re-run on cut-off data. 0 failed."
+  },
+  {
+   "name": "2 \u00b7 Enough trades",
+   "sub": "\u2265100 trades, spread out",
+   "n": 78483,
+   "why": "Needs \u2265100 completed trades and \u226510 a year in \u22654 of the 5 years. Removed 25,197 (25,197 on 15min)."
+  },
+  {
+   "name": "3 \u00b7 Profit",
+   "sub": "net > 0, Sharpe \u2265 0.75",
+   "n": 0,
+   "why": "Needs a net profit, Sharpe \u2265 0.75 and drawdown no worse than 30%. Removed 78,483 (78,483 on 15min); 78,356 of them lost money."
+  },
+  {
+   "name": "4 \u00b7 Stable settings",
+   "sub": "nudged settings also work",
+   "n": 0,
+   "why": "Each setting is nudged one at a time, down and up: look-back N and the z-score history by \u00b120% (rounded, at least one bar), the entry |z| by \u00b10.25, an ATR stop by \u00b10.25 and the minimum net move by \u00b10.5 ATR (\"no stop\" has nothing to nudge). At least 70% of the nudged versions must be profitable, with median Sharpe \u2265 0.5. Removed 0."
+  },
+  {
+   "name": "5 \u00b7 Time stability",
+   "sub": "\u22653 profitable years",
+   "n": 0,
+   "why": "Removed 0."
+  },
+  {
+   "name": "6 \u00b7 Remove duplicates",
+   "sub": "best 2 per group",
+   "n": 0,
+   "why": "Versions whose monthly returns correlate \u2265 0.8 form a group; the best 2 of each go on (a group of one keeps its one). 0 versions formed 0 groups; 0 of the 0 picks are distinct backtests."
+  },
+  {
+   "name": "7 \u00b7 Cost stress",
+   "sub": "profitable at 1.5\u00d7 costs",
+   "n": 0,
+   "why": "Removed 0."
+  },
+  {
+   "name": "8 \u00b7 Validation",
+   "sub": "2023\u20132024, new data",
+   "n": null,
+   "why": "Frozen finalists run once on unseen data: needs net > 0, Sharpe \u2265 0.3, drawdown no worse than 30% and \u226540 trades. Not run yet: the finalists are frozen and waiting for this step."
+  }
+ ],
+ "stable": {
+  "n": 0,
+  "axes": [
+   {
+    "axis": "lookback",
+    "label": "Look-back N (bars)",
+    "values": [
+     {
+      "v": "5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "10",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "15",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "20",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "50",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "signal_form",
+    "label": "Signal form",
+    "values": [
+     {
+      "v": "paper",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "max gap",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "control",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "z_lookback",
+    "label": "z-score history (bars)",
+    "values": [
+     {
+      "v": "25",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "250",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "entry_z",
+    "label": "Entry |z|",
+    "values": [
+     {
+      "v": "0.5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "0.75",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "1",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "1.5",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "quadrant",
+    "label": "Quadrant",
+    "values": [
+     {
+      "v": "all",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "early",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "late",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "min_move_atr",
+    "label": "Min net move (\u00d7 ATR)",
+    "values": [
+     {
+      "v": "any",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "1 ATR",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "2 ATR",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "3 ATR",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "direction",
+    "label": "Direction",
+    "values": [
+     {
+      "v": "long",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "short",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "both",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "hold",
+    "label": "Hold",
+    "values": [
+     {
+      "v": "N/2 bars",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "N bars",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "1.5N bars",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "stop",
+    "label": "Stop",
+    "values": [
+     {
+      "v": "none",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "2 ATR",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "3 ATR",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "4 ATR",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "trend_filter",
+    "label": "Trend filter",
+    "values": [
+     {
+      "v": "none",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "EMA 50",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   }
+  ],
+  "by_timeframe": []
+ },
+ "ablation": [
+  {
+   "axis": "lookback",
+   "label": "Look-back N (bars)",
+   "values": [
+    {
+     "v": "5",
+     "n": 20736,
+     "pct_profitable": 0.06385030864197531,
+     "median_sharpe": -2.2701105960452828,
+     "p90_sharpe": -0.30158561579888327,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "10",
+     "n": 20736,
+     "pct_profitable": 0.04774305555555555,
+     "median_sharpe": -2.0694219339715696,
+     "p90_sharpe": -0.3988126860721239,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "15",
+     "n": 20736,
+     "pct_profitable": 0.04986496913580247,
+     "median_sharpe": -1.8356436609004714,
+     "p90_sharpe": -0.3001343922135538,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "20",
+     "n": 20736,
+     "pct_profitable": 0.03530092592592592,
+     "median_sharpe": -1.8324594505536451,
+     "p90_sharpe": -0.44828220776542443,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "50",
+     "n": 20736,
+     "pct_profitable": 0.014515817901234568,
+     "median_sharpe": -1.339938587603269,
+     "p90_sharpe": -0.46812536470699223,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "signal_form",
+   "label": "Signal form",
+   "values": [
+    {
+     "v": "paper",
+     "n": 34560,
+     "pct_profitable": 0.031510416666666666,
+     "median_sharpe": -1.9397407335839816,
+     "p90_sharpe": -0.5740272025282506,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "max gap",
+     "n": 34560,
+     "pct_profitable": 0.033825231481481484,
+     "median_sharpe": -1.8923371050548794,
+     "p90_sharpe": -0.5392673584716845,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "control",
+     "n": 34560,
+     "pct_profitable": 0.06142939814814815,
+     "median_sharpe": -1.4162105725448493,
+     "p90_sharpe": -0.14525612463739757,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "z_lookback",
+   "label": "z-score history (bars)",
+   "values": [
+    {
+     "v": "25",
+     "n": 51840,
+     "pct_profitable": 0.03821373456790123,
+     "median_sharpe": -1.8939326575230377,
+     "p90_sharpe": -0.44828220776542427,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "250",
+     "n": 51840,
+     "pct_profitable": 0.046296296296296294,
+     "median_sharpe": -1.7382397844450206,
+     "p90_sharpe": -0.36410494041931263,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "entry_z",
+   "label": "Entry |z|",
+   "values": [
+    {
+     "v": "0.5",
+     "n": 25920,
+     "pct_profitable": 0.03861882716049383,
+     "median_sharpe": -1.9103694029831995,
+     "p90_sharpe": -0.4371838288344878,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "0.75",
+     "n": 25920,
+     "pct_profitable": 0.040123456790123455,
+     "median_sharpe": -1.9275702568793642,
+     "p90_sharpe": -0.42882269033756676,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "1",
+     "n": 25920,
+     "pct_profitable": 0.03819444444444445,
+     "median_sharpe": -1.8625891049886034,
+     "p90_sharpe": -0.4358397814379391,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "1.5",
+     "n": 25920,
+     "pct_profitable": 0.052083333333333336,
+     "median_sharpe": -1.6121106593984789,
+     "p90_sharpe": -0.33287401754175755,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "quadrant",
+   "label": "Quadrant",
+   "values": [
+    {
+     "v": "all",
+     "n": 34560,
+     "pct_profitable": 0.019849537037037037,
+     "median_sharpe": -2.1806414092808666,
+     "p90_sharpe": -0.724672741422394,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "early",
+     "n": 34560,
+     "pct_profitable": 0.020341435185185185,
+     "median_sharpe": -1.796906046108933,
+     "p90_sharpe": -0.5259980551618784,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "late",
+     "n": 34560,
+     "pct_profitable": 0.08657407407407407,
+     "median_sharpe": -1.4096806889661924,
+     "p90_sharpe": -0.03945008487308039,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "min_move_atr",
+   "label": "Min net move (\u00d7 ATR)",
+   "values": [
+    {
+     "v": "any",
+     "n": 25920,
+     "pct_profitable": 0.02025462962962963,
+     "median_sharpe": -2.3322825657476383,
+     "p90_sharpe": -0.7333937334254039,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "1 ATR",
+     "n": 25920,
+     "pct_profitable": 0.021141975308641977,
+     "median_sharpe": -2.07553131686703,
+     "p90_sharpe": -0.5536460102852186,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "2 ATR",
+     "n": 25920,
+     "pct_profitable": 0.044444444444444446,
+     "median_sharpe": -1.6927830767153955,
+     "p90_sharpe": -0.29705816592700734,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "3 ATR",
+     "n": 25920,
+     "pct_profitable": 0.08317901234567901,
+     "median_sharpe": -1.3396436870212522,
+     "p90_sharpe": -0.06161341181452271,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "direction",
+   "label": "Direction",
+   "values": [
+    {
+     "v": "long",
+     "n": 34560,
+     "pct_profitable": 0.043402777777777776,
+     "median_sharpe": -1.9458718847228311,
+     "p90_sharpe": -0.4448080045922799,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "short",
+     "n": 34560,
+     "pct_profitable": 0.04487847222222222,
+     "median_sharpe": -1.3156861288714672,
+     "p90_sharpe": -0.3088698282618711,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "both",
+     "n": 34560,
+     "pct_profitable": 0.038483796296296294,
+     "median_sharpe": -2.2164984078249845,
+     "p90_sharpe": -0.47802323571791444,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "hold",
+   "label": "Hold",
+   "values": [
+    {
+     "v": "N/2 bars",
+     "n": 34560,
+     "pct_profitable": 0.04438657407407407,
+     "median_sharpe": -2.1733818802670557,
+     "p90_sharpe": -0.4361399584723044,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "N bars",
+     "n": 34560,
+     "pct_profitable": 0.04071180555555556,
+     "median_sharpe": -1.7828108082614988,
+     "p90_sharpe": -0.4145965393963914,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "1.5N bars",
+     "n": 34560,
+     "pct_profitable": 0.041666666666666664,
+     "median_sharpe": -1.5790372295199577,
+     "p90_sharpe": -0.3861540788113488,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "stop",
+   "label": "Stop",
+   "values": [
+    {
+     "v": "none",
+     "n": 25920,
+     "pct_profitable": 0.04436728395061729,
+     "median_sharpe": -1.7284477177131026,
+     "p90_sharpe": -0.38167066273620104,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "2 ATR",
+     "n": 25920,
+     "pct_profitable": 0.040046296296296295,
+     "median_sharpe": -1.956591841020126,
+     "p90_sharpe": -0.44828220776542427,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "3 ATR",
+     "n": 25920,
+     "pct_profitable": 0.041512345679012345,
+     "median_sharpe": -1.8420436603422852,
+     "p90_sharpe": -0.4102143947446391,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "4 ATR",
+     "n": 25920,
+     "pct_profitable": 0.04309413580246914,
+     "median_sharpe": -1.7773816895738648,
+     "p90_sharpe": -0.3948968997377415,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "trend_filter",
+   "label": "Trend filter",
+   "values": [
+    {
+     "v": "none",
+     "n": 51840,
+     "pct_profitable": 0.006385030864197531,
+     "median_sharpe": -2.196399527772679,
+     "p90_sharpe": -0.9987678054233344,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "EMA 50",
+     "n": 51840,
+     "pct_profitable": 0.078125,
+     "median_sharpe": -1.2387396108028992,
+     "p90_sharpe": -0.07763295375597236,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  }
+ ],
+ "length_map": {
+  "title": "Look-back N (bars) \u00d7 Entry |z|",
+  "pair_text": "look-back n and entry |z|",
+  "corner": "N \u2193 \u00b7 z \u2192",
+  "row_short": "n",
+  "col_short": "z",
+  "order": null,
+  "fixed": {
+   "Signal form": "control",
+   "z-score history (bars)": "250",
+   "Quadrant": "all",
+   "Min net move (\u00d7 ATR)": "3 ATR",
+   "Direction": "both",
+   "Hold": "N/2 bars",
+   "Stop": "none",
+   "Trend filter": "EMA 50"
+  },
+  "center": [
+   "20",
+   "1.5"
+  ],
+  "rows": [
+   "5",
+   "10",
+   "15",
+   "20",
+   "50"
+  ],
+  "cols": [
+   "0.5",
+   "0.75",
+   "1",
+   "1.5"
+  ],
+  "sharpe": [
+   [
+    0.14081387249805793,
+    0.16050814500223307,
+    0.08334150146465633,
+    0.19264345033618951
+   ],
+   [
+    -0.44507908702681476,
+    -0.5363647180110607,
+    -0.8965571480625525,
+    -0.39428306449993195
+   ],
+   [
+    0.004380444006530888,
+    -0.08898448005264,
+    -0.11780601109399076,
+    0.2686171118423266
+   ],
+   [
+    -0.17327950933811137,
+    -0.4167517941770619,
+    -0.7805710670009781,
+    0.9237386113682055
+   ],
+   [
+    -0.9202685217452732,
+    -0.3690253340550394,
+    -0.8407751275480655,
+    -0.33019958674169597
+   ]
+  ],
+  "trades": [
+   [
+    7,
+    10,
+    11,
+    19
+   ],
+   [
+    10,
+    11,
+    20,
+    49
+   ],
+   [
+    18,
+    33,
+    58,
+    37
+   ],
+   [
+    22,
+    38,
+    48,
+    31
+   ],
+   [
+    44,
+    47,
+    35,
+    16
+   ]
+  ]
+ },
+ "luck": null,
+ "finalists": [],
+ "short_labels": {
+  "timeframe": "Bar",
+  "lookback": "N",
+  "signal_form": "Form",
+  "z_lookback": "zHist",
+  "entry_z": "z",
+  "quadrant": "Quad",
+  "min_move_atr": "Move",
+  "direction": "Side",
+  "hold": "Hold",
+  "stop": "Stop",
+  "trend_filter": "Trend"
+ },
+ "exit_labels": [
+  [
+   "time",
+   "time",
+   "time exit"
+  ],
+  [
+   "eod",
+   "close",
+   "session close"
+  ],
+  [
+   "stop",
+   "stop",
+   "stop"
+  ]
+ ],
+ "local_moves": [
+  [
+   "lookback",
+   "N"
+  ],
+  [
+   "z_lookback",
+   "z hist"
+  ],
+  [
+   "entry_z",
+   "Entry z"
+  ],
+  [
+   "stop_atr",
+   "Stop"
+  ],
+  [
+   "min_move_atr",
+   "Min move"
+  ]
+ ],
+ "benchmark": {
+  "label": "Holding ZN (rolled, unlevered)",
+  "dev": {
+   "net_return": -0.06338467573723616,
+   "sharpe": -0.21722100885782564,
+   "max_drawdown": -0.19565193272182846
+  },
+  "val": {
+   "net_return": -0.059784844918865265,
+   "sharpe": -0.4155546322333581,
+   "max_drawdown": -0.1056469825205063
+  }
+ },
+ "transfer_symbol": "ZB",
+ "dsr": {
+  "effective_trials": 1777.0000000000164,
+  "raw_trials": 103680.0
+ },
+ "assumptions": [
+  "Data: Databento CME continuous front month (ZN.v.0), 1-minute bars aggregated to 15 minutes. Rolls are back-adjusted so the roll gap is not treated as a price move. The ATR gap, max gap and reversal signals are point distances; the paper form divides by a back-adjusted price level, so its scale drifts slightly with the roll adjustment (the rolling z-score absorbs most of it).",
+  "Day session only: CBOT Treasury day session 08:20-15:00 NY (former pit hours) on NYSE trading days. Overnight Globex trading is not used and nothing is held overnight.",
+  "Costs: 1 tick slippage per side (stops and wick entries too) and $2.50 commission per contract per side, including the session-close exit.",
+  "Windows (up to 96 bars) and the z-score history run over the day-session bars across days, so the overnight gap shows up as a jump between two closes inside a window. Positions never cross sessions.",
+  "The paper tested convexity on daily closes with 5- to 21-day holds. Every look-back here is intraday, so the whole grid is an extrapolation of the paper.",
+  "The reversal control is extreme almost only in the direction of its own move, so for it quadrant \"late\" nearly equals \"all\" and \"early\" rarely trades. Hold \"N bars\" equals \"to close\" once N exceeds the bars left in the session.",
+  "Each trade uses the whole account in whole contracts with no leverage, the same as the other families; the stop changes where the trade exits, not how big it is.",
+  "Sharpe uses daily mark-to-market returns (\u221a252), with idle cash earning 0%. Time in market is the share of bars with an open position.",
+  "Other strategy families were already selected on this market's 2023\u20132024 data, so 2023\u20132024 is not untouched; only the 2025+ holdout is.",
+  "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead."
+ ],
+ "source": "price-path-convexity-backtest/runs/funnel/pc_zn_v3_15m/ \u00b7 configs/funnel/pc_funnel_zn_v3_15m.yaml"
+}

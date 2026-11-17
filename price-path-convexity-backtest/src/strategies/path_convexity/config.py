@@ -83,6 +83,8 @@ def hold_bars(hold: str, lookback: int) -> int | None:
         return lookback
     if hold == "half":
         return max(1, (lookback + 1) // 2)
+    if hold == "1.5n":
+        return (3 * lookback + 1) // 2  # ceil(1.5 N)
     raise ValueError(f"Unknown hold {hold!r}")
 
 
@@ -96,7 +98,7 @@ class _ConvexityConfig(FrozenModel):
     quadrant: Literal["all", "late", "early"] = "all"
     min_move_atr: Literal[0.0, 1.0, 2.0] = 0.0
     direction: Literal["long", "short", "both"] = "both"
-    hold: Literal["half", "full", "session"] = "full"
+    hold: Literal["half", "full", "1.5n", "session"] = "full"
     stop: Literal["none", "1.5", "2.5"] = "none"
     trend_filter: Literal["none", "ema50", "ema200"] = "none"
 
@@ -144,3 +146,30 @@ class ConvexityV2_15mConfig(_ConvexityConfig):
     stop: Literal["none", "1.5", "2.5", "3.5"] = "none"
     trend_filter: Literal["none", "ema50"] = "none"
 
+
+# --- path_convexity v3 (15-minute bars, 103,680 configs) --------------------------------------
+# Specified by the user (2026-11-16) after v2 on ES failed validation/holdout (pc_es_v2_15m;
+# #115 lost on ES 2025+). Run on NQ: look-back N 5/10/15/20/50, a short (25) and a medium (250)
+# z-score history, a longer 1.5N hold (ceil(1.5 N) bars) and wider 2/3/4 ATR stops.
+V3_LOOKBACKS: tuple[int, ...] = (5, 10, 15, 20, 50)
+V3_SIGNAL_FORMS: tuple[str, ...] = ("paper", "maxgap", "reversal")
+V3_Z_LOOKBACKS: tuple[int, ...] = (25, 250)
+V3_ENTRY_ZS: tuple[float, ...] = (0.5, 0.75, 1.0, 1.5)
+V3_QUADRANTS: tuple[str, ...] = ("all", "early", "late")
+V3_MIN_MOVE_ATRS: tuple[float, ...] = (0.0, 1.0, 2.0, 3.0)
+V3_DIRECTIONS: tuple[str, ...] = ("long", "short", "both")
+V3_HOLDS: tuple[str, ...] = ("half", "full", "1.5n")
+V3_STOPS: tuple[str, ...] = ("none", "2.0", "3.0", "4.0")
+V3_TREND_FILTERS: tuple[str, ...] = ("none", "ema50")
+
+
+class ConvexityV3_15mConfig(_ConvexityConfig):
+    timeframe: Literal["15min"] = "15min"
+    lookback: Literal[5, 10, 15, 20, 50] = 10
+    signal_form: Literal["paper", "maxgap", "reversal"] = "paper"
+    z_lookback: Literal[25, 250] = 250
+    entry_z: Literal[0.5, 0.75, 1.0, 1.5] = 1.0
+    min_move_atr: Literal[0.0, 1.0, 2.0, 3.0] = 0.0
+    hold: Literal["half", "full", "1.5n"] = "full"
+    stop: Literal["none", "2.0", "3.0", "4.0"] = "none"
+    trend_filter: Literal["none", "ema50"] = "none"

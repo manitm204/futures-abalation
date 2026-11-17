@@ -526,3 +526,13 @@ LATTICE_PC_V2_15M = Lattice({
     "hold": ["half", "full"],
     "stop": ["1.5", "2.5", "3.5", "none"],
 }, FIXED_AXES_PC)
+# Price-path convexity v3, 15-minute bars. hold orders half < full < 1.5n; stop "none" after 4 ATR.
+LATTICE_PC_V3_15M = Lattice({
+    "timeframe": ["15min"],
+    "lookback": [5, 10, 15, 20, 50],
+    "z_lookback": [25, 250],
+    "entry_z": [0.5, 0.75, 1.0, 1.5],
+    "min_move_atr": [0.0, 1.0, 2.0, 3.0],
+    "hold": ["half", "full", "1.5n"],
+    "stop": ["2.0", "3.0", "4.0", "none"],
+}, FIXED_AXES_PC)

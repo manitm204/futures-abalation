@@ -4,7 +4,7 @@
 The convexity copy of ../nr-squeeze-backtest/scripts/build_cb_portfolio.py: same page
 ("portfolio" kind on the results site), same shared-account rules, same period switcher and
 the same random-entry luck benchmark. Legs are convexity finalists (`--leg RUN:ORDER`, config
-configs/funnel/pc_funnel_<rest>.yaml, e.g. pc_es_v2_15m -> pc_funnel_es_v2_15m.yaml),
+configs/funnel/pc_funnel_<rest>.yaml, e.g. pc_nq_v3_15m -> pc_funnel_nq_v3_15m.yaml),
 simulated with the convexity backtester. A convexity time exit fills at its bar's close.
 
 Uses data through the validation end only unless `--holdout --confirm-holdout-access`,
@@ -14,8 +14,8 @@ frozen), goes through `authorize_holdout_access`, is ledgered as command
 `portfolio_holdout`, and writes `<key>_holdout.json`.
 
 Usage:
-  PYTHONPATH=. python scripts/build_pc_portfolio.py --leg pc_es_v2_15m:115 \
-      --key path_convexity_portfolio_es_v2 --label "Holdout · v2 #115" --market-name "E-mini S&P 500" \
+  PYTHONPATH=. python scripts/build_pc_portfolio.py --leg pc_nq_v3_15m:38 --leg pc_nq_v3_15m:32 \
+      --key path_convexity_portfolio_nq_v3 --label "Holdout · v3 #38 + #32" --market-name "E-mini Nasdaq-100" \
       --holdout --confirm-holdout-access
 """
 
@@ -134,7 +134,7 @@ def _notes(fcfg, holdout: bool, prior_access, n_sims: int, n_legs: int = 2, runs
 
 @app.command()
 def main(
-    leg: list[str] = typer.Option(..., help="RUN:ORDER, e.g. pc_es_v2_15m:115 (repeat for each strategy)"),
+    leg: list[str] = typer.Option(..., help="RUN:ORDER, e.g. pc_nq_v3_15m:38 (repeat for each strategy)"),
     n_sims: int = typer.Option(200, help="Random-entry runs per luck band"),
     key: str = typer.Option(..., help="File / tab id; must start with path_convexity"),
     label: str = typer.Option(..., help="Tab label"),
@@ -158,7 +158,7 @@ def main(
     specs = []
     for spec in leg:
         run_id, order = spec.split(":")
-        line, rest = run_id.split("_", 1)  # pc_es_v2_15m -> pc_funnel_es_v2_15m
+        line, rest = run_id.split("_", 1)  # pc_nq_v3_15m -> pc_funnel_nq_v3_15m
         cfg_path = PROJECT_ROOT / "configs" / "funnel" / f"{line}_funnel_{rest}.yaml"
         fc = load_funnel_config(cfg_path)
         _select_space(fc)  # _params builds configs of this run's grid

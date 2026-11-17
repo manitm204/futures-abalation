@@ -25,7 +25,7 @@ import polars as pl
 import typer
 
 from src.data.futures import session_spec
-from src.experiments.pc_grid import AXES_PC_V1_5M, AXES_PC_V1_15M, AXES_PC_V2_15M
+from src.experiments.pc_grid import AXES_PC_V1_5M, AXES_PC_V1_15M, AXES_PC_V2_15M, AXES_PC_V3_15M
 from src.experiments.funnel_config import load_execution_config, load_funnel_config
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -37,6 +37,7 @@ SPACES = {
     "path_convexity_v1_15m": (AXES_PC_V1_15M, "path_convexity", "Price-path convexity", ("lookback", "entry_z")),
     "path_convexity_v1_5m": (AXES_PC_V1_5M, "path_convexity", "Price-path convexity", ("lookback", "entry_z")),
     "path_convexity_v2_15m": (AXES_PC_V2_15M, "path_convexity", "Price-path convexity", ("lookback", "entry_z")),
+    "path_convexity_v3_15m": (AXES_PC_V3_15M, "path_convexity", "Price-path convexity", ("lookback", "entry_z")),
 }
 MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini Dow", "RTY": "E-mini Russell 2000",
                 "CL": "Crude oil", "GC": "Gold", "6E": "Euro FX", "6J": "Japanese yen", "ZN": "10-year T-note",
@@ -64,7 +65,7 @@ def _val(axis: str, v) -> str:
     if axis == "signal_form":
         return FORM_NAMES.get(v, v)
     if axis == "hold":
-        return {"half": "N/2 bars", "full": "N bars", "session": "to close"}.get(v, v)
+        return {"half": "N/2 bars", "full": "N bars", "1.5n": "1.5N bars", "session": "to close"}.get(v, v)
     if isinstance(v, float):
         return f"{v:g}"
     return str(v)

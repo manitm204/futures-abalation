@@ -82,3 +82,36 @@ AXES_PC_V2_15M: dict[str, tuple] = {
 def pc_grid_v2_15m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
     return _grid(symbols, AXES_PC_V2_15M, ConvexityV2_15mConfig)
 
+
+# --- v3: 15-minute bars, 103,680 configs (run on NQ) -----------------------------------------
+from src.strategies.path_convexity.config import (  # noqa: E402
+    V3_DIRECTIONS,
+    V3_ENTRY_ZS,
+    V3_HOLDS,
+    V3_LOOKBACKS,
+    V3_MIN_MOVE_ATRS,
+    V3_QUADRANTS,
+    V3_SIGNAL_FORMS,
+    V3_STOPS,
+    V3_TREND_FILTERS,
+    V3_Z_LOOKBACKS,
+    ConvexityV3_15mConfig,
+)
+
+AXES_PC_V3_15M: dict[str, tuple] = {
+    "timeframe": ("15min",),
+    "lookback": V3_LOOKBACKS,
+    "signal_form": V3_SIGNAL_FORMS,
+    "z_lookback": V3_Z_LOOKBACKS,
+    "entry_z": V3_ENTRY_ZS,
+    "quadrant": V3_QUADRANTS,
+    "min_move_atr": V3_MIN_MOVE_ATRS,
+    "direction": V3_DIRECTIONS,
+    "hold": V3_HOLDS,
+    "stop": V3_STOPS,
+    "trend_filter": V3_TREND_FILTERS,
+}
+
+
+def pc_grid_v3_15m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_PC_V3_15M, ConvexityV3_15mConfig)

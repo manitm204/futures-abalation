@@ -1,0 +1,159 @@
+{
+  "calibration_verified": false,
+  "effective_trials": {
+    "li_ji": 1791.9999999999714,
+    "n_components_95": 454,
+    "n_series": 95724,
+    "participation_ratio": 30.127294971123792,
+    "rank_bound_T": 1259
+  },
+  "n_configs_with_defined_sharpe": 95724,
+  "primary_method": "li_ji",
+  "research_history": [
+    {
+      "n_configs": 103680,
+      "name": "path_convexity_v3_15m GC (pc_gc_v3_15m)",
+      "note": "Same grid on gold 15m; 2 frozen (dev only), no edge across the grid."
+    },
+    {
+      "n_configs": 103680,
+      "name": "path_convexity_v3_15m NQ (pc_nq_v3_15m)",
+      "note": "Same grid on NQ 15m; 1,081 frozen, 479 passed 2023-2024, #38 and #32 lost on NQ 2025+."
+    },
+    {
+      "n_configs": 82944,
+      "name": "path_convexity_v2_15m ES (pc_es_v2_15m)",
+      "note": "Round 2 of this line on ES 15m; 349 frozen, 17 passed 2023-2024, #115 lost on ES 2025+. This grid was chosen after it."
+    },
+    {
+      "n_configs": 0,
+      "name": "path_convexity_v1_15m NQ transfer (stage 9 of pc_es_v1_15m / pc_es_v2_15m)",
+      "note": "Frozen ES candidates were re-run on NQ 2018-2022 as a transfer diagnostic; their NQ development results were seen."
+    },
+    {
+      "n_configs": 186624,
+      "name": "path_convexity_v1_15m ES (pc_es_v1_15m)",
+      "note": "Round 1 of this line on ES 15m; development only, 319 frozen candidates. This grid was chosen from its results."
+    },
+    {
+      "n_configs": 186624,
+      "name": "path_convexity_v1_5m ES (pc_es_v1_5m)",
+      "note": "Round 1 grid on 5m bars; specified but never run (0 configs evaluated)."
+    },
+    {
+      "n_configs": 207360,
+      "name": "compression_breakout_nr_v2_15m ES (cb_nr_es_v2_15m)",
+      "note": "Different (NR-N squeeze breakout) family on ES."
+    },
+    {
+      "n_configs": 145152,
+      "name": "compression_breakout_nr_v3_15m ES (cb_nr_es_v3_15m)",
+      "note": "Different (NR-N squeeze breakout) family on ES."
+    },
+    {
+      "n_configs": 16128,
+      "name": "compression_breakout_nr ES v1 (cb_nr_es_v1)",
+      "note": "Earlier grid of this line on ES; specified but never run (0 configs evaluated)."
+    },
+    {
+      "n_configs": 184320,
+      "name": "compression_breakout_bbkc_v2_15m ES (cb_bbkc_es_v2_15m)",
+      "note": "Sibling line (BB/KC squeeze) on ES 15m; 2 tested on 2025+."
+    },
+    {
+      "n_configs": 72576,
+      "name": "compression_breakout_bbkc_v2_5m ES (cb_bbkc_es_v2_5m)",
+      "note": "Sibling line (BB/KC squeeze) on ES 5m."
+    },
+    {
+      "n_configs": 3840,
+      "name": "compression_breakout_bbkc_v4_15m ES (cb_bbkc_es_v4_15m)",
+      "note": "Sibling line (BB/KC squeeze) on ES 15m; development started 2026-11-11, not finished."
+    },
+    {
+      "n_configs": 20736,
+      "name": "compression_breakout_bbkc ES v1 (cb_bbkc_es_v1)",
+      "note": "Sibling compression line (BB-inside-KC squeeze) on ES, 5min + 15min; this grid was specified after its results."
+    },
+    {
+      "n_configs": 46080,
+      "name": "mean_reversion ES (mr_es_v3)",
+      "note": "Different (mean-reversion) family on ES; 11 frozen candidates, 1 passed 2023-2024."
+    },
+    {
+      "n_configs": 46080,
+      "name": "mean_reversion ES (mr_es_v4)",
+      "note": "Different (mean-reversion) family on ES; 18 frozen candidates, 3 passed 2023-2024."
+    },
+    {
+      "n_configs": 41472,
+      "name": "mean_reversion ES (mr_es_v5)",
+      "note": "Different (mean-reversion) family on ES; 45 frozen candidates, 10 passed 2023-2024."
+    },
+    {
+      "n_configs": 864,
+      "name": "mean_reversion ES (mr_es_v6_15m)",
+      "note": "Different (mean-reversion) family on ES; 7 frozen candidates, 0 passed 2023-2024."
+    },
+    {
+      "n_configs": 6804,
+      "name": "mean_reversion ES (mr_es_v6_1h)",
+      "note": "Different (mean-reversion) family on ES; 39 frozen candidates, 1 passed 2023-2024."
+    },
+    {
+      "n_configs": 8100,
+      "name": "noise_band ES (nb_es_v1)",
+      "note": "Different (noise-band intraday momentum) family on ES; 210 frozen candidates."
+    },
+    {
+      "n_configs": 8100,
+      "name": "noise_band ES (nb_es_v2)",
+      "note": "Different (noise-band intraday momentum) family on ES; 235 frozen candidates."
+    },
+    {
+      "n_configs": 16200,
+      "name": "noise_band ES (nb_es_v3)",
+      "note": "Different (noise-band intraday momentum) family on ES; 268 frozen candidates."
+    },
+    {
+      "n_configs": 13824,
+      "name": "noise_band ES (nb_es_v4)",
+      "note": "Different (noise-band intraday momentum) family on ES; 326 frozen candidates."
+    },
+    {
+      "n_configs": 24576,
+      "name": "channel_breakout grid (funnel_v1..v4, SPY)",
+      "note": "Closest prior search: channel breakout, SPY; four funnel variants with changed thresholds/methods."
+    },
+    {
+      "n_configs": 3888,
+      "name": "donchian_ablation (donchian_v1, SPY/QQQ)",
+      "note": "Closest prior search: full-factorial Donchian intraday breakout ablation, 2018-2026 splits incl. holdout."
+    },
+    {
+      "n_configs": 248832,
+      "name": "ma_crossover v2 grid (ma_v2, SPY)",
+      "note": "Long-only trend-following MA crossover, 5min/15min, SPY."
+    },
+    {
+      "n_configs": 60000,
+      "name": "ma_crossover v1 grid (ma_v1, SPY)",
+      "note": "Long-only trend-following MA crossover, 5min/15min/1h, SPY."
+    }
+  ],
+  "serial_dependence": "lag1_effective_n",
+  "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+  "trial_count_options": {
+    "li_ji": 1791.9999999999714,
+    "participation_ratio": 30.127294971123792,
+    "raw": 103680.0,
+    "raw_plus_known_prior": 1942164.0
+  },
+  "unresolved": [
+    "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+    "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+    "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+    "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+  ],
+  "variance_of_trial_sharpes_per_period": 0.0012716459330758322
+}
