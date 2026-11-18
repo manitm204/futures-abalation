@@ -1,0 +1,204 @@
+{
+ "acceptance_holdout": {
+  "max_drawdown": -0.3,
+  "min_completed_trades": null,
+  "min_net_return": 0.0,
+  "min_sharpe": 0.0
+ },
+ "acceptance_validation": {
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40,
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3
+ },
+ "candidates": [
+  {
+   "cluster": 0,
+   "config_id": "cfg_0129a7c4781cf8418b33",
+   "dev_net_return": 0.5718849999999944,
+   "dev_order": 7,
+   "dev_sharpe": 0.7783452989655554,
+   "n_profitable_years": 4,
+   "neighbor_median_sharpe": 0.2950775114186226,
+   "params": {
+    "direction": "short",
+    "entry_z": 1.5,
+    "hold": "full",
+    "lookback": 20,
+    "min_move_atr": 2.0,
+    "quadrant": "all",
+    "signal_form": "maxgap",
+    "stop": "none",
+    "symbol": "CL",
+    "timeframe": "15min",
+    "trend_filter": "none",
+    "z_lookback": 250
+   },
+   "stability_median_sharpe": 0.5767447462841264
+  }
+ ],
+ "code_version": "26d90d38fa4c235350ea1731ac9ab8d220720459",
+ "config_sha256": "e4447c2f48e35bb11e886972a6b0a9826e1a1d0d12c87418daed22111530a2b2",
+ "data_windows": {
+  "clean_root": "data/clean",
+  "development": {
+   "end": "2022-12-31",
+   "start": "2018-01-01"
+  },
+  "holdout": {
+   "end": null,
+   "start": "2025-01-01"
+  },
+  "timeframes": [
+   "15min"
+  ],
+  "validation": {
+   "end": "2024-12-31",
+   "start": "2023-01-01"
+  }
+ },
+ "experiment_id": "pc_cl_v4_15m",
+ "frozen_at": "2026-11-18T03:03:28.935991+00:00",
+ "frozen_manifest_sha256": "7d88218e55f0affd4302a541aa57426d7589d4cc4d369163dc83795497303f47",
+ "git_diff_sha256": "00638be347ae9fb299832721fedb12e416a36a22246e5f6e89a7aa9f5f2cea88",
+ "git_dirty": true,
+ "seed": 20261116,
+ "selection_rules": {
+  "gates": [
+   "1 integrity",
+   "2 trade count",
+   "3 performance & risk",
+   "4 parameter stability",
+   "5 time stability",
+   "6 dedup (complete linkage, best 2 per cluster)",
+   "7 execution stress"
+  ],
+  "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+  "validation_is_not_used_for_ranking": true
+ },
+ "sizing_and_costs": {
+  "allow_overlapping_trades": false,
+  "allow_pyramiding": false,
+  "allow_short": false,
+  "commission_minimum": 0.0,
+  "commission_per_contract": 2.5,
+  "commission_per_share": 0.0,
+  "extended_hours_slippage_multiplier": 1.0,
+  "fractional_shares": false,
+  "include_sec_finra_fees": false,
+  "instrument_type": "futures",
+  "intrabar_collision_mode": "stop_first",
+  "leverage": 1.0,
+  "max_open_positions_per_symbol": 1,
+  "risk_per_trade_pct": 0.0025,
+  "slippage_bps_limit_adverse": 0.0,
+  "slippage_bps_market": 0.0,
+  "slippage_bps_stop": 0.0,
+  "slippage_ticks_market": 1.0,
+  "slippage_ticks_stop": 1.0,
+  "starting_equity": 1000000.0
+ },
+ "symbol": "CL",
+ "validated_at": "2026-11-18T03:04:58.397304+00:00",
+ "validation_summary": [
+  {
+   "config_id": "cfg_4389aa79a6177a649823",
+   "reasons": [
+    "net_return -0.1446 <= 0.0",
+    "sharpe -1.195 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_95d4c008ff52da526fe8",
+   "reasons": [
+    "net_return -0.1446 <= 0.0",
+    "sharpe -1.195 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_96432f5094636d7b8126",
+   "reasons": [
+    "net_return -0.0705 <= 0.0",
+    "sharpe -0.491 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_44134c2251f79dee471a",
+   "reasons": [
+    "net_return -0.0788 <= 0.0",
+    "sharpe -0.560 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_08bda17cd921a39a20ce",
+   "reasons": [
+    "net_return -0.1800 <= 0.0",
+    "sharpe -0.804 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ba82f7a829c2fd11b6c0",
+   "reasons": [
+    "net_return -0.1800 <= 0.0",
+    "sharpe -0.804 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_0129a7c4781cf8418b33",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_29dca45f3ea66cce2378",
+   "reasons": [
+    "net_return -0.0695 <= 0.0",
+    "sharpe -0.837 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_504db616dfdffd55593d",
+   "reasons": [
+    "net_return -0.0695 <= 0.0",
+    "sharpe -0.837 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4ea9e2d2c764c7f3d355",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0443f8588d889f3274f8",
+   "reasons": [
+    "net_return -0.0780 <= 0.0",
+    "sharpe -0.892 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_063f173e44bae093f4a3",
+   "reasons": [
+    "net_return -0.0204 <= 0.0",
+    "sharpe -0.181 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_cfd2660a6a362912530f",
+   "reasons": [
+    "net_return -0.0204 <= 0.0",
+    "sharpe -0.181 < 0.3"
+   ],
+   "status": "hard_reject"
+  }
+ ],
+ "holdout_selection_note": "User-chosen 2026-11-17 from the 2 validation passers (#7 and #10, the same strategy with a different hold) after a validation-window one-setting neighbor check (#7: 8/8 neighbors profitable, median Sharpe 0.97). Only #7 is tested. Chosen before any CL 2025+ access; decided beforehand that a loss retires the convexity line."
+}

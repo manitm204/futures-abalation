@@ -536,3 +536,13 @@ LATTICE_PC_V3_15M = Lattice({
     "hold": ["half", "full", "1.5n"],
     "stop": ["2.0", "3.0", "4.0", "none"],
 }, FIXED_AXES_PC)
+# Price-path convexity v4, 15-minute bars (light grid). hold full < 1.5n; stop "none" after 3 ATR.
+LATTICE_PC_V4_15M = Lattice({
+    "timeframe": ["15min"],
+    "lookback": [5, 10, 20, 50],
+    "z_lookback": [25, 250],
+    "entry_z": [0.5, 1.0, 1.5],
+    "min_move_atr": [0.0, 2.0],
+    "hold": ["full", "1.5n"],
+    "stop": ["3.0", "none"],
+}, FIXED_AXES_PC)

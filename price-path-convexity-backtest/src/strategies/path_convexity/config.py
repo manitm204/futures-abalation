@@ -173,3 +173,31 @@ class ConvexityV3_15mConfig(_ConvexityConfig):
     hold: Literal["half", "full", "1.5n"] = "full"
     stop: Literal["none", "2.0", "3.0", "4.0"] = "none"
     trend_filter: Literal["none", "ema50"] = "none"
+
+
+# --- path_convexity v4 (15-minute bars, 10,368 configs) ---------------------------------------
+# Specified by the user (2026-11-17) after v3 on NQ / GC / 6E / ZN (only NQ showed structure; its
+# picks lost on the holdout). A light grid for markets not yet tested, run on CL first: drops
+# N = 15, entry 0.75, the N/2 hold and most stops; min net move any / 2 ATR.
+V4_LOOKBACKS: tuple[int, ...] = (5, 10, 20, 50)
+V4_SIGNAL_FORMS: tuple[str, ...] = ("paper", "maxgap", "reversal")
+V4_Z_LOOKBACKS: tuple[int, ...] = (25, 250)
+V4_ENTRY_ZS: tuple[float, ...] = (0.5, 1.0, 1.5)
+V4_QUADRANTS: tuple[str, ...] = ("all", "early", "late")
+V4_MIN_MOVE_ATRS: tuple[float, ...] = (0.0, 2.0)
+V4_DIRECTIONS: tuple[str, ...] = ("long", "short", "both")
+V4_HOLDS: tuple[str, ...] = ("full", "1.5n")
+V4_STOPS: tuple[str, ...] = ("none", "3.0")
+V4_TREND_FILTERS: tuple[str, ...] = ("none", "ema50")
+
+
+class ConvexityV4_15mConfig(_ConvexityConfig):
+    timeframe: Literal["15min"] = "15min"
+    lookback: Literal[5, 10, 20, 50] = 10
+    signal_form: Literal["paper", "maxgap", "reversal"] = "paper"
+    z_lookback: Literal[25, 250] = 250
+    entry_z: Literal[0.5, 1.0, 1.5] = 1.0
+    min_move_atr: Literal[0.0, 2.0] = 0.0
+    hold: Literal["full", "1.5n"] = "full"
+    stop: Literal["none", "3.0"] = "none"
+    trend_filter: Literal["none", "ema50"] = "none"

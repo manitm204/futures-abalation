@@ -117,10 +117,10 @@ def _notes(fcfg, holdout: bool, prior_access, n_sims: int, n_legs: int = 2, runs
            "results (Sharpe, beats-luck, a one-setting-at-a-time neighbor check on 2023–2024) as well as "
            "2018–2022, so 2023–2024 is in-sample for the choice. The untouched test is the 2025+ holdout tab.")
     hold = ((f"<b>First convexity look at the {fcfg.symbol} holdout.</b> No price-path convexity strategy had been "
-             f"scored on {fcfg.symbol} 2025 onward before (apart from the final-test of these same frozen picks), and "
+             f"scored on {fcfg.symbol} 2025 onward before (apart from the final-test of {'this same frozen pick' if one else 'these same frozen picks'}), and "
              f"only {them}, frozen beforehand, {were} run, so there's no selection among holdout results. Other "
-             f"strategy families were scored on {fcfg.symbol} 2025+ earlier (see the data-access ledgers), and a "
-             "convexity pick had already been scored on ES 2025+ before the NQ picks were run."
+             f"strategy families were scored on {fcfg.symbol} 2025+ earlier (see the data-access ledgers), and "
+             "convexity picks on other markets had already been scored on their 2025+ data before this one."
              if fcfg.symbol != "ES" else
              f"<b>First convexity look at the {fcfg.symbol} holdout.</b> No price-path convexity strategy had been "
              f"scored on 2025 onward before (apart from the final-test of this same frozen pick), and only {them}, "

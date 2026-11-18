@@ -279,3 +279,19 @@ def test_v2_grid_lattice_and_config():
             assert ax in LATTICE_PC_V2_15M.fixed, ax
     f = load_funnel_config(Path("configs/funnel/pc_funnel_es_v2_15m.yaml"))
     assert f.strategy == "path_convexity_v2_15m"
+
+
+def test_v4_grid_lattice_and_config():
+    from src.analysis.neighborhood import LATTICE_PC_V4_15M
+    from src.experiments.pc_grid import AXES_PC_V4_15M, pc_grid_v4_15m
+    from src.strategies.path_convexity.config import hold_bars
+    assert variants_per_symbol(AXES_PC_V4_15M) == 10_368
+    assert len(pc_grid_v4_15m(("CL",))) == 10_368
+    for ax, vals in AXES_PC_V4_15M.items():
+        if ax in LATTICE_PC_V4_15M.ordered:
+            assert set(vals) == set(LATTICE_PC_V4_15M.ordered[ax]), ax
+        else:
+            assert ax in LATTICE_PC_V4_15M.fixed, ax
+    assert hold_bars("1.5n", 5) == 8 and hold_bars("1.5n", 10) == 15
+    f = load_funnel_config(Path("configs/funnel/pc_funnel_cl_v4_15m.yaml"))
+    assert f.strategy == "path_convexity_v4_15m" and f.symbol == "CL"
