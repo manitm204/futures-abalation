@@ -1,0 +1,127 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 40,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [],
+  "code_version": "66e9a379b8f42b8aaa791b7147e8876e024f58fc",
+  "config_sha256": "c5cf3166727fd6f339336c607c2e1f41327596da6193b463b04fd1b13106c68b",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "5min",
+      "15min"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "emrt_esnq_v2",
+  "frozen_at": "2026-11-18T22:01:53.500231+00:00",
+  "frozen_manifest_sha256": "040f7f588d9b37fbeeaeb4bdc83f379c54ed9f9a5b1d17cfde92b24ba7629fcf",
+  "git_diff_sha256": "5d03eeeb1bf1a086e9034ca9b73727618ef6d16bb76afb2d09ee23ade5436ad1",
+  "git_dirty": true,
+  "seed": 20261118,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, best 2 per cluster)",
+      "7 execution stress"
+    ],
+    "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": false,
+    "commission_minimum": 0.0,
+    "commission_per_contract": 2.5,
+    "commission_per_share": 0.0,
+    "extended_hours_slippage_multiplier": 1.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "instrument_type": "futures",
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 0.0,
+    "slippage_bps_stop": 0.0,
+    "slippage_ticks_market": 1.0,
+    "slippage_ticks_stop": 1.0,
+    "starting_equity": 10000000.0
+  },
+  "symbol": "ES-NQ",
+  "validated_at": "2026-11-19T01:45:25.486273+00:00",
+  "validation_summary": [
+    {
+      "config_id": "cfg_eb21063d2b67188e0268",
+      "reasons": [
+        "completed_trades 31 < 40"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_881b2a72672a20721923",
+      "reasons": [
+        "completed_trades 31 < 40"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_1839bc231db18fc017a5",
+      "reasons": [
+        "net_return -0.0006 <= 0.0",
+        "sharpe -0.064 < 0.3",
+        "completed_trades 34 < 40"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_ac547a99f56fd157703d",
+      "reasons": [
+        "net_return -0.0006 <= 0.0",
+        "sharpe -0.064 < 0.3",
+        "completed_trades 34 < 40"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_84006576ebae52321e35",
+      "reasons": [
+        "completed_trades 28 < 40"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_e0659131b525cfca06dc",
+      "reasons": [
+        "completed_trades 28 < 40"
+      ],
+      "status": "hard_reject"
+    }
+  ]
+}

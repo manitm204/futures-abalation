@@ -1,0 +1,47 @@
+{
+  "audit_notes": [
+    "Pair data: both legs' day-session bars of one timeframe, inner-joined on bar open time (a bar missing in either leg is dropped from both); leg A is the pair's first symbol.",
+    "Hedge refit at each calendar-month start on the bars of the previous `formation` months only (strictly before the trading month; a month is fit only when the data reaches back to its start). Spread S = (A - A0)/RA - beta (B - B0)/RB on closes, anchors at the last formation bar (A0 adjusted close, RA raw close): per $1 of A, short $beta of B.",
+    "Hedges: emrt_cC = the beta in 0.20..3.00 (step 0.01) minimising the empirical mean-reversion time (mean bars from each important extremum at C x sd back to the formation mean; zigzag pivots, the first dropped; never-reverting extrema censored at the window end; >= 4 extrema), subject to var(S) <= 2 x var(S at the OLS beta); ols = formation OLS slope of a on b clipped to 0.20..3.00 (CONTROL); notional = 1 (CONTROL).",
+    "z_k under bar k's month hedge: formation = (S_k - formation mean) / formation sd; rolling_W = (S_k - mean) / sd of the last W bars' S (population, same beta / anchors). z_prev_k is bar k-1 under bar k's month hedge.",
+    "Decision at bar k's close: long spread (long A, short B) on a fresh cross z_k <= -entry_z, short spread on z_k >= entry_z; side filter; no decision on the session's last bar or less than 30 minutes before its last close. A signal while a position is open is dropped, never queued.",
+    "Entry fills both legs at the NEXT bar's open with market slippage; the fill bar must be in the decision's session. The open position keeps its ENTRY month's hedge and z definition for its exits, even after a refit.",
+    "Exits from the entry bar's close on: target z back to 0 (mean) or inside -/+ entry_z/2 (half); stop |z| >= entry_z + stop against the position; both decided at a close and filled at the next bar's open (stop slippage for stops) -- with overnight = hold that can be the next session's open. Time stop (3emrt): closed at the close of bar entry + ceil(3 x EMRT of the entry month's spread) - 1. overnight = flat: closed at the session's last close. The data's last bar closes at its close (forced, not a completed trade).",
+    "P&L = side x qa x multA x (A exit - A entry) - side x qb x multB x (B exit - B entry) - commissions - roll costs; with overnight = hold, each roll of a leg's contract while open costs that leg a round turn (2 x (commission + 1 tick) per contract).",
+    "Sizing: whole contracts, unlevered: gross notional of both legs (raw price x multiplier) + entry commissions <= equity; qa = floor(equity / (VA (1 + beta))), qb = round(qa VA beta / VB), reduced until it fits; >= 1 contract per leg. Starting equity $10M so the ratio is carried by tens of contracts, not a handful.",
+    "Development backtests run on data physically truncated at the development end; a trade still open there is closed at the last development bar and flagged forced (not counted as completed).",
+    "Sharpe: daily session-close mark-to-market returns over every trading day (flat days = 0), sqrt(252) annualization, rf = 0, idle cash earns 0.",
+    "v2 (anchor = session): each leg is measured from TODAY's first open, a = (A - A_open) / A_open_raw, so S = a - beta b restarts every session; beta is fit monthly on these intraday spreads (extremum search and reversion confined to a session, a swing not back by the close censored there); z = formation mean / sd, or tod_N = mean / sd of S at the same bar of the previous N sessions (>= max(5, N/2) present); z_prev of a session's first bar is NaN (no cross across sessions); first_entry = no decision before that many minutes after the open; every position closes at the session's last close (overnight = flat only)."
+  ],
+  "checks_per_config": [
+    "hedge_fit_not_before_decision",
+    "beta_not_month_fit",
+    "signal_not_fresh_cross",
+    "side_not_allowed",
+    "entry_inside_last_entry_cutoff",
+    "signal_skipped_while_flat",
+    "entry_not_next_bar_same_session",
+    "entry_fill_better_than_market",
+    "exit_before_entry",
+    "position_held_overnight",
+    "exit_not_at_first_rule",
+    "exit_rule_not_met",
+    "exit_fill_not_per_rule",
+    "exit_fill_better_than_market",
+    "time_stop_not_per_rule",
+    "overlapping_positions",
+    "position_exceeds_equity",
+    "pnl_mismatch",
+    "roll_cost_mismatch",
+    "forced_close_not_final_trade",
+    "undersized_leg",
+    "entry_before_first_entry"
+  ],
+  "cut_fractions": [
+    0.3,
+    0.6000000000000001,
+    0.9
+  ],
+  "failures": {},
+  "truncation_sample": 40
+}

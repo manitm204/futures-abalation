@@ -1,0 +1,2162 @@
+{
+ "market": "ES-RTY",
+ "market_name": "E-mini S&P 500 vs E-mini Russell 2000",
+ "strategy_key": "emrt_spread_v2",
+ "strategy_name": "EMRT spread \u00b7 v2",
+ "variant": null,
+ "variant_label": null,
+ "stability_mode": "local_perturbation",
+ "validation_rules": {
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3,
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40
+ },
+ "run_id": "emrt_esrty_v2",
+ "generated_at": "2026-11-19T01:48:16+00:00",
+ "periods": {
+  "dev": [
+   "2018-01-01",
+   "2022-12-31"
+  ],
+  "val": [
+   "2023-01-01",
+   "2024-12-31"
+  ]
+ },
+ "strategy": {
+  "summary": "Trade the INTRADAY spread between ES and RTY, flat by the close every day (no overnight holds). Each leg is measured from that day's open, so the spread starts at 0 each session; when ES runs ahead of or behind \u03b2 \u00d7 RTY by an unusual amount, bet on the gap closing before the close. \u03b2 comes from Ning & Lee (Purdue Statistics, 2024): the ratio whose spread reverts fastest (the empirical mean-reversion time, EMRT), fit monthly on these intraday spreads. The OLS slope and 1:1 run alongside as controls. Designed after v1, whose flat-at-close versions all failed because its multi-day spread rarely reverted within the day.",
+  "formula": "spread = (ES \u2212 today's ES open) \u00f7 open \u2212 \u03b2 \u00d7 (RTY \u2212 today's RTY open) \u00f7 open; \u03b2 = argmin EMRT",
+  "rules": [
+   {
+    "label": "Hedge",
+    "text": "At each month start, fit \u03b2 on the previous 1, 3 or 6 months only. EMRT: mark every swing of at least C \u00d7 the spread's sd (an 'important extremum'), time how long each takes to get back to the mean within the same session (a swing still open at the close counts until the close), and pick the \u03b2 from 0.20 to 3.00 with the shortest average (C = 1.5 or 2.0), as long as the spread's variance is at most 2\u00d7 the OLS spread's. Controls: OLS slope; \u03b2 = 1."
+   },
+   {
+    "label": "Enter",
+    "text": "z = the spread against the formation window's mean and sd, or by time of day: against the same bar of the last 20 or 60 sessions. A fresh cross below \u2212entry buys the spread (long ES, short \u03b2 \u00d7 RTY); above +entry sells it. Both legs fill at the next bar's open. Optionally no entries in the first 30 minutes; none in the last 30; a signal while a position is open is dropped."
+   },
+   {
+    "label": "Exit",
+    "text": "Close when z gets back to 0 (at mean) or half-way to it; optional stop once z runs a further 1.5 past the entry level; optional time stop after 3 \u00d7 the spread's EMRT. Anything still open is closed at the session's last close: never held overnight."
+   },
+   {
+    "label": "Size",
+    "text": "Both / long spread / short spread; one position at a time. Whole ES and RTY contracts, the two legs' full contract value together no more than the account (no leverage), starting from $10,000,000 so the ratio is carried by tens of contracts."
+   }
+  ],
+  "axes": [
+   {
+    "label": "Bar size",
+    "values": [
+     "5min",
+     "15min"
+    ]
+   },
+   {
+    "label": "Formation window (months)",
+    "values": [
+     "1 mo",
+     "3 mo",
+     "6 mo"
+    ]
+   },
+   {
+    "label": "Hedge ratio",
+    "values": [
+     "EMRT C=1.5",
+     "EMRT C=2.0",
+     "OLS (control)",
+     "1:1 (control)"
+    ]
+   },
+   {
+    "label": "z-score basis",
+    "values": [
+     "formation",
+     "time of day 20",
+     "time of day 60"
+    ]
+   },
+   {
+    "label": "Entry |z|",
+    "values": [
+     "1",
+     "1.5",
+     "2",
+     "2.5"
+    ]
+   },
+   {
+    "label": "Exit",
+    "values": [
+     "at mean",
+     "half-way"
+    ]
+   },
+   {
+    "label": "Stop (z beyond entry)",
+    "values": [
+     "none",
+     "+1.5 z"
+    ]
+   },
+   {
+    "label": "Time stop",
+    "values": [
+     "none",
+     "3 \u00d7 EMRT"
+    ]
+   },
+   {
+    "label": "Side",
+    "values": [
+     "both",
+     "long spread",
+     "short spread"
+    ]
+   },
+   {
+    "label": "First entry",
+    "values": [
+     "at open",
+     "+30 min"
+    ]
+   },
+   {
+    "label": "Overnight",
+    "values": [
+     "flat at close"
+    ]
+   }
+  ],
+  "grid_size": 13824,
+  "length_note": "Formation is in months; time-of-day windows are in sessions; EMRT and time stops are in bars."
+ },
+ "funnel": [
+  {
+   "name": "Start",
+   "sub": "every combination",
+   "n": 13824,
+   "why": "All 13,824 versions backtested once on 2018\u20132022 data."
+  },
+  {
+   "name": "1 \u00b7 Integrity",
+   "sub": "no cheating",
+   "n": 13824,
+   "why": "Per-trade checks on every version: the spread's z was recomputed by a separate route, each hedge was fit only on months before the trade, each entry was a fresh cross on an allowed side, no qualifying signal was skipped while flat, both legs filled at the next open no better than the market, exits fired at the first bar a rule did, and P&L, roll costs and sizing add up. Plus 40 random versions re-run on cut-off data. 0 failed."
+  },
+  {
+   "name": "2 \u00b7 Enough trades",
+   "sub": "\u2265100 trades, spread out",
+   "n": 9679,
+   "why": "Needs \u2265100 completed trades and \u226510 a year in \u22654 of the 5 years. Removed 4,145 (1,557 on 5min, 2,588 on 15min)."
+  },
+  {
+   "name": "3 \u00b7 Profit",
+   "sub": "net > 0, Sharpe \u2265 0.75",
+   "n": 79,
+   "why": "Needs a net profit, Sharpe \u2265 0.75 and drawdown no worse than 30%. Removed 9,600 (5,280 on 5min, 4,320 on 15min); 7,966 of them lost money."
+  },
+  {
+   "name": "4 \u00b7 Stable settings",
+   "sub": "nudged settings also work",
+   "n": 77,
+   "why": "Each setting is nudged one at a time, down and up: the formation window and a rolling z window by \u00b120% (rounded, at least one month / bar), the entry |z| by \u00b10.25, a stop by \u00b10.25 z, an EMRT hedge's C by \u00b10.25 and a time stop by \u00b10.5 \u00d7 EMRT (\"none\" has nothing to nudge). At least 70% of the nudged versions must be profitable, with median Sharpe \u2265 0.5. Removed 2."
+  },
+  {
+   "name": "5 \u00b7 Time stability",
+   "sub": "\u22653 profitable years",
+   "n": 59,
+   "why": "Removed 18."
+  },
+  {
+   "name": "6 \u00b7 Remove duplicates",
+   "sub": "best 2 per group",
+   "n": 10,
+   "why": "Versions whose monthly returns correlate \u2265 0.8 form a group; the best 2 of each go on (a group of one keeps its one). 59 versions formed 5 groups; 10 of the 10 picks are distinct backtests."
+  },
+  {
+   "name": "7 \u00b7 Cost stress",
+   "sub": "profitable at 1.5\u00d7 costs",
+   "n": 10,
+   "why": "Removed 0."
+  },
+  {
+   "name": "8 \u00b7 Validation",
+   "sub": "2023\u20132024, new data",
+   "n": 2,
+   "why": "Frozen finalists run once on unseen data: needs net > 0, Sharpe \u2265 0.3, drawdown no worse than 30% and \u226540 trades."
+  }
+ ],
+ "stable": {
+  "n": 77,
+  "axes": [
+   {
+    "axis": "timeframe",
+    "label": "Bar size",
+    "values": [
+     {
+      "v": "5min",
+      "n": 73,
+      "median_sharpe": 0.8525715253110584
+     },
+     {
+      "v": "15min",
+      "n": 4,
+      "median_sharpe": 0.8557896985057363
+     }
+    ]
+   },
+   {
+    "axis": "formation",
+    "label": "Formation window (months)",
+    "values": [
+     {
+      "v": "1 mo",
+      "n": 10,
+      "median_sharpe": 0.8234416181727171
+     },
+     {
+      "v": "3 mo",
+      "n": 27,
+      "median_sharpe": 0.8579166898752625
+     },
+     {
+      "v": "6 mo",
+      "n": 40,
+      "median_sharpe": 0.8557896985057363
+     }
+    ]
+   },
+   {
+    "axis": "hedge",
+    "label": "Hedge ratio",
+    "values": [
+     {
+      "v": "EMRT C=1.5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "EMRT C=2.0",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "OLS (control)",
+      "n": 3,
+      "median_sharpe": 0.803813932775342
+     },
+     {
+      "v": "1:1 (control)",
+      "n": 74,
+      "median_sharpe": 0.8557896985057363
+     }
+    ]
+   },
+   {
+    "axis": "z_mode",
+    "label": "z-score basis",
+    "values": [
+     {
+      "v": "formation",
+      "n": 68,
+      "median_sharpe": 0.8557896985057363
+     },
+     {
+      "v": "time of day 20",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "time of day 60",
+      "n": 9,
+      "median_sharpe": 0.8410984146607186
+     }
+    ]
+   },
+   {
+    "axis": "entry_z",
+    "label": "Entry |z|",
+    "values": [
+     {
+      "v": "1",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "1.5",
+      "n": 20,
+      "median_sharpe": 0.8145305927748613
+     },
+     {
+      "v": "2",
+      "n": 35,
+      "median_sharpe": 0.8557896985057363
+     },
+     {
+      "v": "2.5",
+      "n": 22,
+      "median_sharpe": 0.8635503762889429
+     }
+    ]
+   },
+   {
+    "axis": "exit",
+    "label": "Exit",
+    "values": [
+     {
+      "v": "at mean",
+      "n": 27,
+      "median_sharpe": 0.8543554128252768
+     },
+     {
+      "v": "half-way",
+      "n": 50,
+      "median_sharpe": 0.8557896985057363
+     }
+    ]
+   },
+   {
+    "axis": "stop",
+    "label": "Stop (z beyond entry)",
+    "values": [
+     {
+      "v": "none",
+      "n": 65,
+      "median_sharpe": 0.8557896985057363
+     },
+     {
+      "v": "+1.5 z",
+      "n": 12,
+      "median_sharpe": 0.8552694188279195
+     }
+    ]
+   },
+   {
+    "axis": "time_stop",
+    "label": "Time stop",
+    "values": [
+     {
+      "v": "none",
+      "n": 37,
+      "median_sharpe": 0.8557896985057363
+     },
+     {
+      "v": "3 \u00d7 EMRT",
+      "n": 40,
+      "median_sharpe": 0.8541806119083973
+     }
+    ]
+   },
+   {
+    "axis": "side",
+    "label": "Side",
+    "values": [
+     {
+      "v": "both",
+      "n": 47,
+      "median_sharpe": 0.8598294987145242
+     },
+     {
+      "v": "long spread",
+      "n": 30,
+      "median_sharpe": 0.8335917695080209
+     },
+     {
+      "v": "short spread",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "first_entry",
+    "label": "First entry",
+    "values": [
+     {
+      "v": "at open",
+      "n": 54,
+      "median_sharpe": 0.8608060749845488
+     },
+     {
+      "v": "+30 min",
+      "n": 23,
+      "median_sharpe": 0.803813932775342
+     }
+    ]
+   }
+  ],
+  "by_timeframe": [
+   {
+    "timeframe": "5min",
+    "n": 73,
+    "axes": [
+     {
+      "axis": "formation",
+      "label": "Formation window (months)",
+      "values": [
+       {
+        "v": "1 mo",
+        "n": 10,
+        "median_sharpe": 0.8234416181727171
+       },
+       {
+        "v": "3 mo",
+        "n": 27,
+        "median_sharpe": 0.8579166898752625
+       },
+       {
+        "v": "6 mo",
+        "n": 36,
+        "median_sharpe": 0.8582043646524459
+       }
+      ]
+     },
+     {
+      "axis": "hedge",
+      "label": "Hedge ratio",
+      "values": [
+       {
+        "v": "EMRT C=1.5",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "EMRT C=2.0",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "OLS (control)",
+        "n": 3,
+        "median_sharpe": 0.803813932775342
+       },
+       {
+        "v": "1:1 (control)",
+        "n": 70,
+        "median_sharpe": 0.8561001309568876
+       }
+      ]
+     },
+     {
+      "axis": "z_mode",
+      "label": "z-score basis",
+      "values": [
+       {
+        "v": "formation",
+        "n": 64,
+        "median_sharpe": 0.8534634690681676
+       },
+       {
+        "v": "time of day 20",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "time of day 60",
+        "n": 9,
+        "median_sharpe": 0.8410984146607186
+       }
+      ]
+     },
+     {
+      "axis": "entry_z",
+      "label": "Entry |z|",
+      "values": [
+       {
+        "v": "1",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "1.5",
+        "n": 20,
+        "median_sharpe": 0.8145305927748613
+       },
+       {
+        "v": "2",
+        "n": 31,
+        "median_sharpe": 0.8543554128252768
+       },
+       {
+        "v": "2.5",
+        "n": 22,
+        "median_sharpe": 0.8635503762889429
+       }
+      ]
+     },
+     {
+      "axis": "exit",
+      "label": "Exit",
+      "values": [
+       {
+        "v": "at mean",
+        "n": 27,
+        "median_sharpe": 0.8543554128252768
+       },
+       {
+        "v": "half-way",
+        "n": 46,
+        "median_sharpe": 0.8522732413752521
+       }
+      ]
+     },
+     {
+      "axis": "stop",
+      "label": "Stop (z beyond entry)",
+      "values": [
+       {
+        "v": "none",
+        "n": 61,
+        "median_sharpe": 0.8525715253110584
+       },
+       {
+        "v": "+1.5 z",
+        "n": 12,
+        "median_sharpe": 0.8552694188279195
+       }
+      ]
+     },
+     {
+      "axis": "time_stop",
+      "label": "Time stop",
+      "values": [
+       {
+        "v": "none",
+        "n": 35,
+        "median_sharpe": 0.8543554128252768
+       },
+       {
+        "v": "3 \u00d7 EMRT",
+        "n": 38,
+        "median_sharpe": 0.8522732413752521
+       }
+      ]
+     },
+     {
+      "axis": "side",
+      "label": "Side",
+      "values": [
+       {
+        "v": "both",
+        "n": 43,
+        "median_sharpe": 0.861950262503268
+       },
+       {
+        "v": "long spread",
+        "n": 30,
+        "median_sharpe": 0.8335917695080209
+       },
+       {
+        "v": "short spread",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "first_entry",
+      "label": "First entry",
+      "values": [
+       {
+        "v": "at open",
+        "n": 52,
+        "median_sharpe": 0.8618664568789207
+       },
+       {
+        "v": "+30 min",
+        "n": 21,
+        "median_sharpe": 0.7908964970610666
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "timeframe": "15min",
+    "n": 4,
+    "axes": [
+     {
+      "axis": "formation",
+      "label": "Formation window (months)",
+      "values": [
+       {
+        "v": "1 mo",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "3 mo",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "6 mo",
+        "n": 4,
+        "median_sharpe": 0.8557896985057363
+       }
+      ]
+     },
+     {
+      "axis": "hedge",
+      "label": "Hedge ratio",
+      "values": [
+       {
+        "v": "EMRT C=1.5",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "EMRT C=2.0",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "OLS (control)",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "1:1 (control)",
+        "n": 4,
+        "median_sharpe": 0.8557896985057363
+       }
+      ]
+     },
+     {
+      "axis": "z_mode",
+      "label": "z-score basis",
+      "values": [
+       {
+        "v": "formation",
+        "n": 4,
+        "median_sharpe": 0.8557896985057363
+       },
+       {
+        "v": "time of day 20",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "time of day 60",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "entry_z",
+      "label": "Entry |z|",
+      "values": [
+       {
+        "v": "1",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "1.5",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "2",
+        "n": 4,
+        "median_sharpe": 0.8557896985057363
+       },
+       {
+        "v": "2.5",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "exit",
+      "label": "Exit",
+      "values": [
+       {
+        "v": "at mean",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "half-way",
+        "n": 4,
+        "median_sharpe": 0.8557896985057363
+       }
+      ]
+     },
+     {
+      "axis": "stop",
+      "label": "Stop (z beyond entry)",
+      "values": [
+       {
+        "v": "none",
+        "n": 4,
+        "median_sharpe": 0.8557896985057363
+       },
+       {
+        "v": "+1.5 z",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "time_stop",
+      "label": "Time stop",
+      "values": [
+       {
+        "v": "none",
+        "n": 2,
+        "median_sharpe": 0.8557896985057363
+       },
+       {
+        "v": "3 \u00d7 EMRT",
+        "n": 2,
+        "median_sharpe": 0.8557896985057363
+       }
+      ]
+     },
+     {
+      "axis": "side",
+      "label": "Side",
+      "values": [
+       {
+        "v": "both",
+        "n": 4,
+        "median_sharpe": 0.8557896985057363
+       },
+       {
+        "v": "long spread",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "short spread",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "first_entry",
+      "label": "First entry",
+      "values": [
+       {
+        "v": "at open",
+        "n": 2,
+        "median_sharpe": 0.8557896985057363
+       },
+       {
+        "v": "+30 min",
+        "n": 2,
+        "median_sharpe": 0.8557896985057363
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "ablation": [
+  {
+   "axis": "timeframe",
+   "label": "Bar size",
+   "values": [
+    {
+     "v": "5min",
+     "n": 6912,
+     "pct_profitable": 0.24985532407407407,
+     "median_sharpe": -0.3909862824672866,
+     "p90_sharpe": 0.3286301280649708,
+     "n_stage3": 75,
+     "n_survivors": 10
+    },
+    {
+     "v": "15min",
+     "n": 6912,
+     "pct_profitable": 0.2722800925925926,
+     "median_sharpe": -0.30437503919054065,
+     "p90_sharpe": 0.327936145646404,
+     "n_stage3": 4,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "formation",
+   "label": "Formation window (months)",
+   "values": [
+    {
+     "v": "1 mo",
+     "n": 4608,
+     "pct_profitable": 0.2552083333333333,
+     "median_sharpe": -0.3665735372888157,
+     "p90_sharpe": 0.33142358745355494,
+     "n_stage3": 11,
+     "n_survivors": 0
+    },
+    {
+     "v": "3 mo",
+     "n": 4608,
+     "pct_profitable": 0.2658420138888889,
+     "median_sharpe": -0.30098765345357076,
+     "p90_sharpe": 0.29640029146161734,
+     "n_stage3": 27,
+     "n_survivors": 3
+    },
+    {
+     "v": "6 mo",
+     "n": 4608,
+     "pct_profitable": 0.2621527777777778,
+     "median_sharpe": -0.36975981538888725,
+     "p90_sharpe": 0.3517836571091747,
+     "n_stage3": 41,
+     "n_survivors": 7
+    }
+   ]
+  },
+  {
+   "axis": "hedge",
+   "label": "Hedge ratio",
+   "values": [
+    {
+     "v": "EMRT C=1.5",
+     "n": 3456,
+     "pct_profitable": 0.12528935185185186,
+     "median_sharpe": -0.5212189877117921,
+     "p90_sharpe": 0.06868411530088417,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "EMRT C=2.0",
+     "n": 3456,
+     "pct_profitable": 0.3845486111111111,
+     "median_sharpe": -0.12806130726586226,
+     "p90_sharpe": 0.3838814875259058,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "OLS (control)",
+     "n": 3456,
+     "pct_profitable": 0.12905092592592593,
+     "median_sharpe": -0.7440700979476133,
+     "p90_sharpe": 0.07665271254546409,
+     "n_stage3": 4,
+     "n_survivors": 2
+    },
+    {
+     "v": "1:1 (control)",
+     "n": 3456,
+     "pct_profitable": 0.4053819444444444,
+     "median_sharpe": -0.10463970466535036,
+     "p90_sharpe": 0.5371622283763859,
+     "n_stage3": 75,
+     "n_survivors": 8
+    }
+   ]
+  },
+  {
+   "axis": "z_mode",
+   "label": "z-score basis",
+   "values": [
+    {
+     "v": "formation",
+     "n": 4608,
+     "pct_profitable": 0.3216145833333333,
+     "median_sharpe": -0.22961369561561,
+     "p90_sharpe": 0.42221644716445367,
+     "n_stage3": 69,
+     "n_survivors": 8
+    },
+    {
+     "v": "time of day 20",
+     "n": 4608,
+     "pct_profitable": 0.1892361111111111,
+     "median_sharpe": -0.45657674009804006,
+     "p90_sharpe": 0.17435061336982574,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "time of day 60",
+     "n": 4608,
+     "pct_profitable": 0.2723524305555556,
+     "median_sharpe": -0.3470825808386382,
+     "p90_sharpe": 0.34859495516610955,
+     "n_stage3": 10,
+     "n_survivors": 2
+    }
+   ]
+  },
+  {
+   "axis": "entry_z",
+   "label": "Entry |z|",
+   "values": [
+    {
+     "v": "1",
+     "n": 3456,
+     "pct_profitable": 0.06163194444444445,
+     "median_sharpe": -0.7479367261626606,
+     "p90_sharpe": -0.11264278032972305,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "1.5",
+     "n": 3456,
+     "pct_profitable": 0.20457175925925927,
+     "median_sharpe": -0.4059739030391046,
+     "p90_sharpe": 0.24303623299685728,
+     "n_stage3": 21,
+     "n_survivors": 2
+    },
+    {
+     "v": "2",
+     "n": 3456,
+     "pct_profitable": 0.35474537037037035,
+     "median_sharpe": -0.16716113453421122,
+     "p90_sharpe": 0.391165344923433,
+     "n_stage3": 35,
+     "n_survivors": 2
+    },
+    {
+     "v": "2.5",
+     "n": 3456,
+     "pct_profitable": 0.42332175925925924,
+     "median_sharpe": -0.09383610980847365,
+     "p90_sharpe": 0.481908899119552,
+     "n_stage3": 23,
+     "n_survivors": 6
+    }
+   ]
+  },
+  {
+   "axis": "exit",
+   "label": "Exit",
+   "values": [
+    {
+     "v": "at mean",
+     "n": 6912,
+     "pct_profitable": 0.23987268518518517,
+     "median_sharpe": -0.38257690354487744,
+     "p90_sharpe": 0.30006113758711334,
+     "n_stage3": 28,
+     "n_survivors": 2
+    },
+    {
+     "v": "half-way",
+     "n": 6912,
+     "pct_profitable": 0.28226273148148145,
+     "median_sharpe": -0.3068228258348412,
+     "p90_sharpe": 0.35164229259331675,
+     "n_stage3": 51,
+     "n_survivors": 8
+    }
+   ]
+  },
+  {
+   "axis": "stop",
+   "label": "Stop (z beyond entry)",
+   "values": [
+    {
+     "v": "none",
+     "n": 6912,
+     "pct_profitable": 0.3224826388888889,
+     "median_sharpe": -0.23715608970365443,
+     "p90_sharpe": 0.4019718297178537,
+     "n_stage3": 67,
+     "n_survivors": 10
+    },
+    {
+     "v": "+1.5 z",
+     "n": 6912,
+     "pct_profitable": 0.1996527777777778,
+     "median_sharpe": -0.43780114071677406,
+     "p90_sharpe": 0.22304294845254027,
+     "n_stage3": 12,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "time_stop",
+   "label": "Time stop",
+   "values": [
+    {
+     "v": "none",
+     "n": 6912,
+     "pct_profitable": 0.24710648148148148,
+     "median_sharpe": -0.36119394709226116,
+     "p90_sharpe": 0.2971935233360543,
+     "n_stage3": 38,
+     "n_survivors": 4
+    },
+    {
+     "v": "3 \u00d7 EMRT",
+     "n": 6912,
+     "pct_profitable": 0.2750289351851852,
+     "median_sharpe": -0.3271656643170817,
+     "p90_sharpe": 0.3527687933851763,
+     "n_stage3": 41,
+     "n_survivors": 6
+    }
+   ]
+  },
+  {
+   "axis": "side",
+   "label": "Side",
+   "values": [
+    {
+     "v": "both",
+     "n": 4608,
+     "pct_profitable": 0.2339409722222222,
+     "median_sharpe": -0.44713148546881354,
+     "p90_sharpe": 0.3176209548222864,
+     "n_stage3": 49,
+     "n_survivors": 6
+    },
+    {
+     "v": "long spread",
+     "n": 4608,
+     "pct_profitable": 0.2667100694444444,
+     "median_sharpe": -0.36331649186451964,
+     "p90_sharpe": 0.35642996883007255,
+     "n_stage3": 30,
+     "n_survivors": 4
+    },
+    {
+     "v": "short spread",
+     "n": 4608,
+     "pct_profitable": 0.2825520833333333,
+     "median_sharpe": -0.25530682741989885,
+     "p90_sharpe": 0.301735294283965,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "first_entry",
+   "label": "First entry",
+   "values": [
+    {
+     "v": "at open",
+     "n": 6912,
+     "pct_profitable": 0.26953125,
+     "median_sharpe": -0.3450336284495843,
+     "p90_sharpe": 0.33686051339534256,
+     "n_stage3": 55,
+     "n_survivors": 9
+    },
+    {
+     "v": "+30 min",
+     "n": 6912,
+     "pct_profitable": 0.2526041666666667,
+     "median_sharpe": -0.3455221083662755,
+     "p90_sharpe": 0.315403355979077,
+     "n_stage3": 24,
+     "n_survivors": 1
+    }
+   ]
+  }
+ ],
+ "length_map": {
+  "title": "Formation window (months) \u00d7 Entry |z|",
+  "pair_text": "formation window and entry |z|",
+  "corner": "Form \u2193 \u00b7 Entry \u2192",
+  "row_short": "form",
+  "col_short": "entry",
+  "order": 6,
+  "fixed": {
+   "Bar size": "5min",
+   "Hedge ratio": "1:1 (control)",
+   "z-score basis": "formation",
+   "Exit": "at mean",
+   "Stop (z beyond entry)": "none",
+   "Time stop": "none",
+   "Side": "both",
+   "First entry": "at open"
+  },
+  "center": [
+   "3 mo",
+   "2.5"
+  ],
+  "rows": [
+   "1 mo",
+   "3 mo",
+   "6 mo"
+  ],
+  "cols": [
+   "1",
+   "1.5",
+   "2",
+   "2.5"
+  ],
+  "sharpe": [
+   [
+    0.04261490274224142,
+    0.633737609799916,
+    0.6278912894555967,
+    0.7918880309086798
+   ],
+   [
+    -0.24240995309431557,
+    0.7130703897301175,
+    0.8464528100269836,
+    0.8648885283445547
+   ],
+   [
+    0.04062760463811943,
+    0.571918789184595,
+    0.898112195950035,
+    1.095898644338849
+   ]
+  ],
+  "trades": [
+   [
+    933,
+    521,
+    255,
+    130
+   ],
+   [
+    848,
+    471,
+    230,
+    106
+   ],
+   [
+    773,
+    424,
+    213,
+    104
+   ]
+  ]
+ },
+ "luck": null,
+ "finalists": [
+  {
+   "order": 1,
+   "group": 1,
+   "config_id": "cfg_55c2",
+   "settings": {
+    "timeframe": "5min",
+    "formation": "6 mo",
+    "hedge": "1:1 (control)",
+    "z_mode": "formation",
+    "entry_z": "2.5",
+    "exit": "half-way",
+    "stop": "none",
+    "time_stop": "3 \u00d7 EMRT",
+    "side": "both",
+    "first_entry": "at open"
+   },
+   "dev": {
+    "net_return": 0.12785250000000703,
+    "cagr": 0.024374507025331393,
+    "sharpe": 1.1278680141095814,
+    "max_drawdown": -0.014552030156270601,
+    "exposure": 0.03743113264440424,
+    "win_rate": 0.625,
+    "profit_factor": 2.3376036073267055,
+    "n_completed_trades": 112.0,
+    "turnover_annual": 43.63782785549426
+   },
+   "val": {
+    "net_return": 0.010718378511375581,
+    "cagr": 0.005366256726848206,
+    "sharpe": 0.45852538297290885,
+    "max_drawdown": -0.0158871595467468,
+    "exposure": 0.03656096059113301,
+    "win_rate": 0.5135135135135135,
+    "profit_factor": 1.3083864795918756,
+    "n_completed_trades": 37.0,
+    "turnover_annual": 36.128505085696744
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "completed_trades 37 < 40"
+   ],
+   "exits": {
+    "target": 41,
+    "stop": 0,
+    "time": 2,
+    "eod": 69
+   },
+   "stress_1_5x": 0.11407949999999256,
+   "breakeven_cost_x": 6.260948475784222,
+   "transfer_sharpe": -0.320959736732044,
+   "neighbor_median_sharpe": 0.7471343805711667,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.0780045774585671,
+   "local_detail": [
+    {
+     "move": "formation=5",
+     "sharpe": 1.0076291227514473,
+     "net_return": 0.10292575000000737,
+     "trades": 111
+    },
+    {
+     "move": "formation=7",
+     "sharpe": 1.1652019423475173,
+     "net_return": 0.13464600000000737,
+     "trades": 112
+    },
+    {
+     "move": "entry_z=2.25",
+     "sharpe": 1.0458655103027474,
+     "net_return": 0.11419650000000914,
+     "trades": 153
+    },
+    {
+     "move": "entry_z=2.75",
+     "sharpe": 0.7323975220178128,
+     "net_return": 0.07955000000000623,
+     "trades": 86
+    },
+    {
+     "move": "time_stop_mult=2.5",
+     "sharpe": 1.1101436446143866,
+     "net_return": 0.12587625000000702,
+     "trades": 112
+    },
+    {
+     "move": "time_stop_mult=3.5",
+     "sharpe": 1.1302851900618212,
+     "net_return": 0.1280785000000071,
+     "trades": 112
+    }
+   ],
+   "dsr": 0.05709578576154563,
+   "luck": null
+  },
+  {
+   "order": 2,
+   "group": 1,
+   "config_id": "cfg_49cb",
+   "settings": {
+    "timeframe": "5min",
+    "formation": "6 mo",
+    "hedge": "1:1 (control)",
+    "z_mode": "formation",
+    "entry_z": "2.5",
+    "exit": "at mean",
+    "stop": "none",
+    "time_stop": "3 \u00d7 EMRT",
+    "side": "both",
+    "first_entry": "at open"
+   },
+   "dev": {
+    "net_return": 0.1398027500000063,
+    "cagr": 0.02653785177149981,
+    "sharpe": 1.1055409348009129,
+    "max_drawdown": -0.017957473312097627,
+    "exposure": 0.04049758261527296,
+    "win_rate": 0.5865384615384616,
+    "profit_factor": 2.410898420844249,
+    "n_completed_trades": 104.0,
+    "turnover_annual": 40.57038780506223
+   },
+   "val": {
+    "net_return": 0.018400113528415973,
+    "cagr": 0.009194774943040995,
+    "sharpe": 0.6770487088126339,
+    "max_drawdown": -0.01485372145975572,
+    "exposure": 0.04369355500821018,
+    "win_rate": 0.5135135135135135,
+    "profit_factor": 1.5240111935637357,
+    "n_completed_trades": 37.0,
+    "turnover_annual": 36.25815551831155
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "completed_trades 37 < 40"
+   ],
+   "exits": {
+    "target": 18,
+    "stop": 0,
+    "time": 2,
+    "eod": 84
+   },
+   "stress_1_5x": 0.12794024999999287,
+   "breakeven_cost_x": 7.335836979563485,
+   "transfer_sharpe": -0.07596647983268204,
+   "neighbor_median_sharpe": 0.7556636828470198,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.0460796091560616,
+   "local_detail": [
+    {
+     "move": "formation=5",
+     "sharpe": 1.0054603411985032,
+     "net_return": 0.11879850000000625,
+     "trades": 103
+    },
+    {
+     "move": "formation=7",
+     "sharpe": 1.1371081248310568,
+     "net_return": 0.14550350000000623,
+     "trades": 103
+    },
+    {
+     "move": "entry_z=2.25",
+     "sharpe": 0.9602169372116661,
+     "net_return": 0.1175865000000087,
+     "trades": 144
+    },
+    {
+     "move": "entry_z=2.75",
+     "sharpe": 0.7726051541170379,
+     "net_return": 0.0992665000000057,
+     "trades": 79
+    },
+    {
+     "move": "time_stop_mult=2.5",
+     "sharpe": 1.08669887711362,
+     "net_return": 0.13711850000000636,
+     "trades": 104
+    },
+    {
+     "move": "time_stop_mult=3.5",
+     "sharpe": 1.1069652670837247,
+     "net_return": 0.13995150000000622,
+     "trades": 104
+    }
+   ],
+   "dsr": 0.02941204573209467,
+   "luck": null
+  },
+  {
+   "order": 3,
+   "group": 2,
+   "config_id": "cfg_7b40",
+   "settings": {
+    "timeframe": "5min",
+    "formation": "6 mo",
+    "hedge": "1:1 (control)",
+    "z_mode": "formation",
+    "entry_z": "1.5",
+    "exit": "half-way",
+    "stop": "none",
+    "time_stop": "none",
+    "side": "long spread",
+    "first_entry": "at open"
+   },
+   "dev": {
+    "net_return": 0.07855075000001288,
+    "cagr": 0.015250785004005785,
+    "sharpe": 0.8474179700350142,
+    "max_drawdown": -0.025339012996365318,
+    "exposure": 0.08844663865975694,
+    "win_rate": 0.591743119266055,
+    "profit_factor": 1.4575256573047017,
+    "n_completed_trades": 218.0,
+    "turnover_annual": 85.83922145930315
+   },
+   "val": {
+    "net_return": -0.008109493225047837,
+    "cagr": -0.00407915479279386,
+    "sharpe": -0.203624093778293,
+    "max_drawdown": -0.027801010774885504,
+    "exposure": 0.10857963875205255,
+    "win_rate": 0.5050505050505051,
+    "profit_factor": 0.9208508096809191,
+    "n_completed_trades": 99.0,
+    "turnover_annual": 96.88866522828727
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0081 <= 0.0",
+    "sharpe -0.204 < 0.3"
+   ],
+   "exits": {
+    "target": 73,
+    "stop": 0,
+    "time": 0,
+    "eod": 145
+   },
+   "stress_1_5x": 0.05659974999998818,
+   "breakeven_cost_x": 2.9008051350548554,
+   "transfer_sharpe": -1.0607609940228755,
+   "neighbor_median_sharpe": 0.5991559372704137,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9710831047929467,
+   "local_detail": [
+    {
+     "move": "formation=5",
+     "sharpe": 1.028619226830436,
+     "net_return": 0.0966430000000138,
+     "trades": 234
+    },
+    {
+     "move": "formation=7",
+     "sharpe": 0.9545424839938695,
+     "net_return": 0.08984000000001258,
+     "trades": 210
+    },
+    {
+     "move": "entry_z=1.25",
+     "sharpe": 0.656557809927389,
+     "net_return": 0.06774600000001874,
+     "trades": 311
+    },
+    {
+     "move": "entry_z=1.75",
+     "sharpe": 0.9876237255920237,
+     "net_return": 0.0844287500000096,
+     "trades": 159
+    }
+   ],
+   "dsr": 0.01344431442143364,
+   "luck": null
+  },
+  {
+   "order": 4,
+   "group": 2,
+   "config_id": "cfg_d93d",
+   "settings": {
+    "timeframe": "5min",
+    "formation": "3 mo",
+    "hedge": "1:1 (control)",
+    "z_mode": "formation",
+    "entry_z": "1.5",
+    "exit": "half-way",
+    "stop": "none",
+    "time_stop": "3 \u00d7 EMRT",
+    "side": "long spread",
+    "first_entry": "at open"
+   },
+   "dev": {
+    "net_return": 0.09428900000001561,
+    "cagr": 0.018198899010602787,
+    "sharpe": 0.9616421343474832,
+    "max_drawdown": -0.02206767490999073,
+    "exposure": 0.09638874408430693,
+    "win_rate": 0.6024096385542169,
+    "profit_factor": 1.4893242982009844,
+    "n_completed_trades": 249.0,
+    "turnover_annual": 97.95093188772947
+   },
+   "val": {
+    "net_return": -0.020451635719626937,
+    "cagr": -0.010319381858852172,
+    "sharpe": -0.5282530390107867,
+    "max_drawdown": -0.039994882795906794,
+    "exposure": 0.11242816091954023,
+    "win_rate": 0.5104166666666666,
+    "profit_factor": 0.806074260214066,
+    "n_completed_trades": 96.0,
+    "turnover_annual": 94.05509352064784
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0205 <= 0.0",
+    "sharpe -0.528 < 0.3"
+   ],
+   "exits": {
+    "target": 88,
+    "stop": 0,
+    "time": 8,
+    "eod": 153
+   },
+   "stress_1_5x": 0.0694282499999872,
+   "breakeven_cost_x": 2.9759909077993654,
+   "transfer_sharpe": -1.0520152747160971,
+   "neighbor_median_sharpe": 0.7203410155006937,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9589468197231328,
+   "local_detail": [
+    {
+     "move": "formation=2",
+     "sharpe": 0.8661749563309491,
+     "net_return": 0.08373025000001633,
+     "trades": 264
+    },
+    {
+     "move": "formation=4",
+     "sharpe": 0.924708052074663,
+     "net_return": 0.08698500000001452,
+     "trades": 241
+    },
+    {
+     "move": "entry_z=1.25",
+     "sharpe": 0.7227193266697354,
+     "net_return": 0.08091350000001918,
+     "trades": 343
+    },
+    {
+     "move": "entry_z=1.75",
+     "sharpe": 0.9931855873716026,
+     "net_return": 0.08431625000001053,
+     "trades": 168
+    },
+    {
+     "move": "time_stop_mult=2.5",
+     "sharpe": 0.9978731133910692,
+     "net_return": 0.0971945000000154,
+     "trades": 249
+    },
+    {
+     "move": "time_stop_mult=3.5",
+     "sharpe": 1.0099007790908283,
+     "net_return": 0.09869275000001565,
+     "trades": 249
+    }
+   ],
+   "dsr": 0.02524729608471308,
+   "luck": null
+  },
+  {
+   "order": 5,
+   "group": 4,
+   "config_id": "cfg_d47b",
+   "settings": {
+    "timeframe": "5min",
+    "formation": "6 mo",
+    "hedge": "1:1 (control)",
+    "z_mode": "formation",
+    "entry_z": "2",
+    "exit": "half-way",
+    "stop": "none",
+    "time_stop": "none",
+    "side": "long spread",
+    "first_entry": "at open"
+   },
+   "dev": {
+    "net_return": 0.06481200000000675,
+    "cagr": 0.012648957246885528,
+    "sharpe": 0.9105027565646745,
+    "max_drawdown": -0.012556024231052287,
+    "exposure": 0.04157084010507702,
+    "win_rate": 0.5892857142857143,
+    "profit_factor": 1.7354615783965104,
+    "n_completed_trades": 112.0,
+    "turnover_annual": 43.90854450871334
+   },
+   "val": {
+    "net_return": 0.005122265714513574,
+    "cagr": 0.002568065286844723,
+    "sharpe": 0.17932685379586247,
+    "max_drawdown": -0.020199119257735543,
+    "exposure": 0.05393062397372742,
+    "win_rate": 0.5769230769230769,
+    "profit_factor": 1.0961897959544076,
+    "n_completed_trades": 52.0,
+    "turnover_annual": 50.86156957265567
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.179 < 0.3"
+   ],
+   "exits": {
+    "target": 38,
+    "stop": 0,
+    "time": 0,
+    "eod": 74
+   },
+   "stress_1_5x": 0.053271749999993734,
+   "breakeven_cost_x": 3.9375464080190374,
+   "transfer_sharpe": -0.19953993924733765,
+   "neighbor_median_sharpe": 0.8474179700350142,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9570104562424584,
+   "local_detail": [
+    {
+     "move": "formation=5",
+     "sharpe": 0.926397186892893,
+     "net_return": 0.07329300000000649,
+     "trades": 110
+    },
+    {
+     "move": "formation=7",
+     "sharpe": 1.0147025607996591,
+     "net_return": 0.07424950000000674,
+     "trades": 106
+    },
+    {
+     "move": "entry_z=1.75",
+     "sharpe": 0.9876237255920237,
+     "net_return": 0.0844287500000096,
+     "trades": 159
+    },
+    {
+     "move": "entry_z=2.25",
+     "sharpe": 0.7360903919158722,
+     "net_return": 0.04913025000000437,
+     "trades": 71
+    }
+   ],
+   "dsr": 0.02404624490036935,
+   "luck": null
+  },
+  {
+   "order": 6,
+   "group": 0,
+   "config_id": "cfg_f17f",
+   "settings": {
+    "timeframe": "5min",
+    "formation": "3 mo",
+    "hedge": "1:1 (control)",
+    "z_mode": "formation",
+    "entry_z": "2.5",
+    "exit": "at mean",
+    "stop": "none",
+    "time_stop": "none",
+    "side": "both",
+    "first_entry": "at open"
+   },
+   "dev": {
+    "net_return": 0.10153575000000625,
+    "cagr": 0.019544981036000664,
+    "sharpe": 0.8648885283445547,
+    "max_drawdown": -0.016810387313950903,
+    "exposure": 0.04020115911808899,
+    "win_rate": 0.5754716981132075,
+    "profit_factor": 2.063399218179388,
+    "n_completed_trades": 106.0,
+    "turnover_annual": 41.32111892599729
+   },
+   "val": {
+    "net_return": 0.012351392135935946,
+    "cagr": 0.006181347836941242,
+    "sharpe": 0.41516674172301166,
+    "max_drawdown": -0.016104346577833883,
+    "exposure": 0.05487992610837438,
+    "win_rate": 0.5681818181818182,
+    "profit_factor": 1.2559746386525865,
+    "n_completed_trades": 44.0,
+    "turnover_annual": 43.012414575137875
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "target": 18,
+    "stop": 0,
+    "time": 0,
+    "eod": 88
+   },
+   "stress_1_5x": 0.09015474999999307,
+   "breakeven_cost_x": 5.707095530659149,
+   "transfer_sharpe": 0.13601219682676977,
+   "neighbor_median_sharpe": 0.7918880309086798,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9313656912719785,
+   "local_detail": [
+    {
+     "move": "formation=2",
+     "sharpe": 0.9238268084735733,
+     "net_return": 0.11554525000000693,
+     "trades": 112
+    },
+    {
+     "move": "formation=4",
+     "sharpe": 0.9389045740703837,
+     "net_return": 0.10837325000000675,
+     "trades": 104
+    },
+    {
+     "move": "entry_z=2.25",
+     "sharpe": 0.7515262784645025,
+     "net_return": 0.10422375000000939,
+     "trades": 155
+    },
+    {
+     "move": "entry_z=2.75",
+     "sharpe": 0.9770575482125868,
+     "net_return": 0.11463850000000475,
+     "trades": 77
+    }
+   ],
+   "dsr": 0.0022491111250778494,
+   "luck": null
+  },
+  {
+   "order": 7,
+   "group": 0,
+   "config_id": "cfg_57f6",
+   "settings": {
+    "timeframe": "5min",
+    "formation": "3 mo",
+    "hedge": "1:1 (control)",
+    "z_mode": "formation",
+    "entry_z": "2.5",
+    "exit": "half-way",
+    "stop": "none",
+    "time_stop": "none",
+    "side": "both",
+    "first_entry": "at open"
+   },
+   "dev": {
+    "net_return": 0.08228850000000665,
+    "cagr": 0.01595404633392361,
+    "sharpe": 0.8622122242333313,
+    "max_drawdown": -0.01575578300590852,
+    "exposure": 0.036807621150327596,
+    "win_rate": 0.6017699115044248,
+    "profit_factor": 1.8683702327938299,
+    "n_completed_trades": 113.0,
+    "turnover_annual": 44.15254438948014
+   },
+   "val": {
+    "net_return": 0.00803621215600292,
+    "cagr": 0.004026074239923405,
+    "sharpe": 0.2896227523501291,
+    "max_drawdown": -0.018405231648730425,
+    "exposure": 0.045130336617405585,
+    "win_rate": 0.5777777777777777,
+    "profit_factor": 1.1673006362137337,
+    "n_completed_trades": 45.0,
+    "turnover_annual": 43.81873600790883
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.290 < 0.3"
+   ],
+   "exits": {
+    "target": 38,
+    "stop": 0,
+    "time": 0,
+    "eod": 75
+   },
+   "stress_1_5x": 0.06964699999999269,
+   "breakeven_cost_x": 4.535438956634118,
+   "transfer_sharpe": 0.011832093392796037,
+   "neighbor_median_sharpe": 0.763376929559937,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9213256154323364,
+   "local_detail": [
+    {
+     "move": "formation=2",
+     "sharpe": 0.9135123791950328,
+     "net_return": 0.09492225000000754,
+     "trades": 119
+    },
+    {
+     "move": "formation=4",
+     "sharpe": 0.9348864771587702,
+     "net_return": 0.09308375000000768,
+     "trades": 111
+    },
+    {
+     "move": "entry_z=2.25",
+     "sharpe": 0.7012501094222526,
+     "net_return": 0.08099225000000998,
+     "trades": 162
+    },
+    {
+     "move": "entry_z=2.75",
+     "sharpe": 0.9291388516696399,
+     "net_return": 0.08974725000000539,
+     "trades": 83
+    }
+   ],
+   "dsr": 0.009428344696320898,
+   "luck": null
+  },
+  {
+   "order": 8,
+   "group": 4,
+   "config_id": "cfg_8ee7",
+   "settings": {
+    "timeframe": "5min",
+    "formation": "6 mo",
+    "hedge": "1:1 (control)",
+    "z_mode": "formation",
+    "entry_z": "2",
+    "exit": "half-way",
+    "stop": "none",
+    "time_stop": "3 \u00d7 EMRT",
+    "side": "long spread",
+    "first_entry": "at open"
+   },
+   "dev": {
+    "net_return": 0.0652747500000066,
+    "cagr": 0.012737028008959594,
+    "sharpe": 0.9168425467461289,
+    "max_drawdown": -0.012550348649285947,
+    "exposure": 0.041478846605950956,
+    "win_rate": 0.5892857142857143,
+    "profit_factor": 1.740712686916583,
+    "n_completed_trades": 112.0,
+    "turnover_annual": 43.90143103381624
+   },
+   "val": {
+    "net_return": 0.005112296147076201,
+    "cagr": 0.0025630733488195556,
+    "sharpe": 0.17906618549700376,
+    "max_drawdown": -0.02019038605099932,
+    "exposure": 0.05393062397372742,
+    "win_rate": 0.5769230769230769,
+    "profit_factor": 1.0960443010070502,
+    "n_completed_trades": 52.0,
+    "turnover_annual": 50.88869378361023
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.179 < 0.3"
+   ],
+   "exits": {
+    "target": 38,
+    "stop": 0,
+    "time": 2,
+    "eod": 72
+   },
+   "stress_1_5x": 0.05378974999999375,
+   "breakeven_cost_x": 3.9592363261091155,
+   "transfer_sharpe": -0.19953993924733765,
+   "neighbor_median_sharpe": 0.8228382887350423,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9174997471439477,
+   "local_detail": [
+    {
+     "move": "formation=5",
+     "sharpe": 0.9263301025503944,
+     "net_return": 0.07328775000000642,
+     "trades": 111
+    },
+    {
+     "move": "formation=7",
+     "sharpe": 1.0147025607996591,
+     "net_return": 0.07424950000000674,
+     "trades": 106
+    },
+    {
+     "move": "entry_z=1.75",
+     "sharpe": 0.9934872818347106,
+     "net_return": 0.08493150000000949,
+     "trades": 160
+    },
+    {
+     "move": "entry_z=2.25",
+     "sharpe": 0.7360903919158722,
+     "net_return": 0.04913025000000437,
+     "trades": 71
+    },
+    {
+     "move": "time_stop_mult=2.5",
+     "sharpe": 0.8423545024788875,
+     "net_return": 0.06078800000000695,
+     "trades": 112
+    },
+    {
+     "move": "time_stop_mult=3.5",
+     "sharpe": 0.908669391737501,
+     "net_return": 0.06468275000000667,
+     "trades": 112
+    }
+   ],
+   "dsr": 0.024882070838178023,
+   "luck": null
+  },
+  {
+   "order": 9,
+   "group": 3,
+   "config_id": "cfg_3756",
+   "settings": {
+    "timeframe": "5min",
+    "formation": "6 mo",
+    "hedge": "OLS (control)",
+    "z_mode": "time of day 60",
+    "entry_z": "2.5",
+    "exit": "half-way",
+    "stop": "none",
+    "time_stop": "3 \u00d7 EMRT",
+    "side": "both",
+    "first_entry": "+30 min"
+   },
+   "dev": {
+    "net_return": 0.07438575000000625,
+    "cagr": 0.014464836104859158,
+    "sharpe": 0.7908964970610666,
+    "max_drawdown": -0.01645998807632887,
+    "exposure": 0.04725399405108706,
+    "win_rate": 0.6301369863013698,
+    "profit_factor": 1.5389666378052285,
+    "n_completed_trades": 146.0,
+    "turnover_annual": 57.36727646608312
+   },
+   "val": {
+    "net_return": 0.001109238464863438,
+    "cagr": 0.0005566751571302042,
+    "sharpe": 0.05737670742690624,
+    "max_drawdown": -0.01326083299224623,
+    "exposure": 0.04577175697865353,
+    "win_rate": 0.6046511627906976,
+    "profit_factor": 1.0269463616476686,
+    "n_completed_trades": 43.0,
+    "turnover_annual": 42.29085542164425
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.057 < 0.3"
+   ],
+   "exits": {
+    "target": 75,
+    "stop": 0,
+    "time": 14,
+    "eod": 57
+   },
+   "stress_1_5x": 0.05944724999999451,
+   "breakeven_cost_x": 3.610113953594685,
+   "transfer_sharpe": -0.3866390062867186,
+   "neighbor_median_sharpe": 0.26829729015993886,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.6081968395696649,
+   "local_detail": [
+    {
+     "move": "formation=5",
+     "sharpe": 0.37861240215953595,
+     "net_return": 0.03115175000000625,
+     "trades": 140
+    },
+    {
+     "move": "formation=7",
+     "sharpe": 0.5195212201981896,
+     "net_return": 0.04587150000000606,
+     "trades": 138
+    },
+    {
+     "move": "entry_z=2.25",
+     "sharpe": 0.07309009097794437,
+     "net_return": 0.005753250000008814,
+     "trades": 197
+    },
+    {
+     "move": "entry_z=2.75",
+     "sharpe": 0.9086444720816488,
+     "net_return": 0.07491700000000479,
+     "trades": 103
+    },
+    {
+     "move": "z_window=48",
+     "sharpe": 0.6968724589411401,
+     "net_return": 0.05962850000000608,
+     "trades": 144
+    },
+    {
+     "move": "z_window=72",
+     "sharpe": 0.5137699326830445,
+     "net_return": 0.04512600000000644,
+     "trades": 143
+    },
+    {
+     "move": "time_stop_mult=2.5",
+     "sharpe": 0.812005825081884,
+     "net_return": 0.07795250000000631,
+     "trades": 147
+    },
+    {
+     "move": "time_stop_mult=3.5",
+     "sharpe": 0.6973226099384683,
+     "net_return": 0.06576975000000607,
+     "trades": 143
+    }
+   ],
+   "dsr": 0.006157604854830452,
+   "luck": null
+  },
+  {
+   "order": 10,
+   "group": 3,
+   "config_id": "cfg_555d",
+   "settings": {
+    "timeframe": "5min",
+    "formation": "6 mo",
+    "hedge": "OLS (control)",
+    "z_mode": "time of day 60",
+    "entry_z": "2.5",
+    "exit": "half-way",
+    "stop": "none",
+    "time_stop": "3 \u00d7 EMRT",
+    "side": "both",
+    "first_entry": "at open"
+   },
+   "dev": {
+    "net_return": 0.08069625000000746,
+    "cagr": 0.015654700815856515,
+    "sharpe": 0.8182347095147005,
+    "max_drawdown": -0.016429012118877484,
+    "exposure": 0.054644138480880684,
+    "win_rate": 0.6404494382022472,
+    "profit_factor": 1.5069759552182391,
+    "n_completed_trades": 178.0,
+    "turnover_annual": 69.8065459433486
+   },
+   "val": {
+    "net_return": 0.008714058182399897,
+    "cagr": 0.0043649371495488865,
+    "sharpe": 0.4006990137373322,
+    "max_drawdown": -0.008991493017644459,
+    "exposure": 0.04967159277504105,
+    "win_rate": 0.6481481481481481,
+    "profit_factor": 1.2049366730501736,
+    "n_completed_trades": 54.0,
+    "turnover_annual": 53.09936687142186
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "target": 104,
+    "stop": 0,
+    "time": 16,
+    "eod": 58
+   },
+   "stress_1_5x": 0.06311899999999326,
+   "breakeven_cost_x": 3.3486208777438096,
+   "transfer_sharpe": -0.3275049048281033,
+   "neighbor_median_sharpe": 0.2517707484027207,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.5710753217820794,
+   "local_detail": [
+    {
+     "move": "formation=5",
+     "sharpe": 0.43815261192021837,
+     "net_return": 0.03729425000000752,
+     "trades": 170
+    },
+    {
+     "move": "formation=7",
+     "sharpe": 0.5328752869061956,
+     "net_return": 0.048063500000007364,
+     "trades": 168
+    },
+    {
+     "move": "entry_z=2.25",
+     "sharpe": 0.1877177887979105,
+     "net_return": 0.01697625000001035,
+     "trades": 243
+    },
+    {
+     "move": "entry_z=2.75",
+     "sharpe": 0.8372067683597226,
+     "net_return": 0.07187175000000567,
+     "trades": 125
+    },
+    {
+     "move": "z_window=48",
+     "sharpe": 0.5953493982177467,
+     "net_return": 0.05256050000000689,
+     "trades": 169
+    },
+    {
+     "move": "z_window=72",
+     "sharpe": 0.5468012453464121,
+     "net_return": 0.05100900000000763,
+     "trades": 177
+    },
+    {
+     "move": "time_stop_mult=2.5",
+     "sharpe": 0.7594027888532384,
+     "net_return": 0.0743802500000077,
+     "trades": 179
+    },
+    {
+     "move": "time_stop_mult=3.5",
+     "sharpe": 0.658061950783896,
+     "net_return": 0.06387500000000745,
+     "trades": 176
+    }
+   ],
+   "dsr": 0.0077020598375458936,
+   "luck": null
+  }
+ ],
+ "short_labels": {
+  "timeframe": "Bar",
+  "formation": "Form",
+  "hedge": "Hedge",
+  "z_mode": "z",
+  "entry_z": "Entry",
+  "exit": "Exit",
+  "stop": "Stop",
+  "time_stop": "Time",
+  "side": "Side",
+  "overnight": "Night",
+  "first_entry": "1st"
+ },
+ "exit_labels": [
+  [
+   "target",
+   "target",
+   "z target"
+  ],
+  [
+   "stop",
+   "stop",
+   "stop"
+  ],
+  [
+   "time",
+   "time",
+   "time stop"
+  ],
+  [
+   "eod",
+   "close",
+   "session close"
+  ]
+ ],
+ "local_moves": [
+  [
+   "formation",
+   "Formation"
+  ],
+  [
+   "entry_z",
+   "Entry z"
+  ],
+  [
+   "stop_z",
+   "Stop"
+  ],
+  [
+   "emrt_c",
+   "EMRT C"
+  ],
+  [
+   "z_window",
+   "z window"
+  ],
+  [
+   "time_stop_mult",
+   "Time stop"
+  ]
+ ],
+ "benchmark": {
+  "label": "Holding ES (rolled, unlevered)",
+  "dev": {
+   "net_return": 0.43232380603232756,
+   "sharpe": 0.438279550428425,
+   "max_drawdown": -0.3414002377907397
+  },
+  "val": {
+   "net_return": 0.4065902276125519,
+   "sharpe": 1.4020278997073305,
+   "max_drawdown": -0.1132256790285423
+  }
+ },
+ "transfer_symbol": "ES-YM",
+ "dsr": {
+  "effective_trials": 728.0000000000013,
+  "raw_trials": 13824.0
+ },
+ "assumptions": [
+  "Data: Databento CME continuous front month (ES.v.0 and RTY.v.0), 1-minute bars aggregated to 5 minutes and 15 minutes and joined on bar time (a bar missing in either leg is dropped from both). Rolls are back-adjusted per leg; the spread uses only real point moves scaled by real prices.",
+  "Day session only: NYSE regular session 09:30-16:00 NY for both legs, on NYSE trading days.",
+  "Costs on EACH leg: 1 tick slippage per side (stops too) and $2.50 commission per contract per side; holding over a roll costs that leg a round turn.",
+  "Every position is closed at the session's last close, so nothing is held overnight and no trade crosses a contract roll (prop-firm compatible).",
+  "Unlevered across both legs, so returns are small next to a single-market strategy; a market-neutral book would normally run levered. Sharpe doesn't depend on that choice; return and drawdown scale with it.",
+  "The paper tested daily stock pairs with a reinforcement-learning trader. Here a plain z band trades a session-anchored intraday spread, so the whole grid is an extrapolation of the paper.",
+  "Decisions use both legs' bar closes and fill at the next bar's open on both legs.",
+  "Sharpe uses daily mark-to-market returns (\u221a252) of both legs, with idle cash earning 0%. Time in market is the share of bars with an open position.",
+  "Benchmark row: holding ES alone, for scale; the spread is roughly market-neutral and not trying to beat it.",
+  "Other strategy families were already selected on these legs' 2023\u20132024 data, so 2023\u20132024 is not untouched; only the 2025+ holdout is (and single-market picks were already scored on it).",
+  "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead."
+ ],
+ "source": "emrt-spread-backtest/runs/funnel/emrt_esrty_v2/ \u00b7 configs/funnel/emrt_funnel_esrty_v2.yaml"
+}

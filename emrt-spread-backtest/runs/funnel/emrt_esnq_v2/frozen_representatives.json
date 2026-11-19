@@ -1,0 +1,228 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 40,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 1,
+      "config_id": "cfg_eb21063d2b67188e0268",
+      "dev_net_return": 0.08478999999999992,
+      "dev_order": 1,
+      "dev_sharpe": 1.2036581589185515,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.9176810921368319,
+      "params": {
+        "anchor": "session",
+        "entry_z": 2.5,
+        "exit": "half",
+        "first_entry": 0,
+        "formation": 3,
+        "hedge": "emrt_c2.0",
+        "overnight": "flat",
+        "side": "long",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "none",
+        "timeframe": "5min",
+        "z_mode": "tod_20"
+      },
+      "stability_median_sharpe": 1.1225961080536229
+    },
+    {
+      "cluster": 1,
+      "config_id": "cfg_881b2a72672a20721923",
+      "dev_net_return": 0.08862149999999991,
+      "dev_order": 2,
+      "dev_sharpe": 1.2566431149566237,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.9269383208627061,
+      "params": {
+        "anchor": "session",
+        "entry_z": 2.5,
+        "exit": "half",
+        "first_entry": 0,
+        "formation": 3,
+        "hedge": "emrt_c2.0",
+        "overnight": "flat",
+        "side": "long",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "5min",
+        "z_mode": "tod_20"
+      },
+      "stability_median_sharpe": 1.0860894523260711
+    },
+    {
+      "cluster": 0,
+      "config_id": "cfg_1839bc231db18fc017a5",
+      "dev_net_return": 0.07678800000000008,
+      "dev_order": 3,
+      "dev_sharpe": 1.0958809934343796,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5889243692524947,
+      "params": {
+        "anchor": "session",
+        "entry_z": 2.5,
+        "exit": "half",
+        "first_entry": 0,
+        "formation": 3,
+        "hedge": "emrt_c1.5",
+        "overnight": "flat",
+        "side": "long",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "15min",
+        "z_mode": "tod_20"
+      },
+      "stability_median_sharpe": 0.9141025210395215
+    },
+    {
+      "cluster": 0,
+      "config_id": "cfg_ac547a99f56fd157703d",
+      "dev_net_return": 0.07678800000000008,
+      "dev_order": 4,
+      "dev_sharpe": 1.0958809934343796,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.4112052278539876,
+      "params": {
+        "anchor": "session",
+        "entry_z": 2.5,
+        "exit": "half",
+        "first_entry": 30,
+        "formation": 3,
+        "hedge": "emrt_c1.5",
+        "overnight": "flat",
+        "side": "long",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "15min",
+        "z_mode": "tod_20"
+      },
+      "stability_median_sharpe": 0.9141025210395215
+    },
+    {
+      "cluster": 2,
+      "config_id": "cfg_84006576ebae52321e35",
+      "dev_net_return": 0.05417475000000005,
+      "dev_order": 5,
+      "dev_sharpe": 0.8324500269958418,
+      "n_profitable_years": 3,
+      "neighbor_median_sharpe": 0.4760023522688319,
+      "params": {
+        "anchor": "session",
+        "entry_z": 2.5,
+        "exit": "half",
+        "first_entry": 0,
+        "formation": 3,
+        "hedge": "ols",
+        "overnight": "flat",
+        "side": "long",
+        "stop": "none",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "5min",
+        "z_mode": "formation"
+      },
+      "stability_median_sharpe": 0.7122930814193142
+    },
+    {
+      "cluster": 2,
+      "config_id": "cfg_e0659131b525cfca06dc",
+      "dev_net_return": 0.0520385000000001,
+      "dev_order": 6,
+      "dev_sharpe": 0.7914377605014443,
+      "n_profitable_years": 3,
+      "neighbor_median_sharpe": 0.4422305284516563,
+      "params": {
+        "anchor": "session",
+        "entry_z": 2.5,
+        "exit": "half",
+        "first_entry": 0,
+        "formation": 3,
+        "hedge": "ols",
+        "overnight": "flat",
+        "side": "long",
+        "stop": "none",
+        "symbol": "ES-NQ",
+        "time_stop": "none",
+        "timeframe": "5min",
+        "z_mode": "formation"
+      },
+      "stability_median_sharpe": 0.6545859089727557
+    }
+  ],
+  "code_version": "66e9a379b8f42b8aaa791b7147e8876e024f58fc",
+  "config_sha256": "c5cf3166727fd6f339336c607c2e1f41327596da6193b463b04fd1b13106c68b",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "5min",
+      "15min"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "emrt_esnq_v2",
+  "frozen_at": "2026-11-18T22:01:53.500231+00:00",
+  "git_diff_sha256": "5d03eeeb1bf1a086e9034ca9b73727618ef6d16bb76afb2d09ee23ade5436ad1",
+  "git_dirty": true,
+  "seed": 20261118,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, best 2 per cluster)",
+      "7 execution stress"
+    ],
+    "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": false,
+    "commission_minimum": 0.0,
+    "commission_per_contract": 2.5,
+    "commission_per_share": 0.0,
+    "extended_hours_slippage_multiplier": 1.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "instrument_type": "futures",
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 0.0,
+    "slippage_bps_stop": 0.0,
+    "slippage_ticks_market": 1.0,
+    "slippage_ticks_stop": 1.0,
+    "starting_equity": 10000000.0
+  },
+  "symbol": "ES-NQ"
+}

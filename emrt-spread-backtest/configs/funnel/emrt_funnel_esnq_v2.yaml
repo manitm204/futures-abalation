@@ -1,0 +1,219 @@
+# ES-NQ futures pair, EMRT spread v2 (session-anchored, intraday only): run emrt_esnq_v2
+# (emrt_spread_v2, 13,824 configs; 5min and 15min bars) -- the ONE place every threshold lives.
+# Each leg is measured from TODAY's open, so the spread S = a - beta x b restarts at ~0 every
+# session and every position is closed by the session's last close (prop-firm compatible: never
+# held overnight). Hedge refit monthly on the previous 1 / 3 / 6 months of these intraday spreads:
+# EMRT-minimising beta at C = 1.5 / 2.0 (swings and reversion counted within a session), or OLS /
+# 1:1 (controls). z against the formation window or by time of day (same bar of the last 20 / 60
+# sessions); entry |z| 1.0-2.5; exit at the mean or half-way; stop none / +1.5 z; time stop none /
+# 3 x EMRT; both / long / short spread; first entry at the open or after 30 minutes.
+#
+# Gates, splits, costs and stage-4/7 settings are v1's (emrt_esnq_v1) except the grid and bar
+# sizes. Designed 2026-11-18 after v1, whose flat-at-close configs all failed (78% of their trades
+# were cut at the close before reverting).
+#
+# Thresholds are fixed for the duration of a run and are hashed into every run's
+# outputs. They are NEVER adjusted automatically to hit a survivor count; zero
+# survivors is a valid outcome. Changing a value here is a new research trial
+# and should be recorded under `research_history` below.
+
+version: 1
+strategy: emrt_spread_v2
+symbol: ES-NQ
+seed: 20261118
+
+data:
+  clean_root: data/clean
+  development: {start: 2018-01-01, end: 2022-12-31}
+  validation:  {start: 2023-01-01, end: 2024-12-31}
+  # end: null -> the actual available endpoint, recorded at access time.
+  holdout:     {start: 2025-01-01, end: null}
+  timeframes: ["5min", "15min"]
+
+data_history:
+  validation_previously_used_for_selection: true
+  validation_note: >-
+    No pair strategy has been scored on ES-NQ 2023-2024, but mean-reversion, noise-band, squeeze and convexity strategies were selected on ES and NQ 2023-2024 and the researcher has read those results. Treated as used for selection.
+  holdout_previously_inspected: true
+  holdout_note: >-
+    No EMRT or other pair metrics have been computed on 2025+. Single-instrument picks were scored on ES 2025+ (BB/KC squeeze, convexity v2 #115) and NQ 2025+ (convexity v3 #38 and #32), so the researcher has seen how both legs traded in that period.
+
+metrics:
+  return_frequency: daily          # mark-to-market equity at each session close
+  periods_per_year: 252            # Sharpe = mean/std(daily) * sqrt(252)
+  risk_free_rate_annual: 0.0
+  cash_treatment: >-
+    Idle cash earns 0% and the Sharpe excess return is measured against a 0%
+    risk-free rate, so the two assumptions are consistent.
+  drawdown_basis: daily session-close mark-to-market (understates intraday DD)
+
+execution:
+  baseline: configs/execution/futures_pairs.yaml   # $2.50/contract/side + 1 tick/side per leg, unlevered, $10M
+
+integrity:            # stage 1
+  truncation_check_sample: 40
+  truncation_points: 3
+
+trade_count:          # stage 2 -- hard gate
+  min_completed_trades: 100
+  min_trades_per_year: 10
+  min_years_meeting_floor: 4
+
+performance:          # stage 3 -- hard gate
+  min_net_return: 0.0               # strictly greater than
+  min_sharpe: 0.75                  # annualized, daily MTM returns incl. flat days
+  max_drawdown: -0.30
+  max_drawdown_source: src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct
+
+parameter_stability:  # stage 4 -- hard gate
+  mode: local_perturbation          # gate on `local` moves below; grid neighbors are diagnostic only
+  local:
+    int_rel: 0.20                   # formation months, time-of-day z sessions: x0.8 / x1.2, rounded, >= 1 away
+    entry_z_abs: 0.25               # entry |z| -/+ 0.25 (never below 0.25)
+    stop_z_abs: 0.25                # numeric stop beyond the band -/+ 0.25 z ("none" has no numeric move)
+    emrt_c_abs: 0.25                # EMRT hedge: C -/+ 0.25 (controls have no C)
+    time_stop_mult_abs: 0.5         # time stop on: 3 x EMRT -> 2.5 / 3.5 x EMRT
+    stop_atr_abs: 0.25              # required field of the shared model; unused by this family
+  neighbor_mode: single_axis        # grid-neighbor diagnostic
+  min_frac_profitable: 0.70         # of the local moves, share with dev net return > 0
+  min_median_sharpe: 0.50           # median dev Sharpe of the local moves
+  prescreen:                        # big grids: fixed before the run, like every gate
+    max_configs: 3000               # if more than this many pass stage 3, cluster them first (stage-6 rules)
+    per_cluster: 3                  # and send only the best 3 per cluster by dev Sharpe into stage 4
+  perturbation:                     # diagnostic only, never a gate
+    n_per_config: 20
+    integer_rel_step: 0.15          # formation months, time-of-day z sessions
+    float_rel_step: 0.10            # entry z, stop z, EMRT C, time-stop multiple (relative)
+
+time_stability:       # stage 5 -- light hard gate + diagnostics
+  min_profitable_years: 3
+  top_trades_k: 5
+  top_trades_frac: 0.05
+
+dedup:                # stage 6
+  corr_threshold: 0.80
+  return_basis: monthly
+  linkage: complete
+  reps_per_cluster: 2               # best 2 per cluster; a single-member cluster keeps its 1
+
+execution_stress:     # stage 7
+  gate_cost_multiplier: 1.5         # hard gate: positive dev net return
+  diagnostic_cost_multipliers: [2.0]
+  entry_delay_bars: 1
+  missed_entry_frac: 0.10
+  missed_entry_sims: 100
+  breakeven_max_multiplier: 25.0
+
+validation:           # stage 8 -- hard gate (frozen representatives only)
+  min_net_return: 0.0
+  min_sharpe: 0.30
+  max_drawdown: -0.30
+  min_completed_trades: 40          # project default from 2026-10-22
+
+confidence:           # stage 9 -- diagnostics only
+  dsr_threshold: 0.95
+  dsr_calibration_verified: false
+  effective_trials_method: li_ji
+  serial_dependence: lag1_effective_n
+  transfer_symbol: ES-RTY            # another index pair; unchanged rules, development period only
+
+holdout:              # stage 10 -- explicit `final-test` command only
+  acceptance:
+    min_net_return: 0.0
+    min_sharpe: 0.0
+    max_drawdown: -0.30
+    min_completed_trades: null
+
+# Earlier trials on these legs (other families) and the SPY breakout / trend studies. These
+# count toward the DSR "known prior" sensitivity only. No pair strategy has been run before.
+research_history:
+  - name: "emrt_spread_v1 ES-NQ (emrt_esnq_v1)"
+    n_configs: 51840
+    note: "First EMRT grid on ES-NQ (15m/30m/1h, overnight hold allowed); 16 frozen, all holding overnight, none validated. 0 of 25,920 flat-at-close configs passed stage 3; this intraday v2 was designed after it."
+  - name: "path_convexity_v4_15m CL (pc_cl_v4_15m)"
+    n_configs: 10368
+    note: "Convexity light grid on crude 15m; 13 frozen, 2 passed 2023-2024, #7 lost on CL 2025+. Convexity was retired after it and this family chosen."
+  - name: "path_convexity_v3_15m ZN (pc_zn_v3_15m)"
+    n_configs: 103680
+    note: "Same v3 grid on the 10-year note 15m; 0 frozen (nothing passed the development performance gate). This light grid was chosen after it."
+  - name: "path_convexity_v3_15m 6E (pc_6e_v3_15m)"
+    n_configs: 103680
+    note: "Same grid on Euro FX 15m; 74 frozen, 5 passed 2023-2024 (small, short-only); no holdout run."
+  - name: "path_convexity_v3_15m GC (pc_gc_v3_15m)"
+    n_configs: 103680
+    note: "Same grid on gold 15m; 2 frozen (dev only), no edge across the grid."
+  - name: "path_convexity_v3_15m NQ (pc_nq_v3_15m)"
+    n_configs: 103680
+    note: "Same grid on NQ 15m; 1,081 frozen, 479 passed 2023-2024, #38 and #32 lost on NQ 2025+."
+  - name: "path_convexity_v2_15m ES (pc_es_v2_15m)"
+    n_configs: 82944
+    note: "Round 2 of this line on ES 15m; 349 frozen, 17 passed 2023-2024, #115 lost on ES 2025+. This grid was chosen after it."
+  - name: "path_convexity_v1_15m NQ transfer (stage 9 of pc_es_v1_15m / pc_es_v2_15m)"
+    n_configs: 0
+    note: "Frozen ES candidates were re-run on NQ 2018-2022 as a transfer diagnostic; their NQ development results were seen."
+  - name: "path_convexity_v1_15m ES (pc_es_v1_15m)"
+    n_configs: 186624
+    note: "Round 1 of this line on ES 15m; development only, 319 frozen candidates. This grid was chosen from its results."
+  - name: "path_convexity_v1_5m ES (pc_es_v1_5m)"
+    n_configs: 186624
+    note: "Round 1 grid on 5m bars; specified but never run (0 configs evaluated)."
+  - name: "compression_breakout_nr_v2_15m ES (cb_nr_es_v2_15m)"
+    n_configs: 207360
+    note: "Different (NR-N squeeze breakout) family on ES."
+  - name: "compression_breakout_nr_v3_15m ES (cb_nr_es_v3_15m)"
+    n_configs: 145152
+    note: "Different (NR-N squeeze breakout) family on ES."
+  - name: "compression_breakout_nr ES v1 (cb_nr_es_v1)"
+    n_configs: 16128
+    note: "Earlier grid of this line on ES; specified but never run (0 configs evaluated)."
+  - name: "compression_breakout_bbkc_v2_15m ES (cb_bbkc_es_v2_15m)"
+    n_configs: 184320
+    note: "Sibling line (BB/KC squeeze) on ES 15m; 2 tested on 2025+."
+  - name: "compression_breakout_bbkc_v2_5m ES (cb_bbkc_es_v2_5m)"
+    n_configs: 72576
+    note: "Sibling line (BB/KC squeeze) on ES 5m."
+  - name: "compression_breakout_bbkc_v4_15m ES (cb_bbkc_es_v4_15m)"
+    n_configs: 3840
+    note: "Sibling line (BB/KC squeeze) on ES 15m; development started 2026-11-11, not finished."
+  - name: "compression_breakout_bbkc ES v1 (cb_bbkc_es_v1)"
+    n_configs: 20736
+    note: "Sibling compression line (BB-inside-KC squeeze) on ES, 5min + 15min; this grid was specified after its results."
+  - name: "mean_reversion ES (mr_es_v3)"
+    n_configs: 46080
+    note: "Different (mean-reversion) family on ES; 11 frozen candidates, 1 passed 2023-2024."
+  - name: "mean_reversion ES (mr_es_v4)"
+    n_configs: 46080
+    note: "Different (mean-reversion) family on ES; 18 frozen candidates, 3 passed 2023-2024."
+  - name: "mean_reversion ES (mr_es_v5)"
+    n_configs: 41472
+    note: "Different (mean-reversion) family on ES; 45 frozen candidates, 10 passed 2023-2024."
+  - name: "mean_reversion ES (mr_es_v6_15m)"
+    n_configs: 864
+    note: "Different (mean-reversion) family on ES; 7 frozen candidates, 0 passed 2023-2024."
+  - name: "mean_reversion ES (mr_es_v6_1h)"
+    n_configs: 6804
+    note: "Different (mean-reversion) family on ES; 39 frozen candidates, 1 passed 2023-2024."
+  - name: "noise_band ES (nb_es_v1)"
+    n_configs: 8100
+    note: "Different (noise-band intraday momentum) family on ES; 210 frozen candidates."
+  - name: "noise_band ES (nb_es_v2)"
+    n_configs: 8100
+    note: "Different (noise-band intraday momentum) family on ES; 235 frozen candidates."
+  - name: "noise_band ES (nb_es_v3)"
+    n_configs: 16200
+    note: "Different (noise-band intraday momentum) family on ES; 268 frozen candidates."
+  - name: "noise_band ES (nb_es_v4)"
+    n_configs: 13824
+    note: "Different (noise-band intraday momentum) family on ES; 326 frozen candidates."
+  - name: "channel_breakout grid (funnel_v1..v4, SPY)"
+    n_configs: 24576
+    note: "Closest prior search: channel breakout, SPY; four funnel variants with changed thresholds/methods."
+  - name: "donchian_ablation (donchian_v1, SPY/QQQ)"
+    n_configs: 3888
+    note: "Closest prior search: full-factorial Donchian intraday breakout ablation, 2018-2026 splits incl. holdout."
+  - name: "ma_crossover v2 grid (ma_v2, SPY)"
+    n_configs: 248832
+    note: "Long-only trend-following MA crossover, 5min/15min, SPY."
+  - name: "ma_crossover v1 grid (ma_v1, SPY)"
+    n_configs: 60000
+    note: "Long-only trend-following MA crossover, 5min/15min/1h, SPY."
