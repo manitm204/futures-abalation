@@ -387,7 +387,7 @@ function renderRun(r) {
   const table = !finalists.length ? "" : `<section>
     <span class="eyebrow">The out-of-sample check</span>
     <h2>The ${finalists.length} finalists on ${dev} vs ${val}</h2>
-    <p class="muted">${pending ? `<b>The ${val} columns are empty until the validation run.</b> ` : ""}Ordered by their ${dev} rank; ${val} results were never used to re-rank. "In mkt" is the share of bars with an open position. "Grp" is the duplicate group. Pass marks on ${val}: net &gt; 0, Sharpe ≥ ${(r.validation_rules || {}).min_sharpe ?? 0.3}, drawdown no worse than ${Math.abs(100 * ((r.validation_rules || {}).max_drawdown ?? -0.3))}% and at least ${(r.validation_rules || {}).min_completed_trades ?? 60} trades. The shaded row is simply holding ${esc(r.market)}.</p>
+    <p class="muted">${pending ? `<b>The ${val} columns are empty until the validation run.</b> ` : ""}Ordered by their ${dev} rank; ${val} results were never used to re-rank. "In mkt" is the share of bars with an open position. "Grp" is the duplicate group. Pass marks on ${val}: net &gt; 0, Sharpe ≥ ${(r.validation_rules || {}).min_sharpe ?? 0.3}, drawdown no worse than ${Math.abs(100 * ((r.validation_rules || {}).max_drawdown ?? -0.3))}% and at least ${(r.validation_rules || {}).min_completed_trades ?? 60} trades. The shaded row is simply holding ${esc(r.market.split("-")[0])}${r.market.includes("-") ? " alone, for scale" : ""}.</p>
     <div class="table-wrap wide"><table>
       <thead>
         <tr><th colspan="${keys.length + 2}" class="grp l">Settings</th><th colspan="${statCols.length}" class="grp sep">Development ${dev}</th><th colspan="${statCols.length}" class="grp sep">Validation ${val}</th><th colspan="${r.luck ? 2 : 1}" class="grp sep">Result</th></tr>
@@ -436,7 +436,7 @@ function renderRun(r) {
     </table></div>
   </section>`;
 
-  const TF_ORDER = ["5min", "15min", "1h"];
+  const TF_ORDER = ["5min", "15min", "30min", "1h"];
   // A curve covers the finalists in `match` (noise band: bar size + direction) or, without one, its bar size.
   const curveTf = c => c.match?.timeframe ?? c.timeframe;
   const L = r.luck && {...r.luck, curves: [...r.luck.curves].sort((a, b) => TF_ORDER.indexOf(curveTf(a)) - TF_ORDER.indexOf(curveTf(b)))};

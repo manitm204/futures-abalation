@@ -4,6 +4,7 @@
   bb-kc squeeze/index.html         BB-inside-KC squeeze breakout (../bbkc-squeeze-backtest/)
   nr squeeze/index.html            NR-N squeeze breakout (../nr-squeeze-backtest/)
   price-path convexity/index.html  price-path convexity fade (../price-path-convexity-backtest/)
+  emrt spread/index.html           EMRT two-leg futures spread (../emrt-spread-backtest/); its tabs are pairs
 
 Layout of this folder:
   data/<MARKET>/<strategy>.json   one finished run (written by each project's export script,
@@ -27,12 +28,15 @@ MARKETS = [
     ("CL", "Crude oil"), ("GC", "Gold"), ("6E", "Euro FX"), ("6J", "Japanese yen"),
     ("ZN", "10-year T-note"), ("ZB", "30-year T-bond"),
 ]
+# Pair "markets" (two-leg strategies only): data/<A-B>/.
+PAIRS = [("ES-NQ", "ES vs NQ"), ("ES-RTY", "ES vs RTY"), ("ES-YM", "ES vs YM"), ("ZN-ZB", "ZN vs ZB")]
 
 
 # (folder, page title, header text, which runs belong) -- every page uses template.html.
 FAMILIES = [
     ("mean reversion", "Mean Reversion Funnels", "Mean-reversion strategy funnels",
-     lambda run: not run["strategy_key"].startswith(("noise_band", "squeeze_breakout", "nr_breakout", "path_convexity"))),
+     lambda run: not run["strategy_key"].startswith(("noise_band", "squeeze_breakout", "nr_breakout", "path_convexity",
+                                                       "emrt_spread"))),
     ("noise-band breakout", "Noise-Band Breakout Funnels", "Noise-band breakout strategy funnels",
      lambda run: run["strategy_key"].startswith("noise_band")),
     ("bb-kc squeeze", "BB-inside-KC Squeeze Funnels", "BB-inside-KC squeeze strategy funnels",
@@ -41,6 +45,8 @@ FAMILIES = [
      lambda run: run["strategy_key"].startswith("nr_breakout")),
     ("price-path convexity", "Price-Path Convexity Funnels", "Price-path convexity strategy funnels",
      lambda run: run["strategy_key"].startswith("path_convexity")),
+    ("emrt spread", "EMRT Spread Funnels", "EMRT two-leg spread strategy funnels",
+     lambda run: run["strategy_key"].startswith("emrt_spread")),
 ]
 
 
@@ -59,7 +65,10 @@ def main() -> None:
         if not mine:  # a family with no runs yet gets no page
             continue
         # The all-markets tab only appears on a page that has all-markets results.
-        markets = [(c, n) for c, n in MARKETS if c != "ALL" or any(r["market"] == "ALL" for r in mine)]
+        if any("-" in r["market"] for r in mine):  # a pair family: its tabs are the pairs
+            markets = [(c, n) for c, n in PAIRS]
+        else:
+            markets = [(c, n) for c, n in MARKETS if c != "ALL" or any(r["market"] == "ALL" for r in mine)]
         # A page whose all-markets runs all share one market_name (e.g. "Holdout results") shows that as the tab name.
         all_names = {r["market_name"] for r in mine if r["market"] == "ALL"}
         if len(all_names) == 1:

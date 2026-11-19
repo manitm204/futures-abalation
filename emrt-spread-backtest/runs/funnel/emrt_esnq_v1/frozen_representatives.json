@@ -1,0 +1,447 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 40,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 0,
+      "config_id": "cfg_403d754271f64c0b11c8",
+      "dev_net_return": 0.12006150000000004,
+      "dev_order": 1,
+      "dev_sharpe": 0.8861038613300045,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.5906136236434146,
+      "params": {
+        "entry_z": 2.0,
+        "exit": "half",
+        "formation": 3,
+        "hedge": "notional",
+        "overnight": "hold",
+        "side": "both",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "15min",
+        "z_mode": "rolling_250"
+      },
+      "stability_median_sharpe": 0.7773051486231195
+    },
+    {
+      "cluster": 4,
+      "config_id": "cfg_c126dcd41b2f53ccaf3d",
+      "dev_net_return": 0.0825212500000001,
+      "dev_order": 2,
+      "dev_sharpe": 0.8798347570165337,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.4234125343222813,
+      "params": {
+        "entry_z": 2.5,
+        "exit": "half",
+        "formation": 3,
+        "hedge": "emrt_c1.5",
+        "overnight": "hold",
+        "side": "both",
+        "stop": "2.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "30min",
+        "z_mode": "rolling_100"
+      },
+      "stability_median_sharpe": 0.7480967667399847
+    },
+    {
+      "cluster": 0,
+      "config_id": "cfg_e6c127898ea9625ac781",
+      "dev_net_return": 0.11546875000000001,
+      "dev_order": 3,
+      "dev_sharpe": 0.8678021387298531,
+      "n_profitable_years": 5,
+      "neighbor_median_sharpe": 0.5598703474697567,
+      "params": {
+        "entry_z": 2.0,
+        "exit": "half",
+        "formation": 6,
+        "hedge": "notional",
+        "overnight": "hold",
+        "side": "both",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "15min",
+        "z_mode": "rolling_250"
+      },
+      "stability_median_sharpe": 0.7462021321092647
+    },
+    {
+      "cluster": 6,
+      "config_id": "cfg_f3a71263af500da95471",
+      "dev_net_return": 0.061099500000000084,
+      "dev_order": 4,
+      "dev_sharpe": 0.8699978016318977,
+      "n_profitable_years": 3,
+      "neighbor_median_sharpe": 0.5798747487345848,
+      "params": {
+        "entry_z": 2.0,
+        "exit": "half",
+        "formation": 3,
+        "hedge": "ols",
+        "overnight": "hold",
+        "side": "short",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "15min",
+        "z_mode": "rolling_250"
+      },
+      "stability_median_sharpe": 0.7380135581651042
+    },
+    {
+      "cluster": 1,
+      "config_id": "cfg_cf93e20f842b401acadc",
+      "dev_net_return": 0.12406399999999995,
+      "dev_order": 5,
+      "dev_sharpe": 0.8769520390103113,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5692252155930609,
+      "params": {
+        "entry_z": 2.5,
+        "exit": "mean",
+        "formation": 3,
+        "hedge": "emrt_c1.5",
+        "overnight": "hold",
+        "side": "both",
+        "stop": "2.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "30min",
+        "z_mode": "rolling_100"
+      },
+      "stability_median_sharpe": 0.7082730247653948
+    },
+    {
+      "cluster": 6,
+      "config_id": "cfg_942f49e03fa6f50081f2",
+      "dev_net_return": 0.061099500000000084,
+      "dev_order": 6,
+      "dev_sharpe": 0.8699978016318977,
+      "n_profitable_years": 3,
+      "neighbor_median_sharpe": 0.5798747487345848,
+      "params": {
+        "entry_z": 2.0,
+        "exit": "half",
+        "formation": 3,
+        "hedge": "ols",
+        "overnight": "hold",
+        "side": "short",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "none",
+        "timeframe": "15min",
+        "z_mode": "rolling_250"
+      },
+      "stability_median_sharpe": 0.6877960917851469
+    },
+    {
+      "cluster": 7,
+      "config_id": "cfg_c1d882730519dfe09359",
+      "dev_net_return": 0.08074925,
+      "dev_order": 7,
+      "dev_sharpe": 0.8104076760030992,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.6480291462760327,
+      "params": {
+        "entry_z": 1.5,
+        "exit": "half",
+        "formation": 3,
+        "hedge": "emrt_c1.5",
+        "overnight": "hold",
+        "side": "short",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "none",
+        "timeframe": "15min",
+        "z_mode": "rolling_250"
+      },
+      "stability_median_sharpe": 0.6007116699630668
+    },
+    {
+      "cluster": 1,
+      "config_id": "cfg_665c359029013c88e340",
+      "dev_net_return": 0.10238550000000002,
+      "dev_order": 8,
+      "dev_sharpe": 0.7571256116577268,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5808075272559439,
+      "params": {
+        "entry_z": 2.5,
+        "exit": "mean",
+        "formation": 3,
+        "hedge": "emrt_c1.5",
+        "overnight": "hold",
+        "side": "both",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "30min",
+        "z_mode": "rolling_100"
+      },
+      "stability_median_sharpe": 0.596253638020488
+    },
+    {
+      "cluster": 2,
+      "config_id": "cfg_0f30c819cec8cfef4069",
+      "dev_net_return": 0.08098424999999998,
+      "dev_order": 9,
+      "dev_sharpe": 0.8161371054149906,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.707318351760338,
+      "params": {
+        "entry_z": 2.5,
+        "exit": "half",
+        "formation": 3,
+        "hedge": "emrt_c1.5",
+        "overnight": "hold",
+        "side": "both",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "none",
+        "timeframe": "15min",
+        "z_mode": "rolling_250"
+      },
+      "stability_median_sharpe": 0.5825492382333968
+    },
+    {
+      "cluster": 2,
+      "config_id": "cfg_474896d1b644641c4691",
+      "dev_net_return": 0.07496225000000001,
+      "dev_order": 10,
+      "dev_sharpe": 0.7840490786521762,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.6829296010380213,
+      "params": {
+        "entry_z": 2.5,
+        "exit": "half",
+        "formation": 3,
+        "hedge": "emrt_c1.5",
+        "overnight": "hold",
+        "side": "both",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "15min",
+        "z_mode": "rolling_250"
+      },
+      "stability_median_sharpe": 0.577395844166251
+    },
+    {
+      "cluster": 3,
+      "config_id": "cfg_42b09be12e1f4c39a738",
+      "dev_net_return": 0.09244074999999996,
+      "dev_order": 11,
+      "dev_sharpe": 0.7645233723695374,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5885992481224289,
+      "params": {
+        "entry_z": 2.0,
+        "exit": "half",
+        "formation": 3,
+        "hedge": "emrt_c1.5",
+        "overnight": "hold",
+        "side": "both",
+        "stop": "none",
+        "symbol": "ES-NQ",
+        "time_stop": "none",
+        "timeframe": "15min",
+        "z_mode": "rolling_250"
+      },
+      "stability_median_sharpe": 0.575960683179922
+    },
+    {
+      "cluster": 3,
+      "config_id": "cfg_1d8e4b5686270357fc20",
+      "dev_net_return": 0.0912154999999999,
+      "dev_order": 12,
+      "dev_sharpe": 0.7599768628779714,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.49976131765282894,
+      "params": {
+        "entry_z": 2.0,
+        "exit": "half",
+        "formation": 3,
+        "hedge": "emrt_c1.5",
+        "overnight": "hold",
+        "side": "both",
+        "stop": "none",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "15min",
+        "z_mode": "rolling_250"
+      },
+      "stability_median_sharpe": 0.5681589748667449
+    },
+    {
+      "cluster": 4,
+      "config_id": "cfg_3c184674c8c7e788d17f",
+      "dev_net_return": 0.0825212500000001,
+      "dev_order": 13,
+      "dev_sharpe": 0.8798347570165337,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.24379385894434502,
+      "params": {
+        "entry_z": 2.5,
+        "exit": "half",
+        "formation": 3,
+        "hedge": "emrt_c1.5",
+        "overnight": "hold",
+        "side": "both",
+        "stop": "none",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "30min",
+        "z_mode": "rolling_100"
+      },
+      "stability_median_sharpe": 0.5553418443210728
+    },
+    {
+      "cluster": 5,
+      "config_id": "cfg_8f80b22bd37dccc63cdd",
+      "dev_net_return": 0.06526699999999996,
+      "dev_order": 14,
+      "dev_sharpe": 0.7625392057565177,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.21645786153190943,
+      "params": {
+        "entry_z": 1.5,
+        "exit": "half",
+        "formation": 6,
+        "hedge": "emrt_c1.5",
+        "overnight": "hold",
+        "side": "short",
+        "stop": "2.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "15min",
+        "z_mode": "rolling_250"
+      },
+      "stability_median_sharpe": 0.5252915033245977
+    },
+    {
+      "cluster": 8,
+      "config_id": "cfg_e0e0920f033dc9708401",
+      "dev_net_return": 0.10561200000000004,
+      "dev_order": 15,
+      "dev_sharpe": 0.752568948862913,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.2668073008813907,
+      "params": {
+        "entry_z": 1.5,
+        "exit": "half",
+        "formation": 3,
+        "hedge": "emrt_c1.5",
+        "overnight": "hold",
+        "side": "both",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "1h",
+        "z_mode": "rolling_250"
+      },
+      "stability_median_sharpe": 0.5081301321213654
+    },
+    {
+      "cluster": 5,
+      "config_id": "cfg_cc2f2c0db48ce413ecf5",
+      "dev_net_return": 0.06759950000000003,
+      "dev_order": 16,
+      "dev_sharpe": 0.9045309643135186,
+      "n_profitable_years": 3,
+      "neighbor_median_sharpe": 0.34915500694903456,
+      "params": {
+        "entry_z": 1.5,
+        "exit": "half",
+        "formation": 6,
+        "hedge": "emrt_c1.5",
+        "overnight": "hold",
+        "side": "short",
+        "stop": "1.5",
+        "symbol": "ES-NQ",
+        "time_stop": "3emrt",
+        "timeframe": "15min",
+        "z_mode": "rolling_250"
+      },
+      "stability_median_sharpe": 0.5043928124221848
+    }
+  ],
+  "code_version": "66e9a379b8f42b8aaa791b7147e8876e024f58fc",
+  "config_sha256": "ad7823c33d8c8f6ef25e9e78d4f2ad3e4c1fea98334806730bd4169afd179ac0",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "15min",
+      "30min",
+      "1h"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "emrt_esnq_v1",
+  "frozen_at": "2026-11-18T16:45:24.802126+00:00",
+  "git_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "git_dirty": false,
+  "seed": 20261118,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, best 2 per cluster)",
+      "7 execution stress"
+    ],
+    "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": false,
+    "commission_minimum": 0.0,
+    "commission_per_contract": 2.5,
+    "commission_per_share": 0.0,
+    "extended_hours_slippage_multiplier": 1.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "instrument_type": "futures",
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 0.0,
+    "slippage_bps_stop": 0.0,
+    "slippage_ticks_market": 1.0,
+    "slippage_ticks_stop": 1.0,
+    "starting_equity": 10000000.0
+  },
+  "symbol": "ES-NQ"
+}
