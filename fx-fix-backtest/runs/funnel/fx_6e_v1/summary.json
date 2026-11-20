@@ -1,0 +1,426 @@
+{
+  "data_access": {
+    "actual_last_session": "2022-12-30",
+    "command": "develop",
+    "experiment_id": "fx_6e_v1",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 60,
+    "partition_fingerprint": "1149933767f42109",
+    "phase": "development",
+    "phase_end": "2022-12-31",
+    "rows": 1737321,
+    "symbol": "6E"
+  },
+  "data_history": {
+    "holdout_note": "The data-access ledgers of every project show no 6E holdout (2025+) access to date.",
+    "holdout_previously_inspected": false,
+    "validation_note": "No FX-fix strategy has been scored on 6E 2023-2024, but mean-reversion, BB/KC squeeze, NR-N squeeze and convexity strategies were selected there and the researcher has read those results. Treated as used for selection.",
+    "validation_previously_used_for_selection": true
+  },
+  "dsr": {
+    "calibration_verified": false,
+    "effective_trials": {
+      "li_ji": 46.000000000000256,
+      "n_components_95": 18,
+      "n_series": 405,
+      "participation_ratio": 5.495602842447947,
+      "rank_bound_T": 1292
+    },
+    "n_configs_with_defined_sharpe": 405,
+    "primary_method": "li_ji",
+    "research_history": [
+      {
+        "n_configs": 103680,
+        "name": "path_convexity_v3_15m 6E (pc_6e_v3_15m)",
+        "note": "Different (price-path convexity) family on 6E 15m; 74 frozen candidates."
+      },
+      {
+        "n_configs": 2304,
+        "name": "compression_breakout_nr_v4_15m 6E (cb_nr_6e_v4_15m)",
+        "note": "Different (NR-N squeeze) family on 6E 15m; 14 frozen candidates."
+      },
+      {
+        "n_configs": 3840,
+        "name": "compression_breakout_bbkc_v4_15m 6E (cb_bbkc_6e_v4_15m)",
+        "note": "Different (BB/KC squeeze) family on 6E 15m; 23 frozen candidates."
+      },
+      {
+        "n_configs": 24000,
+        "name": "mean_reversion_v21 6E (mr_6e_v6)",
+        "note": "Different (mean-reversion) family on 6E; 252 frozen candidates."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion_v5 6E (mr_6e_v5)",
+        "note": "Different (mean-reversion) family on 6E; 2 frozen candidates."
+      }
+    ],
+    "serial_dependence": "lag1_effective_n",
+    "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+    "trial_count_options": {
+      "li_ji": 46.000000000000256,
+      "participation_ratio": 5.495602842447947,
+      "raw": 405.0,
+      "raw_plus_known_prior": 175701.0
+    },
+    "unresolved": [
+      "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+      "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+      "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+      "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+    ],
+    "variance_of_trial_sharpes_per_period": 0.0008609042410202725
+  },
+  "elapsed_s": 87.4,
+  "experiment_id": "fx_6e_v1",
+  "frozen_manifest_sha256": "8ea1bd77859ec2cda40307bf010d09065427c27246a1f9026f205accf0789ba4",
+  "instrument_type": "futures",
+  "integrity": {
+    "checks_per_config": [
+      "fix_time_mismatch",
+      "entry_not_at_leg_start",
+      "side_not_per_leg",
+      "leg_not_allowed",
+      "vol_gate_not_met",
+      "trade_skipped_while_flat",
+      "entry_fill_better_than_market",
+      "exit_before_entry",
+      "bar_outside_day_window",
+      "position_held_overnight",
+      "stop_not_per_rule",
+      "stop_exit_without_touch",
+      "stop_fill_better_than_rule",
+      "exit_not_at_first_touch",
+      "time_exit_not_per_rule",
+      "eod_exit_not_at_session_close",
+      "exit_fill_better_than_market",
+      "overlapping_positions",
+      "position_exceeds_equity",
+      "forced_close_not_final_trade",
+      "commission_below_minimum"
+    ],
+    "cut_fractions": [
+      0.3,
+      0.6000000000000001,
+      0.9
+    ],
+    "failures": {},
+    "truncation_sample": 40
+  },
+  "mode": "development_only",
+  "n_configs": 405,
+  "n_frozen_candidates": 0,
+  "provenance": {
+    "available_data_endpoint_per_manifest": {
+      "6E": "2026-10-16",
+      "6J": "2026-10-16"
+    },
+    "config_path": "configs/funnel/fx_funnel_6e_v1.yaml",
+    "config_sha256": "1872fbd5aa0dcb4353bd54e9843f660216a2729d380110d257922da97921ed6f",
+    "created_at": "2026-11-20T18:52:47.541708+00:00",
+    "data_manifests": {
+      "6E": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3055554,
+        "schema_version": "1.0.0"
+      },
+      "6J": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3036574,
+        "schema_version": "1.0.0"
+      }
+    },
+    "git_commit": "69fa67193b911862af375e24ebd8b94c30687e50",
+    "git_diff_sha256": "b600e6441db8a6a4bfc67707cf38a5d2c6ce63dcc9f7b61b5d1ec30083298774",
+    "git_dirty": true,
+    "seed": 20261120
+  },
+  "rejection_reason_counts": {
+    "s2:hard_reject:years_with_>=10_trades": 135,
+    "s3:hard_reject:max_drawdown": 15,
+    "s3:hard_reject:net_return": 270,
+    "s3:hard_reject:sharpe": 270
+  },
+  "survivor_table": [
+    {
+      "evaluated": 405,
+      "kind": "universe",
+      "passed": 405,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "0 universe"
+    },
+    {
+      "evaluated": 405,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 405,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "1 backtest integrity",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 405,
+      "hard_reject": 135,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 270,
+      "pct_of_previous": 66.66666666666667,
+      "pct_of_universe": 66.66666666666667,
+      "stage": "2 trade count & coverage",
+      "with_warnings": 180
+    },
+    {
+      "evaluated": 270,
+      "hard_reject": 270,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 0,
+      "pct_of_previous": 0.0,
+      "pct_of_universe": 0.0,
+      "stage": "3 performance & risk",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 0,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 0,
+      "pct_of_previous": null,
+      "pct_of_universe": 0.0,
+      "stage": "4 parameter stability",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 0,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 0,
+      "pct_of_previous": null,
+      "pct_of_universe": 0.0,
+      "stage": "5 time stability",
+      "with_warnings": 0
+    },
+    {
+      "deduplicated": 0,
+      "evaluated": 0,
+      "kind": "dedup",
+      "n_clusters": 0,
+      "note": "best 2 per cluster",
+      "passed": 0,
+      "pct_of_previous": null,
+      "pct_of_universe": 0.0,
+      "stage": "6 deduplication"
+    },
+    {
+      "evaluated": 0,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 0,
+      "pct_of_previous": null,
+      "pct_of_universe": 0.0,
+      "stage": "7 execution stress",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": null,
+      "kind": "hard_gate",
+      "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "8 frozen validation"
+    },
+    {
+      "evaluated": 0,
+      "kind": "diagnostic_only",
+      "note": "diagnostic only: ",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "9 DSR / transfer"
+    },
+    {
+      "evaluated": null,
+      "kind": "explicit_command",
+      "note": "not run; `final-test` command only",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "10 final holdout"
+    }
+  ],
+  "symbol": "6E",
+  "thresholds": {
+    "confidence": {
+      "dsr_calibration_verified": false,
+      "dsr_threshold": 0.95,
+      "effective_trials_method": "li_ji",
+      "serial_dependence": "lag1_effective_n",
+      "transfer_symbol": "6J"
+    },
+    "data": {
+      "clean_root": "data/clean",
+      "development": {
+        "end": "2022-12-31",
+        "start": "2018-01-01"
+      },
+      "holdout": {
+        "end": null,
+        "start": "2025-01-01"
+      },
+      "timeframes": [
+        "1min"
+      ],
+      "validation": {
+        "end": "2024-12-31",
+        "start": "2023-01-01"
+      }
+    },
+    "data_history": {
+      "holdout_note": "The data-access ledgers of every project show no 6E holdout (2025+) access to date.",
+      "holdout_previously_inspected": false,
+      "validation_note": "No FX-fix strategy has been scored on 6E 2023-2024, but mean-reversion, BB/KC squeeze, NR-N squeeze and convexity strategies were selected there and the researcher has read those results. Treated as used for selection.",
+      "validation_previously_used_for_selection": true
+    },
+    "dedup": {
+      "corr_threshold": 0.8,
+      "linkage": "complete",
+      "reps_per_cluster": 2,
+      "return_basis": "monthly"
+    },
+    "execution": {
+      "baseline": "configs/execution/futures.yaml"
+    },
+    "execution_stress": {
+      "breakeven_max_multiplier": 25.0,
+      "diagnostic_cost_multipliers": [
+        2.0
+      ],
+      "entry_delay_bars": 1,
+      "gate_cost_multiplier": 1.5,
+      "missed_entry_frac": 0.1,
+      "missed_entry_sims": 100
+    },
+    "holdout": {
+      "acceptance": {
+        "max_drawdown": -0.3,
+        "min_completed_trades": null,
+        "min_net_return": 0.0,
+        "min_sharpe": 0.0
+      }
+    },
+    "integrity": {
+      "truncation_check_sample": 40,
+      "truncation_points": 3
+    },
+    "metrics": {
+      "cash_treatment": "Idle cash earns 0% and the Sharpe excess return is measured against a 0% risk-free rate, so the two assumptions are consistent.",
+      "drawdown_basis": "daily session-close mark-to-market (understates intraday DD)",
+      "periods_per_year": 252,
+      "return_frequency": "daily",
+      "risk_free_rate_annual": 0.0
+    },
+    "parameter_stability": {
+      "local": {
+        "band_mult_abs": null,
+        "entry_z_abs": null,
+        "exit_z_abs": null,
+        "int_rel": 0.2,
+        "kc_mult_abs": null,
+        "max_range_atr_abs": null,
+        "min_box_atr_abs": null,
+        "min_move_atr_abs": null,
+        "post_hold_abs": 30,
+        "stop_atr_abs": 0.25,
+        "stop_pct_abs": 0.1,
+        "switch_offset_abs": 5,
+        "target_r_abs": null
+      },
+      "min_frac_profitable": 0.7,
+      "min_median_sharpe": 0.5,
+      "mode": "local_perturbation",
+      "neighbor_mode": "single_axis",
+      "perturbation": {
+        "float_rel_step": 0.1,
+        "integer_rel_step": 0.15,
+        "n_per_config": 20,
+        "z_abs": null
+      },
+      "prescreen": {
+        "max_configs": 3000,
+        "per_cluster": 3
+      }
+    },
+    "performance": {
+      "max_drawdown": -0.3,
+      "max_drawdown_source": "src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct",
+      "min_net_return": 0.0,
+      "min_sharpe": 0.75
+    },
+    "research_history": [
+      {
+        "n_configs": 103680,
+        "name": "path_convexity_v3_15m 6E (pc_6e_v3_15m)",
+        "note": "Different (price-path convexity) family on 6E 15m; 74 frozen candidates."
+      },
+      {
+        "n_configs": 2304,
+        "name": "compression_breakout_nr_v4_15m 6E (cb_nr_6e_v4_15m)",
+        "note": "Different (NR-N squeeze) family on 6E 15m; 14 frozen candidates."
+      },
+      {
+        "n_configs": 3840,
+        "name": "compression_breakout_bbkc_v4_15m 6E (cb_bbkc_6e_v4_15m)",
+        "note": "Different (BB/KC squeeze) family on 6E 15m; 23 frozen candidates."
+      },
+      {
+        "n_configs": 24000,
+        "name": "mean_reversion_v21 6E (mr_6e_v6)",
+        "note": "Different (mean-reversion) family on 6E; 252 frozen candidates."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion_v5 6E (mr_6e_v5)",
+        "note": "Different (mean-reversion) family on 6E; 2 frozen candidates."
+      }
+    ],
+    "seed": 20261120,
+    "strategy": "fx_fix_v1",
+    "symbol": "6E",
+    "time_stability": {
+      "min_profitable_years": 3,
+      "top_trades_frac": 0.05,
+      "top_trades_k": 5
+    },
+    "trade_count": {
+      "min_completed_trades": 100,
+      "min_trades_per_year": 10,
+      "min_years_meeting_floor": 4
+    },
+    "validation": {
+      "max_drawdown": -0.3,
+      "min_completed_trades": 40,
+      "min_net_return": 0.0,
+      "min_sharpe": 0.3
+    },
+    "version": 1
+  },
+  "transfer_symbol": "6J"
+}

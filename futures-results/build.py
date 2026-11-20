@@ -5,6 +5,7 @@
   nr squeeze/index.html            NR-N squeeze breakout (../nr-squeeze-backtest/)
   price-path convexity/index.html  price-path convexity fade (../price-path-convexity-backtest/)
   emrt spread/index.html           EMRT two-leg futures spread (../emrt-spread-backtest/); its tabs are pairs
+  fx fix/index.html                daytime FX-fix reversal around the London fix (../fx-fix-backtest/)
 
 Layout of this folder:
   data/<MARKET>/<strategy>.json   one finished run (written by each project's export script,
@@ -36,7 +37,7 @@ PAIRS = [("ES-NQ", "ES vs NQ"), ("ES-RTY", "ES vs RTY"), ("ES-YM", "ES vs YM"), 
 FAMILIES = [
     ("mean reversion", "Mean Reversion Funnels", "Mean-reversion strategy funnels",
      lambda run: not run["strategy_key"].startswith(("noise_band", "squeeze_breakout", "nr_breakout", "path_convexity",
-                                                       "emrt_spread"))),
+                                                       "emrt_spread", "fx_fix"))),
     ("noise-band breakout", "Noise-Band Breakout Funnels", "Noise-band breakout strategy funnels",
      lambda run: run["strategy_key"].startswith("noise_band")),
     ("bb-kc squeeze", "BB-inside-KC Squeeze Funnels", "BB-inside-KC squeeze strategy funnels",
@@ -47,6 +48,8 @@ FAMILIES = [
      lambda run: run["strategy_key"].startswith("path_convexity")),
     ("emrt spread", "EMRT Spread Funnels", "EMRT two-leg spread strategy funnels",
      lambda run: run["strategy_key"].startswith("emrt_spread")),
+    ("fx fix", "FX Fix Funnels", "FX-fix reversal strategy funnels",
+     lambda run: run["strategy_key"].startswith("fx_fix")),
 ]
 
 

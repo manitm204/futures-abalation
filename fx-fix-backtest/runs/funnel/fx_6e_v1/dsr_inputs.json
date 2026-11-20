@@ -1,0 +1,54 @@
+{
+  "calibration_verified": false,
+  "effective_trials": {
+    "li_ji": 46.000000000000256,
+    "n_components_95": 18,
+    "n_series": 405,
+    "participation_ratio": 5.495602842447947,
+    "rank_bound_T": 1292
+  },
+  "n_configs_with_defined_sharpe": 405,
+  "primary_method": "li_ji",
+  "research_history": [
+    {
+      "n_configs": 103680,
+      "name": "path_convexity_v3_15m 6E (pc_6e_v3_15m)",
+      "note": "Different (price-path convexity) family on 6E 15m; 74 frozen candidates."
+    },
+    {
+      "n_configs": 2304,
+      "name": "compression_breakout_nr_v4_15m 6E (cb_nr_6e_v4_15m)",
+      "note": "Different (NR-N squeeze) family on 6E 15m; 14 frozen candidates."
+    },
+    {
+      "n_configs": 3840,
+      "name": "compression_breakout_bbkc_v4_15m 6E (cb_bbkc_6e_v4_15m)",
+      "note": "Different (BB/KC squeeze) family on 6E 15m; 23 frozen candidates."
+    },
+    {
+      "n_configs": 24000,
+      "name": "mean_reversion_v21 6E (mr_6e_v6)",
+      "note": "Different (mean-reversion) family on 6E; 252 frozen candidates."
+    },
+    {
+      "n_configs": 41472,
+      "name": "mean_reversion_v5 6E (mr_6e_v5)",
+      "note": "Different (mean-reversion) family on 6E; 2 frozen candidates."
+    }
+  ],
+  "serial_dependence": "lag1_effective_n",
+  "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+  "trial_count_options": {
+    "li_ji": 46.000000000000256,
+    "participation_ratio": 5.495602842447947,
+    "raw": 405.0,
+    "raw_plus_known_prior": 175701.0
+  },
+  "unresolved": [
+    "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+    "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+    "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+    "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+  ],
+  "variance_of_trial_sharpes_per_period": 0.0008609042410202725
+}

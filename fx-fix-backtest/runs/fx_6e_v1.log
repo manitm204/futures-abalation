@@ -1,0 +1,26 @@
+=== fx_6e_v1 develop 2026-11-20T18:52:46Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-20T18:53:52.227923Z"}
+{"n": 405, "elapsed_s": 87.1, "event": "prep_built", "level": "info", "timestamp": "2026-11-20T18:54:14.660187Z"}
+{"stage": "1 backtest integrity", "evaluated": 405, "passed": 405, "event": "stage_done", "level": "info", "timestamp": "2026-11-20T18:54:14.682590Z"}
+{"stage": "2 trade count & coverage", "evaluated": 405, "passed": 270, "event": "stage_done", "level": "info", "timestamp": "2026-11-20T18:54:14.686295Z"}
+{"stage": "3 performance & risk", "evaluated": 270, "passed": 0, "event": "stage_done", "level": "info", "timestamp": "2026-11-20T18:54:14.687785Z"}
+{"reused_from_prep": 0, "backtested": 0, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-20T18:54:14.692596Z"}
+{"stage": "4 parameter stability", "evaluated": 0, "passed": 0, "event": "stage_done", "level": "info", "timestamp": "2026-11-20T18:54:14.692689Z"}
+{"stage": "5 time stability", "evaluated": 0, "passed": 0, "event": "stage_done", "level": "info", "timestamp": "2026-11-20T18:54:14.692734Z"}
+{"stage": "7 execution stress", "evaluated": 0, "passed": 0, "event": "stage_done", "level": "info", "timestamp": "2026-11-20T18:54:14.692837Z"}
+develop done: 405 configs -> 0 representatives -> 0 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/fx-fix-backtest/runs/funnel/fx_6e_v1
+=== fx_6e_v1 validate 2026-11-20T18:54:15Z
+validate: 0 frozen -> 0 pass validation (previously-inspected data). Selection manifest sha256 1bb0d7213529ab03
+=== fx_6e_v1 luck 2026-11-20T18:54:17Z
+fx_6e_v1: 0 finalists re-run on validation and matched exactly
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/fx-fix-backtest/runs/funnel/fx_6e_v1/random_benchmark.json
+=== fx_6e_v1 export 2026-11-20T18:54:19Z
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/futures-results/data/6E/fx_fix_v1.json
+mean reversion/index.html: 41 run(s) across 10 market(s)
+noise-band breakout/index.html: 15 run(s) across 6 market(s)
+bb-kc squeeze/index.html: 25 run(s) across 10 market(s)
+nr squeeze/index.html: 20 run(s) across 11 market(s)
+price-path convexity/index.html: 10 run(s) across 6 market(s)
+emrt spread/index.html: 4 run(s) across 2 market(s)
+fx fix/index.html: 1 run(s) across 1 market(s)
+=== fx_6e_v1 done 2026-11-20T18:54:22Z

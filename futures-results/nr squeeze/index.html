@@ -301,7 +301,7 @@ function renderRun(r) {
     <div class="formula">${esc(S.formula)}</div>
     <div class="rules">${S.rules.map(x => `<div class="rule"><span class="eyebrow">${esc(x.label)}</span><p>${esc(x.text)}</p></div>`).join("")}</div>
     <h3 style="margin-top:8px">The ${S.axes.length} settings we varied</h3>
-    <p class="muted">Every combination was tested: ${S.axes.map(a => a.values.length).join(" × ")} = ${S.grid_size.toLocaleString("en-US")}. ${esc(S.length_note || "All lengths are in bars.")}</p>
+    <p class="muted">${S.grid_text ? esc(S.grid_text) : `Every combination was tested: ${S.axes.map(a => a.values.length).join(" × ")} = ${S.grid_size.toLocaleString("en-US")}.`} ${esc(S.length_note || "All lengths are in bars.")}</p>
     <div class="axes">${S.axes.map(a => `<span class="chip">${esc(a.label.toLowerCase())}: ${a.values.map(esc).join(" · ")}</span>`).join("")}</div>
   </section>`;
 
