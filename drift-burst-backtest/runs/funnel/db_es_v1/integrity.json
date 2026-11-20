@@ -1,0 +1,41 @@
+{
+  "audit_notes": [
+    "Bars: the market's regular day session (src/data/futures.py SESSIONS) in 1-minute bars (db_day_bars); one session per NY date, so no position can be held overnight.",
+    "Burst statistic at bar t, inside one session only: T = (log C_t - log C_{t-k}) / (s sqrt(k)), s = RMS of the 5k one-minute log returns ending at bar t-k (needs 6k bars of the session first). Recomputed per session with sliding windows in the integrity check.",
+    "Volume ratio at bar t: volume over bars t-k+1..t / the sum of each bar's time-of-day norm (mean volume at that minute over the prior 20 sessions, >= 10 needed). Recomputed with plain dictionaries in the integrity check.",
+    "Decision at bar t's close, p = t-1: |T_p| > threshold and |T| stopped rising at t (T_t NaN, opposite sign or smaller); side = -sign(T_p) (fade); long_only keeps longs; volume gate on the ratio at p; news filter on overlap of [open of bar t-k, open of bar t] with 08:28-08:45, 09:58-10:15 ET and, on Wednesdays, 13:58-15:00 ET.",
+    "At most one trade per session; no decision on the session's last bar; a signal while a position is open is dropped, never queued.",
+    "Entry at the NEXT bar's open with market slippage, same session. Time exit at the close of bar entry + hold - 1 with market slippage; at or past the session's last bar the trade closes at the session's last close. No stop.",
+    "Long and short: P&L = side x (exit fill - entry fill) x quantity - commissions; sizing is the other families' (as many whole contracts as equity covers at full contract value, unlevered, compounding).",
+    "Development backtests run on data physically truncated at the development end; the final session's trade is closed at the last development bar and flagged forced (not counted as completed).",
+    "Sharpe: daily session-close mark-to-market returns over every trading day (flat days = 0), sqrt(252) annualization, rf = 0, idle cash earns 0."
+  ],
+  "checks_per_config": [
+    "peak_below_threshold",
+    "peak_still_rising",
+    "side_not_fade",
+    "side_not_allowed",
+    "volume_gate_not_met",
+    "inside_news_zone",
+    "second_trade_same_session",
+    "signal_skipped_while_flat",
+    "entry_not_next_bar_same_session",
+    "entry_fill_better_than_market",
+    "exit_before_entry",
+    "position_held_overnight",
+    "time_exit_not_per_rule",
+    "eod_exit_not_at_session_close",
+    "exit_fill_better_than_market",
+    "overlapping_positions",
+    "position_exceeds_equity",
+    "forced_close_not_final_trade",
+    "commission_below_minimum"
+  ],
+  "cut_fractions": [
+    0.3,
+    0.6000000000000001,
+    0.9
+  ],
+  "failures": {},
+  "truncation_sample": 40
+}

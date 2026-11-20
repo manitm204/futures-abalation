@@ -1,0 +1,203 @@
+# ES futures (E-mini S&P 500) drift-burst fade, v2: run db_es_v2 (drift_burst_v2, 10,368 configs,
+# 1-minute bars of the NYSE regular session 09:30-16:00 NY) -- the ONE place every threshold lives.
+#
+# Specified by the user (2026-11-20) after v1 on ES (db_es_v1: 576 configs, 0 passed the profit
+# gate, 1 made money; the paper's settings lost money even before costs): "a 10k configuration"
+# with more parameters. v1's axes are kept (burst window 3/5/10, threshold 3.5/4/4.5/5, volume gate
+# none/1.5x/2x/3x, side both/long_only, hold 5/15/30 min) and four new ones are added:
+#   entry_mode cross / peak (v1) / confirm; target none / 0.5 / 1.0 x the burst move;
+#   stop none / 1.0 x the burst move; max_trades 1 / 3 per session. News filter fixed off.
+#
+# Gates, data splits and costs are identical to db_funnel_es_v1.yaml (and the other ES funnels).
+# The prescreen (best 3 per cluster if > 3,000 configs pass stage 3) is fixed before the run, as in
+# the other big grids. Stage 4 adds local moves for the target (+/- 0.25), the stop (+/- 0.25) and
+# the trade cap (+/- 1).
+#
+# Thresholds are fixed for the duration of a run and are hashed into every run's
+# outputs. They are NEVER adjusted automatically to hit a survivor count; zero
+# survivors is a valid outcome. Changing a value here is a new research trial
+# and should be recorded under `research_history` below.
+
+version: 1
+strategy: drift_burst_v2
+symbol: ES
+seed: 20261120
+
+data:
+  clean_root: data/clean
+  development: {start: 2018-01-01, end: 2022-12-31}
+  validation:  {start: 2023-01-01, end: 2024-12-31}
+  # end: null -> the actual available endpoint, recorded at access time.
+  holdout:     {start: 2025-01-01, end: null}
+  timeframes: ["1min"]
+
+data_history:
+  validation_previously_used_for_selection: true
+  validation_note: >-
+    No drift-burst strategy has been scored on ES 2023-2024 (v1 froze nothing), but the mean-reversion, noise-band, BB/KC squeeze, NR-N and convexity families were selected there and the researcher has read those results. Treated as used for selection.
+  holdout_previously_inspected: false   # not for this line; see the note
+  holdout_note: >-
+    No drift-burst metrics have been computed on ES 2025+. Other families (mean reversion, noise band, BB/KC squeeze, NR-N, convexity, EMRT ES-RTY) were scored there, so the researcher has seen how that period treated intraday ES strategies.
+
+metrics:
+  return_frequency: daily          # mark-to-market equity at each session close
+  periods_per_year: 252            # Sharpe = mean/std(daily) * sqrt(252)
+  risk_free_rate_annual: 0.0
+  cash_treatment: >-
+    Idle cash earns 0% and the Sharpe excess return is measured against a 0%
+    risk-free rate, so the two assumptions are consistent.
+  drawdown_basis: daily session-close mark-to-market (understates intraday DD)
+
+execution:
+  baseline: configs/execution/futures.yaml   # $2.50/contract/side + 1 tick/side slippage, unlevered whole contracts
+
+integrity:            # stage 1
+  truncation_check_sample: 40
+  truncation_points: 3
+
+trade_count:          # stage 2 -- hard gate
+  min_completed_trades: 100
+  min_trades_per_year: 10
+  min_years_meeting_floor: 4
+
+performance:          # stage 3 -- hard gate
+  min_net_return: 0.0               # strictly greater than
+  min_sharpe: 0.75                  # annualized, daily MTM returns incl. flat days
+  max_drawdown: -0.30
+  max_drawdown_source: src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct
+
+parameter_stability:  # stage 4 -- hard gate
+  mode: local_perturbation          # gate on `local` moves below; grid neighbors are diagnostic only
+  local:
+    int_rel: 0.20                   # burst window, hold: x0.8 / x1.2, rounded, >= 1 minute away
+    stop_atr_abs: 0.25              # unused by this family (no stop); required field
+    threshold_abs: 0.25             # burst t-stat threshold -/+ 0.25 (never below 2.0)
+    vol_gate_abs: 0.25              # volume-ratio gate -/+ 0.25 (never below 1.0; "none" has no move)
+    target_abs: 0.25                # target -/+ 0.25 x the burst move (never below 0.1; "none" has no move)
+    stop_burst_abs: 0.25            # stop -/+ 0.25 x the burst move (never below 0.25; "none" has no move)
+    max_trades_step: 1              # trades per session -/+ 1 (never below 1)
+  neighbor_mode: single_axis        # grid-neighbor diagnostic
+  min_frac_profitable: 0.70         # of the local moves, share with dev net return > 0
+  min_median_sharpe: 0.50           # median dev Sharpe of the local moves
+  prescreen:                        # big grids: fixed before the run, like every gate
+    max_configs: 3000
+    per_cluster: 3
+  perturbation:                     # diagnostic only, never a gate
+    n_per_config: 20
+    integer_rel_step: 0.15          # burst window, hold
+    float_rel_step: 0.10            # threshold, volume gate, target, stop (relative)
+
+time_stability:       # stage 5 -- light hard gate + diagnostics
+  min_profitable_years: 3
+  top_trades_k: 5
+  top_trades_frac: 0.05
+
+dedup:                # stage 6
+  corr_threshold: 0.80
+  return_basis: monthly
+  linkage: complete
+  reps_per_cluster: 2               # best 2 per cluster; a single-member cluster keeps its 1
+
+execution_stress:     # stage 7
+  gate_cost_multiplier: 1.5         # hard gate: positive dev net return
+  diagnostic_cost_multipliers: [2.0]
+  entry_delay_bars: 1               # one 1-minute bar late
+  missed_entry_frac: 0.10
+  missed_entry_sims: 100
+  breakeven_max_multiplier: 25.0
+
+validation:           # stage 8 -- hard gate (frozen representatives only)
+  min_net_return: 0.0
+  min_sharpe: 0.30
+  max_drawdown: -0.30
+  min_completed_trades: 40          # project default from 2026-10-22
+
+confidence:           # stage 9 -- diagnostics only
+  dsr_threshold: 0.95
+  dsr_calibration_verified: false
+  effective_trials_method: li_ji
+  serial_dependence: lag1_effective_n
+  transfer_symbol: NQ                # unchanged rules, development period only
+
+holdout:              # stage 10 -- explicit `final-test` command only
+  acceptance:
+    min_net_return: 0.0
+    min_sharpe: 0.0
+    max_drawdown: -0.30
+    min_completed_trades: null
+
+# Earlier trials on this market (other families). These count toward the DSR "known prior"
+# sensitivity only.
+research_history:
+  - name: "drift_burst_v1 ES (db_es_v1)"
+    n_configs: 576
+    note: "Round 1 of this line on ES; 0 passed the profit gate, 1 of 576 made money; the paper's settings lost money before costs. This grid was specified after its results."
+  - name: "path_convexity_v2_15m ES (pc_es_v2_15m)"
+    n_configs: 82944
+    note: "Different (price-path convexity) family on ES 15m; 349 frozen, 17 passed 2023-2024, #115 lost on ES 2025+."
+  - name: "path_convexity_v1_15m ES (pc_es_v1_15m)"
+    n_configs: 186624
+    note: "Round 1 of this line on ES 15m; development only, 319 frozen candidates. This grid was chosen from its results."
+  - name: "path_convexity_v1_5m ES (pc_es_v1_5m)"
+    n_configs: 186624
+    note: "Round 1 grid on 5m bars; specified but never run (0 configs evaluated)."
+  - name: "compression_breakout_nr_v2_15m ES (cb_nr_es_v2_15m)"
+    n_configs: 207360
+    note: "Different (NR-N squeeze breakout) family on ES."
+  - name: "compression_breakout_nr_v3_15m ES (cb_nr_es_v3_15m)"
+    n_configs: 145152
+    note: "Different (NR-N squeeze breakout) family on ES."
+  - name: "compression_breakout_nr ES v1 (cb_nr_es_v1)"
+    n_configs: 16128
+    note: "Earlier grid of this line on ES; specified but never run (0 configs evaluated)."
+  - name: "compression_breakout_bbkc_v2_15m ES (cb_bbkc_es_v2_15m)"
+    n_configs: 184320
+    note: "Sibling line (BB/KC squeeze) on ES 15m; 2 tested on 2025+."
+  - name: "compression_breakout_bbkc_v2_5m ES (cb_bbkc_es_v2_5m)"
+    n_configs: 72576
+    note: "Sibling line (BB/KC squeeze) on ES 5m."
+  - name: "compression_breakout_bbkc_v4_15m ES (cb_bbkc_es_v4_15m)"
+    n_configs: 3840
+    note: "Sibling line (BB/KC squeeze) on ES 15m; development started 2026-11-11, not finished."
+  - name: "compression_breakout_bbkc ES v1 (cb_bbkc_es_v1)"
+    n_configs: 20736
+    note: "Sibling compression line (BB-inside-KC squeeze) on ES, 5min + 15min; this grid was specified after its results."
+  - name: "mean_reversion ES (mr_es_v3)"
+    n_configs: 46080
+    note: "Different (mean-reversion) family on ES; 11 frozen candidates, 1 passed 2023-2024."
+  - name: "mean_reversion ES (mr_es_v4)"
+    n_configs: 46080
+    note: "Different (mean-reversion) family on ES; 18 frozen candidates, 3 passed 2023-2024."
+  - name: "mean_reversion ES (mr_es_v5)"
+    n_configs: 41472
+    note: "Different (mean-reversion) family on ES; 45 frozen candidates, 10 passed 2023-2024."
+  - name: "mean_reversion ES (mr_es_v6_15m)"
+    n_configs: 864
+    note: "Different (mean-reversion) family on ES; 7 frozen candidates, 0 passed 2023-2024."
+  - name: "mean_reversion ES (mr_es_v6_1h)"
+    n_configs: 6804
+    note: "Different (mean-reversion) family on ES; 39 frozen candidates, 1 passed 2023-2024."
+  - name: "noise_band ES (nb_es_v1)"
+    n_configs: 8100
+    note: "Different (noise-band intraday momentum) family on ES; 210 frozen candidates."
+  - name: "noise_band ES (nb_es_v2)"
+    n_configs: 8100
+    note: "Different (noise-band intraday momentum) family on ES; 235 frozen candidates."
+  - name: "noise_band ES (nb_es_v3)"
+    n_configs: 16200
+    note: "Different (noise-band intraday momentum) family on ES; 268 frozen candidates."
+  - name: "noise_band ES (nb_es_v4)"
+    n_configs: 13824
+    note: "Different (noise-band intraday momentum) family on ES; 326 frozen candidates."
+  - name: "channel_breakout grid (funnel_v1..v4, SPY)"
+    n_configs: 24576
+    note: "Closest prior search: channel breakout, SPY; four funnel variants with changed thresholds/methods."
+  - name: "donchian_ablation (donchian_v1, SPY/QQQ)"
+    n_configs: 3888
+    note: "Closest prior search: full-factorial Donchian intraday breakout ablation, 2018-2026 splits incl. holdout."
+  - name: "ma_crossover v2 grid (ma_v2, SPY)"
+    n_configs: 248832
+    note: "Long-only trend-following MA crossover, 5min/15min, SPY."
+  - name: "ma_crossover v1 grid (ma_v1, SPY)"
+    n_configs: 60000
+    note: "Long-only trend-following MA crossover, 5min/15min/1h, SPY."

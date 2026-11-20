@@ -1,0 +1,27 @@
+=== db_es_v1 develop 2026-11-20T19:46:36Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-20T19:47:24.005784Z"}
+{"n": 576, "elapsed_s": 76.7, "event": "prep_built", "level": "info", "timestamp": "2026-11-20T19:47:53.912969Z"}
+{"stage": "1 backtest integrity", "evaluated": 576, "passed": 576, "event": "stage_done", "level": "info", "timestamp": "2026-11-20T19:47:53.931744Z"}
+{"stage": "2 trade count & coverage", "evaluated": 576, "passed": 474, "event": "stage_done", "level": "info", "timestamp": "2026-11-20T19:47:53.936376Z"}
+{"stage": "3 performance & risk", "evaluated": 474, "passed": 0, "event": "stage_done", "level": "info", "timestamp": "2026-11-20T19:47:53.938583Z"}
+{"reused_from_prep": 0, "backtested": 0, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-20T19:47:53.946114Z"}
+{"stage": "4 parameter stability", "evaluated": 0, "passed": 0, "event": "stage_done", "level": "info", "timestamp": "2026-11-20T19:47:53.946174Z"}
+{"stage": "5 time stability", "evaluated": 0, "passed": 0, "event": "stage_done", "level": "info", "timestamp": "2026-11-20T19:47:53.946216Z"}
+{"stage": "7 execution stress", "evaluated": 0, "passed": 0, "event": "stage_done", "level": "info", "timestamp": "2026-11-20T19:47:53.946302Z"}
+develop done: 576 configs -> 0 representatives -> 0 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/drift-burst-backtest/runs/funnel/db_es_v1
+=== db_es_v1 validate 2026-11-20T19:47:55Z
+validate: 0 frozen -> 0 pass validation (previously-inspected data). Selection manifest sha256 cef10a620cc88fc1
+=== db_es_v1 luck 2026-11-20T19:47:57Z
+db_es_v1: 0 finalists re-run on validation and matched exactly
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/drift-burst-backtest/runs/funnel/db_es_v1/random_benchmark.json
+=== db_es_v1 export 2026-11-20T19:48:00Z
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/futures-results/data/ES/drift_burst_v1.json
+mean reversion/index.html: 41 run(s) across 10 market(s)
+noise-band breakout/index.html: 15 run(s) across 6 market(s)
+bb-kc squeeze/index.html: 25 run(s) across 10 market(s)
+nr squeeze/index.html: 20 run(s) across 11 market(s)
+price-path convexity/index.html: 10 run(s) across 6 market(s)
+emrt spread/index.html: 4 run(s) across 2 market(s)
+fx fix/index.html: 1 run(s) across 1 market(s)
+drift burst/index.html: 1 run(s) across 1 market(s)
+=== db_es_v1 done 2026-11-20T19:48:02Z

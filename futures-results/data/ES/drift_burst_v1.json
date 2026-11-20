@@ -1,0 +1,660 @@
+{
+ "market": "ES",
+ "market_name": "E-mini S&P 500",
+ "strategy_key": "drift_burst_v1",
+ "strategy_name": "Drift burst \u00b7 v1",
+ "variant": null,
+ "variant_label": null,
+ "stability_mode": "local_perturbation",
+ "validation_rules": {
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3,
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40
+ },
+ "run_id": "db_es_v1",
+ "generated_at": "2026-11-20T19:48:00+00:00",
+ "periods": {
+  "dev": [
+   "2018-01-01",
+   "2022-12-31"
+  ],
+  "val": [
+   "2023-01-01",
+   "2024-12-31"
+  ]
+ },
+ "strategy": {
+  "summary": "Fade sudden, outsized moves a few minutes after they peak, day session only. Christensen, Oomen & Ren\u00f2 (\"The drift burst hypothesis\") find that short bursts of extreme drift in futures (about one a week in ES at their settings) mostly reverse within minutes: about 71% reverse over the next 5 minutes, drops more than spikes, and bursts on heavy volume for the time of day reverse most. Their study used tick data to 2017, mid-quotes and no costs; this is a simplified 1-minute version on traded prices.",
+  "formula": "T = k-minute log return \u00f7 (local volatility \u00d7 \u221ak); fade when |T| peaks above the threshold",
+  "rules": [
+   {
+    "label": "Signal",
+    "text": "Over the last k minutes (3, 5 or 10): the log return, divided by the volatility of the 5k one-minute returns just before it (scaled by \u221ak). Everything stays inside one day session."
+   },
+   {
+    "label": "Enter",
+    "text": "When |T| has been above the threshold (3.5, 4, 4.5 or 5) and stops rising, trade against the burst at the next bar's open. Optional filters: the burst window's volume must be at least 1.5\u00d7, 2\u00d7 or 3\u00d7 the normal volume for those minutes of the day (20-day average); buy drops only; skip bursts around 08:30 and 10:00 ET releases and on Wednesdays 14:00\u201315:00 ET. At most one trade per day."
+   },
+   {
+    "label": "Exit",
+    "text": "After 5, 15 or 30 minutes at that bar's close, or at the session's last close if sooner. No stop."
+   },
+   {
+    "label": "Size",
+    "text": "One position at a time, never held overnight. As many whole ES contracts as the account covers at full contract value (no leverage), starting from $1,000,000."
+   }
+  ],
+  "axes": [
+   {
+    "label": "Bar size",
+    "values": [
+     "1 min"
+    ]
+   },
+   {
+    "label": "Burst window (min)",
+    "values": [
+     "3 min",
+     "5 min",
+     "10 min"
+    ]
+   },
+   {
+    "label": "Burst threshold |T|",
+    "values": [
+     "3.5",
+     "4",
+     "4.5",
+     "5"
+    ]
+   },
+   {
+    "label": "Volume gate (\u00d7 normal)",
+    "values": [
+     "none",
+     "\u22651.5\u00d7",
+     "\u22652\u00d7",
+     "\u22653\u00d7"
+    ]
+   },
+   {
+    "label": "Side",
+    "values": [
+     "fade both",
+     "buy drops only"
+    ]
+   },
+   {
+    "label": "Hold (min)",
+    "values": [
+     "5 min",
+     "15 min",
+     "30 min"
+    ]
+   },
+   {
+    "label": "News filter",
+    "values": [
+     "off",
+     "skip news"
+    ]
+   }
+  ],
+  "grid_size": 576,
+  "length_note": "Windows and holds are in 1-minute bars of the day session."
+ },
+ "funnel": [
+  {
+   "name": "Start",
+   "sub": "every combination",
+   "n": 576,
+   "why": "All 576 versions backtested once on 2018\u20132022 data."
+  },
+  {
+   "name": "1 \u00b7 Integrity",
+   "sub": "no cheating",
+   "n": 576,
+   "why": "Per-trade checks on every version: the burst statistic, the time-of-day volume norm and the news windows were recomputed independently; each trade followed a burst peak above the threshold on the fade side with every filter met, at most one a day; no qualifying burst was skipped while flat; fills were never better than the market; nothing was held overnight. Plus 40 random versions re-run on cut-off data. 0 failed."
+  },
+  {
+   "name": "2 \u00b7 Enough trades",
+   "sub": "\u2265100 trades, spread out",
+   "n": 474,
+   "why": "Needs \u2265100 completed trades and \u226510 a year in \u22654 of the 5 years. Removed 102 (102 on 1min)."
+  },
+  {
+   "name": "3 \u00b7 Profit",
+   "sub": "net > 0, Sharpe \u2265 0.75",
+   "n": 0,
+   "why": "Needs a net profit, Sharpe \u2265 0.75 and drawdown no worse than 30%. Removed 474 (474 on 1min); 474 of them lost money."
+  },
+  {
+   "name": "4 \u00b7 Stable settings",
+   "sub": "nudged settings also work",
+   "n": 0,
+   "why": "Each setting is nudged one at a time, down and up: the burst window and the hold by \u00b120% (rounded, at least one minute), the threshold by \u00b10.25 and a volume gate by \u00b10.25\u00d7 (\"no gate\" has nothing to nudge). At least 70% of the nudged versions must be profitable, with median Sharpe \u2265 0.5. Removed 0."
+  },
+  {
+   "name": "5 \u00b7 Time stability",
+   "sub": "\u22653 profitable years",
+   "n": 0,
+   "why": "Removed 0."
+  },
+  {
+   "name": "6 \u00b7 Remove duplicates",
+   "sub": "best 2 per group",
+   "n": 0,
+   "why": "Versions whose monthly returns correlate \u2265 0.8 form a group; the best 2 of each go on (a group of one keeps its one). 0 versions formed 0 groups; 0 of the 0 picks are distinct backtests."
+  },
+  {
+   "name": "7 \u00b7 Cost stress",
+   "sub": "profitable at 1.5\u00d7 costs",
+   "n": 0,
+   "why": "Removed 0."
+  },
+  {
+   "name": "8 \u00b7 Validation",
+   "sub": "2023\u20132024, new data",
+   "n": 0,
+   "why": "Frozen finalists run once on unseen data: needs net > 0, Sharpe \u2265 0.3, drawdown no worse than 30% and \u226540 trades."
+  }
+ ],
+ "stable": {
+  "n": 0,
+  "axes": [
+   {
+    "axis": "burst_window",
+    "label": "Burst window (min)",
+    "values": [
+     {
+      "v": "3 min",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "5 min",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "10 min",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "threshold",
+    "label": "Burst threshold |T|",
+    "values": [
+     {
+      "v": "3.5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "4",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "4.5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "5",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "vol_gate",
+    "label": "Volume gate (\u00d7 normal)",
+    "values": [
+     {
+      "v": "none",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "\u22651.5\u00d7",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "\u22652\u00d7",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "\u22653\u00d7",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "side",
+    "label": "Side",
+    "values": [
+     {
+      "v": "fade both",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "buy drops only",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "hold",
+    "label": "Hold (min)",
+    "values": [
+     {
+      "v": "5 min",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "15 min",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "30 min",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "news_filter",
+    "label": "News filter",
+    "values": [
+     {
+      "v": "off",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "skip news",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   }
+  ],
+  "by_timeframe": []
+ },
+ "ablation": [
+  {
+   "axis": "burst_window",
+   "label": "Burst window (min)",
+   "values": [
+    {
+     "v": "3 min",
+     "n": 192,
+     "pct_profitable": 0.0,
+     "median_sharpe": -1.362551788341937,
+     "p90_sharpe": -0.8069969204359628,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "5 min",
+     "n": 192,
+     "pct_profitable": 0.005208333333333333,
+     "median_sharpe": -0.9085648434944238,
+     "p90_sharpe": -0.39902164259972955,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "10 min",
+     "n": 192,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.9328050314472156,
+     "p90_sharpe": -0.3813220585522968,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "threshold",
+   "label": "Burst threshold |T|",
+   "values": [
+    {
+     "v": "3.5",
+     "n": 144,
+     "pct_profitable": 0.0,
+     "median_sharpe": -1.3477698148516373,
+     "p90_sharpe": -0.7816152002335959,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "4",
+     "n": 144,
+     "pct_profitable": 0.0,
+     "median_sharpe": -1.233095341951302,
+     "p90_sharpe": -0.8148756737650127,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "4.5",
+     "n": 144,
+     "pct_profitable": 0.006944444444444444,
+     "median_sharpe": -0.8233484157766586,
+     "p90_sharpe": -0.37244759379723374,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "5",
+     "n": 144,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.7665444519377957,
+     "p90_sharpe": -0.3198952391711832,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "vol_gate",
+   "label": "Volume gate (\u00d7 normal)",
+   "values": [
+    {
+     "v": "none",
+     "n": 144,
+     "pct_profitable": 0.0,
+     "median_sharpe": -1.2717642019578244,
+     "p90_sharpe": -0.6494288004368732,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "\u22651.5\u00d7",
+     "n": 144,
+     "pct_profitable": 0.0,
+     "median_sharpe": -1.268196359828086,
+     "p90_sharpe": -0.6920487970190928,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "\u22652\u00d7",
+     "n": 144,
+     "pct_profitable": 0.0,
+     "median_sharpe": -1.1152937874643056,
+     "p90_sharpe": -0.4587704781546025,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "\u22653\u00d7",
+     "n": 144,
+     "pct_profitable": 0.006944444444444444,
+     "median_sharpe": -0.7673655713412011,
+     "p90_sharpe": -0.22328939446297433,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "side",
+   "label": "Side",
+   "values": [
+    {
+     "v": "fade both",
+     "n": 288,
+     "pct_profitable": 0.0,
+     "median_sharpe": -1.2349159974402606,
+     "p90_sharpe": -0.6549056200292455,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "buy drops only",
+     "n": 288,
+     "pct_profitable": 0.003472222222222222,
+     "median_sharpe": -0.9161078746843359,
+     "p90_sharpe": -0.36942674994119723,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "hold",
+   "label": "Hold (min)",
+   "values": [
+    {
+     "v": "5 min",
+     "n": 192,
+     "pct_profitable": 0.005208333333333333,
+     "median_sharpe": -1.1277956318715698,
+     "p90_sharpe": -0.3813220585522968,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "15 min",
+     "n": 192,
+     "pct_profitable": 0.0,
+     "median_sharpe": -1.017275089398351,
+     "p90_sharpe": -0.48205018293768914,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "30 min",
+     "n": 192,
+     "pct_profitable": 0.0,
+     "median_sharpe": -1.1095396534437156,
+     "p90_sharpe": -0.5596100696520787,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "news_filter",
+   "label": "News filter",
+   "values": [
+    {
+     "v": "off",
+     "n": 288,
+     "pct_profitable": 0.003472222222222222,
+     "median_sharpe": -1.0578415986249334,
+     "p90_sharpe": -0.4829082746205429,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "skip news",
+     "n": 288,
+     "pct_profitable": 0.0,
+     "median_sharpe": -1.0964141002195449,
+     "p90_sharpe": -0.4403235714958981,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  }
+ ],
+ "length_map": {
+  "title": "Burst threshold |T| \u00d7 Volume gate (\u00d7 normal)",
+  "pair_text": "burst threshold |t| and volume gate",
+  "corner": "|T| \u2193 \u00b7 Vol \u2192",
+  "row_short": "|t|",
+  "col_short": "vol",
+  "order": null,
+  "fixed": {
+   "Burst window (min)": "5 min",
+   "Side": "buy drops only",
+   "Hold (min)": "5 min",
+   "News filter": "off"
+  },
+  "center": [
+   "4.5",
+   "\u22653\u00d7"
+  ],
+  "rows": [
+   "3.5",
+   "4",
+   "4.5",
+   "5"
+  ],
+  "cols": [
+   "none",
+   "\u22651.5\u00d7",
+   "\u22652\u00d7",
+   "\u22653\u00d7"
+  ],
+  "sharpe": [
+   [
+    -1.5486043045839109,
+    -1.369597627421495,
+    -0.7696998763679194,
+    -0.39902164259972955
+   ],
+   [
+    -1.1526428922256498,
+    -0.8953796498691611,
+    -0.4587704781546025,
+    -0.5130486154771946
+   ],
+   [
+    -0.7813401671327915,
+    -0.5961813820807944,
+    -0.2183821591277512,
+    0.022275207264547237
+   ],
+   [
+    -0.5184598483571807,
+    -0.3773385881735637,
+    -0.3198952391711832,
+    -0.04872926811530203
+   ]
+  ],
+  "trades": [
+   [
+    572,
+    382,
+    283,
+    151
+   ],
+   [
+    370,
+    274,
+    210,
+    117
+   ],
+   [
+    244,
+    199,
+    158,
+    97
+   ],
+   [
+    163,
+    138,
+    121,
+    77
+   ]
+  ]
+ },
+ "luck": {
+  "n_sims": 100,
+  "levels": [],
+  "method": "Per bar size and side setting (long_only = long only, both = the finalists' actual long share): random intraday trades on random sessions at random times, never overlapping and always closed by the session's last bar, covering the target share of the validation window's bars. Trade lengths are drawn from that group's own validation trades; each trade is long with the group's actual long share (1.0 for long-only, 0.0 for short-only), else short. Same fills, slippage, commission and whole-contract sizing as the strategy; scored with the same daily-Sharpe and time-in-market code.",
+  "curves": [],
+  "text": "For every whole-percent time in market in each group's 2023\u20132024 range, 100 random runs trade ES at random times of the day session on random days, so they test whether the burst trigger matters. Each group is one side setting. Like the strategy, the random trades are intraday only, never overlap, and are always closed by the session's last bar. Their lengths are drawn from that group's own finalist trades, so trade counts and costs match. Buy-drops-only groups trade long; fade-both groups go long with the same share of trades their finalists did. They pay the same costs and use the same sizing and Sharpe math as the strategy."
+ },
+ "finalists": [],
+ "short_labels": {
+  "timeframe": "Bar",
+  "burst_window": "k",
+  "threshold": "|T|",
+  "vol_gate": "Vol",
+  "side": "Side",
+  "hold": "Hold",
+  "news_filter": "News"
+ },
+ "exit_labels": [
+  [
+   "time",
+   "time",
+   "time exit"
+  ],
+  [
+   "eod",
+   "close",
+   "session close"
+  ],
+  [
+   "stop",
+   "stop",
+   "stop"
+  ]
+ ],
+ "local_moves": [
+  [
+   "burst_window",
+   "Window"
+  ],
+  [
+   "hold",
+   "Hold"
+  ],
+  [
+   "threshold",
+   "Threshold"
+  ],
+  [
+   "vol_gate",
+   "Vol gate"
+  ]
+ ],
+ "benchmark": {
+  "label": "Holding ES (rolled, unlevered)",
+  "dev": {
+   "net_return": 0.43232380603232756,
+   "sharpe": 0.438279550428425,
+   "max_drawdown": -0.3414002377907397
+  },
+  "val": {
+   "net_return": 0.4065902276125519,
+   "sharpe": 1.4020278997073305,
+   "max_drawdown": -0.1132256790285423
+  }
+ },
+ "transfer_symbol": "NQ",
+ "dsr": {
+  "effective_trials": 111.00000000000028,
+  "raw_trials": 576.0
+ },
+ "assumptions": [
+  "Data: Databento CME continuous front month (ES.v.0), 1-minute bars of the day session only (NYSE regular session 09:30-16:00 NY). Rolls are back-adjusted; positions never cross a session.",
+  "Costs: 1 tick slippage per side and $2.50 commission per contract per side. Entries come right after a violent minute, so real slippage may be worse than one tick.",
+  "The paper used a kernel-smoothed drift estimator on tick data (2010/2012\u20132017), measured mid-quote returns and reported no trading costs. This 1-minute version is a simplification on traded prices.",
+  "The volume gate is a fixed multiple of normal time-of-day volume; the paper sorted events into volume quartiles after the fact, which needs hindsight.",
+  "The first 6k minutes of each session cannot produce a burst (the volatility window needs them).",
+  "Fading bursts is the same direction of bet as the mean-reversion family; check the daily P&L correlation with those finalists before adding a survivor.",
+  "Each trade uses the whole account in whole contracts with no leverage, the same as the other families.",
+  "Sharpe uses daily mark-to-market returns (\u221a252), with idle cash earning 0%. Time in market is the share of 1-minute bars with an open position.",
+  "Other strategy families were already selected on this market's 2023\u20132024 data, so 2023\u20132024 is not untouched; only the 2025+ holdout is.",
+  "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead."
+ ],
+ "source": "drift-burst-backtest/runs/funnel/db_es_v1/ \u00b7 configs/funnel/db_funnel_es_v1.yaml"
+}
