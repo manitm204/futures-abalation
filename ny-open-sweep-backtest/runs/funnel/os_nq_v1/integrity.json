@@ -1,0 +1,50 @@
+{
+  "audit_notes": [
+    "Bars: the full Globex 1-minute bars are loaded only to measure the pre-open ranges (os_day_bars); trading uses 1-minute bars with NY open time in [09:30, 16:00) on their own session date. Each NY date is one session and no position can be held overnight.",
+    "Levels per session date D: onh = 18:00 (D-1) to 09:30; asia = 20:00 to 00:00 (D-1 evening); lon = 02:00-05:00; box = 08:00-09:30; each needs bars for >= 50% of its minutes. pdr = the previous RTH session's high/low. Every pre-open level is recomputed from the raw Globex bars with plain loops (check_levels) and must match exactly.",
+    "dATR = mean RTH high-low range of the previous 14 sessions; the 09:30 open must come from a bar opening by 09:32.",
+    "Trigger (high side; the low side mirrors it): only if the 09:30 open is at or below H; p = first bar opening before 09:30 + window with high > H + pen x dATR. fade: first close < H within `confirm` bars from p (p counts, all in the window) -> short; cont: `confirm` consecutive closes > H from p, all in the window -> long. side=both takes the earlier trigger; a same-bar tie trades nothing. Recomputed with plain loops in the per-config integrity check.",
+    "Entry at the OPEN of the bar after the trigger (opening within 2 minutes of it, same session) with market slippage.",
+    "Stop: struct = beyond the extreme of bars p..t by 2 ticks; dX = X x dATR; never closer than 0.03 x dATR; live intrabar from the entry bar, filled at the worse of the bar's open and the stop with stop slippage. Target: R x the stop distance, or the opposite side of the range (fade) / one range height beyond the broken level (cont); a limit filled at the target only when a bar trades 1 tick through it; a bar touching both is a stop. A range target on the wrong side of the entry skips the trade.",
+    "Time exit at the CLOSE of the last bar opening before the exit time with market slippage; a 16:00 exit is the session's last bar.",
+    "One trade per session; sizing is the other families' (as many whole contracts as equity covers at full contract value, unlevered, compounding).",
+    "Development backtests run on data physically truncated at the development end; the final session's trade is closed at the last development bar and flagged forced (not counted as completed).",
+    "Sharpe: daily session-close mark-to-market returns over every trading day (flat days = 0), sqrt(252) annualization, rf = 0, idle cash earns 0."
+  ],
+  "checks_per_config": [
+    "signal_mismatch",
+    "entry_not_per_rule",
+    "day_not_allowed",
+    "wrong_direction",
+    "trade_skipped_while_flat",
+    "entry_fill_better_than_market",
+    "exit_before_entry",
+    "bar_outside_day_window",
+    "position_held_overnight",
+    "stop_not_per_rule",
+    "target_not_per_rule",
+    "stop_exit_without_touch",
+    "stop_fill_better_than_rule",
+    "target_exit_without_trade_through",
+    "target_fill_not_at_target",
+    "exit_not_at_first_touch",
+    "time_exit_not_per_rule",
+    "eod_exit_not_at_session_close",
+    "exit_fill_better_than_market",
+    "overlapping_positions",
+    "position_exceeds_equity",
+    "forced_close_not_final_trade",
+    "commission_below_minimum"
+  ],
+  "cut_fractions": [
+    0.3,
+    0.6000000000000001,
+    0.9
+  ],
+  "failures": {},
+  "pre_open_level_check": {
+    "mismatches": [],
+    "symbol": "NQ"
+  },
+  "truncation_sample": 40
+}

@@ -9,6 +9,7 @@
   drift burst/index.html           volume-gated drift-burst fade (../drift-burst-backtest/)
   month end/index.html             Treasury month-end long, day session only (../month-end-backtest/)
   last half hour/index.html        last-half-hour momentum into the close (../last-half-hour-backtest/)
+  ny open sweep/index.html         ICT NY-open liquidity sweep, fade vs continuation (../ny-open-sweep-backtest/)
 
 Layout of this folder:
   data/<MARKET>/<strategy>.json   one finished run (written by each project's export script,
@@ -41,7 +42,7 @@ FAMILIES = [
     ("mean reversion", "Mean Reversion Funnels", "Mean-reversion strategy funnels",
      lambda run: not run["strategy_key"].startswith(("noise_band", "squeeze_breakout", "nr_breakout", "path_convexity",
                                                        "emrt_spread", "fx_fix", "drift_burst",
-                                                       "month_end", "last_half_hour"))),
+                                                       "month_end", "last_half_hour", "open_sweep"))),
     ("noise-band breakout", "Noise-Band Breakout Funnels", "Noise-band breakout strategy funnels",
      lambda run: run["strategy_key"].startswith("noise_band")),
     ("bb-kc squeeze", "BB-inside-KC Squeeze Funnels", "BB-inside-KC squeeze strategy funnels",
@@ -60,6 +61,8 @@ FAMILIES = [
      lambda run: run["strategy_key"].startswith("month_end")),
     ("last half hour", "Last-Half-Hour Momentum Funnels", "Last-half-hour momentum strategy funnels",
      lambda run: run["strategy_key"].startswith("last_half_hour")),
+    ("ny open sweep", "NY-Open Sweep Funnels", "ICT NY-open liquidity sweep funnels",
+     lambda run: run["strategy_key"].startswith("open_sweep")),
 ]
 
 
