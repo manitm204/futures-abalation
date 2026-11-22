@@ -1,0 +1,40 @@
+=== lh_es_v1 develop 2026-11-22T17:04:11Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-22T17:04:47.205546Z"}
+{"n": 500, "elapsed_s": 81.4, "event": "prep_built", "level": "info", "timestamp": "2026-11-22T17:05:34.046744Z"}
+{"stage": "1 backtest integrity", "evaluated": 500, "passed": 500, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T17:05:34.070896Z"}
+{"stage": "2 trade count & coverage", "evaluated": 500, "passed": 500, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T17:05:34.075002Z"}
+{"stage": "3 performance & risk", "evaluated": 500, "passed": 1, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T17:05:34.077323Z"}
+{"step": "s4_local_moves", "total": 4, "saved": 0, "to_run": 4, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T17:05:34.085947Z"}
+{"step": "s4_local_moves", "saved": 4, "of": 4, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T17:05:36.149589Z"}
+{"reused_from_prep": 1, "backtested": 4, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-22T17:05:36.149717Z"}
+{"stage": "4 parameter stability", "evaluated": 1, "passed": 1, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T17:05:36.149983Z"}
+{"stage": "5 time stability", "evaluated": 1, "passed": 1, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T17:05:36.150042Z"}
+{"step": "s6_intervals", "total": 1, "saved": 0, "to_run": 1, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T17:05:36.150892Z"}
+{"step": "s6_intervals", "saved": 1, "of": 1, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T17:05:37.287624Z"}
+{"step": "s6_perturbations", "total": 20, "saved": 0, "to_run": 20, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T17:05:37.288966Z"}
+{"step": "s6_perturbations", "saved": 20, "of": 20, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T17:05:46.776020Z"}
+{"step": "s7_execution_stress", "total": 113, "saved": 0, "to_run": 113, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T17:05:46.779980Z"}
+{"step": "s7_execution_stress", "saved": 113, "of": 113, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T17:05:57.705980Z"}
+{"stage": "7 execution stress", "evaluated": 1, "passed": 1, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T17:05:57.708596Z"}
+{"step": "s9_transfer", "total": 1, "saved": 0, "to_run": 1, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T17:06:01.588020Z"}
+{"step": "s9_transfer", "saved": 1, "of": 1, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T17:06:03.441021Z"}
+develop done: 500 configs -> 1 representatives -> 1 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/last-half-hour-backtest/runs/funnel/lh_es_v1
+=== lh_es_v1 validate 2026-11-22T17:06:03Z
+validate: 1 frozen -> 0 pass validation (previously-inspected data). Selection manifest sha256 2af6248700fff1f1
+=== lh_es_v1 luck 2026-11-22T17:06:10Z
+lh_es_v1: 1 finalists re-run on validation and matched exactly
+lh_es_v1 1min|15:50-16:00-0.10: 1 levels x 100 sims (median trade 10 bars, 497 tradable days)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/last-half-hour-backtest/runs/funnel/lh_es_v1/random_benchmark.json
+=== lh_es_v1 export 2026-11-22T17:06:15Z
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/futures-results/data/ES/last_half_hour_v1.json
+mean reversion/index.html: 41 run(s) across 10 market(s)
+noise-band breakout/index.html: 15 run(s) across 6 market(s)
+bb-kc squeeze/index.html: 25 run(s) across 10 market(s)
+nr squeeze/index.html: 20 run(s) across 11 market(s)
+price-path convexity/index.html: 10 run(s) across 6 market(s)
+emrt spread/index.html: 4 run(s) across 2 market(s)
+fx fix/index.html: 1 run(s) across 1 market(s)
+drift burst/index.html: 2 run(s) across 1 market(s)
+month end/index.html: 6 run(s) across 5 market(s)
+last half hour/index.html: 2 run(s) across 2 market(s)
+=== lh_es_v1 done 2026-11-22T17:06:19Z

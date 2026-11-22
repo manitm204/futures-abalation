@@ -1,0 +1,6625 @@
+{
+ "market": "NQ",
+ "market_name": "E-mini Nasdaq-100",
+ "strategy_key": "last_half_hour_v1",
+ "strategy_name": "Last half hour \u00b7 v1",
+ "variant": null,
+ "variant_label": null,
+ "stability_mode": "local_perturbation",
+ "validation_rules": {
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3,
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40
+ },
+ "run_id": "lh_nq_v1",
+ "generated_at": "2026-11-22T16:29:15+00:00",
+ "periods": {
+  "dev": [
+   "2018-01-01",
+   "2022-12-31"
+  ],
+  "val": [
+   "2023-01-01",
+   "2024-12-31"
+  ]
+ },
+ "strategy": {
+  "summary": "Trade stock index futures in the day's direction into the close. Baltussen, Da, Lammers & Martens (JFE 2021) find across 60+ futures (1974\u20132020) that the move from the previous close to 30 minutes before today's close predicts the last half hour: for equity index futures, going long if the day is up and short if it is down earned a Sharpe of 1.7 before costs. They tie it to dealers and leveraged ETFs hedging in the day's direction near the close. Replications after 2013 find the plain version near zero, but still working on days dealers are short gamma; the filters here are price-based stand-ins for those days.",
+  "formula": "sign(price now \u00f7 reference \u2212 1): long if up, short if down, from the entry time to the exit time",
+  "rules": [
+   {
+    "label": "Signal",
+    "text": "The day's move so far: the previous session's last close to the minute before the entry (the paper's), today's 09:30 open to the same minute (no overnight gap), or the previous close to 10:00 (the first half hour only). Optionally it must have the same sign as the first-half-hour move."
+   },
+   {
+    "label": "Filter",
+    "text": "None; the move bigger than 0.5\u03c3 or 1\u03c3 of the same signal over the previous 20 days; only when 20-day volatility is above its 120-day median; or only down days (shorts only)."
+   },
+   {
+    "label": "Enter",
+    "text": "At 15:00, 15:30, 15:45 or 15:50 ET, at that minute's open, long if the signal is up and short if down."
+   },
+   {
+    "label": "Exit",
+    "text": "At 15:50 or 16:00 ET, at the close of the minute before (16:00 = the last regular-session bar). Optional stop 0.1%, 0.2% or 0.4% against the entry price, live during the trade. Early-close days are not traded."
+   },
+   {
+    "label": "Size",
+    "text": "One position at a time, never held overnight. As many whole NQ contracts as the account covers at full contract value (no leverage), starting from $1,000,000."
+   }
+  ],
+  "axes": [
+   {
+    "label": "Bar size",
+    "values": [
+     "1 min"
+    ]
+   },
+   {
+    "label": "Signal",
+    "values": [
+     "prior close \u2192 now",
+     "today's open \u2192 now",
+     "first half hour"
+    ]
+   },
+   {
+    "label": "Must agree with first half hour",
+    "values": [
+     "no",
+     "yes"
+    ]
+   },
+   {
+    "label": "Trade window (ET)",
+    "values": [
+     "15:00\u201316:00",
+     "15:30\u201315:50",
+     "15:30\u201316:00",
+     "15:45\u201316:00",
+     "15:50\u201316:00"
+    ]
+   },
+   {
+    "label": "Filter",
+    "values": [
+     "none",
+     "move > 0.5\u03c3",
+     "move > 1\u03c3",
+     "high volatility",
+     "down days only"
+    ]
+   },
+   {
+    "label": "Stop (% against entry)",
+    "values": [
+     "none",
+     "0.1%",
+     "0.2%",
+     "0.4%"
+    ]
+   }
+  ],
+  "grid_size": 500,
+  "length_note": "Times are New York clock times on 1-minute bars from 09:30 to 16:00 ET."
+ },
+ "funnel": [
+  {
+   "name": "Start",
+   "sub": "every combination",
+   "n": 500,
+   "why": "All 500 versions backtested once on 2018\u20132022 data."
+  },
+  {
+   "name": "1 \u00b7 Integrity",
+   "sub": "no cheating",
+   "n": 500,
+   "why": "Per-trade checks on every version: the prior close, the signal, its 20-day spread, the volatility regime and each day's direction were recomputed independently; each trade was on an allowed day in the signal's direction, entered and exited at the set times; no allowed day was skipped; fills were never better than the market; nothing was held overnight. Plus 40 random versions re-run on cut-off data. 0 failed."
+  },
+  {
+   "name": "2 \u00b7 Enough trades",
+   "sub": "\u2265100 trades, spread out",
+   "n": 500,
+   "why": "Needs \u2265100 completed trades and \u226510 a year in \u22654 of the 5 years. Removed 0 (none)."
+  },
+  {
+   "name": "3 \u00b7 Profit",
+   "sub": "net > 0, Sharpe \u2265 0.75",
+   "n": 116,
+   "why": "Needs a net profit, Sharpe \u2265 0.75 and drawdown no worse than 30%. Removed 384 (384 on 1min); 136 of them lost money."
+  },
+  {
+   "name": "4 \u00b7 Stable settings",
+   "sub": "nudged settings also work",
+   "n": 113,
+   "why": "Each setting is nudged one at a time, down and up: the entry time by \u00b15 minutes, the exit time by \u00b15 minutes (never after 16:00), a move-size filter's \u03c3 level by \u00b10.25 and a stop by \u00b10.05% (\"no stop\" and the other filters have nothing to nudge). At least 70% of the nudged versions must be profitable, with median Sharpe \u2265 0.5. Removed 3."
+  },
+  {
+   "name": "5 \u00b7 Time stability",
+   "sub": "\u22653 profitable years",
+   "n": 110,
+   "why": "Removed 3."
+  },
+  {
+   "name": "6 \u00b7 Remove duplicates",
+   "sub": "best 2 per group",
+   "n": 56,
+   "why": "Versions whose monthly returns correlate \u2265 0.8 form a group; the best 2 of each go on (a group of one keeps its one). 110 versions formed 33 groups; 56 of the 56 picks are distinct backtests."
+  },
+  {
+   "name": "7 \u00b7 Cost stress",
+   "sub": "profitable at 1.5\u00d7 costs",
+   "n": 56,
+   "why": "Removed 0."
+  },
+  {
+   "name": "8 \u00b7 Validation",
+   "sub": "2023\u20132024, new data",
+   "n": 16,
+   "why": "Frozen finalists run once on unseen data: needs net > 0, Sharpe \u2265 0.3, drawdown no worse than 30% and \u226540 trades."
+  }
+ ],
+ "stable": {
+  "n": 113,
+  "axes": [
+   {
+    "axis": "signal",
+    "label": "Signal",
+    "values": [
+     {
+      "v": "prior close \u2192 now",
+      "n": 49,
+      "median_sharpe": 0.9298935240139373
+     },
+     {
+      "v": "today's open \u2192 now",
+      "n": 63,
+      "median_sharpe": 0.9481464229739739
+     },
+     {
+      "v": "first half hour",
+      "n": 1,
+      "median_sharpe": 0.9452747145797817
+     }
+    ]
+   },
+   {
+    "axis": "agree",
+    "label": "Must agree with first half hour",
+    "values": [
+     {
+      "v": "no",
+      "n": 87,
+      "median_sharpe": 0.947856412552597
+     },
+     {
+      "v": "yes",
+      "n": 26,
+      "median_sharpe": 0.8584290617017145
+     }
+    ]
+   },
+   {
+    "axis": "window",
+    "label": "Trade window (ET)",
+    "values": [
+     {
+      "v": "15:00\u201316:00",
+      "n": 29,
+      "median_sharpe": 0.9167983683310634
+     },
+     {
+      "v": "15:30\u201315:50",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "15:30\u201316:00",
+      "n": 10,
+      "median_sharpe": 0.8294501094380891
+     },
+     {
+      "v": "15:45\u201316:00",
+      "n": 38,
+      "median_sharpe": 0.9110221175871321
+     },
+     {
+      "v": "15:50\u201316:00",
+      "n": 36,
+      "median_sharpe": 1.0416333983467383
+     }
+    ]
+   },
+   {
+    "axis": "filter",
+    "label": "Filter",
+    "values": [
+     {
+      "v": "none",
+      "n": 20,
+      "median_sharpe": 0.9306018013953847
+     },
+     {
+      "v": "move > 0.5\u03c3",
+      "n": 23,
+      "median_sharpe": 1.0050082833893272
+     },
+     {
+      "v": "move > 1\u03c3",
+      "n": 16,
+      "median_sharpe": 0.9729860989870174
+     },
+     {
+      "v": "high volatility",
+      "n": 36,
+      "median_sharpe": 0.9803417718431262
+     },
+     {
+      "v": "down days only",
+      "n": 18,
+      "median_sharpe": 0.863754367228146
+     }
+    ]
+   },
+   {
+    "axis": "stop",
+    "label": "Stop (% against entry)",
+    "values": [
+     {
+      "v": "none",
+      "n": 27,
+      "median_sharpe": 0.905263314330884
+     },
+     {
+      "v": "0.1%",
+      "n": 25,
+      "median_sharpe": 0.9452747145797817
+     },
+     {
+      "v": "0.2%",
+      "n": 27,
+      "median_sharpe": 0.9306971962677608
+     },
+     {
+      "v": "0.4%",
+      "n": 34,
+      "median_sharpe": 0.9767188289110053
+     }
+    ]
+   }
+  ],
+  "by_timeframe": [
+   {
+    "timeframe": "1 min",
+    "n": 113,
+    "axes": [
+     {
+      "axis": "signal",
+      "label": "Signal",
+      "values": [
+       {
+        "v": "prior close \u2192 now",
+        "n": 49,
+        "median_sharpe": 0.9298935240139373
+       },
+       {
+        "v": "today's open \u2192 now",
+        "n": 63,
+        "median_sharpe": 0.9481464229739739
+       },
+       {
+        "v": "first half hour",
+        "n": 1,
+        "median_sharpe": 0.9452747145797817
+       }
+      ]
+     },
+     {
+      "axis": "agree",
+      "label": "Must agree with first half hour",
+      "values": [
+       {
+        "v": "no",
+        "n": 87,
+        "median_sharpe": 0.947856412552597
+       },
+       {
+        "v": "yes",
+        "n": 26,
+        "median_sharpe": 0.8584290617017145
+       }
+      ]
+     },
+     {
+      "axis": "window",
+      "label": "Trade window (ET)",
+      "values": [
+       {
+        "v": "15:00\u201316:00",
+        "n": 29,
+        "median_sharpe": 0.9167983683310634
+       },
+       {
+        "v": "15:30\u201315:50",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "15:30\u201316:00",
+        "n": 10,
+        "median_sharpe": 0.8294501094380891
+       },
+       {
+        "v": "15:45\u201316:00",
+        "n": 38,
+        "median_sharpe": 0.9110221175871321
+       },
+       {
+        "v": "15:50\u201316:00",
+        "n": 36,
+        "median_sharpe": 1.0416333983467383
+       }
+      ]
+     },
+     {
+      "axis": "filter",
+      "label": "Filter",
+      "values": [
+       {
+        "v": "none",
+        "n": 20,
+        "median_sharpe": 0.9306018013953847
+       },
+       {
+        "v": "move > 0.5\u03c3",
+        "n": 23,
+        "median_sharpe": 1.0050082833893272
+       },
+       {
+        "v": "move > 1\u03c3",
+        "n": 16,
+        "median_sharpe": 0.9729860989870174
+       },
+       {
+        "v": "high volatility",
+        "n": 36,
+        "median_sharpe": 0.9803417718431262
+       },
+       {
+        "v": "down days only",
+        "n": 18,
+        "median_sharpe": 0.863754367228146
+       }
+      ]
+     },
+     {
+      "axis": "stop",
+      "label": "Stop (% against entry)",
+      "values": [
+       {
+        "v": "none",
+        "n": 27,
+        "median_sharpe": 0.905263314330884
+       },
+       {
+        "v": "0.1%",
+        "n": 25,
+        "median_sharpe": 0.9452747145797817
+       },
+       {
+        "v": "0.2%",
+        "n": 27,
+        "median_sharpe": 0.9306971962677608
+       },
+       {
+        "v": "0.4%",
+        "n": 34,
+        "median_sharpe": 0.9767188289110053
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "ablation": [
+  {
+   "axis": "signal",
+   "label": "Signal",
+   "values": [
+    {
+     "v": "prior close \u2192 now",
+     "n": 200,
+     "pct_profitable": 0.84,
+     "median_sharpe": 0.49422595301162175,
+     "p90_sharpe": 0.9724064302132329,
+     "n_stage3": 49,
+     "n_survivors": 22
+    },
+    {
+     "v": "today's open \u2192 now",
+     "n": 200,
+     "pct_profitable": 0.825,
+     "median_sharpe": 0.5653510559029231,
+     "p90_sharpe": 1.0459747848241676,
+     "n_stage3": 65,
+     "n_survivors": 34
+    },
+    {
+     "v": "first half hour",
+     "n": 100,
+     "pct_profitable": 0.31,
+     "median_sharpe": -0.16997110666535675,
+     "p90_sharpe": 0.3479167845515426,
+     "n_stage3": 2,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "agree",
+   "label": "Must agree with first half hour",
+   "values": [
+    {
+     "v": "no",
+     "n": 300,
+     "pct_profitable": 0.6933333333333334,
+     "median_sharpe": 0.36734679740500886,
+     "p90_sharpe": 1.031703097987312,
+     "n_stage3": 89,
+     "n_survivors": 48
+    },
+    {
+     "v": "yes",
+     "n": 200,
+     "pct_profitable": 0.78,
+     "median_sharpe": 0.44011296244420123,
+     "p90_sharpe": 0.7970481471504525,
+     "n_stage3": 27,
+     "n_survivors": 8
+    }
+   ]
+  },
+  {
+   "axis": "window",
+   "label": "Trade window (ET)",
+   "values": [
+    {
+     "v": "15:00\u201316:00",
+     "n": 100,
+     "pct_profitable": 0.75,
+     "median_sharpe": 0.4299630346069332,
+     "p90_sharpe": 1.0050082833893272,
+     "n_stage3": 29,
+     "n_survivors": 26
+    },
+    {
+     "v": "15:30\u201315:50",
+     "n": 100,
+     "pct_profitable": 0.33,
+     "median_sharpe": -0.1250319873567052,
+     "p90_sharpe": 0.2809513811932851,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "15:30\u201316:00",
+     "n": 100,
+     "pct_profitable": 0.77,
+     "median_sharpe": 0.3755899757917991,
+     "p90_sharpe": 0.7405178495933367,
+     "n_stage3": 10,
+     "n_survivors": 8
+    },
+    {
+     "v": "15:45\u201316:00",
+     "n": 100,
+     "pct_profitable": 0.89,
+     "median_sharpe": 0.6575749403782798,
+     "p90_sharpe": 1.0211411912980781,
+     "n_stage3": 38,
+     "n_survivors": 14
+    },
+    {
+     "v": "15:50\u201316:00",
+     "n": 100,
+     "pct_profitable": 0.9,
+     "median_sharpe": 0.6105679657783776,
+     "p90_sharpe": 1.153266661037499,
+     "n_stage3": 39,
+     "n_survivors": 8
+    }
+   ]
+  },
+  {
+   "axis": "filter",
+   "label": "Filter",
+   "values": [
+    {
+     "v": "none",
+     "n": 100,
+     "pct_profitable": 0.63,
+     "median_sharpe": 0.3924328693801679,
+     "p90_sharpe": 0.9306971962677608,
+     "n_stage3": 22,
+     "n_survivors": 11
+    },
+    {
+     "v": "move > 0.5\u03c3",
+     "n": 100,
+     "pct_profitable": 0.64,
+     "median_sharpe": 0.4171543999032424,
+     "p90_sharpe": 1.0211411912980781,
+     "n_stage3": 23,
+     "n_survivors": 8
+    },
+    {
+     "v": "move > 1\u03c3",
+     "n": 100,
+     "pct_profitable": 0.72,
+     "median_sharpe": 0.38293727537758093,
+     "p90_sharpe": 0.9051645985318921,
+     "n_stage3": 16,
+     "n_survivors": 9
+    },
+    {
+     "v": "high volatility",
+     "n": 100,
+     "pct_profitable": 0.84,
+     "median_sharpe": 0.5785324569002963,
+     "p90_sharpe": 1.1479393995319565,
+     "n_stage3": 37,
+     "n_survivors": 17
+    },
+    {
+     "v": "down days only",
+     "n": 100,
+     "pct_profitable": 0.81,
+     "median_sharpe": 0.3830326988495383,
+     "p90_sharpe": 0.8162853220412727,
+     "n_stage3": 18,
+     "n_survivors": 11
+    }
+   ]
+  },
+  {
+   "axis": "stop",
+   "label": "Stop (% against entry)",
+   "values": [
+    {
+     "v": "none",
+     "n": 125,
+     "pct_profitable": 0.832,
+     "median_sharpe": 0.46909585405064097,
+     "p90_sharpe": 0.9335768683791809,
+     "n_stage3": 29,
+     "n_survivors": 14
+    },
+    {
+     "v": "0.1%",
+     "n": 125,
+     "pct_profitable": 0.584,
+     "median_sharpe": 0.16510443439866204,
+     "p90_sharpe": 0.9452747145797817,
+     "n_stage3": 26,
+     "n_survivors": 6
+    },
+    {
+     "v": "0.2%",
+     "n": 125,
+     "pct_profitable": 0.712,
+     "median_sharpe": 0.3976519027651142,
+     "p90_sharpe": 0.9373336903103541,
+     "n_stage3": 27,
+     "n_survivors": 12
+    },
+    {
+     "v": "0.4%",
+     "n": 125,
+     "pct_profitable": 0.784,
+     "median_sharpe": 0.5194349854913334,
+     "p90_sharpe": 1.031703097987312,
+     "n_stage3": 34,
+     "n_survivors": 24
+    }
+   ]
+  }
+ ],
+ "length_map": {
+  "title": "Trade window (ET) \u00d7 Filter",
+  "pair_text": "trade window and filter",
+  "corner": "Window \u2193 \u00b7 Filter \u2192",
+  "row_short": "window",
+  "col_short": "filter",
+  "order": 8,
+  "fixed": {
+   "Signal": "prior close \u2192 now",
+   "Must agree with first half hour": "no",
+   "Stop (% against entry)": "none"
+  },
+  "center": [
+   "15:00\u201316:00",
+   "move > 1\u03c3"
+  ],
+  "rows": [
+   "15:00\u201316:00",
+   "15:30\u201315:50",
+   "15:30\u201316:00",
+   "15:45\u201316:00",
+   "15:50\u201316:00"
+  ],
+  "cols": [
+   "none",
+   "move > 0.5\u03c3",
+   "move > 1\u03c3",
+   "high volatility",
+   "down days only"
+  ],
+  "sharpe": [
+   [
+    0.905263314330884,
+    1.0778828572053178,
+    1.2447334300495332,
+    1.1510194528515147,
+    0.8107605772690305
+   ],
+   [
+    0.15759103977988223,
+    0.35094994088572584,
+    0.5644154024604103,
+    0.4063111437797385,
+    0.5089643719615341
+   ],
+   [
+    0.7517356143737771,
+    0.6572890239939653,
+    0.6154635096961645,
+    0.8100060883232287,
+    0.64424241911057
+   ],
+   [
+    0.6864669914577531,
+    0.8423146172204744,
+    0.3332147837270747,
+    0.8039870171495594,
+    0.6611845150351199
+   ],
+   [
+    0.423157758196883,
+    0.531163154047817,
+    0.16934445461113748,
+    0.629750081456962,
+    0.18880498557526534
+   ]
+  ],
+  "trades": [
+   [
+    1245,
+    729,
+    408,
+    560,
+    540
+   ],
+   [
+    1248,
+    723,
+    392,
+    560,
+    540
+   ],
+   [
+    1247,
+    722,
+    392,
+    560,
+    539
+   ],
+   [
+    1245,
+    727,
+    400,
+    560,
+    544
+   ],
+   [
+    1245,
+    726,
+    403,
+    560,
+    558
+   ]
+  ]
+ },
+ "luck": {
+  "n_sims": 100,
+  "levels": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15
+  ],
+  "method": "Per clock and stop (entry-exit window x stop): the same trade window and stop, but on random validation-window sessions, each long or short by a fair coin. The number of days is scaled so the time in market matches each level. Same fills, slippage, commission and whole-contract sizing as the strategy; scored with the same daily-Sharpe and time-in-market code.",
+  "curves": [
+   {
+    "timeframe": "15:00\u201316:00 \u00b7 stop 0.2%",
+    "match": {
+     "window": "15:00\u201316:00",
+     "stop": "0.2%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.04018151039692767,
+      "exposure_pct": 4,
+      "frac_profitable": 0.36,
+      "mean_return": -0.010634495400000117,
+      "mean_sharpe": -0.31519895339951937,
+      "mean_trades": 161.0,
+      "median_return": -0.011508520000000466,
+      "median_sharpe": -0.29745497487068984,
+      "p10_return": -0.04300723300000001,
+      "p10_sharpe": -1.2751096044910326,
+      "p90_return": 0.02303892099999936,
+      "p90_sharpe": 0.5893331179606377
+     },
+     {
+      "actual_exposure": 0.05033270168523711,
+      "exposure_pct": 5,
+      "frac_profitable": 0.33,
+      "mean_return": -0.011257080600000186,
+      "mean_sharpe": -0.29059333731511944,
+      "mean_trades": 201.0,
+      "median_return": -0.014235945000000583,
+      "median_sharpe": -0.32698837888741994,
+      "p10_return": -0.04376477499999992,
+      "p10_sharpe": -1.1195714447066651,
+      "p90_return": 0.022780608999999473,
+      "p90_sharpe": 0.5216750795169344
+     },
+     {
+      "actual_exposure": 0.06006629778417848,
+      "exposure_pct": 6,
+      "frac_profitable": 0.29,
+      "mean_return": -0.015577607900000233,
+      "mean_sharpe": -0.35690488353748867,
+      "mean_trades": 241.0,
+      "median_return": -0.012467554999999908,
+      "median_sharpe": -0.25729370071831453,
+      "p10_return": -0.06279974400000046,
+      "p10_sharpe": -1.3909636579219096,
+      "p90_return": 0.022553077999999727,
+      "p90_sharpe": 0.4351366562100007
+     },
+     {
+      "actual_exposure": 0.07072902296672477,
+      "exposure_pct": 7,
+      "frac_profitable": 0.35,
+      "mean_return": -0.012603189900000327,
+      "mean_sharpe": -0.2708706995089286,
+      "mean_trades": 282.0,
+      "median_return": -0.015400180000000374,
+      "median_sharpe": -0.28266245329882567,
+      "p10_return": -0.04954301700000006,
+      "p10_sharpe": -1.0289865061967394,
+      "p90_return": 0.02888522599999937,
+      "p90_sharpe": 0.5902297527966253
+     },
+     {
+      "actual_exposure": 0.08028782940448216,
+      "exposure_pct": 8,
+      "frac_profitable": 0.28,
+      "mean_return": -0.018030157600000308,
+      "mean_sharpe": -0.3498153975980859,
+      "mean_trades": 322.0,
+      "median_return": -0.019036825000000313,
+      "median_sharpe": -0.331239030314496,
+      "p10_return": -0.06851966200000044,
+      "p10_sharpe": -1.3634229714289894,
+      "p90_return": 0.033495798999999396,
+      "p90_sharpe": 0.5575882334323927
+     },
+     {
+      "actual_exposure": 0.0905967811213017,
+      "exposure_pct": 9,
+      "frac_profitable": 0.36,
+      "mean_return": -0.01283073010000032,
+      "mean_sharpe": -0.236503825244779,
+      "mean_trades": 362.0,
+      "median_return": -0.01725011000000015,
+      "median_sharpe": -0.29265331700039154,
+      "p10_return": -0.05582420900000029,
+      "p10_sharpe": -1.0017037543512688,
+      "p90_return": 0.0430279639999995,
+      "p90_sharpe": 0.7109557813908663
+     },
+     {
+      "actual_exposure": 0.1003028878950959,
+      "exposure_pct": 10,
+      "frac_profitable": 0.27,
+      "mean_return": -0.024018006900000284,
+      "mean_sharpe": -0.4054714391197373,
+      "mean_trades": 402.0,
+      "median_return": -0.02418283500000007,
+      "median_sharpe": -0.3711005811079562,
+      "p10_return": -0.07674309100000014,
+      "p10_sharpe": -1.2921412808010917,
+      "p90_return": 0.018972070999999445,
+      "p90_sharpe": 0.31328863907693
+     },
+     {
+      "actual_exposure": 0.11061805502918214,
+      "exposure_pct": 11,
+      "frac_profitable": 0.23,
+      "mean_return": -0.02689471420000043,
+      "mean_sharpe": -0.44135404644716586,
+      "mean_trades": 443.0,
+      "median_return": -0.027929835000000736,
+      "median_sharpe": -0.44033160380760145,
+      "p10_return": -0.07757655700000066,
+      "p10_sharpe": -1.3066644514302455,
+      "p90_return": 0.035728776000000066,
+      "p90_sharpe": 0.5501683057005964
+     },
+     {
+      "actual_exposure": 0.12067869324641858,
+      "exposure_pct": 12,
+      "frac_profitable": 0.32,
+      "mean_return": -0.025234064500000538,
+      "mean_sharpe": -0.3922016274094151,
+      "mean_trades": 483.0,
+      "median_return": -0.02744496000000074,
+      "median_sharpe": -0.40144592339399,
+      "p10_return": -0.07656955500000014,
+      "p10_sharpe": -1.194773119192344,
+      "p90_return": 0.031133603999999575,
+      "p90_sharpe": 0.4627244011081056
+     }
+    ],
+    "trade_bars": [
+     60.0,
+     49.30616864742501
+    ],
+    "p_long": 0.5659309564233164
+   },
+   {
+    "timeframe": "15:00\u201316:00 \u00b7 stop 0.4%",
+    "match": {
+     "window": "15:00\u201316:00",
+     "stop": "0.4%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.03022112736552212,
+      "exposure_pct": 3,
+      "frac_profitable": 0.39,
+      "mean_return": -0.005184447600000023,
+      "mean_sharpe": -0.17531400972344405,
+      "mean_trades": 103.8,
+      "median_return": -0.006669780000000014,
+      "median_sharpe": -0.18237496110308068,
+      "p10_return": -0.032216804000000175,
+      "p10_sharpe": -1.0638200013251295,
+      "p90_return": 0.021965460000000048,
+      "p90_sharpe": 0.6047387478634085
+     },
+     {
+      "actual_exposure": 0.040063265873316656,
+      "exposure_pct": 4,
+      "frac_profitable": 0.31,
+      "mean_return": -0.015506941599999982,
+      "mean_sharpe": -0.4048436503523803,
+      "mean_trades": 137.74,
+      "median_return": -0.02144858000000005,
+      "median_sharpe": -0.5520811342257632,
+      "p10_return": -0.05269498000000009,
+      "p10_sharpe": -1.3881843692950002,
+      "p90_return": 0.028691554000000008,
+      "p90_sharpe": 0.7060611541688562
+     },
+     {
+      "actual_exposure": 0.05029268046186109,
+      "exposure_pct": 5,
+      "frac_profitable": 0.35,
+      "mean_return": -0.009722026000000017,
+      "mean_sharpe": -0.2346782359742712,
+      "mean_trades": 172.64,
+      "median_return": -0.011955840000000162,
+      "median_sharpe": -0.2456025739187912,
+      "p10_return": -0.048303384000000046,
+      "p10_sharpe": -1.186214161338456,
+      "p90_return": 0.043707843999999725,
+      "p90_sharpe": 0.877971446185379
+     },
+     {
+      "actual_exposure": 0.0601690795623942,
+      "exposure_pct": 6,
+      "frac_profitable": 0.37,
+      "mean_return": -0.007976351800000036,
+      "mean_sharpe": -0.1802348798201389,
+      "mean_trades": 206.62,
+      "median_return": -0.01211896999999984,
+      "median_sharpe": -0.25842617676040053,
+      "p10_return": -0.04629061199999981,
+      "p10_sharpe": -1.0408707435650655,
+      "p90_return": 0.0456831980000001,
+      "p90_sharpe": 0.9020024293541721
+     },
+     {
+      "actual_exposure": 0.07023153692614771,
+      "exposure_pct": 7,
+      "frac_profitable": 0.32,
+      "mean_return": -0.020393400000000016,
+      "mean_sharpe": -0.39030975174477384,
+      "mean_trades": 241.46,
+      "median_return": -0.01880025000000002,
+      "median_sharpe": -0.34382949307006305,
+      "p10_return": -0.07085934199999991,
+      "p10_sharpe": -1.3730248622746941,
+      "p90_return": 0.023729221999999984,
+      "p90_sharpe": 0.408433225545331
+     },
+     {
+      "actual_exposure": 0.08056868541398217,
+      "exposure_pct": 8,
+      "frac_profitable": 0.36,
+      "mean_return": -0.011194885800000014,
+      "mean_sharpe": -0.19556904012772378,
+      "mean_trades": 276.41,
+      "median_return": -0.012767890000000004,
+      "median_sharpe": -0.2057254736813001,
+      "p10_return": -0.05275645600000006,
+      "p10_sharpe": -0.9472482062904622,
+      "p90_return": 0.03790514599999985,
+      "p90_sharpe": 0.6666209947477983
+     },
+     {
+      "actual_exposure": 0.09028040122287073,
+      "exposure_pct": 9,
+      "frac_profitable": 0.22,
+      "mean_return": -0.02584838300000002,
+      "mean_sharpe": -0.419606421456411,
+      "mean_trades": 310.33,
+      "median_return": -0.025930000000000397,
+      "median_sharpe": -0.3983570735900016,
+      "p10_return": -0.07349059600000005,
+      "p10_sharpe": -1.2370476508572619,
+      "p90_return": 0.022337146000000165,
+      "p90_sharpe": 0.37326083846214997
+     },
+     {
+      "actual_exposure": 0.10059157634098889,
+      "exposure_pct": 10,
+      "frac_profitable": 0.34,
+      "mean_return": -0.021342370600000014,
+      "mean_sharpe": -0.3395631999304733,
+      "mean_trades": 345.37,
+      "median_return": -0.018715250000000017,
+      "median_sharpe": -0.26725861110542054,
+      "p10_return": -0.07803350800000022,
+      "p10_sharpe": -1.2674154813156975,
+      "p90_return": 0.024886463999999994,
+      "p90_sharpe": 0.39871313849606493
+     },
+     {
+      "actual_exposure": 0.11030303949063898,
+      "exposure_pct": 11,
+      "frac_profitable": 0.31,
+      "mean_return": -0.02119288380000003,
+      "mean_sharpe": -0.3211732353049131,
+      "mean_trades": 379.22,
+      "median_return": -0.02132243000000028,
+      "median_sharpe": -0.3022113894957429,
+      "p10_return": -0.07559400400000006,
+      "p10_sharpe": -1.1849612275940202,
+      "p90_return": 0.037336295999999734,
+      "p90_sharpe": 0.5485488779291897
+     },
+     {
+      "actual_exposure": 0.12051997271280224,
+      "exposure_pct": 12,
+      "frac_profitable": 0.36,
+      "mean_return": -0.02246831000000002,
+      "mean_sharpe": -0.31862353569097035,
+      "mean_trades": 414.15,
+      "median_return": -0.02233604999999972,
+      "median_sharpe": -0.3033860416379439,
+      "p10_return": -0.07851692599999974,
+      "p10_sharpe": -1.1341282582372383,
+      "p90_return": 0.04120734999999986,
+      "p90_sharpe": 0.6171217506799986
+     },
+     {
+      "actual_exposure": 0.1302993506657571,
+      "exposure_pct": 13,
+      "frac_profitable": 0.27,
+      "mean_return": -0.029236206800000074,
+      "mean_sharpe": -0.40191200375703084,
+      "mean_trades": 448.08,
+      "median_return": -0.026727040000000146,
+      "median_sharpe": -0.3440156180108245,
+      "p10_return": -0.08969403199999995,
+      "p10_sharpe": -1.2415022633118558,
+      "p90_return": 0.025085784000000045,
+      "p90_sharpe": 0.3445187711885866
+     },
+     {
+      "actual_exposure": 0.14070729427221507,
+      "exposure_pct": 14,
+      "frac_profitable": 0.32,
+      "mean_return": -0.01652269000000002,
+      "mean_sharpe": -0.21882779753264178,
+      "mean_trades": 483.03,
+      "median_return": -0.015866849999999988,
+      "median_sharpe": -0.1857044672903233,
+      "p10_return": -0.08523784399999998,
+      "p10_sharpe": -1.1532159296549505,
+      "p90_return": 0.047889610000000096,
+      "p90_sharpe": 0.6216274282750905
+     }
+    ],
+    "trade_bars": [
+     60.0,
+     57.38963963963964
+    ],
+    "p_long": 0.5720720720720721
+   },
+   {
+    "timeframe": "15:00\u201316:00 \u00b7 stop none",
+    "match": {
+     "window": "15:00\u201316:00",
+     "stop": "none"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.030015917532024563,
+      "exposure_pct": 3,
+      "frac_profitable": 0.31,
+      "mean_return": -0.007884100000000003,
+      "mean_sharpe": -0.2158349545492344,
+      "mean_trades": 98.83,
+      "median_return": -0.010492500000000016,
+      "median_sharpe": -0.27491155161979586,
+      "p10_return": -0.035492500000000024,
+      "p10_sharpe": -0.9394776244608146,
+      "p90_return": 0.03534399999999993,
+      "p90_sharpe": 0.7310544863100326
+     },
+     {
+      "actual_exposure": 0.04002122337603275,
+      "exposure_pct": 4,
+      "frac_profitable": 0.47,
+      "mean_return": -0.009092750000000004,
+      "mean_sharpe": -0.207357473846099,
+      "mean_trades": 131.67,
+      "median_return": -0.004835000000000034,
+      "median_sharpe": -0.08617964551601939,
+      "p10_return": -0.049501499999999976,
+      "p10_sharpe": -1.1663917031308086,
+      "p90_return": 0.024430999999999935,
+      "p90_sharpe": 0.5997143367661678
+     },
+     {
+      "actual_exposure": 0.05002652922004093,
+      "exposure_pct": 5,
+      "frac_profitable": 0.51,
+      "mean_return": -0.002610599999999993,
+      "mean_sharpe": -0.047091984485033496,
+      "mean_trades": 164.56,
+      "median_return": 0.001027499999999959,
+      "median_sharpe": 0.032192486647707234,
+      "p10_return": -0.046222,
+      "p10_sharpe": -0.8860113074743482,
+      "p90_return": 0.04179199999999999,
+      "p90_sharpe": 0.7926330861768188
+     },
+     {
+      "actual_exposure": 0.060031835064049126,
+      "exposure_pct": 6,
+      "frac_profitable": 0.52,
+      "mean_return": 0.0027023499999999944,
+      "mean_sharpe": 0.042040593757488344,
+      "mean_trades": 197.59,
+      "median_return": 0.0025000000000000577,
+      "median_sharpe": 0.0634352255871597,
+      "p10_return": -0.040644,
+      "p10_sharpe": -0.7635001234863498,
+      "p90_return": 0.04068049999999993,
+      "p90_sharpe": 0.7582754057956438
+     },
+     {
+      "actual_exposure": 0.07003714090805731,
+      "exposure_pct": 7,
+      "frac_profitable": 0.46,
+      "mean_return": -0.0090262,
+      "mean_sharpe": -0.13805237896891384,
+      "mean_trades": 230.6,
+      "median_return": -0.0038599999999999746,
+      "median_sharpe": -0.05108944394228474,
+      "p10_return": -0.06813050000000002,
+      "p10_sharpe": -1.0839392352132453,
+      "p90_return": 0.04001149999999992,
+      "p90_sharpe": 0.6790016841184229
+     },
+     {
+      "actual_exposure": 0.0800424467520655,
+      "exposure_pct": 8,
+      "frac_profitable": 0.42,
+      "mean_return": -0.010988849999999994,
+      "mean_sharpe": -0.16665685731226826,
+      "mean_trades": 263.43,
+      "median_return": -0.004727499999999996,
+      "median_sharpe": -0.06097519321768148,
+      "p10_return": -0.06706799999999997,
+      "p10_sharpe": -1.0078607951481422,
+      "p90_return": 0.037239500000000064,
+      "p90_sharpe": 0.5823882550855101
+     },
+     {
+      "actual_exposure": 0.09004775259607371,
+      "exposure_pct": 9,
+      "frac_profitable": 0.4,
+      "mean_return": -0.011518200000000003,
+      "mean_sharpe": -0.16401929912714788,
+      "mean_trades": 296.48,
+      "median_return": -0.013029999999999986,
+      "median_sharpe": -0.18215191532531286,
+      "p10_return": -0.08050650000000002,
+      "p10_sharpe": -1.1810551435731607,
+      "p90_return": 0.03915749999999994,
+      "p90_sharpe": 0.6088502786031663
+     },
+     {
+      "actual_exposure": 0.10005305844008186,
+      "exposure_pct": 10,
+      "frac_profitable": 0.35,
+      "mean_return": -0.016389700000000004,
+      "mean_sharpe": -0.23233066809235708,
+      "mean_trades": 329.3,
+      "median_return": -0.014557500000000001,
+      "median_sharpe": -0.18617019503977805,
+      "p10_return": -0.07981750000000001,
+      "p10_sharpe": -1.1760515877058795,
+      "p90_return": 0.04651599999999992,
+      "p90_sharpe": 0.638609753568658
+     },
+     {
+      "actual_exposure": 0.11005836428409,
+      "exposure_pct": 11,
+      "frac_profitable": 0.39,
+      "mean_return": -0.01227194999999999,
+      "mean_sharpe": -0.1599003991401403,
+      "mean_trades": 362.25,
+      "median_return": -0.011387499999999995,
+      "median_sharpe": -0.1322862652760668,
+      "p10_return": -0.0782935,
+      "p10_sharpe": -1.0665379922654914,
+      "p90_return": 0.05125050000000006,
+      "p90_sharpe": 0.6931576384854188
+     },
+     {
+      "actual_exposure": 0.12006367012809825,
+      "exposure_pct": 12,
+      "frac_profitable": 0.35,
+      "mean_return": -0.020672450000000002,
+      "mean_sharpe": -0.25832399080092755,
+      "mean_trades": 395.17,
+      "median_return": -0.025000000000000022,
+      "median_sharpe": -0.30746594535392524,
+      "p10_return": -0.08361400000000002,
+      "p10_sharpe": -1.1107728391450369,
+      "p90_return": 0.04085550000000005,
+      "p90_sharpe": 0.5325480843915449
+     },
+     {
+      "actual_exposure": 0.1300689759721064,
+      "exposure_pct": 13,
+      "frac_profitable": 0.38,
+      "mean_return": -0.017265849999999996,
+      "mean_sharpe": -0.21051671545416561,
+      "mean_trades": 428.12,
+      "median_return": -0.01401749999999996,
+      "median_sharpe": -0.1661610447282568,
+      "p10_return": -0.08822000000000003,
+      "p10_sharpe": -1.0922252631909597,
+      "p90_return": 0.0457225000000001,
+      "p90_sharpe": 0.586274601234922
+     },
+     {
+      "actual_exposure": 0.14007428181611462,
+      "exposure_pct": 14,
+      "frac_profitable": 0.35,
+      "mean_return": -0.024963500000000007,
+      "mean_sharpe": -0.3001709421341697,
+      "mean_trades": 461.1,
+      "median_return": -0.02068749999999997,
+      "median_sharpe": -0.22938577763357604,
+      "p10_return": -0.091529,
+      "p10_sharpe": -1.1209533860355116,
+      "p90_return": 0.05621500000000008,
+      "p90_sharpe": 0.6829605641824564
+     },
+     {
+      "actual_exposure": 0.15007958766012286,
+      "exposure_pct": 15,
+      "frac_profitable": 0.42,
+      "mean_return": -0.013521350000000001,
+      "mean_sharpe": -0.14994725404211706,
+      "mean_trades": 494.0,
+      "median_return": -0.0099225,
+      "median_sharpe": -0.09538730437611523,
+      "p10_return": -0.08808849999999999,
+      "p10_sharpe": -1.036692297071378,
+      "p90_return": 0.0600945000000001,
+      "p90_sharpe": 0.7120262837018064
+     }
+    ],
+    "trade_bars": [
+     60.0,
+     60.0
+    ],
+    "p_long": 0.5051254860374691
+   },
+   {
+    "timeframe": "15:30\u201316:00 \u00b7 stop 0.4%",
+    "match": {
+     "window": "15:30\u201316:00",
+     "stop": "0.4%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.030221430556608305,
+      "exposure_pct": 3,
+      "frac_profitable": 0.42,
+      "mean_return": -0.008391512199999982,
+      "mean_sharpe": -0.22420575430461015,
+      "mean_trades": 202.79,
+      "median_return": -0.007826320000000053,
+      "median_sharpe": -0.17330933629192147,
+      "p10_return": -0.042703153999999854,
+      "p10_sharpe": -1.0999682948378402,
+      "p90_return": 0.025893907999999802,
+      "p90_sharpe": 0.6079703872436575
+     },
+     {
+      "actual_exposure": 0.040214558225321516,
+      "exposure_pct": 4,
+      "frac_profitable": 0.36,
+      "mean_return": -0.005625055000000015,
+      "mean_sharpe": -0.12471272246712205,
+      "mean_trades": 269.71,
+      "median_return": -0.007144119999999754,
+      "median_sharpe": -0.1385553067942623,
+      "p10_return": -0.04273772799999999,
+      "p10_sharpe": -0.9410248730741133,
+      "p90_return": 0.03516205600000015,
+      "p90_sharpe": 0.7376009268877635
+     },
+     {
+      "actual_exposure": 0.050282877283407884,
+      "exposure_pct": 5,
+      "frac_profitable": 0.39,
+      "mean_return": -0.011240505599999997,
+      "mean_sharpe": -0.22366758839025253,
+      "mean_trades": 337.67,
+      "median_return": -0.008614509999999853,
+      "median_sharpe": -0.15836622879270967,
+      "p10_return": -0.05826382799999995,
+      "p10_sharpe": -1.1750739598087006,
+      "p90_return": 0.031447860000000036,
+      "p90_sharpe": 0.5992732161021013
+     },
+     {
+      "actual_exposure": 0.06028186664645394,
+      "exposure_pct": 6,
+      "frac_profitable": 0.41,
+      "mean_return": -0.008728647799999985,
+      "mean_sharpe": -0.15348441955718337,
+      "mean_trades": 404.59,
+      "median_return": -0.012014939999999918,
+      "median_sharpe": -0.18382399902262625,
+      "p10_return": -0.054091290000000083,
+      "p10_sharpe": -0.9292437624025671,
+      "p90_return": 0.032521942000000005,
+      "p90_sharpe": 0.5694993547614257
+     },
+     {
+      "actual_exposure": 0.07043199676596174,
+      "exposure_pct": 7,
+      "frac_profitable": 0.3,
+      "mean_return": -0.014470834800000021,
+      "mean_sharpe": -0.24067406328798394,
+      "mean_trades": 472.48,
+      "median_return": -0.01593734000000019,
+      "median_sharpe": -0.2428384364918499,
+      "p10_return": -0.06614303399999995,
+      "p10_sharpe": -1.1194755129867924,
+      "p90_return": 0.03255694599999983,
+      "p90_sharpe": 0.5214160652535768
+     }
+    ],
+    "trade_bars": [
+     30.0,
+     29.33696682464455
+    ],
+    "p_long": 0.43601895734597157
+   },
+   {
+    "timeframe": "15:30\u201316:00 \u00b7 stop none",
+    "match": {
+     "window": "15:30\u201316:00",
+     "stop": "none"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.030015917532024563,
+      "exposure_pct": 3,
+      "frac_profitable": 0.41,
+      "mean_return": -0.0097547,
+      "mean_sharpe": -0.21857834301405873,
+      "mean_trades": 197.56,
+      "median_return": -0.007085000000000008,
+      "median_sharpe": -0.15078600406419307,
+      "p10_return": -0.05090649999999998,
+      "p10_sharpe": -1.1550974913940792,
+      "p90_return": 0.028915499999999986,
+      "p90_sharpe": 0.6596681526430108
+     }
+    ],
+    "trade_bars": [
+     30.0,
+     30.0
+    ],
+    "p_long": 0.5692307692307692
+   },
+   {
+    "timeframe": "15:45\u201316:00 \u00b7 stop 0.2%",
+    "match": {
+     "window": "15:45\u201316:00",
+     "stop": "0.2%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.010258571464665604,
+      "exposure_pct": 1,
+      "frac_profitable": 0.42,
+      "mean_return": -0.0043627701000001455,
+      "mean_sharpe": -0.2043845025739064,
+      "mean_trades": 143.87,
+      "median_return": -0.0031317450000000746,
+      "median_sharpe": -0.12037343858162006,
+      "p10_return": -0.031294384999999966,
+      "p10_sharpe": -1.3466798027604798,
+      "p90_return": 0.024440962000000198,
+      "p90_sharpe": 0.8942653089212096
+     },
+     {
+      "actual_exposure": 0.02060921195583517,
+      "exposure_pct": 2,
+      "frac_profitable": 0.4,
+      "mean_return": -0.002953592200000309,
+      "mean_sharpe": -0.09206779465686545,
+      "mean_trades": 288.64,
+      "median_return": -0.006443575000000312,
+      "median_sharpe": -0.18631172667360663,
+      "p10_return": -0.035018013000000583,
+      "p10_sharpe": -1.0162884216974735,
+      "p90_return": 0.03261971799999969,
+      "p90_sharpe": 0.9205987856812472
+     },
+     {
+      "actual_exposure": 0.030825033477349103,
+      "exposure_pct": 3,
+      "frac_profitable": 0.33,
+      "mean_return": -0.014902546500000424,
+      "mean_sharpe": -0.3493394098589864,
+      "mean_trades": 432.52,
+      "median_return": -0.021064950000000526,
+      "median_sharpe": -0.4855853079941861,
+      "p10_return": -0.05028152500000023,
+      "p10_sharpe": -1.1368631062963643,
+      "p90_return": 0.027587823999999782,
+      "p90_sharpe": 0.6445320658868376
+     }
+    ],
+    "trade_bars": [
+     15.0,
+     13.791752577319588
+    ],
+    "p_long": 0.47525773195876286
+   },
+   {
+    "timeframe": "15:45\u201316:00 \u00b7 stop 0.4%",
+    "match": {
+     "window": "15:45\u201316:00",
+     "stop": "0.4%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.010064579701356779,
+      "exposure_pct": 1,
+      "frac_profitable": 0.38,
+      "mean_return": -0.005314522799999988,
+      "mean_sharpe": -0.21149369881097943,
+      "mean_trades": 133.68,
+      "median_return": -0.00549835999999998,
+      "median_sharpe": -0.21444908614266978,
+      "p10_return": -0.02815891200000001,
+      "p10_sharpe": -1.1099325535368036,
+      "p90_return": 0.02025223200000006,
+      "p90_sharpe": 0.7380705276470308
+     },
+     {
+      "actual_exposure": 0.020141741832790116,
+      "exposure_pct": 2,
+      "frac_profitable": 0.34,
+      "mean_return": -0.008337689199999979,
+      "mean_sharpe": -0.22937189995804455,
+      "mean_trades": 267.4,
+      "median_return": -0.008780719999999964,
+      "median_sharpe": -0.22787416118028198,
+      "p10_return": -0.03683338399999989,
+      "p10_sharpe": -1.036335331442912,
+      "p90_return": 0.024764644000000037,
+      "p90_sharpe": 0.6907993130418879
+     },
+     {
+      "actual_exposure": 0.030149574269183157,
+      "exposure_pct": 3,
+      "frac_profitable": 0.41,
+      "mean_return": -0.008496652199999937,
+      "mean_sharpe": -0.19044538444485326,
+      "mean_trades": 400.19,
+      "median_return": -0.005072999999999939,
+      "median_sharpe": -0.10326735662960801,
+      "p10_return": -0.04680946399999982,
+      "p10_sharpe": -1.0630367754031043,
+      "p90_return": 0.024324336000000082,
+      "p90_sharpe": 0.5647359343231607
+     },
+     {
+      "actual_exposure": 0.037361277445109774,
+      "exposure_pct": 4,
+      "frac_profitable": 0.36,
+      "mean_return": -0.01444484299999997,
+      "mean_sharpe": -0.2915987277907282,
+      "mean_trades": 496.0,
+      "median_return": -0.014538339999999983,
+      "median_sharpe": -0.28409702040933005,
+      "p10_return": -0.06358286800000008,
+      "p10_sharpe": -1.3193903068640993,
+      "p90_return": 0.036913088000000094,
+      "p90_sharpe": 0.7567042951681542
+     }
+    ],
+    "trade_bars": [
+     15.0,
+     14.799086757990867
+    ],
+    "p_long": 0.4
+   },
+   {
+    "timeframe": "15:45\u201316:00 \u00b7 stop none",
+    "match": {
+     "window": "15:45\u201316:00",
+     "stop": "none"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.010005305844008187,
+      "exposure_pct": 1,
+      "frac_profitable": 0.3,
+      "mean_return": -0.007694800000000009,
+      "mean_sharpe": -0.2918059115580802,
+      "mean_trades": 131.74,
+      "median_return": -0.007535000000000014,
+      "median_sharpe": -0.268184770270119,
+      "p10_return": -0.03200299999999999,
+      "p10_sharpe": -1.2099296653124398,
+      "p90_return": 0.012787500000000087,
+      "p90_sharpe": 0.517930559405378
+     }
+    ],
+    "trade_bars": [
+     15.0,
+     15.0
+    ],
+    "p_long": 0.5282051282051282
+   },
+   {
+    "timeframe": "15:50\u201316:00 \u00b7 stop 0.1%",
+    "match": {
+     "window": "15:50\u201316:00",
+     "stop": "0.1%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.010639935319234947,
+      "exposure_pct": 1,
+      "frac_profitable": 0.45,
+      "mean_return": -0.0035664255499938693,
+      "mean_sharpe": -0.1564514676214213,
+      "mean_trades": 276.68,
+      "median_return": -0.004403837499994345,
+      "median_sharpe": -0.15129301340341283,
+      "p10_return": -0.03230485949999323,
+      "p10_sharpe": -1.2168570814422497,
+      "p90_return": 0.020176003000007034,
+      "p90_sharpe": 0.7024350037429524
+     },
+     {
+      "actual_exposure": 0.01906556507238687,
+      "exposure_pct": 2,
+      "frac_profitable": 0.29,
+      "mean_return": -0.010361906699988582,
+      "mean_sharpe": -0.2823088029094809,
+      "mean_trades": 496.49,
+      "median_return": -0.010059982499989961,
+      "median_sharpe": -0.26158056399781193,
+      "p10_return": -0.037581195499986356,
+      "p10_sharpe": -1.0226195804037344,
+      "p90_return": 0.023208651500010974,
+      "p90_sharpe": 0.6036007194782462
+     }
+    ],
+    "trade_bars": [
+     10.0,
+     7.229059829059829
+    ],
+    "p_long": 0.36866096866096865
+   },
+   {
+    "timeframe": "15:50\u201316:00 \u00b7 stop 0.2%",
+    "match": {
+     "window": "15:50\u201316:00",
+     "stop": "0.2%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.010049116955961494,
+      "exposure_pct": 1,
+      "frac_profitable": 0.34,
+      "mean_return": -0.007623157400000408,
+      "mean_sharpe": -0.27757996057874046,
+      "mean_trades": 210.78,
+      "median_return": -0.008750650000000249,
+      "median_sharpe": -0.30539469512820183,
+      "p10_return": -0.032452231000000664,
+      "p10_sharpe": -1.180723988016023,
+      "p90_return": 0.017608411999999567,
+      "p90_sharpe": 0.6136177975451423
+     }
+    ],
+    "trade_bars": [
+     10.0,
+     9.376288659793815
+    ],
+    "p_long": 0.5463917525773195
+   },
+   {
+    "timeframe": "15:50\u201316:00 \u00b7 stop 0.4%",
+    "match": {
+     "window": "15:50\u201316:00",
+     "stop": "0.4%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.009954268677834204,
+      "exposure_pct": 1,
+      "frac_profitable": 0.35,
+      "mean_return": -0.00655876420000006,
+      "mean_sharpe": -0.2283041598492251,
+      "mean_trades": 197.8,
+      "median_return": -0.0070484099999999494,
+      "median_sharpe": -0.23982881771045628,
+      "p10_return": -0.03219653000000009,
+      "p10_sharpe": -1.0807037365396897,
+      "p90_return": 0.015880316000000047,
+      "p90_sharpe": 0.49227263605367555
+     }
+    ],
+    "trade_bars": [
+     10.0,
+     9.986531986531986
+    ],
+    "p_long": 0.5286195286195287
+   }
+  ],
+  "text": "For every whole-percent time in market in each group's 2023\u20132024 range, 100 random runs trade NQ in the same window with the same stop, but on random days and long or short by a coin flip. So they test whether the signal (which days to trade and which way) beats chance at the same hours. Each group is one trade window and stop setting. They pay the same costs and use the same sizing and Sharpe math as the strategy."
+ },
+ "finalists": [
+  {
+   "order": 1,
+   "group": 4,
+   "config_id": "cfg_588f",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:50\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.1%"
+   },
+   "dev": {
+    "net_return": 0.3009335700000191,
+    "cagr": 0.0527363160150045,
+    "sharpe": 1.6758977541452575,
+    "max_drawdown": -0.020178721036091418,
+    "exposure": 0.00794649628087839,
+    "win_rate": 0.44285714285714284,
+    "profit_factor": 1.7285884443656292,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 274.89676853443194
+   },
+   "val": {
+    "net_return": -0.0112052377893469,
+    "cagr": -0.0054881008060911896,
+    "sharpe": -0.41495857070010905,
+    "max_drawdown": -0.020331170322147596,
+    "exposure": 0.00695823542787842,
+    "win_rate": 0.36082474226804123,
+    "profit_factor": 0.8935517134337371,
+    "n_completed_trades": 193.0,
+    "turnover_annual": 194.34361445075828
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0112 <= 0.0",
+    "sharpe -0.415 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 305,
+    "stop": 255
+   },
+   "stress_1_5x": 0.27722731500001885,
+   "breakeven_cost_x": 8.10403566786191,
+   "transfer_sharpe": 0.8032416842830052,
+   "neighbor_median_sharpe": 1.2220323731630076,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.5205106529772312,
+   "local_detail": [
+    {
+     "move": "entry=15:45",
+     "sharpe": 0.9206158357452244,
+     "net_return": 0.1653871850000188,
+     "trades": 560
+    },
+    {
+     "move": "entry=15:55",
+     "sharpe": 0.24945839971291991,
+     "net_return": 0.02426449000001729,
+     "trades": 558
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.672146218685382,
+     "net_return": 0.19837376000001372,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.05",
+     "sharpe": 1.5764265335933894,
+     "net_return": 0.25842980750002753,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 1.5205106529772312,
+     "net_return": 0.281875804999997,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.8686752788299259,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.36,
+    "luck_pct_return": 0.35
+   }
+  },
+  {
+   "order": 2,
+   "group": 4,
+   "config_id": "cfg_651f",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:50\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.2%"
+   },
+   "dev": {
+    "net_return": 0.31197445000000057,
+    "cagr": 0.05447572265339784,
+    "sharpe": 1.5234489105807907,
+    "max_drawdown": -0.02241143073641838,
+    "exposure": 0.00992706971941204,
+    "win_rate": 0.5267857142857143,
+    "profit_factor": 1.6090865189426307,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 276.10177416696155
+   },
+   "val": {
+    "net_return": -0.0037682974695125715,
+    "cagr": -0.0018421087470382735,
+    "sharpe": -0.11741329156254096,
+    "max_drawdown": -0.01880641847312814,
+    "exposure": 0.009191743096086308,
+    "win_rate": 0.4329896907216495,
+    "profit_factor": 0.9666434142382451,
+    "n_completed_trades": 193.0,
+    "turnover_annual": 194.86307342215144
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0038 <= 0.0",
+    "sharpe -0.117 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 437,
+    "stop": 123
+   },
+   "stress_1_5x": 0.28860750000000057,
+   "breakeven_cost_x": 8.56408733275068,
+   "transfer_sharpe": 0.6784820659192015,
+   "neighbor_median_sharpe": 1.4314675436506514,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.4147407395130012,
+   "local_detail": [
+    {
+     "move": "entry=15:45",
+     "sharpe": 1.0557884015557457,
+     "net_return": 0.21294275999999845,
+     "trades": 560
+    },
+    {
+     "move": "entry=15:55",
+     "sharpe": 0.24026173453220714,
+     "net_return": 0.025516549999999638,
+     "trades": 558
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.4922297803311544,
+     "net_return": 0.19641335000000026,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 1.5205106529772312,
+     "net_return": 0.281875804999997,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.25",
+     "sharpe": 1.4147407395130012,
+     "net_return": 0.29521838750000673,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.7441312273128369,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.6,
+    "luck_pct_return": 0.59
+   }
+  },
+  {
+   "order": 3,
+   "group": 8,
+   "config_id": "cfg_11c8",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:45\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.25751379999999924,
+    "cagr": 0.045778482918853225,
+    "sharpe": 1.1479393995319565,
+    "max_drawdown": -0.045774616975183036,
+    "exposure": 0.016360908078803426,
+    "win_rate": 0.5339285714285714,
+    "profit_factor": 1.4214999618624342,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 277.2164016120057
+   },
+   "val": {
+    "net_return": -0.01947846616076898,
+    "cagr": -0.009560610962535687,
+    "sharpe": -0.5669916189165309,
+    "max_drawdown": -0.031840546161534755,
+    "exposure": 0.01459865079966649,
+    "win_rate": 0.4666666666666667,
+    "profit_factor": 0.8527663724291091,
+    "n_completed_trades": 194.0,
+    "turnover_annual": 195.04640288302215
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0195 <= 0.0",
+    "sharpe -0.567 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 515,
+    "stop": 45
+   },
+   "stress_1_5x": 0.22930769999999923,
+   "breakeven_cost_x": 6.8847853162288875,
+   "transfer_sharpe": 0.521593908621409,
+   "neighbor_median_sharpe": 1.078133191748243,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.2508591912842124,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.7342604835730561,
+     "net_return": 0.13611349999999867,
+     "trades": 560
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 1.4314675436506514,
+     "net_return": 0.3052088399999995,
+     "trades": 560
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.379430408129776,
+     "net_return": 0.22042767999999913,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.2508591912842124,
+     "net_return": 0.2776856424999996,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 1.1902119886288232,
+     "net_return": 0.2685755775000025,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.3604040319056386,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.31,
+    "luck_pct_return": 0.23
+   }
+  },
+  {
+   "order": 4,
+   "group": 21,
+   "config_id": "cfg_baae",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:30\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.29879903999999957,
+    "cagr": 0.052398667803136734,
+    "sharpe": 1.1636461281432935,
+    "max_drawdown": -0.03686178923317318,
+    "exposure": 0.03163471933136486,
+    "win_rate": 0.5321428571428571,
+    "profit_factor": 1.376043694504745,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 275.00407966448176
+   },
+   "val": {
+    "net_return": -0.024536959928766255,
+    "cagr": -0.012059328107486111,
+    "sharpe": -0.620915812970639,
+    "max_drawdown": -0.04114758900465432,
+    "exposure": 0.02856565350312034,
+    "win_rate": 0.4666666666666667,
+    "profit_factor": 0.8417400569641991,
+    "n_completed_trades": 194.0,
+    "turnover_annual": 196.38607036340028
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0245 <= 0.0",
+    "sharpe -0.621 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 482,
+    "stop": 78
+   },
+   "stress_1_5x": 0.27549697999999956,
+   "breakeven_cost_x": 7.989370092701942,
+   "transfer_sharpe": 0.5829556708835661,
+   "neighbor_median_sharpe": 0.7959130489284534,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.1893873613968717,
+   "local_detail": [
+    {
+     "move": "entry=15:25",
+     "sharpe": 1.175066565937019,
+     "net_return": 0.3215854999999985,
+     "trades": 560
+    },
+    {
+     "move": "entry=15:35",
+     "sharpe": 0.8440866186357799,
+     "net_return": 0.21240917999999853,
+     "trades": 558
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.1893873613968717,
+     "net_return": 0.2528887999999998,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.2239831725337131,
+     "net_return": 0.31063450249999947,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 1.2102590374760924,
+     "net_return": 0.3165361950000045,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.3836204966142174,
+   "luck": {
+    "exposure_level": 3,
+    "luck_pct_sharpe": 0.27,
+    "luck_pct_return": 0.27
+   }
+  },
+  {
+   "order": 5,
+   "group": 1,
+   "config_id": "cfg_143d",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:50\u201316:00",
+    "filter": "none",
+    "stop": "0.1%"
+   },
+   "dev": {
+    "net_return": 0.2826809000000372,
+    "cagr": 0.049834518463350186,
+    "sharpe": 1.3943614858434865,
+    "max_drawdown": -0.030404319294920268,
+    "exposure": 0.019160333672168708,
+    "win_rate": 0.4267413931144916,
+    "profit_factor": 1.3371272551157773,
+    "n_completed_trades": 1248.0,
+    "turnover_annual": 610.2753246176836
+   },
+   "val": {
+    "net_return": -0.00567283336017943,
+    "cagr": -0.002774485488886813,
+    "sharpe": -0.11966318910803117,
+    "max_drawdown": -0.04964747744360731,
+    "exposure": 0.01859066676773036,
+    "win_rate": 0.4092741935483871,
+    "profit_factor": 0.9785698172596066,
+    "n_completed_trades": 495.0,
+    "turnover_annual": 510.28506203359075
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0057 <= 0.0",
+    "sharpe -0.120 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 765,
+    "stop": 483
+   },
+   "stress_1_5x": 0.23190399000003636,
+   "breakeven_cost_x": 3.735088397608527,
+   "transfer_sharpe": 0.20316872293314608,
+   "neighbor_median_sharpe": 0.9311977622748979,
+   "local_frac_profitable": 0.8,
+   "local_median_sharpe": 1.1853101623804616,
+   "local_detail": [
+    {
+     "move": "entry=15:45",
+     "sharpe": 0.7091288635122968,
+     "net_return": 0.1439869400000371,
+     "trades": 1247
+    },
+    {
+     "move": "entry=15:55",
+     "sharpe": -0.2648071792721884,
+     "net_return": -0.03141448999997343,
+     "trades": 1243
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.1853101623804616,
+     "net_return": 0.1615166100000247,
+     "trades": 1249
+    },
+    {
+     "move": "stop_pct=0.05",
+     "sharpe": 1.6824094848653923,
+     "net_return": 0.31614644500005973,
+     "trades": 1248
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 1.209009840594274,
+     "net_return": 0.25250120999999726,
+     "trades": 1248
+    }
+   ],
+   "dsr": 0.6140554655170286,
+   "luck": {
+    "exposure_level": 2,
+    "luck_pct_sharpe": 0.63,
+    "luck_pct_return": 0.58
+   }
+  },
+  {
+   "order": 6,
+   "group": 10,
+   "config_id": "cfg_5ec9",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:45\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.26680879999999907,
+    "cagr": 0.04728404774560935,
+    "sharpe": 1.14797953127162,
+    "max_drawdown": -0.04019198087705389,
+    "exposure": 0.016342756183745585,
+    "win_rate": 0.5339285714285714,
+    "profit_factor": 1.4327053474324434,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 276.24770116917284
+   },
+   "val": {
+    "net_return": -0.020609708426401863,
+    "cagr": -0.010118831051315724,
+    "sharpe": -0.6105993626409447,
+    "max_drawdown": -0.03165425574228631,
+    "exposure": 0.014442002071805756,
+    "win_rate": 0.49740932642487046,
+    "profit_factor": 0.8422239110613486,
+    "n_completed_trades": 192.0,
+    "turnover_annual": 193.06499221947595
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0206 <= 0.0",
+    "sharpe -0.611 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 513,
+    "stop": 47
+   },
+   "stress_1_5x": 0.24764875999999902,
+   "breakeven_cost_x": 7.348860579678693,
+   "transfer_sharpe": 0.5812556237553191,
+   "neighbor_median_sharpe": 0.9161311972376399,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.1844786008362813,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 1.2594968981578059,
+     "net_return": 0.29682653999999786,
+     "trades": 559
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 0.9810312276087776,
+     "net_return": 0.18717721999999926,
+     "trades": 560
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.4832163761874273,
+     "net_return": 0.25284893999999936,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.1844786008362813,
+     "net_return": 0.27272698499999914,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 1.1592491518330328,
+     "net_return": 0.2709257900000026,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.37381358105983387,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.29,
+    "luck_pct_return": 0.22
+   }
+  },
+  {
+   "order": 7,
+   "group": 7,
+   "config_id": "cfg_10b3",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "yes",
+    "window": "15:00\u201316:00",
+    "filter": "high volatility",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.3213349999999999,
+    "cagr": 0.05594120408864711,
+    "sharpe": 1.1095195606122554,
+    "max_drawdown": -0.05400268232900152,
+    "exposure": 0.04078125756328961,
+    "win_rate": 0.5667655786350149,
+    "profit_factor": 1.5462233441274211,
+    "n_completed_trades": 337.0,
+    "turnover_annual": 165.7547167474499
+   },
+   "val": {
+    "net_return": -0.0033602379411731276,
+    "cagr": -0.001642459466393964,
+    "sharpe": -0.0879439026763021,
+    "max_drawdown": -0.0278246580209629,
+    "exposure": 0.03153187296293489,
+    "win_rate": 0.4519230769230769,
+    "profit_factor": 0.9617026782248674,
+    "n_completed_trades": 104.0,
+    "turnover_annual": 102.61550295855459
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0034 <= 0.0",
+    "sharpe -0.088 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 337,
+    "stop": 0
+   },
+   "stress_1_5x": 0.3101825,
+   "breakeven_cost_x": 13.240317775571004,
+   "transfer_sharpe": -0.0019272173476219605,
+   "neighbor_median_sharpe": 0.4608209894767129,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.1552538873288287,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 1.1552538873288287,
+     "net_return": 0.3389249999999999,
+     "trades": 333
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.8460826705178236,
+     "net_return": 0.23584500000000008,
+     "trades": 331
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.4856851551529995,
+     "net_return": 0.36229500000000003,
+     "trades": 337
+    }
+   ],
+   "dsr": 0.3376141882825472,
+   "luck": {
+    "exposure_level": 3,
+    "luck_pct_sharpe": 0.63,
+    "luck_pct_return": 0.65
+   }
+  },
+  {
+   "order": 8,
+   "group": 15,
+   "config_id": "cfg_b495",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "move > 1\u03c3",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.43279500000000004,
+    "cagr": 0.07277927298489129,
+    "sharpe": 1.2447334300495332,
+    "max_drawdown": -0.0813514633319522,
+    "exposure": 0.049373154557335784,
+    "win_rate": 0.5220588235294118,
+    "profit_factor": 1.6137456216231547,
+    "n_completed_trades": 408.0,
+    "turnover_annual": 200.37380664911288
+   },
+   "val": {
+    "net_return": 0.026490181777574673,
+    "cagr": 0.01285054781606676,
+    "sharpe": 0.44455597533625874,
+    "max_drawdown": -0.0676375247955876,
+    "exposure": 0.04729780944440234,
+    "win_rate": 0.5128205128205128,
+    "profit_factor": 1.1551685370290876,
+    "n_completed_trades": 156.0,
+    "turnover_annual": 160.29726354139135
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 408,
+    "stop": 0
+   },
+   "stress_1_5x": 0.41027499999999995,
+   "breakeven_cost_x": 13.216522738223192,
+   "transfer_sharpe": 0.1837158558647315,
+   "neighbor_median_sharpe": 0.7684109163368216,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.1472278400775373,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 1.1472278400775373,
+     "net_return": 0.41749499999999995,
+     "trades": 402
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.9198779320871844,
+     "net_return": 0.307175,
+     "trades": 407
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.7277743207540976,
+     "net_return": 0.4938,
+     "trades": 408
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.9986508362777049,
+     "net_return": 0.36956999999999995,
+     "trades": 553
+    },
+    {
+     "move": "z=1.25",
+     "sharpe": 1.2837536532748657,
+     "net_return": 0.3599399999999999,
+     "trades": 294
+    }
+   ],
+   "dsr": 0.4708462853514197,
+   "luck": {
+    "exposure_level": 5,
+    "luck_pct_sharpe": 0.76,
+    "luck_pct_return": 0.77
+   }
+  },
+  {
+   "order": 9,
+   "group": 1,
+   "config_id": "cfg_a6da",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:50\u201316:00",
+    "filter": "none",
+    "stop": "0.1%"
+   },
+   "dev": {
+    "net_return": 0.2811104750000377,
+    "cagr": 0.0495833042077336,
+    "sharpe": 1.4094068225553102,
+    "max_drawdown": -0.030675810430654704,
+    "exposure": 0.01927932942865902,
+    "win_rate": 0.43980738362760835,
+    "profit_factor": 1.3362547290040692,
+    "n_completed_trades": 1246.0,
+    "turnover_annual": 608.5957040546542
+   },
+   "val": {
+    "net_return": -0.008731257154058647,
+    "cagr": -0.0042736686662881995,
+    "sharpe": -0.18864702106420492,
+    "max_drawdown": -0.04480351622268286,
+    "exposure": 0.018479496702796937,
+    "win_rate": 0.41448692152917505,
+    "profit_factor": 0.9673000206200519,
+    "n_completed_trades": 496.0,
+    "turnover_annual": 510.3559812952848
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0087 <= 0.0",
+    "sharpe -0.189 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 773,
+    "stop": 473
+   },
+   "stress_1_5x": 0.2267732450000366,
+   "breakeven_cost_x": 3.747623409708292,
+   "transfer_sharpe": -0.1080848510612236,
+   "neighbor_median_sharpe": 0.7547611972809694,
+   "local_frac_profitable": 0.8,
+   "local_median_sharpe": 1.144046760688533,
+   "local_detail": [
+    {
+     "move": "entry=15:45",
+     "sharpe": 0.6771968999556489,
+     "net_return": 0.14122870000003673,
+     "trades": 1246
+    },
+    {
+     "move": "entry=15:55",
+     "sharpe": -0.9255043557812779,
+     "net_return": -0.10139889499997357,
+     "trades": 1247
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.3708079730329934,
+     "net_return": 0.18520449500002578,
+     "trades": 1246
+    },
+    {
+     "move": "stop_pct=0.05",
+     "sharpe": 1.7093850345174495,
+     "net_return": 0.3164769975000594,
+     "trades": 1246
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 1.144046760688533,
+     "net_return": 0.23505945749999602,
+     "trades": 1246
+    }
+   ],
+   "dsr": 0.6281403567052423,
+   "luck": {
+    "exposure_level": 2,
+    "luck_pct_sharpe": 0.56,
+    "luck_pct_return": 0.53
+   }
+  },
+  {
+   "order": 10,
+   "group": 7,
+   "config_id": "cfg_114c",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "high volatility",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.4904599999999999,
+    "cagr": 0.08108022659520775,
+    "sharpe": 1.1510194528515147,
+    "max_drawdown": -0.05526091744839057,
+    "exposure": 0.06776707488261774,
+    "win_rate": 0.55,
+    "profit_factor": 1.4145584866747247,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 279.3869742244821
+   },
+   "val": {
+    "net_return": 1.6773345141718465e-05,
+    "cagr": 8.191598525053578e-06,
+    "sharpe": 0.013924436660370312,
+    "max_drawdown": -0.04603741235059111,
+    "exposure": 0.05912226180550292,
+    "win_rate": 0.48717948717948717,
+    "profit_factor": 1.0000909190093465,
+    "n_completed_trades": 194.0,
+    "turnover_annual": 189.28468105683837
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.014 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 560,
+    "stop": 0
+   },
+   "stress_1_5x": 0.4739850000000001,
+   "breakeven_cost_x": 10.976037299407256,
+   "transfer_sharpe": 0.4629192925655399,
+   "neighbor_median_sharpe": 0.7309599756655978,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.1136444579715792,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 1.1136444579715792,
+     "net_return": 0.4820199999999999,
+     "trades": 559
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 1.0428431823692337,
+     "net_return": 0.42832500000000007,
+     "trades": 560
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.4200982154678097,
+     "net_return": 0.5154449999999999,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.3848161111045583,
+   "luck": {
+    "exposure_level": 6,
+    "luck_pct_sharpe": 0.49,
+    "luck_pct_return": 0.49
+   }
+  },
+  {
+   "order": 11,
+   "group": 6,
+   "config_id": "cfg_1998",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:45\u201316:00",
+    "filter": "move > 1\u03c3",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.19403581999999941,
+    "cagr": 0.03525002778079722,
+    "sharpe": 1.0459747848241676,
+    "max_drawdown": -0.049347216427418905,
+    "exposure": 0.011135179179372992,
+    "win_rate": 0.5158730158730159,
+    "profit_factor": 1.4809722114326396,
+    "n_completed_trades": 378.0,
+    "turnover_annual": 184.37613308447726
+   },
+   "val": {
+    "net_return": -0.035139264080034094,
+    "cagr": -0.01731809159421449,
+    "sharpe": -1.2047060510662764,
+    "max_drawdown": -0.03864022742309603,
+    "exposure": 0.012122590262512948,
+    "win_rate": 0.4539877300613497,
+    "profit_factor": 0.687635894913839,
+    "n_completed_trades": 163.0,
+    "turnover_annual": 158.12985775946004
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0351 <= 0.0",
+    "sharpe -1.205 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 352,
+    "stop": 26
+   },
+   "stress_1_5x": 0.18208589999999947,
+   "breakeven_cost_x": 7.775407905803177,
+   "transfer_sharpe": 0.5032915049021809,
+   "neighbor_median_sharpe": 0.9647507997032284,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.110780547310962,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.24249631845043346,
+     "net_return": 0.03518717999999876,
+     "trades": 378
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 0.9051645985318921,
+     "net_return": 0.13941635999999957,
+     "trades": 367
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.4261270930553365,
+     "net_return": 0.19362461999999958,
+     "trades": 378
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 1.0743337444568968,
+     "net_return": 0.2246562199999993,
+     "trades": 540
+    },
+    {
+     "move": "z=1.25",
+     "sharpe": 1.1895482693406567,
+     "net_return": 0.1587340199999996,
+     "trades": 269
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.1135238065144724,
+     "net_return": 0.20479357749999827,
+     "trades": 378
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 1.110780547310962,
+     "net_return": 0.20599647500000118,
+     "trades": 378
+    }
+   ],
+   "dsr": 0.25525602297971794,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.07,
+    "luck_pct_return": 0.05
+   }
+  },
+  {
+   "order": 12,
+   "group": 18,
+   "config_id": "cfg_29c4",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:45\u201316:00",
+    "filter": "move > 0.5\u03c3",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.2598545799999994,
+    "cagr": 0.04615847396957373,
+    "sharpe": 1.144248722807806,
+    "max_drawdown": -0.046716329809700086,
+    "exposure": 0.022038417477451312,
+    "win_rate": 0.5208053691275167,
+    "profit_factor": 1.35853364435044,
+    "n_completed_trades": 745.0,
+    "turnover_annual": 363.72252196019303
+   },
+   "val": {
+    "net_return": -0.021462937412982996,
+    "cagr": -0.010540081646255639,
+    "sharpe": -0.49435498092395824,
+    "max_drawdown": -0.04359119905965003,
+    "exposure": 0.021668056292478335,
+    "win_rate": 0.4793103448275862,
+    "profit_factor": 0.8926658303866255,
+    "n_completed_trades": 289.0,
+    "turnover_annual": 297.11138801239656
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0215 <= 0.0",
+    "sharpe -0.494 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 706,
+    "stop": 39
+   },
+   "stress_1_5x": 0.2310519599999994,
+   "breakeven_cost_x": 5.365146812405575,
+   "transfer_sharpe": 0.2800145702265664,
+   "neighbor_median_sharpe": 1.1204191042439948,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.1085832789142342,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.3701132512123022,
+     "net_return": 0.0665422799999984,
+     "trades": 750
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 1.0538510394670249,
+     "net_return": 0.1955321399999992,
+     "trades": 748
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.5652063822118323,
+     "net_return": 0.2660908599999994,
+     "trades": 745
+    },
+    {
+     "move": "z=0.25",
+     "sharpe": 1.1085832789142342,
+     "net_return": 0.2671321199999992,
+     "trades": 981
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 1.0743337444568968,
+     "net_return": 0.2246562199999993,
+     "trades": 540
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.2368543626990924,
+     "net_return": 0.28091900499999856,
+     "trades": 745
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 1.172415863902643,
+     "net_return": 0.26785021500000217,
+     "trades": 745
+    }
+   ],
+   "dsr": 0.3662726510837553,
+   "luck": {
+    "exposure_level": 2,
+    "luck_pct_sharpe": 0.35,
+    "luck_pct_return": 0.28
+   }
+  },
+  {
+   "order": 13,
+   "group": 18,
+   "config_id": "cfg_c545",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:50\u201316:00",
+    "filter": "move > 0.5\u03c3",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.1955321399999992,
+    "cagr": 0.03550333312600884,
+    "sharpe": 1.0538510394670249,
+    "max_drawdown": -0.043906012760351,
+    "exposure": 0.01486438517514562,
+    "win_rate": 0.4979973297730307,
+    "profit_factor": 1.3088400317754403,
+    "n_completed_trades": 748.0,
+    "turnover_annual": 366.22801438527665
+   },
+   "val": {
+    "net_return": 0.017494903984764276,
+    "cagr": 0.008506118032151067,
+    "sharpe": 0.4333476637465728,
+    "max_drawdown": -0.027458610453171106,
+    "exposure": 0.014987746026933474,
+    "win_rate": 0.4612794612794613,
+    "profit_factor": 1.1011646570183928,
+    "n_completed_trades": 296.0,
+    "turnover_annual": 293.15557648372925
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 721,
+    "stop": 27
+   },
+   "stress_1_5x": 0.16776339999999923,
+   "breakeven_cost_x": 4.419664498198743,
+   "transfer_sharpe": 0.32565173631218364,
+   "neighbor_median_sharpe": 1.0413506884547412,
+   "local_frac_profitable": 0.8571428571428571,
+   "local_median_sharpe": 1.1050142372675893,
+   "local_detail": [
+    {
+     "move": "entry=15:45",
+     "sharpe": 1.144248722807806,
+     "net_return": 0.2598545799999994,
+     "trades": 745
+    },
+    {
+     "move": "entry=15:55",
+     "sharpe": -0.21400207382531794,
+     "net_return": -0.026522940000000328,
+     "trades": 751
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.1574954665347466,
+     "net_return": 0.1454869799999996,
+     "trades": 749
+    },
+    {
+     "move": "z=0.25",
+     "sharpe": 1.1318148340751335,
+     "net_return": 0.23873379999999944,
+     "trades": 972
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.8248899699771135,
+     "net_return": 0.13687599999999933,
+     "trades": 530
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.1050142372675893,
+     "net_return": 0.204936752499999,
+     "trades": 748
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.9781237314606376,
+     "net_return": 0.18302369250000128,
+     "trades": 748
+    }
+   ],
+   "dsr": 0.28923954693349613,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.86,
+    "luck_pct_return": 0.92
+   }
+  },
+  {
+   "order": 14,
+   "group": 10,
+   "config_id": "cfg_29d9",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:45\u201316:00",
+    "filter": "move > 0.5\u03c3",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.24170949999999913,
+    "cagr": 0.043197886265594176,
+    "sharpe": 1.0525031261952553,
+    "max_drawdown": -0.039898188678589075,
+    "exposure": 0.02155436694257547,
+    "win_rate": 0.5048143053645117,
+    "profit_factor": 1.3420882983368243,
+    "n_completed_trades": 727.0,
+    "turnover_annual": 355.5716185177387
+   },
+   "val": {
+    "net_return": -0.052580140524011276,
+    "cagr": -0.026033534914109202,
+    "sharpe": -1.3433413557083835,
+    "max_drawdown": -0.06435672572727558,
+    "exposure": 0.021076833674423305,
+    "win_rate": 0.4574468085106383,
+    "profit_factor": 0.7337352132462953,
+    "n_completed_trades": 281.0,
+    "turnover_annual": 286.33911758220444
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0526 <= 0.0",
+    "sharpe -1.343 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 692,
+    "stop": 35
+   },
+   "stress_1_5x": 0.21671509999999916,
+   "breakeven_cost_x": 5.322547880222304,
+   "transfer_sharpe": 0.17466646882679823,
+   "neighbor_median_sharpe": 0.8165081346814547,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.0790429983569514,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.6379189172742951,
+     "net_return": 0.13390453999999896,
+     "trades": 715
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 0.794088473092859,
+     "net_return": 0.14713837999999924,
+     "trades": 726
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.569815850961559,
+     "net_return": 0.27172371999999956,
+     "trades": 727
+    },
+    {
+     "move": "z=0.25",
+     "sharpe": 1.0790429983569514,
+     "net_return": 0.27237741999999887,
+     "trades": 960
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.655678453410377,
+     "net_return": 0.13259707999999937,
+     "trades": 539
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.1042859735027661,
+     "net_return": 0.26044021249999894,
+     "trades": 727
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 1.1400531803787202,
+     "net_return": 0.27152296000000176,
+     "trades": 727
+    }
+   ],
+   "dsr": 0.2998719358519272,
+   "luck": {
+    "exposure_level": 2,
+    "luck_pct_sharpe": 0.05,
+    "luck_pct_return": 0.04
+   }
+  },
+  {
+   "order": 15,
+   "group": 13,
+   "config_id": "cfg_21f8",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.2980931399999991,
+    "cagr": 0.05228690756238086,
+    "sharpe": 1.0556088075514571,
+    "max_drawdown": -0.06353618166168906,
+    "exposure": 0.0610569243429014,
+    "win_rate": 0.5107142857142857,
+    "profit_factor": 1.3145282275058119,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 274.4047149916292
+   },
+   "val": {
+    "net_return": 0.0038550392462597394,
+    "cagr": 0.001880840521907734,
+    "sharpe": 0.09182631147882146,
+    "max_drawdown": -0.04637588567921236,
+    "exposure": 0.05602465954167614,
+    "win_rate": 0.4666666666666667,
+    "profit_factor": 1.021990606466493,
+    "n_completed_trades": 194.0,
+    "turnover_annual": 194.92959706417915
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.092 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 440,
+    "stop": 120
+   },
+   "stress_1_5x": 0.27734965999999917,
+   "breakeven_cost_x": 7.783160106810172,
+   "transfer_sharpe": 0.36660088978513605,
+   "neighbor_median_sharpe": 0.8906032243625384,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.0623074596160869,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.9537126754966047,
+     "net_return": 0.27040838000000034,
+     "trades": 559
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 1.0623074596160869,
+     "net_return": 0.3193632399999988,
+     "trades": 560
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.2076286518613442,
+     "net_return": 0.3189832399999992,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.1192644258159217,
+     "net_return": 0.30974609999999814,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.9622424792341161,
+     "net_return": 0.27443396000000697,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.2941715878992473,
+   "luck": {
+    "exposure_level": 6,
+    "luck_pct_sharpe": 0.65,
+    "luck_pct_return": 0.64
+   }
+  },
+  {
+   "order": 16,
+   "group": 8,
+   "config_id": "cfg_87f1",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:45\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.2%"
+   },
+   "dev": {
+    "net_return": 0.21294275999999845,
+    "cagr": 0.03843210436849187,
+    "sharpe": 1.0557884015557457,
+    "max_drawdown": -0.044986030648886066,
+    "exposure": 0.01455378608193362,
+    "win_rate": 0.4875,
+    "profit_factor": 1.373500413697121,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 276.47232798158274
+   },
+   "val": {
+    "net_return": -0.02302219933280336,
+    "cagr": -0.011310395974848841,
+    "sharpe": -0.7107403951174285,
+    "max_drawdown": -0.02887003924299103,
+    "exposure": 0.01349705651987165,
+    "win_rate": 0.4461538461538462,
+    "profit_factor": 0.8248742385058637,
+    "n_completed_trades": 194.0,
+    "turnover_annual": 186.63927891016596
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0230 <= 0.0",
+    "sharpe -0.711 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 406,
+    "stop": 154
+   },
+   "stress_1_5x": 0.1912576499999985,
+   "breakeven_cost_x": 5.79504968166401,
+   "transfer_sharpe": 0.3205188785010044,
+   "neighbor_median_sharpe": 1.0342776176385904,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.0605095564901452,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.7428305622789041,
+     "net_return": 0.12141332000000005,
+     "trades": 560
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 1.5234489105807907,
+     "net_return": 0.31197445000000057,
+     "trades": 560
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.0759066642229638,
+     "net_return": 0.14582178999999962,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.9200279491728784,
+     "net_return": 0.17363131249999975,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.25",
+     "sharpe": 1.0605095564901452,
+     "net_return": 0.22376860000000764,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.26256369892907394,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.3,
+    "luck_pct_return": 0.23
+   }
+  },
+  {
+   "order": 17,
+   "group": 6,
+   "config_id": "cfg_109e",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:45\u201316:00",
+    "filter": "move > 1\u03c3",
+    "stop": "0.2%"
+   },
+   "dev": {
+    "net_return": 0.17222963999999963,
+    "cagr": 0.03152925727353617,
+    "sharpe": 1.0243370008745647,
+    "max_drawdown": -0.033250988274164395,
+    "exposure": 0.010096487406618584,
+    "win_rate": 0.47883597883597884,
+    "profit_factor": 1.4889132313033646,
+    "n_completed_trades": 378.0,
+    "turnover_annual": 184.73130520989665
+   },
+   "val": {
+    "net_return": -0.04791562854527387,
+    "cagr": -0.023694629816897406,
+    "sharpe": -1.8971266564440568,
+    "max_drawdown": -0.04892712195628934,
+    "exposure": 0.01107658101518482,
+    "win_rate": 0.4110429447852761,
+    "profit_factor": 0.5829609530875133,
+    "n_completed_trades": 163.0,
+    "turnover_annual": 157.57088365413182
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0479 <= 0.0",
+    "sharpe -1.897 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 290,
+    "stop": 88
+   },
+   "stress_1_5x": 0.1569904299999998,
+   "breakeven_cost_x": 7.023268144150841,
+   "transfer_sharpe": 0.3487482040905139,
+   "neighbor_median_sharpe": 0.9350896096959427,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.0496314547075538,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.556555125148528,
+     "net_return": 0.07390469,
+     "trades": 378
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 0.9735657677608018,
+     "net_return": 0.1442785499999999,
+     "trades": 367
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.2645220208677035,
+     "net_return": 0.14495089999999955,
+     "trades": 378
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 1.053410101762474,
+     "net_return": 0.20363943999999923,
+     "trades": 540
+    },
+    {
+     "move": "z=1.25",
+     "sharpe": 1.231015533030478,
+     "net_return": 0.1471246899999994,
+     "trades": 269
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.923284613941521,
+     "net_return": 0.14728278749999535,
+     "trades": 378
+    },
+    {
+     "move": "stop_pct=0.25",
+     "sharpe": 1.0496314547075538,
+     "net_return": 0.18376561250000467,
+     "trades": 378
+    }
+   ],
+   "dsr": 0.216995328587206,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.01,
+    "luck_pct_return": 0.01
+   }
+  },
+  {
+   "order": 18,
+   "group": 11,
+   "config_id": "cfg_1906",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.3157084399999994,
+    "cagr": 0.055061319142990284,
+    "sharpe": 1.1117142859809133,
+    "max_drawdown": -0.12336908178027506,
+    "exposure": 0.060663633283314776,
+    "win_rate": 0.5160714285714286,
+    "profit_factor": 1.335361794821089,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 275.82011547988606
+   },
+   "val": {
+    "net_return": -0.030251519858001452,
+    "cagr": -0.014890107103560202,
+    "sharpe": -0.6313962705273052,
+    "max_drawdown": -0.05125397230200368,
+    "exposure": 0.056403648399403726,
+    "win_rate": 0.4381443298969072,
+    "profit_factor": 0.8396154560002663,
+    "n_completed_trades": 193.0,
+    "turnover_annual": 190.89125278712908
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0303 <= 0.0",
+    "sharpe -0.631 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 438,
+    "stop": 122
+   },
+   "stress_1_5x": 0.29735819999999924,
+   "breakeven_cost_x": 8.284793050175029,
+   "transfer_sharpe": 0.1624397949408632,
+   "neighbor_median_sharpe": 0.8496191818482506,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.0400436418513068,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.9766059519268371,
+     "net_return": 0.2793035800000001,
+     "trades": 559
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.9595815716500903,
+     "net_return": 0.2819101399999995,
+     "trades": 560
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.2156719875945967,
+     "net_return": 0.31709795999999946,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.1062369506684901,
+     "net_return": 0.30370415749999835,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 1.0400436418513068,
+     "net_return": 0.30222147750000716,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.3436305359642219,
+   "luck": {
+    "exposure_level": 6,
+    "luck_pct_sharpe": 0.31,
+    "luck_pct_return": 0.31
+   }
+  },
+  {
+   "order": 19,
+   "group": 24,
+   "config_id": "cfg_d1e3",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:30\u201316:00",
+    "filter": "down days only",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.2481549799999998,
+    "cagr": 0.04425350646179349,
+    "sharpe": 1.031703097987312,
+    "max_drawdown": -0.05032837908169829,
+    "exposure": 0.030926795424108942,
+    "win_rate": 0.5203703703703704,
+    "profit_factor": 1.3557573370485603,
+    "n_completed_trades": 540.0,
+    "turnover_annual": 265.89909472699895
+   },
+   "val": {
+    "net_return": -0.032401553210964384,
+    "cagr": -0.01595736194057562,
+    "sharpe": -0.720127459141556,
+    "max_drawdown": -0.05083443410663624,
+    "exposure": 0.0334167108820334,
+    "win_rate": 0.45982142857142855,
+    "profit_factor": 0.8339248043135846,
+    "n_completed_trades": 223.0,
+    "turnover_annual": 226.74878510902315
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0324 <= 0.0",
+    "sharpe -0.720 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 478,
+    "stop": 62
+   },
+   "stress_1_5x": 0.22671319999999962,
+   "breakeven_cost_x": 6.634050457982731,
+   "transfer_sharpe": 0.6553848700667269,
+   "neighbor_median_sharpe": 0.5682041411840225,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.0322807670976824,
+   "local_detail": [
+    {
+     "move": "entry=15:25",
+     "sharpe": 0.9323431025230468,
+     "net_return": 0.22540363999999857,
+     "trades": 541
+    },
+    {
+     "move": "entry=15:35",
+     "sharpe": 0.7284013299802843,
+     "net_return": 0.14050515999999913,
+     "trades": 547
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.0322807670976824,
+     "net_return": 0.19357646000000006,
+     "trades": 540
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.0950110364188297,
+     "net_return": 0.25876346249999393,
+     "trades": 540
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 1.0589632492805479,
+     "net_return": 0.25684885500000343,
+     "trades": 540
+    }
+   ],
+   "dsr": 0.2638935493668516,
+   "luck": {
+    "exposure_level": 3,
+    "luck_pct_sharpe": 0.22,
+    "luck_pct_return": 0.19
+   }
+  },
+  {
+   "order": 20,
+   "group": 19,
+   "config_id": "cfg_36e3",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:30\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.2841791999999992,
+    "cagr": 0.05007396459552749,
+    "sharpe": 1.1004779819407404,
+    "max_drawdown": -0.05633006237687843,
+    "exposure": 0.03181825515917195,
+    "win_rate": 0.5196428571428572,
+    "profit_factor": 1.3573656027156733,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 275.3943082860054
+   },
+   "val": {
+    "net_return": -0.007327108241591218,
+    "cagr": -0.003585087249855512,
+    "sharpe": -0.16381477410635753,
+    "max_drawdown": -0.035944470303114984,
+    "exposure": 0.028626291720356755,
+    "win_rate": 0.4587628865979381,
+    "profit_factor": 0.9513363859674807,
+    "n_completed_trades": 193.0,
+    "turnover_annual": 196.4803222500838
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0073 <= 0.0",
+    "sharpe -0.164 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 484,
+    "stop": 76
+   },
+   "stress_1_5x": 0.2624862399999992,
+   "breakeven_cost_x": 7.563132843945534,
+   "transfer_sharpe": 0.5273082734959671,
+   "neighbor_median_sharpe": 0.5176885994984279,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.030751384447078,
+   "local_detail": [
+    {
+     "move": "entry=15:25",
+     "sharpe": 1.030751384447078,
+     "net_return": 0.27348385999999936,
+     "trades": 558
+    },
+    {
+     "move": "entry=15:35",
+     "sharpe": 0.7135855077911674,
+     "net_return": 0.1459827399999989,
+     "trades": 560
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.0208557169563535,
+     "net_return": 0.20324329999999935,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.135626293005269,
+     "net_return": 0.28951820749999957,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 1.172839784657571,
+     "net_return": 0.30938890250000406,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.3404986077260412,
+   "luck": {
+    "exposure_level": 3,
+    "luck_pct_sharpe": 0.5,
+    "luck_pct_return": 0.51
+   }
+  },
+  {
+   "order": 21,
+   "group": 24,
+   "config_id": "cfg_55ca",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:30\u201316:00",
+    "filter": "none",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.3035486399999989,
+    "cagr": 0.05314937082786675,
+    "sharpe": 0.9986479122405014,
+    "max_drawdown": -0.06572058602250774,
+    "exposure": 0.07268825532052213,
+    "win_rate": 0.5056089743589743,
+    "profit_factor": 1.2071670129725682,
+    "n_completed_trades": 1248.0,
+    "turnover_annual": 607.8509733748908
+   },
+   "val": {
+    "net_return": -0.05413751189215321,
+    "cagr": -0.026815751971486335,
+    "sharpe": -0.8650906888345777,
+    "max_drawdown": -0.08601676229341071,
+    "exposure": 0.07378660400717552,
+    "win_rate": 0.46277665995975853,
+    "profit_factor": 0.8626600514929835,
+    "n_completed_trades": 496.0,
+    "turnover_annual": 511.61934353032933
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0541 <= 0.0",
+    "sharpe -0.865 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 1133,
+    "stop": 115
+   },
+   "stress_1_5x": 0.23229077999999892,
+   "breakeven_cost_x": 3.8124706722366573,
+   "transfer_sharpe": 0.24107874760370945,
+   "neighbor_median_sharpe": 0.6738179985037683,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.0242861578369618,
+   "local_detail": [
+    {
+     "move": "entry=15:25",
+     "sharpe": 1.1976951855925706,
+     "net_return": 0.38846003999999823,
+     "trades": 1246
+    },
+    {
+     "move": "entry=15:35",
+     "sharpe": 0.8181678366830899,
+     "net_return": 0.24750645999999832,
+     "trades": 1244
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.9713328647154759,
+     "net_return": 0.24667827999999958,
+     "trades": 1248
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.0656872599441793,
+     "net_return": 0.32235523749999984,
+     "trades": 1248
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 1.0242861578369618,
+     "net_return": 0.3162030725000069,
+     "trades": 1248
+    }
+   ],
+   "dsr": 0.2599558475922763,
+   "luck": {
+    "exposure_level": 7,
+    "luck_pct_sharpe": 0.17,
+    "luck_pct_return": 0.16
+   }
+  },
+  {
+   "order": 22,
+   "group": 2,
+   "config_id": "cfg_0660",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:45\u201316:00",
+    "filter": "none",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.23739875999999915,
+    "cagr": 0.042489423896106215,
+    "sharpe": 0.9305064065230086,
+    "max_drawdown": -0.055474641486555676,
+    "exposure": 0.037102473498233215,
+    "win_rate": 0.5040064102564102,
+    "profit_factor": 1.2053984532775421,
+    "n_completed_trades": 1247.0,
+    "turnover_annual": 615.1225584487966
+   },
+   "val": {
+    "net_return": -0.030656617111851414,
+    "cagr": -0.015091100656903556,
+    "sharpe": -0.5601149038981741,
+    "max_drawdown": -0.06663243159245924,
+    "exposure": 0.037186386720230426,
+    "win_rate": 0.4879032258064516,
+    "profit_factor": 0.9040858856560053,
+    "n_completed_trades": 495.0,
+    "turnover_annual": 497.7594989576701
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0307 <= 0.0",
+    "sharpe -0.560 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 1191,
+    "stop": 56
+   },
+   "stress_1_5x": 0.18945611999999912,
+   "breakeven_cost_x": 3.2804760922320857,
+   "transfer_sharpe": 0.1169538159031264,
+   "neighbor_median_sharpe": 0.8893258476893229,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.0230959390662584,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.2451460813867836,
+     "net_return": 0.04966881999999839,
+     "trades": 1245
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 1.0896775876654379,
+     "net_return": 0.2566467599999993,
+     "trades": 1248
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.2447036168209658,
+     "net_return": 0.2356039399999994,
+     "trades": 1248
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.0230959390662584,
+     "net_return": 0.260852839999999,
+     "trades": 1247
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.9504849277376446,
+     "net_return": 0.24440878750000294,
+     "trades": 1247
+    }
+   ],
+   "dsr": 0.19167993520408289,
+   "luck": {
+    "exposure_level": 4,
+    "luck_pct_sharpe": 0.35,
+    "luck_pct_return": 0.32
+   }
+  },
+  {
+   "order": 23,
+   "group": 11,
+   "config_id": "cfg_3276",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "high volatility",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.40027499999999994,
+    "cagr": 0.0679787341572684,
+    "sharpe": 0.9796523160774749,
+    "max_drawdown": -0.10335978859757133,
+    "exposure": 0.06776707488261774,
+    "win_rate": 0.5571428571428572,
+    "profit_factor": 1.3549953438871891,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 275.509787515432
+   },
+   "val": {
+    "net_return": -0.027419614004391968,
+    "cagr": -0.013486223365470007,
+    "sharpe": -0.5145244101168844,
+    "max_drawdown": -0.04998759222819116,
+    "exposure": 0.058819070719320854,
+    "win_rate": 0.4587628865979381,
+    "profit_factor": 0.8561634854927229,
+    "n_completed_trades": 193.0,
+    "turnover_annual": 183.96010463330575
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0274 <= 0.0",
+    "sharpe -0.515 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 560,
+    "stop": 0
+   },
+   "stress_1_5x": 0.37739750000000005,
+   "breakeven_cost_x": 10.006489348076677,
+   "transfer_sharpe": 0.06113941922342648,
+   "neighbor_median_sharpe": 0.5767519473287662,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.015856942727426,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 1.015856942727426,
+     "net_return": 0.4183699999999999,
+     "trades": 559
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.5365040667452485,
+     "net_return": 0.19218000000000002,
+     "trades": 560
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.1424097755129234,
+     "net_return": 0.38433000000000006,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.25944758009699975,
+   "luck": {
+    "exposure_level": 6,
+    "luck_pct_sharpe": 0.21,
+    "luck_pct_return": 0.21
+   }
+  },
+  {
+   "order": 24,
+   "group": 16,
+   "config_id": "cfg_569b",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:45\u201316:00",
+    "filter": "down days only",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.20486755999999917,
+    "cagr": 0.037077949655422104,
+    "sharpe": 1.0136952879011232,
+    "max_drawdown": -0.05193230422698403,
+    "exposure": 0.01604425835390548,
+    "win_rate": 0.5302752293577981,
+    "profit_factor": 1.3680349627138952,
+    "n_completed_trades": 545.0,
+    "turnover_annual": 267.80970002899824
+   },
+   "val": {
+    "net_return": -0.037762474076403985,
+    "cagr": -0.018623765073104148,
+    "sharpe": -0.9629019720216192,
+    "max_drawdown": -0.041574734659492796,
+    "exposure": 0.016988807195735114,
+    "win_rate": 0.4801762114537445,
+    "profit_factor": 0.7731003275521736,
+    "n_completed_trades": 226.0,
+    "turnover_annual": 221.4686964896672
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0378 <= 0.0",
+    "sharpe -0.963 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 504,
+    "stop": 41
+   },
+   "stress_1_5x": 0.18239589999999928,
+   "breakeven_cost_x": 5.8074345179419256,
+   "transfer_sharpe": 0.6745765384124819,
+   "neighbor_median_sharpe": 0.7992591026727369,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 1.01175489335032,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.8083138227844946,
+     "net_return": 0.1435841999999985,
+     "trades": 551
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 0.4639351839189712,
+     "net_return": 0.0719666599999993,
+     "trades": 558
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.3720735554480084,
+     "net_return": 0.19378917999999934,
+     "trades": 545
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.052797749414898,
+     "net_return": 0.21031894749999602,
+     "trades": 545
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 1.01175489335032,
+     "net_return": 0.205123575000002,
+     "trades": 545
+    }
+   ],
+   "dsr": 0.23893008558783035,
+   "luck": {
+    "exposure_level": 2,
+    "luck_pct_sharpe": 0.14,
+    "luck_pct_return": 0.1
+   }
+  },
+  {
+   "order": 25,
+   "group": 22,
+   "config_id": "cfg_49e0",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "move > 0.5\u03c3",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.44055500000000003,
+    "cagr": 0.07391181569915117,
+    "sharpe": 1.0778828572053178,
+    "max_drawdown": -0.08961535298624068,
+    "exposure": 0.08833922261484099,
+    "win_rate": 0.5260273972602739,
+    "profit_factor": 1.3492144646310917,
+    "n_completed_trades": 729.0,
+    "turnover_annual": 358.6146493108375
+   },
+   "val": {
+    "net_return": 0.08815352416256239,
+    "cagr": 0.042121741473580165,
+    "sharpe": 1.1520965089308475,
+    "max_drawdown": -0.061233340974851114,
+    "exposure": 0.08489350413097856,
+    "win_rate": 0.55,
+    "profit_factor": 1.321632094825621,
+    "n_completed_trades": 279.0,
+    "turnover_annual": 287.33772576383416
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 729,
+    "stop": 0
+   },
+   "stress_1_5x": 0.4086525000000001,
+   "breakeven_cost_x": 7.9030430220356775,
+   "transfer_sharpe": 0.24837400300023857,
+   "neighbor_median_sharpe": 0.5301278822729347,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9986508362777049,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 1.0514480186155872,
+     "net_return": 0.4365300000000001,
+     "trades": 720
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.6217268667429859,
+     "net_return": 0.2282550000000001,
+     "trades": 725
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.5720837182972094,
+     "net_return": 0.5638799999999999,
+     "trades": 730
+    },
+    {
+     "move": "z=0.25",
+     "sharpe": 0.9793031951624854,
+     "net_return": 0.43107000000000006,
+     "trades": 941
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.9986508362777049,
+     "net_return": 0.36956999999999995,
+     "trades": 553
+    }
+   ],
+   "dsr": 0.3334525641773657,
+   "luck": {
+    "exposure_level": 8,
+    "luck_pct_sharpe": 0.97,
+    "luck_pct_return": 0.99
+   }
+  },
+  {
+   "order": 26,
+   "group": 32,
+   "config_id": "cfg_f08a",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "none",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.36333091999999967,
+    "cagr": 0.06241502603404192,
+    "sharpe": 1.020613578336435,
+    "max_drawdown": -0.1366552904334023,
+    "exposure": 0.1413508236926602,
+    "win_rate": 0.4955964771817454,
+    "profit_factor": 1.2059799420615767,
+    "n_completed_trades": 1249.0,
+    "turnover_annual": 611.4948995199333
+   },
+   "val": {
+    "net_return": 0.026550839175568886,
+    "cagr": 0.012879777129770842,
+    "sharpe": 0.34192720842274016,
+    "max_drawdown": -0.059554895685216214,
+    "exposure": 0.1441774678491119,
+    "win_rate": 0.5,
+    "profit_factor": 1.0570038457491238,
+    "n_completed_trades": 495.0,
+    "turnover_annual": 499.72753693169375
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 1073,
+    "stop": 176
+   },
+   "stress_1_5x": 0.3092303799999998,
+   "breakeven_cost_x": 4.380117761874766,
+   "transfer_sharpe": -0.18508131105557196,
+   "neighbor_median_sharpe": 0.8111598974521838,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9950899927522615,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.9485728522343649,
+     "net_return": 0.3430638399999997,
+     "trades": 1246
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.9950899927522615,
+     "net_return": 0.35494154,
+     "trades": 1247
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.0834500040649455,
+     "net_return": 0.35370632000000035,
+     "trades": 1249
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.0085317709337205,
+     "net_return": 0.3456828274999968,
+     "trades": 1249
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.9789732170621916,
+     "net_return": 0.35174546750001,
+     "trades": 1249
+    }
+   ],
+   "dsr": 0.2703429066515741,
+   "luck": {
+    "exposure_level": 14,
+    "luck_pct_sharpe": 0.82,
+    "luck_pct_return": 0.84
+   }
+  },
+  {
+   "order": 27,
+   "group": 15,
+   "config_id": "cfg_2b1a",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "yes",
+    "window": "15:00\u201316:00",
+    "filter": "move > 1\u03c3",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.33396500000000007,
+    "cagr": 0.057905365603508896,
+    "sharpe": 1.0315899952817633,
+    "max_drawdown": -0.07322341449089442,
+    "exposure": 0.044411636574858415,
+    "win_rate": 0.5122615803814714,
+    "profit_factor": 1.5273325859373765,
+    "n_completed_trades": 367.0,
+    "turnover_annual": 179.36573855847087
+   },
+   "val": {
+    "net_return": 0.00989531209589467,
+    "cagr": 0.00482042186646181,
+    "sharpe": 0.1938971881025729,
+    "max_drawdown": -0.06468273661822044,
+    "exposure": 0.040627605548396874,
+    "win_rate": 0.5074626865671642,
+    "profit_factor": 1.0726712177934377,
+    "n_completed_trades": 134.0,
+    "turnover_annual": 135.89626998225523
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.194 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 367,
+    "stop": 0
+   },
+   "stress_1_5x": 0.3172299999999999,
+   "breakeven_cost_x": 12.15344687057612,
+   "transfer_sharpe": 0.007203053422717063,
+   "neighbor_median_sharpe": 0.4949511717299234,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9920176536103354,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.9920176536103354,
+     "net_return": 0.32946999999999993,
+     "trades": 366
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.7313271043785747,
+     "net_return": 0.22441,
+     "trades": 365
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.5334224865609005,
+     "net_return": 0.4056900000000001,
+     "trades": 367
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.839476687493065,
+     "net_return": 0.287455,
+     "trades": 494
+    },
+    {
+     "move": "z=1.25",
+     "sharpe": 1.2359474974305888,
+     "net_return": 0.3296650000000001,
+     "trades": 272
+    }
+   ],
+   "dsr": 0.3001068839790993,
+   "luck": {
+    "exposure_level": 4,
+    "luck_pct_sharpe": 0.67,
+    "luck_pct_return": 0.7
+   }
+  },
+  {
+   "order": 28,
+   "group": 31,
+   "config_id": "cfg_e687",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:45\u201316:00",
+    "filter": "high volatility",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.21290999999999993,
+    "cagr": 0.03842662541968456,
+    "sharpe": 0.7982539440300427,
+    "max_drawdown": -0.0704623451127574,
+    "exposure": 0.016941768720654435,
+    "win_rate": 0.5446428571428571,
+    "profit_factor": 1.3257970482245736,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 274.0637615532393
+   },
+   "val": {
+    "net_return": -0.017495115053878685,
+    "cagr": -0.008582705987384864,
+    "sharpe": -0.49769462642018913,
+    "max_drawdown": -0.029224063489452723,
+    "exposure": 0.01478056545137573,
+    "win_rate": 0.4666666666666667,
+    "profit_factor": 0.864218070130535,
+    "n_completed_trades": 194.0,
+    "turnover_annual": 186.87305686748238
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0175 <= 0.0",
+    "sharpe -0.498 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 560,
+    "stop": 0
+   },
+   "stress_1_5x": 0.19055,
+   "breakeven_cost_x": 5.577754891864059,
+   "transfer_sharpe": 0.15102544490408634,
+   "neighbor_median_sharpe": 1.1479393995319565,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9902956856954953,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.4424082368197592,
+     "net_return": 0.1173249999999999,
+     "trades": 560
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 1.2471820544886196,
+     "net_return": 0.2884850000000001,
+     "trades": 560
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.9902956856954953,
+     "net_return": 0.17949499999999996,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.14354837006183802,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.31,
+    "luck_pct_return": 0.26
+   }
+  },
+  {
+   "order": 29,
+   "group": 16,
+   "config_id": "cfg_6a36",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:45\u201316:00",
+    "filter": "down days only",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.17916269999999934,
+    "cagr": 0.03271823485576997,
+    "sharpe": 0.9350821557621516,
+    "max_drawdown": -0.04545858886949983,
+    "exposure": 0.016816722332478176,
+    "win_rate": 0.528169014084507,
+    "profit_factor": 1.3350888011217317,
+    "n_completed_trades": 568.0,
+    "turnover_annual": 279.0197442658527
+   },
+   "val": {
+    "net_return": -0.04474931237224511,
+    "cagr": -0.02211029726830782,
+    "sharpe": -1.1779017492612291,
+    "max_drawdown": -0.052371989836339616,
+    "exposure": 0.01702417948912302,
+    "win_rate": 0.4605263157894737,
+    "profit_factor": 0.7270946438955911,
+    "n_completed_trades": 227.0,
+    "turnover_annual": 219.0528303012294
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0447 <= 0.0",
+    "sharpe -1.178 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 535,
+    "stop": 33
+   },
+   "stress_1_5x": 0.1521400999999991,
+   "breakeven_cost_x": 4.9692619898633605,
+   "transfer_sharpe": 0.6778362886527041,
+   "neighbor_median_sharpe": 0.719070703791401,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9616824325309845,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.29305768501408347,
+     "net_return": 0.04529243999999877,
+     "trades": 566
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 0.5586150064358434,
+     "net_return": 0.08602509999999941,
+     "trades": 584
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.2807378214901035,
+     "net_return": 0.17302013999999932,
+     "trades": 568
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.0074122045472247,
+     "net_return": 0.19372321499999678,
+     "trades": 568
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.9616824325309845,
+     "net_return": 0.1859820625000017,
+     "trades": 568
+    }
+   ],
+   "dsr": 0.17469281653751773,
+   "luck": {
+    "exposure_level": 2,
+    "luck_pct_sharpe": 0.09,
+    "luck_pct_return": 0.05
+   }
+  },
+  {
+   "order": 30,
+   "group": 23,
+   "config_id": "cfg_f492",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "yes",
+    "window": "15:45\u201316:00",
+    "filter": "down days only",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.1442145599999991,
+    "cagr": 0.02666644070537738,
+    "sharpe": 0.9014283994290399,
+    "max_drawdown": -0.026306946711013968,
+    "exposure": 0.00904166061603498,
+    "win_rate": 0.5409836065573771,
+    "profit_factor": 1.4936227098834747,
+    "n_completed_trades": 305.0,
+    "turnover_annual": 149.52612021101828
+   },
+   "val": {
+    "net_return": -0.0287450982969486,
+    "cagr": -0.014143055755913236,
+    "sharpe": -1.0976472771437147,
+    "max_drawdown": -0.033656143586430765,
+    "exposure": 0.008666211880037394,
+    "win_rate": 0.4396551724137931,
+    "profit_factor": 0.6739168453533597,
+    "n_completed_trades": 116.0,
+    "turnover_annual": 111.89233777834191
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0287 <= 0.0",
+    "sharpe -1.098 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 286,
+    "stop": 19
+   },
+   "stress_1_5x": 0.13276005999999918,
+   "breakeven_cost_x": 6.940936169595751,
+   "transfer_sharpe": 0.29259696495977383,
+   "neighbor_median_sharpe": 0.7403078824993837,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9412419942758204,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.4794589453089202,
+     "net_return": 0.05765577999999927,
+     "trades": 302
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 0.5321741796649699,
+     "net_return": 0.06751089999999937,
+     "trades": 305
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.4150464657974924,
+     "net_return": 0.15144991999999946,
+     "trades": 305
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.9412419942758204,
+     "net_return": 0.1494386699999981,
+     "trades": 305
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.9502465274265224,
+     "net_return": 0.15241696250000092,
+     "trades": 305
+    }
+   ],
+   "dsr": 0.13625060321801952,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.11,
+    "luck_pct_return": 0.1
+   }
+  },
+  {
+   "order": 31,
+   "group": 5,
+   "config_id": "cfg_0a74",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "move > 1\u03c3",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.23090327999999927,
+    "cagr": 0.04141814340976269,
+    "sharpe": 0.9724064302132329,
+    "max_drawdown": -0.09351486970666634,
+    "exposure": 0.04573269115962373,
+    "win_rate": 0.49019607843137253,
+    "profit_factor": 1.366922745124111,
+    "n_completed_trades": 408.0,
+    "turnover_annual": 201.32682135903895
+   },
+   "val": {
+    "net_return": 0.02611828282722617,
+    "cagr": 0.01267131950347511,
+    "sharpe": 0.52245223534181,
+    "max_drawdown": -0.049434882428057936,
+    "exposure": 0.044852068015867,
+    "win_rate": 0.4935897435897436,
+    "profit_factor": 1.1694903209031267,
+    "n_completed_trades": 156.0,
+    "turnover_annual": 159.7112023835179
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 342,
+    "stop": 66
+   },
+   "stress_1_5x": 0.21346559999999926,
+   "breakeven_cost_x": 8.18996881575507,
+   "transfer_sharpe": -0.11398870837552934,
+   "neighbor_median_sharpe": 1.0187498118999565,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9252719081103379,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.829923835570182,
+     "net_return": 0.19790612000000052,
+     "trades": 402
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.892711103858032,
+     "net_return": 0.22303891999999936,
+     "trades": 407
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.4170208360470917,
+     "net_return": 0.3175475999999997,
+     "trades": 408
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.6225411847313609,
+     "net_return": 0.14928787999999926,
+     "trades": 554
+    },
+    {
+     "move": "z=1.25",
+     "sharpe": 1.0676765600981415,
+     "net_return": 0.22050939999999963,
+     "trades": 294
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.9322937353792377,
+     "net_return": 0.21370862749999686,
+     "trades": 408
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.9252719081103379,
+     "net_return": 0.22238653250000295,
+     "trades": 408
+    }
+   ],
+   "dsr": 0.2225934844292095,
+   "luck": {
+    "exposure_level": 4,
+    "luck_pct_sharpe": 0.85,
+    "luck_pct_return": 0.88
+   }
+  },
+  {
+   "order": 32,
+   "group": 22,
+   "config_id": "cfg_89e5",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "none",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.42591,
+    "cagr": 0.07177029351416375,
+    "sharpe": 0.905263314330884,
+    "max_drawdown": -0.09174892048629002,
+    "exposure": 0.1507817416138245,
+    "win_rate": 0.507223113964687,
+    "profit_factor": 1.199506281560038,
+    "n_completed_trades": 1245.0,
+    "turnover_annual": 613.3602570679964
+   },
+   "val": {
+    "net_return": 0.10400025247035227,
+    "cagr": 0.04950604600142028,
+    "sharpe": 1.0908361410903935,
+    "max_drawdown": -0.07114338680271481,
+    "exposure": 0.15068596983248692,
+    "win_rate": 0.5271629778672032,
+    "profit_factor": 1.2162522785271601,
+    "n_completed_trades": 496.0,
+    "turnover_annual": 509.2829754376494
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 1245,
+    "stop": 0
+   },
+   "stress_1_5x": 0.403405,
+   "breakeven_cost_x": 5.164485337531982,
+   "transfer_sharpe": 0.24446958666224286,
+   "neighbor_median_sharpe": 0.49907132850693453,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.916467204699022,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.916467204699022,
+     "net_return": 0.4425300000000001,
+     "trades": 1244
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.8687952139014662,
+     "net_return": 0.39437999999999995,
+     "trades": 1245
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.2520187923312927,
+     "net_return": 0.5316050000000001,
+     "trades": 1246
+    }
+   ],
+   "dsr": 0.2056875072396127,
+   "luck": {
+    "exposure_level": 15,
+    "luck_pct_sharpe": 0.97,
+    "luck_pct_return": 0.98
+   }
+  },
+  {
+   "order": 33,
+   "group": 12,
+   "config_id": "cfg_19e9",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:30\u201316:00",
+    "filter": "none",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.2556131799999988,
+    "cagr": 0.045469526435582885,
+    "sharpe": 0.8479544991108849,
+    "max_drawdown": -0.07791914530289146,
+    "exposure": 0.07290809493844491,
+    "win_rate": 0.4931945556445156,
+    "profit_factor": 1.1756970548382024,
+    "n_completed_trades": 1248.0,
+    "turnover_annual": 616.0964358358788
+   },
+   "val": {
+    "net_return": -0.034280541719066804,
+    "cagr": -0.016891066798190302,
+    "sharpe": -0.5206708997810302,
+    "max_drawdown": -0.07098740978490481,
+    "exposure": 0.07370069986609061,
+    "win_rate": 0.4717741935483871,
+    "profit_factor": 0.909664053814855,
+    "n_completed_trades": 495.0,
+    "turnover_annual": 499.4637760403911
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0343 <= 0.0",
+    "sharpe -0.521 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 1133,
+    "stop": 115
+   },
+   "stress_1_5x": 0.17622537999999865,
+   "breakeven_cost_x": 3.3836424199369217,
+   "transfer_sharpe": 0.13378515977435562,
+   "neighbor_median_sharpe": 0.36013302953567333,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8863130965673625,
+   "local_detail": [
+    {
+     "move": "entry=15:25",
+     "sharpe": 1.0687510207094166,
+     "net_return": 0.34306197999999877,
+     "trades": 1246
+    },
+    {
+     "move": "entry=15:35",
+     "sharpe": 0.4891904589271572,
+     "net_return": 0.11735463999999873,
+     "trades": 1247
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.6722285582277405,
+     "net_return": 0.15539435999999918,
+     "trades": 1249
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.8942596877635249,
+     "net_return": 0.2667303774999994,
+     "trades": 1248
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.8863130965673625,
+     "net_return": 0.27127160750000634,
+     "trades": 1248
+    }
+   ],
+   "dsr": 0.1762422578621033,
+   "luck": {
+    "exposure_level": 7,
+    "luck_pct_sharpe": 0.33,
+    "luck_pct_return": 0.32
+   }
+  },
+  {
+   "order": 34,
+   "group": 32,
+   "config_id": "cfg_fe2c",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "none",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.39820999999999995,
+    "cagr": 0.06767088499119955,
+    "sharpe": 0.8509550026815299,
+    "max_drawdown": -0.11856770722124954,
+    "exposure": 0.15114477951498137,
+    "win_rate": 0.5172137710168134,
+    "profit_factor": 1.1938903198476962,
+    "n_completed_trades": 1248.0,
+    "turnover_annual": 614.7216600944178
+   },
+   "val": {
+    "net_return": 0.033203166906258685,
+    "cagr": 0.016080025703194778,
+    "sharpe": 0.37719312913378,
+    "max_drawdown": -0.06263414183840665,
+    "exposure": 0.15038277874630485,
+    "win_rate": 0.5141129032258065,
+    "profit_factor": 1.0688364162063981,
+    "n_completed_trades": 495.0,
+    "turnover_annual": 500.5861299982301
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 1248,
+    "stop": 0
+   },
+   "stress_1_5x": 0.35318249999999995,
+   "breakeven_cost_x": 4.889699133095359,
+   "transfer_sharpe": -0.024404089196967526,
+   "neighbor_median_sharpe": 0.4506979645744127,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.881390689997515,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.881390689997515,
+     "net_return": 0.4233800000000001,
+     "trades": 1245
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.6138464683793506,
+     "net_return": 0.2577050000000001,
+     "trades": 1247
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.9768754029738983,
+     "net_return": 0.38988,
+     "trades": 1249
+    }
+   ],
+   "dsr": 0.1714427218408654,
+   "luck": {
+    "exposure_level": 15,
+    "luck_pct_sharpe": 0.8,
+    "luck_pct_return": 0.81
+   }
+  },
+  {
+   "order": 35,
+   "group": 21,
+   "config_id": "cfg_462d",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:30\u201316:00",
+    "filter": "high volatility",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.25749,
+    "cagr": 0.04577461641865588,
+    "sharpe": 0.8100060883232287,
+    "max_drawdown": -0.07540450836675427,
+    "exposure": 0.03388353744130887,
+    "win_rate": 0.5446428571428571,
+    "profit_factor": 1.28728264689639,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 276.1811419189679
+   },
+   "val": {
+    "net_return": -0.044171325418094765,
+    "cagr": -0.021821379545763464,
+    "sharpe": -0.9071790321897182,
+    "max_drawdown": -0.05713170685556834,
+    "exposure": 0.02956113090275146,
+    "win_rate": 0.4717948717948718,
+    "profit_factor": 0.749848003783017,
+    "n_completed_trades": 194.0,
+    "turnover_annual": 195.38223479782795
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0442 <= 0.0",
+    "sharpe -0.907 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 560,
+    "stop": 0
+   },
+   "stress_1_5x": 0.2371000000000001,
+   "breakeven_cost_x": 7.383541147132169,
+   "transfer_sharpe": 0.4641020352649313,
+   "neighbor_median_sharpe": 0.8039870171495594,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8769407375466717,
+   "local_detail": [
+    {
+     "move": "entry=15:25",
+     "sharpe": 0.8769407375466717,
+     "net_return": 0.29993500000000006,
+     "trades": 560
+    },
+    {
+     "move": "entry=15:35",
+     "sharpe": 0.7151421416682097,
+     "net_return": 0.22224,
+     "trades": 558
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.1347683167871194,
+     "net_return": 0.29105000000000003,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.15704474831069648,
+   "luck": {
+    "exposure_level": 3,
+    "luck_pct_sharpe": 0.24,
+    "luck_pct_return": 0.19
+   }
+  },
+  {
+   "order": 36,
+   "group": 2,
+   "config_id": "cfg_f83a",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:45\u201316:00",
+    "filter": "none",
+    "stop": "0.2%"
+   },
+   "dev": {
+    "net_return": 0.21860942999999877,
+    "cagr": 0.03937804041571469,
+    "sharpe": 0.9306971962677608,
+    "max_drawdown": -0.04983745953876695,
+    "exposure": 0.03437162173064201,
+    "win_rate": 0.4791666666666667,
+    "profit_factor": 1.2018115320936134,
+    "n_completed_trades": 1247.0,
+    "turnover_annual": 614.1564695747596
+   },
+   "val": {
+    "net_return": -0.04321095726298507,
+    "cagr": -0.02134151891863134,
+    "sharpe": -0.8675432053454337,
+    "max_drawdown": -0.06904778736321171,
+    "exposure": 0.03497814497587104,
+    "win_rate": 0.4717741935483871,
+    "profit_factor": 0.8624408198511747,
+    "n_completed_trades": 495.0,
+    "turnover_annual": 490.7747608199386
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0432 <= 0.0",
+    "sharpe -0.868 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 1009,
+    "stop": 238
+   },
+   "stress_1_5x": 0.15632318999999884,
+   "breakeven_cost_x": 3.0643308684428354,
+   "transfer_sharpe": -0.12643831880072753,
+   "neighbor_median_sharpe": 0.8198176350176527,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8757099482061982,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.4061766377208194,
+     "net_return": 0.0766213499999997,
+     "trades": 1245
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 1.153266661037499,
+     "net_return": 0.2619103999999999,
+     "trades": 1248
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.8777794314635283,
+     "net_return": 0.14479477999999957,
+     "trades": 1248
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.7423174453410003,
+     "net_return": 0.16126553249999898,
+     "trades": 1247
+    },
+    {
+     "move": "stop_pct=0.25",
+     "sharpe": 0.8757099482061982,
+     "net_return": 0.20998077500001133,
+     "trades": 1247
+    }
+   ],
+   "dsr": 0.1828934616363448,
+   "luck": {
+    "exposure_level": 3,
+    "luck_pct_sharpe": 0.22,
+    "luck_pct_return": 0.16
+   }
+  },
+  {
+   "order": 37,
+   "group": 9,
+   "config_id": "cfg_18df",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "none",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.2837451599999996,
+    "cagr": 0.050004622987449565,
+    "sharpe": 0.8405516172339869,
+    "max_drawdown": -0.07515905839322301,
+    "exposure": 0.14108459589847847,
+    "win_rate": 0.4839486356340289,
+    "profit_factor": 1.1629581562720883,
+    "n_completed_trades": 1246.0,
+    "turnover_annual": 609.340979090404
+   },
+   "val": {
+    "net_return": 0.09291799004718393,
+    "cagr": 0.04434765198050172,
+    "sharpe": 1.1069225923281307,
+    "max_drawdown": -0.06400296201462585,
+    "exposure": 0.14491523282548827,
+    "win_rate": 0.5090543259557344,
+    "profit_factor": 1.2056242248992162,
+    "n_completed_trades": 496.0,
+    "turnover_annual": 503.142254634683
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 1068,
+    "stop": 178
+   },
+   "stress_1_5x": 0.2081886199999996,
+   "breakeven_cost_x": 3.5802034461342114,
+   "transfer_sharpe": -0.19213805336269016,
+   "neighbor_median_sharpe": 0.6009834801911181,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8604264696848407,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.846407095484958,
+     "net_return": 0.29327594000000046,
+     "trades": 1245
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.8992036993901033,
+     "net_return": 0.3179665999999992,
+     "trades": 1246
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.9733872189481985,
+     "net_return": 0.30558591999999996,
+     "trades": 1246
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.8604264696848407,
+     "net_return": 0.28273308999999736,
+     "trades": 1246
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.8199437019048311,
+     "net_return": 0.2803086300000097,
+     "trades": 1246
+    }
+   ],
+   "dsr": 0.15163431944290184,
+   "luck": {
+    "exposure_level": 14,
+    "luck_pct_sharpe": 0.96,
+    "luck_pct_return": 0.98
+   }
+  },
+  {
+   "order": 38,
+   "group": 17,
+   "config_id": "cfg_29a0",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "move > 0.5\u03c3",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.352155,
+    "cagr": 0.06070806309730492,
+    "sharpe": 0.9167540250670629,
+    "max_drawdown": -0.08862363639477333,
+    "exposure": 0.09003339948690643,
+    "win_rate": 0.5228494623655914,
+    "profit_factor": 1.2812896887206153,
+    "n_completed_trades": 744.0,
+    "turnover_annual": 365.29544073894283
+   },
+   "val": {
+    "net_return": 0.034200960688678395,
+    "cagr": 0.016559126138795843,
+    "sharpe": 0.479945044847371,
+    "max_drawdown": -0.05960909569603412,
+    "exposure": 0.08671265064807095,
+    "win_rate": 0.5524475524475524,
+    "profit_factor": 1.120263698541076,
+    "n_completed_trades": 285.0,
+    "turnover_annual": 286.9487070879709
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 744,
+    "stop": 0
+   },
+   "stress_1_5x": 0.32533999999999996,
+   "breakeven_cost_x": 6.445951144450857,
+   "transfer_sharpe": 0.3587075567635359,
+   "neighbor_median_sharpe": 0.3512925193640595,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.855989060640345,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.855989060640345,
+     "net_return": 0.33419,
+     "trades": 735
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.5258380108322793,
+     "net_return": 0.18542999999999998,
+     "trades": 750
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.225979960927128,
+     "net_return": 0.4055899999999999,
+     "trades": 744
+    },
+    {
+     "move": "z=0.25",
+     "sharpe": 0.9090781397924809,
+     "net_return": 0.4049750000000001,
+     "trades": 964
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.7891498945237885,
+     "net_return": 0.23280499999999993,
+     "trades": 519
+    }
+   ],
+   "dsr": 0.2125540869447849,
+   "luck": {
+    "exposure_level": 9,
+    "luck_pct_sharpe": 0.85,
+    "luck_pct_return": 0.86
+   }
+  },
+  {
+   "order": 39,
+   "group": 12,
+   "config_id": "cfg_7432",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:30\u201316:00",
+    "filter": "move > 0.5\u03c3",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.20705329999999922,
+    "cagr": 0.03744520208473956,
+    "sharpe": 0.8109457197652932,
+    "max_drawdown": -0.05674136949563602,
+    "exposure": 0.04335075915258886,
+    "win_rate": 0.5066666666666667,
+    "profit_factor": 1.2160514767177841,
+    "n_completed_trades": 750.0,
+    "turnover_annual": 369.257591846918
+   },
+   "val": {
+    "net_return": -0.018546140423128077,
+    "cagr": -0.00910079538482289,
+    "sharpe": -0.3701800146454987,
+    "max_drawdown": -0.060177582294882015,
+    "exposure": 0.04187574218651305,
+    "win_rate": 0.4628975265017668,
+    "profit_factor": 0.9177556745225909,
+    "n_completed_trades": 282.0,
+    "turnover_annual": 279.42886937305457
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0185 <= 0.0",
+    "sharpe -0.370 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 668,
+    "stop": 82
+   },
+   "stress_1_5x": 0.17730291999999892,
+   "breakeven_cost_x": 4.716263808486383,
+   "transfer_sharpe": 0.4152513123137782,
+   "neighbor_median_sharpe": 0.5075645302353465,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8493939896590366,
+   "local_detail": [
+    {
+     "move": "entry=15:25",
+     "sharpe": 0.6565426431904735,
+     "net_return": 0.16444083999999948,
+     "trades": 740
+    },
+    {
+     "move": "entry=15:35",
+     "sharpe": 0.643346227816196,
+     "net_return": 0.1348390399999988,
+     "trades": 736
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.9467875127234622,
+     "net_return": 0.1990133599999997,
+     "trades": 750
+    },
+    {
+     "move": "z=0.25",
+     "sharpe": 0.8557772318983342,
+     "net_return": 0.2417217799999989,
+     "trades": 985
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.8260950239351099,
+     "net_return": 0.19480899999999912,
+     "trades": 540
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.906214866815543,
+     "net_return": 0.22959591249999822,
+     "trades": 750
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.8493939896590366,
+     "net_return": 0.21982944000000515,
+     "trades": 750
+    }
+   ],
+   "dsr": 0.14815061691282233,
+   "luck": {
+    "exposure_level": 4,
+    "luck_pct_sharpe": 0.38,
+    "luck_pct_return": 0.37
+   }
+  },
+  {
+   "order": 40,
+   "group": 26,
+   "config_id": "cfg_5ce0",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:50\u201316:00",
+    "filter": "down days only",
+    "stop": "0.1%"
+   },
+   "dev": {
+    "net_return": 0.12432414500003519,
+    "cagr": 0.023155404536358226,
+    "sharpe": 0.9313634358905235,
+    "max_drawdown": -0.03793952015957702,
+    "exposure": 0.008658453942591607,
+    "win_rate": 0.4160958904109589,
+    "profit_factor": 1.318591273363164,
+    "n_completed_trades": 584.0,
+    "turnover_annual": 284.4204606227695
+   },
+   "val": {
+    "net_return": 0.004351071727639821,
+    "cagr": 0.0021225819795815948,
+    "sharpe": 0.1485170918969124,
+    "max_drawdown": -0.028918927753806667,
+    "exposure": 0.008074989261982364,
+    "win_rate": 0.41517857142857145,
+    "profit_factor": 1.0378425159751132,
+    "n_completed_trades": 223.0,
+    "turnover_annual": 216.06744462122523
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.149 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 340,
+    "stop": 244
+   },
+   "stress_1_5x": 0.09825292500003457,
+   "breakeven_cost_x": 3.684553968127118,
+   "transfer_sharpe": 0.09571850690039428,
+   "neighbor_median_sharpe": 0.7505355727094937,
+   "local_frac_profitable": 0.8,
+   "local_median_sharpe": 0.8493649532305129,
+   "local_detail": [
+    {
+     "move": "entry=15:45",
+     "sharpe": 0.8493649532305129,
+     "net_return": 0.1301534250000378,
+     "trades": 568
+    },
+    {
+     "move": "entry=15:55",
+     "sharpe": -0.12989635125760468,
+     "net_return": -0.013028764999972964,
+     "trades": 584
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.9216887322304461,
+     "net_return": 0.08075580000002458,
+     "trades": 584
+    },
+    {
+     "move": "stop_pct=0.05",
+     "sharpe": 1.1389044856700188,
+     "net_return": 0.14939629750002692,
+     "trades": 584
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.7606575734430058,
+     "net_return": 0.1055941999999872,
+     "trades": 584
+    }
+   ],
+   "dsr": 0.1635595360650255,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.64,
+    "luck_pct_return": 0.66
+   }
+  },
+  {
+   "order": 41,
+   "group": 30,
+   "config_id": "cfg_8267",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.2%"
+   },
+   "dev": {
+    "net_return": 0.2071409099999999,
+    "cagr": 0.037459911335369966,
+    "sharpe": 0.8906032243625384,
+    "max_drawdown": -0.044925133145929275,
+    "exposure": 0.04880842893331397,
+    "win_rate": 0.4160714285714286,
+    "profit_factor": 1.2624498249364475,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 272.9588351880871
+   },
+   "val": {
+    "net_return": -0.01444824697391811,
+    "cagr": -0.007082392087598421,
+    "sharpe": -0.3292167113175083,
+    "max_drawdown": -0.044128981916205734,
+    "exposure": 0.04772733014982693,
+    "win_rate": 0.38974358974358975,
+    "profit_factor": 0.9160866019742394,
+    "n_completed_trades": 195.0,
+    "turnover_annual": 186.79096565614367
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0144 <= 0.0",
+    "sharpe -0.329 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 293,
+    "stop": 267
+   },
+   "stress_1_5x": 0.19506188999999985,
+   "breakeven_cost_x": 6.019684843037708,
+   "transfer_sharpe": 0.317841554874005,
+   "neighbor_median_sharpe": 0.27344793035518566,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8413462637988839,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.4367384781256163,
+     "net_return": 0.08857213000000042,
+     "trades": 559
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.9016859521593298,
+     "net_return": 0.19950354999999975,
+     "trades": 560
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.8413462637988839,
+     "net_return": 0.1779646499999994,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.6974777779532805,
+     "net_return": 0.14204215249999708,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.25",
+     "sharpe": 1.0161212652087206,
+     "net_return": 0.25954552500001604,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.1674537814304628,
+   "luck": {
+    "exposure_level": 5,
+    "luck_pct_sharpe": 0.5,
+    "luck_pct_return": 0.49
+   }
+  },
+  {
+   "order": 42,
+   "group": 27,
+   "config_id": "cfg_635b",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:30\u201316:00",
+    "filter": "down days only",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.17212205999999908,
+    "cagr": 0.03151076342661829,
+    "sharpe": 0.7779406156773606,
+    "max_drawdown": -0.06501585455553027,
+    "exposure": 0.032778288720009034,
+    "win_rate": 0.4982394366197183,
+    "profit_factor": 1.251652233875171,
+    "n_completed_trades": 568.0,
+    "turnover_annual": 278.9906071520486
+   },
+   "val": {
+    "net_return": -0.026433202699043146,
+    "cagr": -0.012997712877303225,
+    "sharpe": -0.5767167704358633,
+    "max_drawdown": -0.04626653374206102,
+    "exposure": 0.032825488263978374,
+    "win_rate": 0.47058823529411764,
+    "profit_factor": 0.859330186466523,
+    "n_completed_trades": 220.0,
+    "turnover_annual": 212.31017788883096
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0264 <= 0.0",
+    "sharpe -0.577 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 507,
+    "stop": 61
+   },
+   "stress_1_5x": 0.14040403999999906,
+   "breakeven_cost_x": 4.782544131351032,
+   "transfer_sharpe": 0.3983042237071769,
+   "neighbor_median_sharpe": 0.3947473221765838,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8209433180638444,
+   "local_detail": [
+    {
+     "move": "entry=15:25",
+     "sharpe": 0.7425077154421121,
+     "net_return": 0.16934319999999947,
+     "trades": 565
+    },
+    {
+     "move": "entry=15:35",
+     "sharpe": 0.5557694621795808,
+     "net_return": 0.09941259999999907,
+     "trades": 561
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.8527122205844773,
+     "net_return": 0.14778057999999916,
+     "trades": 568
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.8209433180638444,
+     "net_return": 0.1792135449999941,
+     "trades": 568
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.824010635169057,
+     "net_return": 0.18454745250000282,
+     "trades": 568
+    }
+   ],
+   "dsr": 0.10604050356612738,
+   "luck": {
+    "exposure_level": 3,
+    "luck_pct_sharpe": 0.3,
+    "luck_pct_return": 0.23
+   }
+  },
+  {
+   "order": 43,
+   "group": 3,
+   "config_id": "cfg_f49c",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "move > 1\u03c3",
+    "stop": "0.2%"
+   },
+   "dev": {
+    "net_return": 0.1836046600000001,
+    "cagr": 0.033477050663399455,
+    "sharpe": 1.0298395346552505,
+    "max_drawdown": -0.08731136273479634,
+    "exposure": 0.03465801829711022,
+    "win_rate": 0.4594594594594595,
+    "profit_factor": 1.3930396163174434,
+    "n_completed_trades": 370.0,
+    "turnover_annual": 181.64477988022853
+   },
+   "val": {
+    "net_return": 0.021846855520152975,
+    "cagr": 0.010610413712798028,
+    "sharpe": 0.49257044477904294,
+    "max_drawdown": -0.03151421934402532,
+    "exposure": 0.039136916041335054,
+    "win_rate": 0.475,
+    "profit_factor": 1.1519033177823301,
+    "n_completed_trades": 160.0,
+    "turnover_annual": 158.3865818097389
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 225,
+    "stop": 145
+   },
+   "stress_1_5x": 0.16461890999999995,
+   "breakeven_cost_x": 6.927209354743526,
+   "transfer_sharpe": 0.26640009310819046,
+   "neighbor_median_sharpe": 0.5384265532345353,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8193144267728326,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.41502944542655595,
+     "net_return": 0.06854495000000127,
+     "trades": 376
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.6145343251720706,
+     "net_return": 0.10062210000000094,
+     "trades": 378
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.106860068083948,
+     "net_return": 0.1830212599999994,
+     "trades": 370
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.7909262768955264,
+     "net_return": 0.15119667000000026,
+     "trades": 519
+    },
+    {
+     "move": "z=1.25",
+     "sharpe": 0.8193144267728326,
+     "net_return": 0.12471662000000006,
+     "trades": 277
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.8968051857062876,
+     "net_return": 0.1429432724999975,
+     "trades": 370
+    },
+    {
+     "move": "stop_pct=0.25",
+     "sharpe": 1.0611808132021292,
+     "net_return": 0.20681563750000942,
+     "trades": 370
+    }
+   ],
+   "dsr": 0.2645516503494296,
+   "luck": {
+    "exposure_level": 4,
+    "luck_pct_sharpe": 0.87,
+    "luck_pct_return": 0.87
+   }
+  },
+  {
+   "order": 44,
+   "group": 14,
+   "config_id": "cfg_8321",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "move > 1\u03c3",
+    "stop": "0.2%"
+   },
+   "dev": {
+    "net_return": 0.20925882999999978,
+    "cagr": 0.0378152376685279,
+    "sharpe": 1.0187498118999565,
+    "max_drawdown": -0.06754535127022177,
+    "exposure": 0.03898018619810575,
+    "win_rate": 0.4338235294117647,
+    "profit_factor": 1.40448903380336,
+    "n_completed_trades": 408.0,
+    "turnover_annual": 200.52514460192214
+   },
+   "val": {
+    "net_return": 0.030062869170862205,
+    "cagr": 0.014570634175617547,
+    "sharpe": 0.6500621939264557,
+    "max_drawdown": -0.040945996020040565,
+    "exposure": 0.039379468910280706,
+    "win_rate": 0.44871794871794873,
+    "profit_factor": 1.2169906433958357,
+    "n_completed_trades": 156.0,
+    "turnover_annual": 160.17112526182575
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 256,
+    "stop": 152
+   },
+   "stress_1_5x": 0.19505785999999992,
+   "breakeven_cost_x": 7.451308885775523,
+   "transfer_sharpe": -0.29790146314976335,
+   "neighbor_median_sharpe": 0.23436431420476603,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.803490744846864,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.5083014504678853,
+     "net_return": 0.09402035000000075,
+     "trades": 402
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.5041156520047712,
+     "net_return": 0.08505589000000069,
+     "trades": 407
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.2357514747330578,
+     "net_return": 0.24027752999999952,
+     "trades": 408
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.7565167907306197,
+     "net_return": 0.1588580899999994,
+     "trades": 554
+    },
+    {
+     "move": "z=1.25",
+     "sharpe": 0.9786939439445773,
+     "net_return": 0.1673013499999998,
+     "trades": 294
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.803490744846864,
+     "net_return": 0.1468774924999956,
+     "trades": 408
+    },
+    {
+     "move": "stop_pct=0.25",
+     "sharpe": 1.170950323628867,
+     "net_return": 0.26190608750000943,
+     "trades": 408
+    }
+   ],
+   "dsr": 0.24663221151596165,
+   "luck": {
+    "exposure_level": 4,
+    "luck_pct_sharpe": 0.93,
+    "luck_pct_return": 0.94
+   }
+  },
+  {
+   "order": 45,
+   "group": 20,
+   "config_id": "cfg_f5b8",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:50\u201316:00",
+    "filter": "down days only",
+    "stop": "0.1%"
+   },
+   "dev": {
+    "net_return": 0.1312610100000351,
+    "cagr": 0.024385528149095004,
+    "sharpe": 0.9298935240139373,
+    "max_drawdown": -0.03748674466832658,
+    "exposure": 0.008194572180002259,
+    "win_rate": 0.4203935599284436,
+    "profit_factor": 1.3462218521176865,
+    "n_completed_trades": 559.0,
+    "turnover_annual": 273.10056811816105
+   },
+   "val": {
+    "net_return": -0.0004657103845434607,
+    "cagr": -0.0002274670577102622,
+    "sharpe": -0.0073257779256603525,
+    "max_drawdown": -0.028179359002768356,
+    "exposure": 0.007994138305667147,
+    "win_rate": 0.4166666666666667,
+    "profit_factor": 0.9961829229346153,
+    "n_completed_trades": 227.0,
+    "turnover_annual": 220.17423401957248
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0005 <= 0.0",
+    "sharpe -0.007 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 321,
+    "stop": 238
+   },
+   "stress_1_5x": 0.10847817000003457,
+   "breakeven_cost_x": 3.9683208092616584,
+   "transfer_sharpe": -0.02533344003693246,
+   "neighbor_median_sharpe": 0.6845024289319814,
+   "local_frac_profitable": 0.8,
+   "local_median_sharpe": 0.7991750724084519,
+   "local_detail": [
+    {
+     "move": "entry=15:45",
+     "sharpe": 0.7991750724084519,
+     "net_return": 0.12039725500003651,
+     "trades": 545
+    },
+    {
+     "move": "entry=15:55",
+     "sharpe": -0.3876365897836811,
+     "net_return": -0.03809499499997271,
+     "trades": 571
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.0777806222705766,
+     "net_return": 0.09174281000002504,
+     "trades": 559
+    },
+    {
+     "move": "stop_pct=0.05",
+     "sharpe": 1.2302137002092735,
+     "net_return": 0.16429115250002568,
+     "trades": 559
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.6883116723905903,
+     "net_return": 0.10027597499998753,
+     "trades": 559
+    }
+   ],
+   "dsr": 0.15100379709799672,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.55,
+    "luck_pct_return": 0.55
+   }
+  },
+  {
+   "order": 46,
+   "group": 20,
+   "config_id": "cfg_3807",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "yes",
+    "window": "15:50\u201316:00",
+    "filter": "down days only",
+    "stop": "0.1%"
+   },
+   "dev": {
+    "net_return": 0.0890223400000203,
+    "cagr": 0.016798960702653964,
+    "sharpe": 0.7614927421790335,
+    "max_drawdown": -0.02464542238580314,
+    "exposure": 0.0044008261129128545,
+    "win_rate": 0.4065573770491803,
+    "profit_factor": 1.4284706291635048,
+    "n_completed_trades": 305.0,
+    "turnover_annual": 147.98591761385174
+   },
+   "val": {
+    "net_return": -0.002089879074466894,
+    "cagr": -0.0010211848471644025,
+    "sharpe": -0.09063821873837802,
+    "max_drawdown": -0.015490384123030276,
+    "exposure": 0.0040122287071426765,
+    "win_rate": 0.39655172413793105,
+    "profit_factor": 0.9661199306151207,
+    "n_completed_trades": 116.0,
+    "turnover_annual": 109.80723515457754
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0021 <= 0.0",
+    "sharpe -0.091 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 168,
+    "stop": 137
+   },
+   "stress_1_5x": 0.07326340000002007,
+   "breakeven_cost_x": 4.678183632252596,
+   "transfer_sharpe": -0.13328373240318236,
+   "neighbor_median_sharpe": 0.6677366201203959,
+   "local_frac_profitable": 0.8,
+   "local_median_sharpe": 0.7970481471504525,
+   "local_detail": [
+    {
+     "move": "entry=15:45",
+     "sharpe": 0.7970481471504525,
+     "net_return": 0.11230420000002073,
+     "trades": 305
+    },
+    {
+     "move": "entry=15:55",
+     "sharpe": -0.21552613586775934,
+     "net_return": -0.01813271499998259,
+     "trades": 319
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.894839326591524,
+     "net_return": 0.05992403000001367,
+     "trades": 305
+    },
+    {
+     "move": "stop_pct=0.05",
+     "sharpe": 0.9617262878006874,
+     "net_return": 0.10773455250001329,
+     "trades": 305
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.6050063996711161,
+     "net_return": 0.06821028749999325,
+     "trades": 305
+    }
+   ],
+   "dsr": 0.05147586618328095,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.52,
+    "luck_pct_return": 0.54
+   }
+  },
+  {
+   "order": 47,
+   "group": 0,
+   "config_id": "cfg_02aa",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "move > 0.5\u03c3",
+    "stop": "0.2%"
+   },
+   "dev": {
+    "net_return": 0.17899086999999958,
+    "cagr": 0.03268883512208709,
+    "sharpe": 0.7827017513453104,
+    "max_drawdown": -0.11141765975446216,
+    "exposure": 0.07057053423044032,
+    "win_rate": 0.43010752688172044,
+    "profit_factor": 1.1968979228992662,
+    "n_completed_trades": 744.0,
+    "turnover_annual": 364.1662258470933
+   },
+   "val": {
+    "net_return": 0.03503832900758597,
+    "cagr": 0.016961014237144356,
+    "sharpe": 0.6092052281002899,
+    "max_drawdown": -0.031167158298605502,
+    "exposure": 0.07164405366482225,
+    "win_rate": 0.46503496503496505,
+    "profit_factor": 1.139829576624429,
+    "n_completed_trades": 286.0,
+    "turnover_annual": 283.8663799054017
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 459,
+    "stop": 285
+   },
+   "stress_1_5x": 0.14961741999999978,
+   "breakeven_cost_x": 4.1156493630822615,
+   "transfer_sharpe": -0.004452792961406756,
+   "neighbor_median_sharpe": 0.26218438714319187,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7909262768955264,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.1900742331592649,
+     "net_return": 0.03662304000000183,
+     "trades": 735
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.3812329768314116,
+     "net_return": 0.07924580000000114,
+     "trades": 750
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.8852948419776058,
+     "net_return": 0.1961090199999993,
+     "trades": 744
+    },
+    {
+     "move": "z=0.25",
+     "sharpe": 0.899415971843317,
+     "net_return": 0.24431712000000072,
+     "trades": 964
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.7909262768955264,
+     "net_return": 0.15119667000000026,
+     "trades": 519
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.6586322866884041,
+     "net_return": 0.13433654999999733,
+     "trades": 744
+    },
+    {
+     "move": "stop_pct=0.25",
+     "sharpe": 0.8561924328385953,
+     "net_return": 0.2134822875000173,
+     "trades": 744
+    }
+   ],
+   "dsr": 0.11478168908064773,
+   "luck": {
+    "exposure_level": 7,
+    "luck_pct_sharpe": 0.91,
+    "luck_pct_return": 0.91
+   }
+  },
+  {
+   "order": 48,
+   "group": 25,
+   "config_id": "cfg_585c",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "yes",
+    "window": "15:00\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.17160539999999913,
+    "cagr": 0.031421926479348716,
+    "sharpe": 0.83871434217765,
+    "max_drawdown": -0.04028201180436708,
+    "exposure": 0.03678380689610662,
+    "win_rate": 0.5281899109792285,
+    "profit_factor": 1.3174676058182784,
+    "n_completed_trades": 337.0,
+    "turnover_annual": 162.0474913538405
+   },
+   "val": {
+    "net_return": -0.011535590395878925,
+    "cagr": -0.0056503824975797645,
+    "sharpe": -0.3584902024084431,
+    "max_drawdown": -0.036349431526827236,
+    "exposure": 0.030177619444654993,
+    "win_rate": 0.4326923076923077,
+    "profit_factor": 0.8670489525568609,
+    "n_completed_trades": 104.0,
+    "turnover_annual": 95.9091998140473
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0115 <= 0.0",
+    "sharpe -0.358 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 266,
+    "stop": 71
+   },
+   "stress_1_5x": 0.15782025999999938,
+   "breakeven_cost_x": 7.945388532617277,
+   "transfer_sharpe": -0.43173879509254487,
+   "neighbor_median_sharpe": 0.6778259191503333,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7564007375591407,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.751034583186057,
+     "net_return": 0.15386600000000028,
+     "trades": 333
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.7710053973215684,
+     "net_return": 0.17618697999999977,
+     "trades": 331
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.054504294078164,
+     "net_return": 0.20461915999999913,
+     "trades": 337
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.7564007375591407,
+     "net_return": 0.14710704499999983,
+     "trades": 337
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.7301966880421128,
+     "net_return": 0.1504965225000039,
+     "trades": 337
+    }
+   ],
+   "dsr": 0.13905053980574222,
+   "luck": {
+    "exposure_level": 3,
+    "luck_pct_sharpe": 0.4,
+    "luck_pct_return": 0.43
+   }
+  },
+  {
+   "order": 49,
+   "group": 14,
+   "config_id": "cfg_2366",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "move > 0.5\u03c3",
+    "stop": "0.2%"
+   },
+   "dev": {
+    "net_return": 0.20150132999999837,
+    "cagr": 0.036511298971604766,
+    "sharpe": 0.8479841278631784,
+    "max_drawdown": -0.06443152139522046,
+    "exposure": 0.06945923487745453,
+    "win_rate": 0.4397260273972603,
+    "profit_factor": 1.2257873137657718,
+    "n_completed_trades": 730.0,
+    "turnover_annual": 355.7782763572911
+   },
+   "val": {
+    "net_return": 0.08308301248405581,
+    "cagr": 0.03974736538579626,
+    "sharpe": 1.3992010194306228,
+    "max_drawdown": -0.03149705059405117,
+    "exposure": 0.07193713838146491,
+    "win_rate": 0.48214285714285715,
+    "profit_factor": 1.3606036868332085,
+    "n_completed_trades": 280.0,
+    "turnover_annual": 285.34292533118406
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 454,
+    "stop": 276
+   },
+   "stress_1_5x": 0.1558250599999984,
+   "breakeven_cost_x": 4.525692927720034,
+   "transfer_sharpe": -0.07842878652976647,
+   "neighbor_median_sharpe": 0.14644437477681513,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7541572148546399,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.475527732643111,
+     "net_return": 0.10289214000000113,
+     "trades": 721
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.35007788676843954,
+     "net_return": 0.0681976599999996,
+     "trades": 726
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.911512342478897,
+     "net_return": 0.19944280999999808,
+     "trades": 730
+    },
+    {
+     "move": "z=0.25",
+     "sharpe": 0.7541572148546399,
+     "net_return": 0.1884530699999989,
+     "trades": 942
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.7565167907306197,
+     "net_return": 0.1588580899999994,
+     "trades": 554
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.6309524717546875,
+     "net_return": 0.1320621174999952,
+     "trades": 730
+    },
+    {
+     "move": "stop_pct=0.25",
+     "sharpe": 0.8314761985292849,
+     "net_return": 0.20776716250001614,
+     "trades": 730
+    }
+   ],
+   "dsr": 0.14307785077811502,
+   "luck": {
+    "exposure_level": 7,
+    "luck_pct_sharpe": 1.0,
+    "luck_pct_return": 1.0
+   }
+  },
+  {
+   "order": 50,
+   "group": 23,
+   "config_id": "cfg_dcb8",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "yes",
+    "window": "15:45\u201316:00",
+    "filter": "down days only",
+    "stop": "0.2%"
+   },
+   "dev": {
+    "net_return": 0.1321775399999996,
+    "cagr": 0.02454760336730044,
+    "sharpe": 0.8781437812257792,
+    "max_drawdown": -0.031848908528153363,
+    "exposure": 0.008242977233489842,
+    "win_rate": 0.5147540983606558,
+    "profit_factor": 1.4995514233474347,
+    "n_completed_trades": 305.0,
+    "turnover_annual": 149.3747943372103
+   },
+   "val": {
+    "net_return": -0.029834234302157592,
+    "cagr": -0.014683111097583357,
+    "sharpe": -1.2589775574112787,
+    "max_drawdown": -0.034286736720039346,
+    "exposure": 0.00804972333813386,
+    "win_rate": 0.41379310344827586,
+    "profit_factor": 0.6467979293682635,
+    "n_completed_trades": 116.0,
+    "turnover_annual": 111.66608343938724
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0298 <= 0.0",
+    "sharpe -1.259 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 236,
+    "stop": 69
+   },
+   "stress_1_5x": 0.11348818999999954,
+   "breakeven_cost_x": 6.3857563208547266,
+   "transfer_sharpe": -0.10513255885167494,
+   "neighbor_median_sharpe": 0.6677366201203959,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7474905498464444,
+   "local_detail": [
+    {
+     "move": "entry=15:40",
+     "sharpe": 0.5090854276992609,
+     "net_return": 0.053533289999999845,
+     "trades": 302
+    },
+    {
+     "move": "entry=15:50",
+     "sharpe": 0.5384250930903394,
+     "net_return": 0.06580873999999959,
+     "trades": 305
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.2694978922308628,
+     "net_return": 0.12340468999999965,
+     "trades": 305
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.7474905498464444,
+     "net_return": 0.10038370249999251,
+     "trades": 305
+    },
+    {
+     "move": "stop_pct=0.25",
+     "sharpe": 0.8869165508118932,
+     "net_return": 0.13724763750000335,
+     "trades": 305
+    }
+   ],
+   "dsr": 0.10264228455708618,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.13,
+    "luck_pct_return": 0.12
+   }
+  },
+  {
+   "order": 51,
+   "group": 3,
+   "config_id": "cfg_067e",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "move > 1\u03c3",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.25398999999999994,
+    "cagr": 0.04520537132312841,
+    "sharpe": 0.9167983683310634,
+    "max_drawdown": -0.07189470100614848,
+    "exposure": 0.0447746744760153,
+    "win_rate": 0.5540540540540541,
+    "profit_factor": 1.3942505452203,
+    "n_completed_trades": 370.0,
+    "turnover_annual": 181.9776103616164
+   },
+   "val": {
+    "net_return": 0.02578170479828379,
+    "cagr": 0.012509084660595526,
+    "sharpe": 0.4269065619784524,
+    "max_drawdown": -0.05458772402999479,
+    "exposure": 0.0485105737891306,
+    "win_rate": 0.59375,
+    "profit_factor": 1.1460846776015543,
+    "n_completed_trades": 159.0,
+    "turnover_annual": 164.7640120470304
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 370,
+    "stop": 0
+   },
+   "stress_1_5x": 0.23555250000000005,
+   "breakeven_cost_x": 9.713928641442854,
+   "transfer_sharpe": 0.400719639175307,
+   "neighbor_median_sharpe": 0.5196739660791891,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7470420993550563,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.7470420993550563,
+     "net_return": 0.19662500000000005,
+     "trades": 376
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.6381118111956916,
+     "net_return": 0.16706500000000002,
+     "trades": 378
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.2084174208997527,
+     "net_return": 0.2817050000000001,
+     "trades": 370
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.7891498945237885,
+     "net_return": 0.23280499999999993,
+     "trades": 519
+    },
+    {
+     "move": "z=1.25",
+     "sharpe": 0.6152987770010642,
+     "net_return": 0.14968000000000004,
+     "trades": 277
+    }
+   ],
+   "dsr": 0.23939024196224024,
+   "luck": {
+    "exposure_level": 5,
+    "luck_pct_sharpe": 0.76,
+    "luck_pct_return": 0.77
+   }
+  },
+  {
+   "order": 52,
+   "group": 28,
+   "config_id": "cfg_7351",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.2%"
+   },
+   "dev": {
+    "net_return": 0.19635575000000038,
+    "cagr": 0.03564264955977192,
+    "sharpe": 0.8496191818482506,
+    "max_drawdown": -0.09215436665625043,
+    "exposure": 0.04835059780241057,
+    "win_rate": 0.4107142857142857,
+    "profit_factor": 1.2507322386438773,
+    "n_completed_trades": 560.0,
+    "turnover_annual": 274.25691650529177
+   },
+   "val": {
+    "net_return": -0.042849470151333,
+    "cagr": -0.021160960950300844,
+    "sharpe": -1.027628632840561,
+    "max_drawdown": -0.06062125128443541,
+    "exposure": 0.046757118674044314,
+    "win_rate": 0.3556701030927835,
+    "profit_factor": 0.7625859211707695,
+    "n_completed_trades": 194.0,
+    "turnover_annual": 182.43951030685568
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0428 <= 0.0",
+    "sharpe -1.028 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 295,
+    "stop": 265
+   },
+   "stress_1_5x": 0.17288956000000044,
+   "breakeven_cost_x": 5.5032764363633015,
+   "transfer_sharpe": 0.024869309120261255,
+   "neighbor_median_sharpe": 0.25563131905545367,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7267345068624392,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.7267345068624392,
+     "net_return": 0.16373945000000134,
+     "trades": 559
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.5396004873053866,
+     "net_return": 0.11229995999999942,
+     "trades": 560
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.772684435659949,
+     "net_return": 0.16096754000000058,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.5152752791554429,
+     "net_return": 0.1000019099999978,
+     "trades": 560
+    },
+    {
+     "move": "stop_pct=0.25",
+     "sharpe": 0.9850470328441896,
+     "net_return": 0.24561348750001688,
+     "trades": 560
+    }
+   ],
+   "dsr": 0.14438797093280253,
+   "luck": {
+    "exposure_level": 5,
+    "luck_pct_sharpe": 0.11,
+    "luck_pct_return": 0.11
+   }
+  },
+  {
+   "order": 53,
+   "group": 29,
+   "config_id": "cfg_9ab6",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "yes",
+    "window": "15:00\u201316:00",
+    "filter": "down days only",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.2062299999999999,
+    "cagr": 0.03730693243121541,
+    "sharpe": 0.8068502779329576,
+    "max_drawdown": -0.06940130614178108,
+    "exposure": 0.037634929086596644,
+    "win_rate": 0.5209003215434084,
+    "profit_factor": 1.3904761904761904,
+    "n_completed_trades": 310.0,
+    "turnover_annual": 153.49280054076368
+   },
+   "val": {
+    "net_return": 0.04673652620147073,
+    "cagr": 0.022558168723053607,
+    "sharpe": 0.9566879989979695,
+    "max_drawdown": -0.02920528162235847,
+    "exposure": 0.033654210566209354,
+    "win_rate": 0.5405405405405406,
+    "profit_factor": 1.4277151853116345,
+    "n_completed_trades": 111.0,
+    "turnover_annual": 111.66885580916981
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 310,
+    "stop": 0
+   },
+   "stress_1_5x": 0.18970749999999992,
+   "breakeven_cost_x": 9.66553656680274,
+   "transfer_sharpe": 0.17838529088250304,
+   "neighbor_median_sharpe": 0.40850319864596385,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.691537167225322,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.691537167225322,
+     "net_return": 0.17483500000000007,
+     "trades": 306
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.5541754820756543,
+     "net_return": 0.13095499999999993,
+     "trades": 307
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.9847133887707968,
+     "net_return": 0.1987350000000001,
+     "trades": 311
+    }
+   ],
+   "dsr": 0.12305676683251654,
+   "luck": {
+    "exposure_level": 3,
+    "luck_pct_sharpe": 0.91,
+    "luck_pct_return": 0.98
+   }
+  },
+  {
+   "order": 54,
+   "group": 0,
+   "config_id": "cfg_3ead",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "none",
+    "stop": "0.2%"
+   },
+   "dev": {
+    "net_return": 0.2371437800000007,
+    "cagr": 0.042447456218587476,
+    "sharpe": 0.8111598974521838,
+    "max_drawdown": -0.11784422251875637,
+    "exposure": 0.12079077722380883,
+    "win_rate": 0.4339471577261809,
+    "profit_factor": 1.1600429119268756,
+    "n_completed_trades": 1249.0,
+    "turnover_annual": 610.9417229900597
+   },
+   "val": {
+    "net_return": 0.0060259931953901,
+    "cagr": 0.00293840401288592,
+    "sharpe": 0.1006252419014968,
+    "max_drawdown": -0.058841368508450564,
+    "exposure": 0.12367164405366482,
+    "win_rate": 0.4435483870967742,
+    "profit_factor": 1.0134669248696444,
+    "n_completed_trades": 496.0,
+    "turnover_annual": 506.153099818533
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.101 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 798,
+    "stop": 451
+   },
+   "stress_1_5x": 0.1682936000000006,
+   "breakeven_cost_x": 3.093757558522127,
+   "transfer_sharpe": -0.37419145256702546,
+   "neighbor_median_sharpe": 0.19723379109728148,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.6881198472305848,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.6881198472305848,
+     "net_return": 0.1981013700000016,
+     "trades": 1246
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.4997764214696064,
+     "net_return": 0.12808817000000006,
+     "trades": 1247
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.7196445349912484,
+     "net_return": 0.19194637000000014,
+     "trades": 1249
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.44551458330188104,
+     "net_return": 0.10862202999999604,
+     "trades": 1249
+    },
+    {
+     "move": "stop_pct=0.25",
+     "sharpe": 0.9527414865319095,
+     "net_return": 0.3006499250000263,
+     "trades": 1249
+    }
+   ],
+   "dsr": 0.1309777864874745,
+   "luck": {
+    "exposure_level": 12,
+    "luck_pct_sharpe": 0.74,
+    "luck_pct_return": 0.74
+   }
+  },
+  {
+   "order": 55,
+   "group": 5,
+   "config_id": "cfg_455e",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "yes",
+    "window": "15:00\u201316:00",
+    "filter": "move > 1\u03c3",
+    "stop": "0.4%"
+   },
+   "dev": {
+    "net_return": 0.1598159999999993,
+    "cagr": 0.029386183853264747,
+    "sharpe": 0.7506641670463432,
+    "max_drawdown": -0.07931749443742564,
+    "exposure": 0.04123102118527841,
+    "win_rate": 0.4822888283378747,
+    "profit_factor": 1.2833521565762842,
+    "n_completed_trades": 367.0,
+    "turnover_annual": 180.09066035743587
+   },
+   "val": {
+    "net_return": 0.002946329417770066,
+    "cagr": 0.0014378221513138278,
+    "sharpe": 0.0768320648333928,
+    "max_drawdown": -0.05291468863480586,
+    "exposure": 0.03849010839081331,
+    "win_rate": 0.48507462686567165,
+    "profit_factor": 1.0235810777239847,
+    "n_completed_trades": 134.0,
+    "turnover_annual": 130.17809711201883
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.077 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 307,
+    "stop": 60
+   },
+   "stress_1_5x": 0.14506917999999924,
+   "breakeven_cost_x": 6.900778122174846,
+   "transfer_sharpe": -0.280089903945518,
+   "neighbor_median_sharpe": 0.7488670583136424,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.6721940546205907,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.5763474769164194,
+     "net_return": 0.12158824000000079,
+     "trades": 366
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.6721940546205907,
+     "net_return": 0.1535890999999996,
+     "trades": 365
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.2654261919646346,
+     "net_return": 0.2573623399999996,
+     "trades": 367
+    },
+    {
+     "move": "z=0.75",
+     "sharpe": 0.49837235375980016,
+     "net_return": 0.10884611999999927,
+     "trades": 495
+    },
+    {
+     "move": "z=1.25",
+     "sharpe": 1.026642591000083,
+     "net_return": 0.20157329999999973,
+     "trades": 272
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.6912753938087557,
+     "net_return": 0.1405666974999975,
+     "trades": 367
+    },
+    {
+     "move": "stop_pct=0.45",
+     "sharpe": 0.6440897598844257,
+     "net_return": 0.13746889750000268,
+     "trades": 367
+    }
+   ],
+   "dsr": 0.09726471945179954,
+   "luck": {
+    "exposure_level": 4,
+    "luck_pct_sharpe": 0.72,
+    "luck_pct_return": 0.72
+   }
+  },
+  {
+   "order": 56,
+   "group": 29,
+   "config_id": "cfg_7ae0",
+   "settings": {
+    "signal": "prior close \u2192 now",
+    "agree": "no",
+    "window": "15:00\u201316:00",
+    "filter": "down days only",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.2664249999999999,
+    "cagr": 0.04722205767076448,
+    "sharpe": 0.8107605772690305,
+    "max_drawdown": -0.0736606054697021,
+    "exposure": 0.0654678348419575,
+    "win_rate": 0.5083179297597042,
+    "profit_factor": 1.2665142822845654,
+    "n_completed_trades": 540.0,
+    "turnover_annual": 266.58736076557767
+   },
+   "val": {
+    "net_return": 0.09351126201709548,
+    "cagr": 0.04462447480353027,
+    "sharpe": 1.3890846060069757,
+    "max_drawdown": -0.03118195310609806,
+    "exposure": 0.0654892746153263,
+    "win_rate": 0.5324074074074074,
+    "profit_factor": 1.4519089504111733,
+    "n_completed_trades": 215.0,
+    "turnover_annual": 218.29574850475598
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 0,
+    "eod": 540,
+    "stop": 0
+   },
+   "stress_1_5x": 0.233865,
+   "breakeven_cost_x": 7.079699926673811,
+   "transfer_sharpe": 0.33572630564017747,
+   "neighbor_median_sharpe": 0.5405364355550302,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.5991970817391674,
+   "local_detail": [
+    {
+     "move": "entry=14:55",
+     "sharpe": 0.5991970817391674,
+     "net_return": 0.19028500000000004,
+     "trades": 540
+    },
+    {
+     "move": "entry=15:05",
+     "sharpe": 0.5575878210558214,
+     "net_return": 0.16864499999999993,
+     "trades": 540
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 1.0382491790416393,
+     "net_return": 0.2836749999999999,
+     "trades": 541
+    }
+   ],
+   "dsr": 0.1370950946960932,
+   "luck": {
+    "exposure_level": 7,
+    "luck_pct_sharpe": 1.0,
+    "luck_pct_return": 1.0
+   }
+  }
+ ],
+ "short_labels": {
+  "timeframe": "Bar",
+  "signal": "Signal",
+  "agree": "Agree",
+  "window": "Window",
+  "filter": "Filter",
+  "stop": "Stop"
+ },
+ "exit_labels": [
+  [
+   "time",
+   "time",
+   "time exit"
+  ],
+  [
+   "eod",
+   "close",
+   "16:00 close"
+  ],
+  [
+   "stop",
+   "stop",
+   "stop"
+  ]
+ ],
+ "local_moves": [
+  [
+   "entry",
+   "Entry"
+  ],
+  [
+   "exit",
+   "Exit"
+  ],
+  [
+   "z",
+   "z level"
+  ],
+  [
+   "stop_pct",
+   "Stop"
+  ]
+ ],
+ "benchmark": {
+  "label": "Holding NQ (rolled, unlevered)",
+  "dev": {
+   "net_return": 0.6223841260515461,
+   "sharpe": 0.49395618440136174,
+   "max_drawdown": -0.36263311407982224
+  },
+  "val": {
+   "net_return": 0.7411193151941036,
+   "sharpe": 1.6126936714973361,
+   "max_drawdown": -0.1398454138648927
+  }
+ },
+ "transfer_symbol": "ES",
+ "dsr": {
+  "effective_trials": 92.00000000000048,
+  "raw_trials": 500.0
+ },
+ "assumptions": [
+  "Data: Databento CME continuous front month (NQ.v.0), 1-minute bars from 09:30 to 16:00 ET only. Rolls are back-adjusted; positions never cross a session. The previous close is the last regular-session bar's close, not the 17:00 settlement.",
+  "Costs: 1 tick slippage per side and $2.50 commission per contract per side.",
+  "The paper's effect is strongest when dealers are short gamma, which price bars cannot see. The move-size, volatility and down-day filters are stand-ins chosen before the run, not measured dealer positioning.",
+  "Post-2013 replications find the plain version near zero in the S&P 500, and the whole 2018\u20132026 sample is in that period. The family was chosen from a research report that read those replications.",
+  "Close to the noise-band strategy: on breakout days both hold the day's direction into the close, so what matters for adding it is its daily profit correlation with the noise-band picks, not only its own Sharpe.",
+  "Each trade uses the whole account in whole contracts with no leverage, the same as the other families.",
+  "Sharpe uses daily mark-to-market returns (\u221a252), with idle cash earning 0%. Time in market is the share of 1-minute bars with an open position.",
+  "Other strategy families were already selected on this market's 2023\u20132024 data, so 2023\u20132024 is not untouched; only the 2025+ holdout is.",
+  "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead."
+ ],
+ "source": "last-half-hour-backtest/runs/funnel/lh_nq_v1/ \u00b7 configs/funnel/lh_funnel_nq_v1.yaml"
+}

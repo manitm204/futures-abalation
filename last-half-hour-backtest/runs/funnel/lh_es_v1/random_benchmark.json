@@ -1,0 +1,75 @@
+{
+  "curves": {
+    "1min|15:50-16:00-0.10": [
+      {
+        "actual_exposure": 0.010083983930872432,
+        "exposure_pct": 1,
+        "frac_profitable": 0.04,
+        "mean_return": -0.025512615749994458,
+        "mean_sharpe": -1.0943252975236353,
+        "mean_trades": 243.73,
+        "median_return": -0.026035262499994105,
+        "median_sharpe": -1.0486394441975933,
+        "p10_return": -0.043614396249994726,
+        "p10_sharpe": -1.9288338685753876,
+        "p90_return": -0.005724839999994134,
+        "p90_sharpe": -0.23211121342637722
+      }
+    ]
+  },
+  "data_access": {
+    "actual_last_session": "2024-12-31",
+    "command": "random_benchmark",
+    "experiment_id": "lh_es_v1",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 84,
+    "partition_fingerprint": "4ab8834f351216c0",
+    "phase": "validation",
+    "phase_end": "2024-12-31",
+    "rows": 2464309,
+    "symbol": "ES"
+  },
+  "experiment_id": "lh_es_v1",
+  "finalists": [
+    {
+      "config_id": "cfg_e96274c4399369cfd247",
+      "dev_order": 1,
+      "direction": "signal",
+      "exposure": 0.00769094721948508,
+      "exposure_level": 1,
+      "group": "1min|15:50-16:00-0.10",
+      "luck_pct_return": 0.89,
+      "luck_pct_sharpe": 0.89,
+      "net_return": -0.006612931798726351,
+      "sharpe": -0.27515110315193436,
+      "status": "hard_reject",
+      "timeframe": "1min"
+    }
+  ],
+  "group_levels": {
+    "1min|15:50-16:00-0.10": [
+      1
+    ]
+  },
+  "groups": {
+    "1min|15:50-16:00-0.10": {
+      "direction": "coin flip",
+      "mean_trade_bars": 8.095744680851064,
+      "median_trade_bars": 10.0,
+      "n_pool_trades": 188,
+      "p_long": 0.5638297872340425,
+      "placebo_pool_days": 497,
+      "timeframe": "1min"
+    }
+  },
+  "levels": [
+    1
+  ],
+  "method": "Per clock and stop (entry-exit window x stop): the same trade window and stop, but on random validation-window sessions, each long or short by a fair coin. The number of days is scaled so the time in market matches each level. Same fills, slippage, commission and whole-contract sizing as the strategy; scored with the same daily-Sharpe and time-in-market code.",
+  "n_sims": 100,
+  "window": [
+    "2023-01-01",
+    "2024-12-31"
+  ]
+}

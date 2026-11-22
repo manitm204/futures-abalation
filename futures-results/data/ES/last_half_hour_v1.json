@@ -1,0 +1,935 @@
+{
+ "market": "ES",
+ "market_name": "E-mini S&P 500",
+ "strategy_key": "last_half_hour_v1",
+ "strategy_name": "Last half hour \u00b7 v1",
+ "variant": null,
+ "variant_label": null,
+ "stability_mode": "local_perturbation",
+ "validation_rules": {
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3,
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40
+ },
+ "run_id": "lh_es_v1",
+ "generated_at": "2026-11-22T17:06:16+00:00",
+ "periods": {
+  "dev": [
+   "2018-01-01",
+   "2022-12-31"
+  ],
+  "val": [
+   "2023-01-01",
+   "2024-12-31"
+  ]
+ },
+ "strategy": {
+  "summary": "Trade stock index futures in the day's direction into the close. Baltussen, Da, Lammers & Martens (JFE 2021) find across 60+ futures (1974\u20132020) that the move from the previous close to 30 minutes before today's close predicts the last half hour: for equity index futures, going long if the day is up and short if it is down earned a Sharpe of 1.7 before costs. They tie it to dealers and leveraged ETFs hedging in the day's direction near the close. Replications after 2013 find the plain version near zero, but still working on days dealers are short gamma; the filters here are price-based stand-ins for those days.",
+  "formula": "sign(price now \u00f7 reference \u2212 1): long if up, short if down, from the entry time to the exit time",
+  "rules": [
+   {
+    "label": "Signal",
+    "text": "The day's move so far: the previous session's last close to the minute before the entry (the paper's), today's 09:30 open to the same minute (no overnight gap), or the previous close to 10:00 (the first half hour only). Optionally it must have the same sign as the first-half-hour move."
+   },
+   {
+    "label": "Filter",
+    "text": "None; the move bigger than 0.5\u03c3 or 1\u03c3 of the same signal over the previous 20 days; only when 20-day volatility is above its 120-day median; or only down days (shorts only)."
+   },
+   {
+    "label": "Enter",
+    "text": "At 15:00, 15:30, 15:45 or 15:50 ET, at that minute's open, long if the signal is up and short if down."
+   },
+   {
+    "label": "Exit",
+    "text": "At 15:50 or 16:00 ET, at the close of the minute before (16:00 = the last regular-session bar). Optional stop 0.1%, 0.2% or 0.4% against the entry price, live during the trade. Early-close days are not traded."
+   },
+   {
+    "label": "Size",
+    "text": "One position at a time, never held overnight. As many whole ES contracts as the account covers at full contract value (no leverage), starting from $1,000,000."
+   }
+  ],
+  "axes": [
+   {
+    "label": "Bar size",
+    "values": [
+     "1 min"
+    ]
+   },
+   {
+    "label": "Signal",
+    "values": [
+     "prior close \u2192 now",
+     "today's open \u2192 now",
+     "first half hour"
+    ]
+   },
+   {
+    "label": "Must agree with first half hour",
+    "values": [
+     "no",
+     "yes"
+    ]
+   },
+   {
+    "label": "Trade window (ET)",
+    "values": [
+     "15:00\u201316:00",
+     "15:30\u201315:50",
+     "15:30\u201316:00",
+     "15:45\u201316:00",
+     "15:50\u201316:00"
+    ]
+   },
+   {
+    "label": "Filter",
+    "values": [
+     "none",
+     "move > 0.5\u03c3",
+     "move > 1\u03c3",
+     "high volatility",
+     "down days only"
+    ]
+   },
+   {
+    "label": "Stop (% against entry)",
+    "values": [
+     "none",
+     "0.1%",
+     "0.2%",
+     "0.4%"
+    ]
+   }
+  ],
+  "grid_size": 500,
+  "length_note": "Times are New York clock times on 1-minute bars from 09:30 to 16:00 ET."
+ },
+ "funnel": [
+  {
+   "name": "Start",
+   "sub": "every combination",
+   "n": 500,
+   "why": "All 500 versions backtested once on 2018\u20132022 data."
+  },
+  {
+   "name": "1 \u00b7 Integrity",
+   "sub": "no cheating",
+   "n": 500,
+   "why": "Per-trade checks on every version: the prior close, the signal, its 20-day spread, the volatility regime and each day's direction were recomputed independently; each trade was on an allowed day in the signal's direction, entered and exited at the set times; no allowed day was skipped; fills were never better than the market; nothing was held overnight. Plus 40 random versions re-run on cut-off data. 0 failed."
+  },
+  {
+   "name": "2 \u00b7 Enough trades",
+   "sub": "\u2265100 trades, spread out",
+   "n": 500,
+   "why": "Needs \u2265100 completed trades and \u226510 a year in \u22654 of the 5 years. Removed 0 (none)."
+  },
+  {
+   "name": "3 \u00b7 Profit",
+   "sub": "net > 0, Sharpe \u2265 0.75",
+   "n": 1,
+   "why": "Needs a net profit, Sharpe \u2265 0.75 and drawdown no worse than 30%. Removed 499 (499 on 1min); 371 of them lost money."
+  },
+  {
+   "name": "4 \u00b7 Stable settings",
+   "sub": "nudged settings also work",
+   "n": 1,
+   "why": "Each setting is nudged one at a time, down and up: the entry time by \u00b15 minutes, the exit time by \u00b15 minutes (never after 16:00), a move-size filter's \u03c3 level by \u00b10.25 and a stop by \u00b10.05% (\"no stop\" and the other filters have nothing to nudge). At least 70% of the nudged versions must be profitable, with median Sharpe \u2265 0.5. Removed 0."
+  },
+  {
+   "name": "5 \u00b7 Time stability",
+   "sub": "\u22653 profitable years",
+   "n": 1,
+   "why": "Removed 0."
+  },
+  {
+   "name": "6 \u00b7 Remove duplicates",
+   "sub": "best 2 per group",
+   "n": 1,
+   "why": "Versions whose monthly returns correlate \u2265 0.8 form a group; the best 2 of each go on (a group of one keeps its one). 1 versions formed 1 groups; 1 of the 1 picks are distinct backtests."
+  },
+  {
+   "name": "7 \u00b7 Cost stress",
+   "sub": "profitable at 1.5\u00d7 costs",
+   "n": 1,
+   "why": "Removed 0."
+  },
+  {
+   "name": "8 \u00b7 Validation",
+   "sub": "2023\u20132024, new data",
+   "n": 0,
+   "why": "Frozen finalists run once on unseen data: needs net > 0, Sharpe \u2265 0.3, drawdown no worse than 30% and \u226540 trades."
+  }
+ ],
+ "stable": {
+  "n": 1,
+  "axes": [
+   {
+    "axis": "signal",
+    "label": "Signal",
+    "values": [
+     {
+      "v": "prior close \u2192 now",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "today's open \u2192 now",
+      "n": 1,
+      "median_sharpe": 0.8032416842830052
+     },
+     {
+      "v": "first half hour",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "agree",
+    "label": "Must agree with first half hour",
+    "values": [
+     {
+      "v": "no",
+      "n": 1,
+      "median_sharpe": 0.8032416842830052
+     },
+     {
+      "v": "yes",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "window",
+    "label": "Trade window (ET)",
+    "values": [
+     {
+      "v": "15:00\u201316:00",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "15:30\u201315:50",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "15:30\u201316:00",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "15:45\u201316:00",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "15:50\u201316:00",
+      "n": 1,
+      "median_sharpe": 0.8032416842830052
+     }
+    ]
+   },
+   {
+    "axis": "filter",
+    "label": "Filter",
+    "values": [
+     {
+      "v": "none",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "move > 0.5\u03c3",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "move > 1\u03c3",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "high volatility",
+      "n": 1,
+      "median_sharpe": 0.8032416842830052
+     },
+     {
+      "v": "down days only",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "stop",
+    "label": "Stop (% against entry)",
+    "values": [
+     {
+      "v": "none",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "0.1%",
+      "n": 1,
+      "median_sharpe": 0.8032416842830052
+     },
+     {
+      "v": "0.2%",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "0.4%",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   }
+  ],
+  "by_timeframe": [
+   {
+    "timeframe": "1 min",
+    "n": 1,
+    "axes": [
+     {
+      "axis": "signal",
+      "label": "Signal",
+      "values": [
+       {
+        "v": "prior close \u2192 now",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "today's open \u2192 now",
+        "n": 1,
+        "median_sharpe": 0.8032416842830052
+       },
+       {
+        "v": "first half hour",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "agree",
+      "label": "Must agree with first half hour",
+      "values": [
+       {
+        "v": "no",
+        "n": 1,
+        "median_sharpe": 0.8032416842830052
+       },
+       {
+        "v": "yes",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "window",
+      "label": "Trade window (ET)",
+      "values": [
+       {
+        "v": "15:00\u201316:00",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "15:30\u201315:50",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "15:30\u201316:00",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "15:45\u201316:00",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "15:50\u201316:00",
+        "n": 1,
+        "median_sharpe": 0.8032416842830052
+       }
+      ]
+     },
+     {
+      "axis": "filter",
+      "label": "Filter",
+      "values": [
+       {
+        "v": "none",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "move > 0.5\u03c3",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "move > 1\u03c3",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "high volatility",
+        "n": 1,
+        "median_sharpe": 0.8032416842830052
+       },
+       {
+        "v": "down days only",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "stop",
+      "label": "Stop (% against entry)",
+      "values": [
+       {
+        "v": "none",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "0.1%",
+        "n": 1,
+        "median_sharpe": 0.8032416842830052
+       },
+       {
+        "v": "0.2%",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "0.4%",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "ablation": [
+  {
+   "axis": "signal",
+   "label": "Signal",
+   "values": [
+    {
+     "v": "prior close \u2192 now",
+     "n": 200,
+     "pct_profitable": 0.28,
+     "median_sharpe": -0.19754423747456706,
+     "p90_sharpe": 0.2979552663876232,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "today's open \u2192 now",
+     "n": 200,
+     "pct_profitable": 0.365,
+     "median_sharpe": -0.15117044342086677,
+     "p90_sharpe": 0.33114048826091275,
+     "n_stage3": 1,
+     "n_survivors": 1
+    },
+    {
+     "v": "first half hour",
+     "n": 100,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.8786596069706689,
+     "p90_sharpe": -0.3422205475918398,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "agree",
+   "label": "Must agree with first half hour",
+   "values": [
+    {
+     "v": "no",
+     "n": 300,
+     "pct_profitable": 0.3233333333333333,
+     "median_sharpe": -0.23681183115778529,
+     "p90_sharpe": 0.3487482040905139,
+     "n_stage3": 1,
+     "n_survivors": 1
+    },
+    {
+     "v": "yes",
+     "n": 200,
+     "pct_profitable": 0.16,
+     "median_sharpe": -0.30771161461518437,
+     "p90_sharpe": 0.11467223043524226,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "window",
+   "label": "Trade window (ET)",
+   "values": [
+    {
+     "v": "15:00\u201316:00",
+     "n": 100,
+     "pct_profitable": 0.22,
+     "median_sharpe": -0.33750512164414637,
+     "p90_sharpe": 0.24837400300023857,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "15:30\u201315:50",
+     "n": 100,
+     "pct_profitable": 0.03,
+     "median_sharpe": -0.7166605079466681,
+     "p90_sharpe": -0.22308783740406712,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "15:30\u201316:00",
+     "n": 100,
+     "pct_profitable": 0.3,
+     "median_sharpe": -0.24343285397936137,
+     "p90_sharpe": 0.2573030824061634,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "15:45\u201316:00",
+     "n": 100,
+     "pct_profitable": 0.41,
+     "median_sharpe": -0.07436003058322085,
+     "p90_sharpe": 0.36988895264183097,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "15:50\u201316:00",
+     "n": 100,
+     "pct_profitable": 0.33,
+     "median_sharpe": -0.1426732868005055,
+     "p90_sharpe": 0.33114048826091275,
+     "n_stage3": 1,
+     "n_survivors": 1
+    }
+   ]
+  },
+  {
+   "axis": "filter",
+   "label": "Filter",
+   "values": [
+    {
+     "v": "none",
+     "n": 100,
+     "pct_profitable": 0.09,
+     "median_sharpe": -0.5872891366113904,
+     "p90_sharpe": -0.049851179710322026,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "move > 0.5\u03c3",
+     "n": 100,
+     "pct_profitable": 0.21,
+     "median_sharpe": -0.31675931534466883,
+     "p90_sharpe": 0.24837400300023857,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "move > 1\u03c3",
+     "n": 100,
+     "pct_profitable": 0.23,
+     "median_sharpe": -0.25155705085908175,
+     "p90_sharpe": 0.21301961108783457,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "high volatility",
+     "n": 100,
+     "pct_profitable": 0.43,
+     "median_sharpe": -0.09570820828944471,
+     "p90_sharpe": 0.5199885632157747,
+     "n_stage3": 1,
+     "n_survivors": 1
+    },
+    {
+     "v": "down days only",
+     "n": 100,
+     "pct_profitable": 0.33,
+     "median_sharpe": -0.18840841349461065,
+     "p90_sharpe": 0.29396849620732457,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "stop",
+   "label": "Stop (% against entry)",
+   "values": [
+    {
+     "v": "none",
+     "n": 125,
+     "pct_profitable": 0.32,
+     "median_sharpe": -0.17038243800485828,
+     "p90_sharpe": 0.30721842911789604,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "0.1%",
+     "n": 125,
+     "pct_profitable": 0.208,
+     "median_sharpe": -0.45459060877330554,
+     "p90_sharpe": 0.20740125966228345,
+     "n_stage3": 1,
+     "n_survivors": 1
+    },
+    {
+     "v": "0.2%",
+     "n": 125,
+     "pct_profitable": 0.2,
+     "median_sharpe": -0.3422205475918398,
+     "p90_sharpe": 0.26367408443487056,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "0.4%",
+     "n": 125,
+     "pct_profitable": 0.304,
+     "median_sharpe": -0.2667421363279192,
+     "p90_sharpe": 0.36660088978513605,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  }
+ ],
+ "length_map": {
+  "title": "Trade window (ET) \u00d7 Filter",
+  "pair_text": "trade window and filter",
+  "corner": "Window \u2193 \u00b7 Filter \u2192",
+  "row_short": "window",
+  "col_short": "filter",
+  "order": 1,
+  "fixed": {
+   "Signal": "today's open \u2192 now",
+   "Must agree with first half hour": "no",
+   "Stop (% against entry)": "0.1%"
+  },
+  "center": [
+   "15:50\u201316:00",
+   "high volatility"
+  ],
+  "rows": [
+   "15:00\u201316:00",
+   "15:30\u201315:50",
+   "15:30\u201316:00",
+   "15:45\u201316:00",
+   "15:50\u201316:00"
+  ],
+  "cols": [
+   "none",
+   "move > 0.5\u03c3",
+   "move > 1\u03c3",
+   "high volatility",
+   "down days only"
+  ],
+  "sharpe": [
+   [
+    -0.7602994799171837,
+    0.01128012679908659,
+    0.2503217683372048,
+    -0.09138264016902833,
+    -0.5793444315366084
+   ],
+   [
+    -1.7356585735136854,
+    -0.8875589331302408,
+    -0.7197651233592458,
+    -1.1298376560447467,
+    -0.6434999231052273
+   ],
+   [
+    -0.9011073675706619,
+    -0.2679852050256187,
+    -0.23103187928478877,
+    -0.5332150041167173,
+    -0.31082335233541286
+   ],
+   [
+    -0.2578164233737982,
+    0.18842806719706826,
+    0.46670425183883857,
+    0.26508902233038,
+    0.47291311956206417
+   ],
+   [
+    0.20316872293314608,
+    0.3153153011227666,
+    0.13180588779219193,
+    0.8032416842830052,
+    0.09571850690039428
+   ]
+  ],
+  "trades": [
+   [
+    1243,
+    722,
+    371,
+    538,
+    566
+   ],
+   [
+    1244,
+    712,
+    360,
+    540,
+    570
+   ],
+   [
+    1244,
+    712,
+    360,
+    540,
+    570
+   ],
+   [
+    1240,
+    712,
+    373,
+    538,
+    565
+   ],
+   [
+    1239,
+    716,
+    365,
+    535,
+    566
+   ]
+  ]
+ },
+ "luck": {
+  "n_sims": 100,
+  "levels": [
+   1
+  ],
+  "method": "Per clock and stop (entry-exit window x stop): the same trade window and stop, but on random validation-window sessions, each long or short by a fair coin. The number of days is scaled so the time in market matches each level. Same fills, slippage, commission and whole-contract sizing as the strategy; scored with the same daily-Sharpe and time-in-market code.",
+  "curves": [
+   {
+    "timeframe": "15:50\u201316:00 \u00b7 stop 0.1%",
+    "match": {
+     "window": "15:50\u201316:00",
+     "stop": "0.1%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.010083983930872432,
+      "exposure_pct": 1,
+      "frac_profitable": 0.04,
+      "mean_return": -0.025512615749994458,
+      "mean_sharpe": -1.0943252975236353,
+      "mean_trades": 243.73,
+      "median_return": -0.026035262499994105,
+      "median_sharpe": -1.0486394441975933,
+      "p10_return": -0.043614396249994726,
+      "p10_sharpe": -1.9288338685753876,
+      "p90_return": -0.005724839999994134,
+      "p90_sharpe": -0.23211121342637722
+     }
+    ],
+    "trade_bars": [
+     10.0,
+     8.095744680851064
+    ],
+    "p_long": 0.5638297872340425
+   }
+  ],
+  "text": "For every whole-percent time in market in each group's 2023\u20132024 range, 100 random runs trade ES in the same window with the same stop, but on random days and long or short by a coin flip. So they test whether the signal (which days to trade and which way) beats chance at the same hours. Each group is one trade window and stop setting. They pay the same costs and use the same sizing and Sharpe math as the strategy."
+ },
+ "finalists": [
+  {
+   "order": 1,
+   "group": 0,
+   "config_id": "cfg_e962",
+   "settings": {
+    "signal": "today's open \u2192 now",
+    "agree": "no",
+    "window": "15:50\u201316:00",
+    "filter": "high volatility",
+    "stop": "0.1%"
+   },
+   "dev": {
+    "net_return": 0.10907502500001698,
+    "cagr": 0.020429639170684855,
+    "sharpe": 0.8032416842830052,
+    "max_drawdown": -0.03749866613432873,
+    "exposure": 0.0075915258886361065,
+    "win_rate": 0.38317757009345793,
+    "profit_factor": 1.2817875570316675,
+    "n_completed_trades": 535.0,
+    "turnover_annual": 241.5602513112074
+   },
+   "val": {
+    "net_return": -0.006612931798726351,
+    "cagr": -0.0032350530260809585,
+    "sharpe": -0.27515110315193436,
+    "max_drawdown": -0.022005251885846122,
+    "exposure": 0.00769094721948508,
+    "win_rate": 0.425531914893617,
+    "profit_factor": 0.9273202733230507,
+    "n_completed_trades": 187.0,
+    "turnover_annual": 183.79408246363423
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0066 <= 0.0",
+    "sharpe -0.275 < 0.3"
+   ],
+   "exits": {
+    "time": 0,
+    "eod": 285,
+    "stop": 250
+   },
+   "stress_1_5x": 0.05960756250001631,
+   "breakeven_cost_x": 2.1692444859248963,
+   "transfer_sharpe": 1.6758977541452575,
+   "neighbor_median_sharpe": 0.47178554412479073,
+   "local_frac_profitable": 0.8,
+   "local_median_sharpe": 0.5334941666968095,
+   "local_detail": [
+    {
+     "move": "entry=15:45",
+     "sharpe": 0.26508902233038,
+     "net_return": 0.030924225000017014,
+     "trades": 538
+    },
+    {
+     "move": "entry=15:55",
+     "sharpe": -0.19526914414111918,
+     "net_return": -0.01775026249998668,
+     "trades": 540
+    },
+    {
+     "move": "exit=15:55",
+     "sharpe": 0.5334941666968095,
+     "net_return": 0.05185118750001205,
+     "trades": 535
+    },
+    {
+     "move": "stop_pct=0.05",
+     "sharpe": 0.8026859922985905,
+     "net_return": 0.0982855500000217,
+     "trades": 535
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.7357888398764482,
+     "net_return": 0.1036975187499991,
+     "trades": 535
+    }
+   ],
+   "dsr": 0.08198731603657261,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.89,
+    "luck_pct_return": 0.89
+   }
+  }
+ ],
+ "short_labels": {
+  "timeframe": "Bar",
+  "signal": "Signal",
+  "agree": "Agree",
+  "window": "Window",
+  "filter": "Filter",
+  "stop": "Stop"
+ },
+ "exit_labels": [
+  [
+   "time",
+   "time",
+   "time exit"
+  ],
+  [
+   "eod",
+   "close",
+   "16:00 close"
+  ],
+  [
+   "stop",
+   "stop",
+   "stop"
+  ]
+ ],
+ "local_moves": [
+  [
+   "entry",
+   "Entry"
+  ],
+  [
+   "exit",
+   "Exit"
+  ],
+  [
+   "z",
+   "z level"
+  ],
+  [
+   "stop_pct",
+   "Stop"
+  ]
+ ],
+ "benchmark": {
+  "label": "Holding ES (rolled, unlevered)",
+  "dev": {
+   "net_return": 0.4323238060323267,
+   "sharpe": 0.4323249878762704,
+   "max_drawdown": -0.3417404236183267
+  },
+  "val": {
+   "net_return": 0.4066429987450888,
+   "sharpe": 1.383958703985139,
+   "max_drawdown": -0.1132256790285423
+  }
+ },
+ "transfer_symbol": "NQ",
+ "dsr": {
+  "effective_trials": 100.00000000000034,
+  "raw_trials": 500.0
+ },
+ "assumptions": [
+  "Data: Databento CME continuous front month (ES.v.0), 1-minute bars from 09:30 to 16:00 ET only. Rolls are back-adjusted; positions never cross a session. The previous close is the last regular-session bar's close, not the 17:00 settlement.",
+  "Costs: 1 tick slippage per side and $2.50 commission per contract per side.",
+  "The paper's effect is strongest when dealers are short gamma, which price bars cannot see. The move-size, volatility and down-day filters are stand-ins chosen before the run, not measured dealer positioning.",
+  "Post-2013 replications find the plain version near zero in the S&P 500, and the whole 2018\u20132026 sample is in that period. The family was chosen from a research report that read those replications.",
+  "Close to the noise-band strategy: on breakout days both hold the day's direction into the close, so what matters for adding it is its daily profit correlation with the noise-band picks, not only its own Sharpe.",
+  "Each trade uses the whole account in whole contracts with no leverage, the same as the other families.",
+  "Sharpe uses daily mark-to-market returns (\u221a252), with idle cash earning 0%. Time in market is the share of 1-minute bars with an open position.",
+  "Other strategy families were already selected on this market's 2023\u20132024 data, so 2023\u20132024 is not untouched; only the 2025+ holdout is.",
+  "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead."
+ ],
+ "source": "last-half-hour-backtest/runs/funnel/lh_es_v1/ \u00b7 configs/funnel/lh_funnel_es_v1.yaml"
+}

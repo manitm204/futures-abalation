@@ -1,0 +1,173 @@
+# NQ futures (E-mini Nasdaq-100) last-half-hour momentum, v1: run lh_nq_v1 (last_half_hour_v1,
+# 500 configs, 1-minute bars 09:30-16:00 ET) -- the ONE place every threshold lives.
+#
+# Specified 2026-11-22 from reports/Futures papers with strong edges.md (rank 2): Baltussen, Da,
+# Lammers & Martens (JFE 2021) -- the return from the previous close to 15:30 predicts the last
+# half hour. NQ is the primary market (cheapest per basis point of edge); ES is the stage-9
+# transfer symbol. The report's 90-cell grid was widened before any run at the user's request
+# ("maybe like 500 configs"):
+#   signal prev_close / open (each with first-half-hour agreement off|on) / first_half;
+#   window 15:00-16:00, 15:30-15:50, 15:30-16:00, 15:45-16:00, 15:50-16:00 ET;
+#   filter none / |signal| > 0.5 or 1.0 x its 20-day std / RV20 above its 120-day median / down
+#   days only; stop none / 0.10 / 0.20 / 0.40% against the position.
+#
+# Gates, data splits and costs are identical to the other NQ / ES funnels. Stage 4 moves one
+# setting at a time: entry +/- 5 min, exit +/- 5 min, z +/- 0.25, stop +/- 0.05%.
+#
+# Thresholds are fixed for the duration of a run and are hashed into every run's
+# outputs. They are NEVER adjusted automatically to hit a survivor count; zero
+# survivors is a valid outcome. Changing a value here is a new research trial
+# and should be recorded under `research_history` below.
+
+version: 1
+strategy: last_half_hour_v1
+symbol: NQ
+seed: 20261124
+
+data:
+  clean_root: data/clean
+  development: {start: 2018-01-01, end: 2022-12-31}
+  validation:  {start: 2023-01-01, end: 2024-12-31}
+  # end: null -> the actual available endpoint, recorded at access time.
+  holdout:     {start: 2025-01-01, end: null}
+  timeframes: ["1min"]
+
+data_history:
+  validation_previously_used_for_selection: true
+  validation_note: >-
+    No last-half-hour strategy has been scored on NQ 2023-2024, but the noise-band, mean-reversion, squeeze, convexity and EMRT families were selected there and the researcher has read those results.
+  holdout_previously_inspected: true
+  holdout_note: >-
+    No last-half-hour metrics have been computed on NQ 2025+. Noise-band NQ picks and the month-end #7 transfer check were scored there, so the researcher has seen how that period treated intraday NQ strategies.
+
+metrics:
+  return_frequency: daily          # mark-to-market equity at each session close
+  periods_per_year: 252            # Sharpe = mean/std(daily) * sqrt(252)
+  risk_free_rate_annual: 0.0
+  cash_treatment: >-
+    Idle cash earns 0% and the Sharpe excess return is measured against a 0%
+    risk-free rate, so the two assumptions are consistent.
+  drawdown_basis: daily session-close mark-to-market (understates intraday DD)
+
+execution:
+  baseline: configs/execution/futures.yaml   # $2.50/contract/side + 1 tick/side slippage, unlevered whole contracts
+
+integrity:            # stage 1
+  truncation_check_sample: 40
+  truncation_points: 3
+
+trade_count:          # stage 2 -- hard gate
+  min_completed_trades: 100
+  min_trades_per_year: 10
+  min_years_meeting_floor: 4
+
+performance:          # stage 3 -- hard gate
+  min_net_return: 0.0               # strictly greater than
+  min_sharpe: 0.75                  # annualized, daily MTM returns incl. flat days
+  max_drawdown: -0.30
+  max_drawdown_source: src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct
+
+parameter_stability:  # stage 4 -- hard gate
+  mode: local_perturbation          # gate on `local` moves below; grid neighbors are diagnostic only
+  local:
+    int_rel: 0.20                   # unused by this family; required field
+    stop_atr_abs: 0.25              # unused by this family (no stop); required field
+    entry_shift_abs: 5              # entry time -/+ 5 minutes (always >= 5 min before the exit)
+    exit_shift_abs: 5               # exit time -/+ 5 minutes (never after 16:00)
+    threshold_abs: 0.25             # z filter threshold -/+ 0.25 (>= 0.05)
+    stop_pct_abs: 0.05              # stop -/+ 0.05% (never below 0.02%; "none" has no move)
+  neighbor_mode: single_axis        # grid-neighbor diagnostic
+  min_frac_profitable: 0.70         # of the local moves, share with dev net return > 0
+  min_median_sharpe: 0.50           # median dev Sharpe of the local moves
+  prescreen:                        # big grids: fixed before the run, like every gate
+    max_configs: 3000
+    per_cluster: 3
+  perturbation:                     # diagnostic only, never a gate
+    n_per_config: 20
+    integer_rel_step: 0.15          # unused by this family's perturbations (minute shifts up to +/- 5)
+    float_rel_step: 0.10            # z threshold and stop (relative)
+
+time_stability:       # stage 5 -- light hard gate + diagnostics
+  min_profitable_years: 3
+  top_trades_k: 5
+  top_trades_frac: 0.05
+
+dedup:                # stage 6
+  corr_threshold: 0.80
+  return_basis: monthly
+  linkage: complete
+  reps_per_cluster: 2               # best 2 per cluster; a single-member cluster keeps its 1
+
+execution_stress:     # stage 7
+  gate_cost_multiplier: 1.5         # hard gate: positive dev net return
+  diagnostic_cost_multipliers: [2.0]
+  entry_delay_bars: 1               # one 1-minute bar late
+  missed_entry_frac: 0.10
+  missed_entry_sims: 100
+  breakeven_max_multiplier: 25.0
+
+validation:           # stage 8 -- hard gate (frozen representatives only)
+  min_net_return: 0.0
+  min_sharpe: 0.30
+  max_drawdown: -0.30
+  min_completed_trades: 40          # project default from 2026-10-22
+
+confidence:           # stage 9 -- diagnostics only
+  dsr_threshold: 0.95
+  dsr_calibration_verified: false
+  effective_trials_method: li_ji
+  serial_dependence: lag1_effective_n
+  transfer_symbol: ES                # unchanged rules, development period only
+
+holdout:              # stage 10 -- explicit `final-test` command only
+  acceptance:
+    min_net_return: 0.0
+    min_sharpe: 0.0
+    max_drawdown: -0.30
+    min_completed_trades: null
+
+# Earlier trials on this market (other families). These count toward the DSR "known prior"
+# sensitivity only.
+research_history:
+  - name: "month_end_v2 NQ (me_nq_v2)"
+    n_configs: 4864
+    note: "Different (turn-of-month) family on NQ; diagnostic, development only."
+  - name: "noise_band NQ (nb_nq_v1)"
+    n_configs: 8100
+    note: "Closest family: noise-band intraday momentum on NQ (also trades the day's direction into the close); 757 frozen."
+  - name: "noise_band_v6 NQ (nb_nq_v2)"
+    n_configs: 3456
+    note: "Noise-band intraday momentum on NQ; 374 frozen."
+  - name: "noise_band_v7 NQ (nb_nq_v3)"
+    n_configs: 432
+    note: "Noise-band intraday momentum on NQ; 71 frozen; part of the noise-band NQ book."
+  - name: "compression_breakout_bbkc_v3_15m NQ"
+    n_configs: 28800
+    note: "Different (BB/KC squeeze) family on NQ."
+  - name: "compression_breakout_bbkc_v3_5m NQ"
+    n_configs: 27648
+    note: "Different (BB/KC squeeze) family on NQ."
+  - name: "compression_breakout_nr_v4_15m NQ"
+    n_configs: 2304
+    note: "Different (NR-N squeeze) family on NQ."
+  - name: "emrt_spread_v1 ES-NQ"
+    n_configs: 51840
+    note: "Different (spread mean reversion) family on ES-NQ."
+  - name: "emrt_spread_v2 ES-NQ"
+    n_configs: 13824
+    note: "Different (spread mean reversion) family on ES-NQ."
+  - name: "mean_reversion_v5 NQ (mr_nq_v5)"
+    n_configs: 41472
+    note: "Different (mean-reversion) family on NQ."
+  - name: "mean_reversion_v6 NQ (mr_nq_v6)"
+    n_configs: 21600
+    note: "Different (mean-reversion) family on NQ."
+  - name: "mean_reversion_v12 NQ 15m"
+    n_configs: 1152
+    note: "Different (mean-reversion) family on NQ."
+  - name: "mean_reversion_v13 NQ 1h"
+    n_configs: 3456
+    note: "Different (mean-reversion) family on NQ."
+  - name: "path_convexity_v3_15m NQ"
+    n_configs: 103680
+    note: "Different (price-path convexity) family on NQ."
