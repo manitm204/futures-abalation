@@ -509,13 +509,18 @@ function cbStg(o) {
     `${{long: "long only", short: "short only", both: "long + short"}[o.direction]}, ${o.trend_filter === "none" ? "no trend filter" : "EMA(" + String(o.trend_filter).slice(3) + ")"}` +
     `${+o.min_box_atr ? `, box ≥ ${n(o.min_box_atr)}× ATR` : ""}`;
 }
+function meStg(o) {  // month-end / turn-of-month picks
+  const days = [+o.window ? `last ${o.window}` : "", +o.first_days ? `first ${o.first_days}` : ""].filter(Boolean).join(" + ");
+  return `${o.symbol || ""} ${days} day(s) of the month, ${o.entry} → ${o.exit === "strike" ? "index strike" : o.exit} ET` +
+    `${o.stop && o.stop !== "none" ? `, ${+o.stop}% stop` : ""}${o.event_filter && o.event_filter !== "none" ? ", skip FOMC" + (o.event_filter === "skip_fomc_auction" ? " + auctions" : "") : ""}`;
+}
 function chartKit(r, P) {
   const PER = r.periods, [a, b] = PER[P].range;
   const days = r.days.slice(a, b + 1), n = days.length;
   const vIdx = P === "all" ? days.findIndex(d => d >= r.validation_start) : -1;
   const yr = PER[P].label;
   const rebase = eq => { const s = eq.slice(a, b + 2), z = s[0]; return s.map(v => v / z); };
-  const stg = (o) => o.compression ? cbStg(o) : `${o.timeframe} ${o.mean_type.toUpperCase()} ${o.mean_lookback}/${o.std_lookback}, entry ${o.entry_z}, exit ${o.exit_z}, hold ${o.max_holding_bars}, ${o.entry_confirmation === "none" ? "no confirmation" : "up bar"}, ${o.stop_atr_multiple === "none" ? "no stop" : o.stop_atr_multiple.replace(".0", "") + "× ATR stop"}`;
+  const stg = (o) => o.event_filter !== undefined ? meStg(o) : o.compression ? cbStg(o) : `${o.timeframe} ${o.mean_type.toUpperCase()} ${o.mean_lookback}/${o.std_lookback}, entry ${o.entry_z}, exit ${o.exit_z}, hold ${o.max_holding_bars}, ${o.entry_confirmation === "none" ? "no confirmation" : "up bar"}, ${o.stop_atr_multiple === "none" ? "no stop" : o.stop_atr_multiple.replace(".0", "") + "× ATR stop"}`;
   const W = 760, H = 300, PAD = {l: 52, r: 14, t: 14, b: 28};
   const X = i => PAD.l + i / Math.max(1, n) * (W - PAD.l - PAD.r);
   const xTicks = () => { const t = []; days.forEach((d, i) => { const k = n > 600 ? d.slice(0, 4) : d.slice(0, 7); const prev = i ? (n > 600 ? days[i - 1].slice(0, 4) : days[i - 1].slice(0, 7)) : null;
@@ -543,7 +548,7 @@ function chartKit(r, P) {
       <polygon points="${area(bnd.p95, bnd.p5)}" class="band5"/><polygon points="${area(bnd.p90, bnd.p10)}" class="band10"/>
       <polyline points="${pts(bnd.mean, Yq).join(" ")}" class="lmean"/>${ex.map(e => `<polyline points="${pts(e.eq, Yq).join(" ")}" class="${e.cls}"/>`).join("")}<polyline points="${pts(eq, Yq).join(" ")}" class="strat"/>
     </svg>
-    <div class="legend"><span><i class="k strat"></i>${esc(title)}</span>${ex.map(e => `<span><i class="k ${e.cls}"></i>${esc(e.label)}</span>`).join("")}<span><i class="k lmean"></i>random entries, average</span><span><i class="k band10"></i>random, 10th–90th pct</span><span><i class="k band5"></i>random, 5th–95th pct</span></div>`;
+    <div class="legend"><span><i class="k strat"></i>${esc(title)}</span>${ex.map(e => `<span><i class="k ${e.cls}"></i>${esc(e.label)}</span>`).join("")}<span><i class="k lmean"></i>${esc(r.luck_label || "random entries")}, average</span><span><i class="k band10"></i>random, 10th–90th pct</span><span><i class="k band5"></i>random, 5th–95th pct</span></div>`;
   };
   const cols = [["net_return", "Return", v => fmt.pct(v), true], ["cagr", "CAGR", v => fmt.pct(v), true], ["sharpe", "Sharpe", v => fmt.x(v), true],
     ["max_drawdown", "Max DD", v => fmt.pct(v), false], ["n_completed_trades", "Trades", v => fmt.n(v), false],
@@ -552,7 +557,7 @@ function chartKit(r, P) {
     <td class="sep ${luck ? (luck.pct_sharpe >= 0.95 ? "pos" : luck.pct_sharpe < 0.5 ? "neg" : "") : ""}">${luck ? fmt.pctu(luck.pct_sharpe, 0) : ""}</td><td>${luck ? fmt.pctu(luck.pct_return, 0) : ""}</td></tr>`;
   const statTable = block => { const B = block.periods[P]; return `<div class="table-wrap"><table>
     <thead><tr><th class="l">${esc(yr)}</th>${cols.map(([, l]) => `<th>${l}</th>`).join("")}<th class="sep" title="Share of random-entry runs with a lower Sharpe">Beats luck: Sharpe</th><th title="Share of random-entry runs with a lower return">Return</th></tr></thead>
-    <tbody>${row(esc(block.name), B.stats, "passrow", B.luck)}${row(`Random entries, average of ${r.n_sims}`, B.luck.mean_stats, "bench")}${row(esc(r.hold.name), r.hold.periods[P].stats, "bench")}</tbody>
+    <tbody>${row(esc(block.name), B.stats, "passrow", B.luck)}${row(`${esc(r.luck_label ? r.luck_label[0].toUpperCase() + r.luck_label.slice(1) : "Random entries")}, average of ${r.n_sims}`, B.luck.mean_stats, "bench")}${row(esc(r.hold.name), r.hold.periods[P].stats, "bench")}</tbody>
   </table></div>`; };
 
   return {PER, a, b, days, n, vIdx, yr, rebase, stg, W, H, PAD, X, frame, pts, pctY, range, ystep, eqChart, cols, row, statTable};
@@ -693,6 +698,7 @@ function renderCombined(r, pk) {
       ? r.holdout_caveat ? `<p>${r.holdout_caveat}</p>` : `<p><b>Not a fresh test.</b> Every market's holdout had already been scored for its own pair (${prior} earlier holdout runs across these markets), and the CL pair was changed after its first holdout result. This page shows how the same strategies do together under fixed rules, as a check, not as independent proof. The rules were set before this combined run.</p>`
       : P === "val"
       ? `<p><b>Validation only.</b> Every strategy here was chosen with its market's 2023–2024 results in view, so this stretch is largely in-sample too.</p>`
+      : r.insample_note ? `<p>${esc(r.insample_note)}</p>`
       : `<p><b>In-sample.</b> These ${r.legs.length} strategies were picked from tens of thousands of versions on 2018–2022 and checked on 2023–2024, so a strong result here is expected. The holdout tab is the real check.</p>`}
     <p><b>Deployment rules</b>, fixed before this run: micro contracts (1/10 size: ${M.map(m => esc(m.micro)).join(", ")}), $${mx(R.micro_commission)} per micro per side plus ${mx(R.slippage_ticks)} tick of slippage each way. Each trade gets ${pc(R.per_trade)} of the account balance (contract value at entry). Open positions may not exceed ${pc(R.market_cap)} of the balance in any one market, ${pc(R.group_cap)} across the ${esc(R.group_name)} futures (${R.group.join(", ")}) together, and ${pc(R.total_cap)} in total (no leverage). A trade that hits a cap gets what is left in whole micros, or is skipped. Largest open position seen: ${pc(C.peak.total)} in total, ${pc(C.peak.market)} in one market, ${pc(C.peak.group)} across the index group.</p>
     <p class="muted">${r.contracts_note ? esc(r.contracts_note) : "Micro contracts trade at the same prices as the full contracts. MCL and MGC have existed only since 2021 and MES/MNQ/MYM/M2K since 2019, so earlier years are a stand-in for what they would have done."}</p>

@@ -7,6 +7,7 @@
   emrt spread/index.html           EMRT two-leg futures spread (../emrt-spread-backtest/); its tabs are pairs
   fx fix/index.html                daytime FX-fix reversal around the London fix (../fx-fix-backtest/)
   drift burst/index.html           volume-gated drift-burst fade (../drift-burst-backtest/)
+  month end/index.html             Treasury month-end long, day session only (../month-end-backtest/)
 
 Layout of this folder:
   data/<MARKET>/<strategy>.json   one finished run (written by each project's export script,
@@ -38,7 +39,8 @@ PAIRS = [("ES-NQ", "ES vs NQ"), ("ES-RTY", "ES vs RTY"), ("ES-YM", "ES vs YM"), 
 FAMILIES = [
     ("mean reversion", "Mean Reversion Funnels", "Mean-reversion strategy funnels",
      lambda run: not run["strategy_key"].startswith(("noise_band", "squeeze_breakout", "nr_breakout", "path_convexity",
-                                                       "emrt_spread", "fx_fix", "drift_burst"))),
+                                                       "emrt_spread", "fx_fix", "drift_burst",
+                                                       "month_end"))),
     ("noise-band breakout", "Noise-Band Breakout Funnels", "Noise-band breakout strategy funnels",
      lambda run: run["strategy_key"].startswith("noise_band")),
     ("bb-kc squeeze", "BB-inside-KC Squeeze Funnels", "BB-inside-KC squeeze strategy funnels",
@@ -53,6 +55,8 @@ FAMILIES = [
      lambda run: run["strategy_key"].startswith("fx_fix")),
     ("drift burst", "Drift Burst Funnels", "Drift-burst fade strategy funnels",
      lambda run: run["strategy_key"].startswith("drift_burst")),
+    ("month end", "Month-End and Turn-of-Month Funnels", "Month-end and turn-of-month strategy funnels",
+     lambda run: run["strategy_key"].startswith("month_end")),
 ]
 
 

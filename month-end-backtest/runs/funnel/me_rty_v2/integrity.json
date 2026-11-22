@@ -1,0 +1,43 @@
+{
+  "audit_notes": [
+    "Bars: 1-minute bars with NY open time in [08:00, 17:00) only (me_day_bars); each NY date is one session, so the session's last bar is the last bar before 17:00 ET and no position can be held overnight.",
+    "Month-end rank per session date: the number of NYSE trading days in its calendar month on or after it (1 = the last). Taken from the NYSE calendar (published in advance), never from later bars; recomputed month by month in the integrity check.",
+    "Eligible day: 1 <= rank <= window, and the event filter allows it (skip_fomc: not a scheduled FOMC statement day; skip_fomc_auction: also no fixed-rate Treasury note/bond auction that day, from configs/calendars/coupon_auctions.csv).",
+    "Entry: LONG at the OPEN of the first bar opening at/after the entry time with market slippage; skipped when that bar opens more than 5 minutes late (a gap in the bars) or is not before the exit.",
+    "Exit at the CLOSE of the last bar opening before the exit target (15:00, 16:00, or the index strike: 15:00 ET on month-ends before 14 Jan 2021, 16:00 ET from then on), with market slippage; when the bars stop earlier (early closes) the trade closes at the session's last bar. Stop (optional) = entry open x (1 - stop%), live intrabar from the entry bar, filled at the worse of the bar's open and the stop with stop slippage.",
+    "One trade per eligible day; long only; sizing is the other families' (as many whole contracts as equity covers at full contract value, unlevered, compounding).",
+    "Development backtests run on data physically truncated at the development end; the final session's trade is closed at the last development bar and flagged forced (not counted as completed).",
+    "Sharpe: daily session-close mark-to-market returns over every trading day (flat days = 0), sqrt(252) annualization, rf = 0, idle cash earns 0."
+  ],
+  "checks_per_config": [
+    "month_end_rank_mismatch",
+    "event_flag_mismatch",
+    "entry_not_per_rule",
+    "day_not_eligible",
+    "event_filter_violated",
+    "not_long",
+    "trade_skipped_while_flat",
+    "entry_fill_better_than_market",
+    "exit_before_entry",
+    "bar_outside_day_window",
+    "position_held_overnight",
+    "stop_not_per_rule",
+    "stop_exit_without_touch",
+    "stop_fill_better_than_rule",
+    "exit_not_at_first_touch",
+    "time_exit_not_per_rule",
+    "eod_exit_not_at_session_close",
+    "exit_fill_better_than_market",
+    "overlapping_positions",
+    "position_exceeds_equity",
+    "forced_close_not_final_trade",
+    "commission_below_minimum"
+  ],
+  "cut_fractions": [
+    0.3,
+    0.6000000000000001,
+    0.9
+  ],
+  "failures": {},
+  "truncation_sample": 40
+}

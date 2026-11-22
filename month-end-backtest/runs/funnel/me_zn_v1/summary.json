@@ -1,0 +1,431 @@
+{
+  "data_access": {
+    "actual_last_session": "2022-12-30",
+    "command": "develop",
+    "experiment_id": "me_zn_v1",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 60,
+    "partition_fingerprint": "a0be46ee4ac01bb5",
+    "phase": "development",
+    "phase_end": "2022-12-31",
+    "rows": 1649734,
+    "symbol": "ZN"
+  },
+  "data_history": {
+    "holdout_note": "No month-end metrics have been computed on this project's ZN 2025+ data. But the family was chosen partly on a practitioner futures test (ohlcv.io) that runs to Sep 2026 and reports a positive close-to-close month-end effect over the whole span, so the choice of family is not blind to the holdout period.",
+    "holdout_previously_inspected": false,
+    "validation_note": "No month-end strategy has been scored on ZN 2023-2024, but BB/KC squeeze, NR squeeze, noise-band, mean-reversion and convexity strategies were selected there and the researcher has read those results. Treated as used for selection.",
+    "validation_previously_used_for_selection": true
+  },
+  "dsr": {
+    "calibration_verified": false,
+    "effective_trials": {
+      "li_ji": 74.00000000000114,
+      "n_components_95": 23,
+      "n_series": 972,
+      "participation_ratio": 3.6762580212085014,
+      "rank_bound_T": 1291
+    },
+    "n_configs_with_defined_sharpe": 972,
+    "primary_method": "li_ji",
+    "research_history": [
+      {
+        "n_configs": 103680,
+        "name": "path_convexity_v3_15m ZN (pc_zn_v3_15m)",
+        "note": "Different (price-path convexity) family on ZN 15m."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion ZN (mr_zn_v5)",
+        "note": "Different (mean-reversion) family on ZN."
+      },
+      {
+        "n_configs": 3456,
+        "name": "noise_band ZN (nb_zn_v2)",
+        "note": "Different (noise-band intraday momentum) family on ZN."
+      },
+      {
+        "n_configs": 2304,
+        "name": "compression_breakout_nr_v4_15m ZN (cb_nr_zn_v4_15m)",
+        "note": "Different (NR-N squeeze breakout) family on ZN 15m."
+      },
+      {
+        "n_configs": 3840,
+        "name": "compression_breakout_bbkc_v4_15m ZN (cb_bbkc_zn_v4_15m)",
+        "note": "Different (BB/KC squeeze) family on ZN 15m."
+      }
+    ],
+    "serial_dependence": "lag1_effective_n",
+    "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+    "trial_count_options": {
+      "li_ji": 74.00000000000114,
+      "participation_ratio": 3.6762580212085014,
+      "raw": 972.0,
+      "raw_plus_known_prior": 155724.0
+    },
+    "unresolved": [
+      "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+      "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+      "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+      "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+    ],
+    "variance_of_trial_sharpes_per_period": 0.002205889313027657
+  },
+  "elapsed_s": 133.2,
+  "experiment_id": "me_zn_v1",
+  "frozen_manifest_sha256": "45c18f294c2586d9738a9fab164b5b1a97f3f0299d7b3faed504a2505dbc97fc",
+  "instrument_type": "futures",
+  "integrity": {
+    "checks_per_config": [
+      "month_end_rank_mismatch",
+      "event_flag_mismatch",
+      "entry_not_per_rule",
+      "day_not_eligible",
+      "event_filter_violated",
+      "not_long",
+      "trade_skipped_while_flat",
+      "entry_fill_better_than_market",
+      "exit_before_entry",
+      "bar_outside_day_window",
+      "position_held_overnight",
+      "stop_not_per_rule",
+      "stop_exit_without_touch",
+      "stop_fill_better_than_rule",
+      "exit_not_at_first_touch",
+      "time_exit_not_per_rule",
+      "eod_exit_not_at_session_close",
+      "exit_fill_better_than_market",
+      "overlapping_positions",
+      "position_exceeds_equity",
+      "forced_close_not_final_trade",
+      "commission_below_minimum"
+    ],
+    "cut_fractions": [
+      0.3,
+      0.6000000000000001,
+      0.9
+    ],
+    "failures": {},
+    "truncation_sample": 40
+  },
+  "mode": "development_only",
+  "n_configs": 972,
+  "n_frozen_candidates": 2,
+  "provenance": {
+    "available_data_endpoint_per_manifest": {
+      "ZB": "2026-10-16",
+      "ZN": "2026-10-16"
+    },
+    "config_path": "configs/funnel/me_funnel_zn_v1.yaml",
+    "config_sha256": "3fab5b581b7c7cd210e3fc776d40e1733c32456e89f0e73eb7da2cc60df68e0a",
+    "created_at": "2026-11-22T14:39:52.401429+00:00",
+    "data_manifests": {
+      "ZB": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 2705370,
+        "schema_version": "1.0.0"
+      },
+      "ZN": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 2901998,
+        "schema_version": "1.0.0"
+      }
+    },
+    "git_commit": "d7cd024716c88bf1dc54f540fa22723c26604186",
+    "git_diff_sha256": "d5d1bad97e31e8772e9fce9ca2fd1597251091222833e1a5df51943958aa07b7",
+    "git_dirty": true,
+    "seed": 20261122
+  },
+  "rejection_reason_counts": {
+    "s2:hard_reject:completed_trades": 216,
+    "s3:hard_reject:net_return": 520,
+    "s3:hard_reject:sharpe": 746
+  },
+  "survivor_table": [
+    {
+      "evaluated": 972,
+      "kind": "universe",
+      "passed": 972,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "0 universe"
+    },
+    {
+      "evaluated": 972,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 972,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "1 backtest integrity",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 972,
+      "hard_reject": 216,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 756,
+      "pct_of_previous": 77.77777777777777,
+      "pct_of_universe": 77.77777777777777,
+      "stage": "2 trade count & coverage",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 756,
+      "hard_reject": 746,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 10,
+      "pct_of_previous": 1.3227513227513228,
+      "pct_of_universe": 1.02880658436214,
+      "stage": "3 performance & risk",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 10,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 10,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 1.02880658436214,
+      "stage": "4 parameter stability",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 10,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 10,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 1.02880658436214,
+      "stage": "5 time stability",
+      "with_warnings": 10
+    },
+    {
+      "deduplicated": 8,
+      "evaluated": 10,
+      "kind": "dedup",
+      "n_clusters": 1,
+      "note": "best 2 per cluster",
+      "passed": 2,
+      "pct_of_previous": 20.0,
+      "pct_of_universe": 0.205761316872428,
+      "stage": "6 deduplication"
+    },
+    {
+      "evaluated": 2,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 2,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 0.205761316872428,
+      "stage": "7 execution stress",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": null,
+      "kind": "hard_gate",
+      "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "8 frozen validation"
+    },
+    {
+      "evaluated": 2,
+      "kind": "diagnostic_only",
+      "note": "diagnostic only: unverified: 2",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "9 DSR / transfer"
+    },
+    {
+      "evaluated": null,
+      "kind": "explicit_command",
+      "note": "not run; `final-test` command only",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "10 final holdout"
+    }
+  ],
+  "symbol": "ZN",
+  "thresholds": {
+    "confidence": {
+      "dsr_calibration_verified": false,
+      "dsr_threshold": 0.95,
+      "effective_trials_method": "li_ji",
+      "serial_dependence": "lag1_effective_n",
+      "transfer_symbol": "ZB"
+    },
+    "data": {
+      "clean_root": "data/clean",
+      "development": {
+        "end": "2022-12-31",
+        "start": "2018-01-01"
+      },
+      "holdout": {
+        "end": null,
+        "start": "2025-01-01"
+      },
+      "timeframes": [
+        "1min"
+      ],
+      "validation": {
+        "end": "2024-12-31",
+        "start": "2023-01-01"
+      }
+    },
+    "data_history": {
+      "holdout_note": "No month-end metrics have been computed on this project's ZN 2025+ data. But the family was chosen partly on a practitioner futures test (ohlcv.io) that runs to Sep 2026 and reports a positive close-to-close month-end effect over the whole span, so the choice of family is not blind to the holdout period.",
+      "holdout_previously_inspected": false,
+      "validation_note": "No month-end strategy has been scored on ZN 2023-2024, but BB/KC squeeze, NR squeeze, noise-band, mean-reversion and convexity strategies were selected there and the researcher has read those results. Treated as used for selection.",
+      "validation_previously_used_for_selection": true
+    },
+    "dedup": {
+      "corr_threshold": 0.8,
+      "linkage": "complete",
+      "reps_per_cluster": 2,
+      "return_basis": "monthly"
+    },
+    "execution": {
+      "baseline": "configs/execution/futures.yaml"
+    },
+    "execution_stress": {
+      "breakeven_max_multiplier": 25.0,
+      "diagnostic_cost_multipliers": [
+        2.0
+      ],
+      "entry_delay_bars": 1,
+      "gate_cost_multiplier": 1.5,
+      "missed_entry_frac": 0.1,
+      "missed_entry_sims": 100
+    },
+    "holdout": {
+      "acceptance": {
+        "max_drawdown": -0.3,
+        "min_completed_trades": null,
+        "min_net_return": 0.0,
+        "min_sharpe": 0.0
+      }
+    },
+    "integrity": {
+      "truncation_check_sample": 40,
+      "truncation_points": 3
+    },
+    "metrics": {
+      "cash_treatment": "Idle cash earns 0% and the Sharpe excess return is measured against a 0% risk-free rate, so the two assumptions are consistent.",
+      "drawdown_basis": "daily session-close mark-to-market (understates intraday DD)",
+      "periods_per_year": 252,
+      "return_frequency": "daily",
+      "risk_free_rate_annual": 0.0
+    },
+    "parameter_stability": {
+      "local": {
+        "band_mult_abs": null,
+        "entry_shift_abs": 30,
+        "entry_z_abs": null,
+        "exit_shift_abs": 15,
+        "exit_z_abs": null,
+        "int_rel": 0.2,
+        "kc_mult_abs": null,
+        "max_range_atr_abs": null,
+        "max_trades_step": null,
+        "min_box_atr_abs": null,
+        "min_move_atr_abs": null,
+        "post_hold_abs": null,
+        "stop_atr_abs": 0.25,
+        "stop_burst_abs": null,
+        "stop_pct_abs": 0.1,
+        "switch_offset_abs": null,
+        "target_abs": null,
+        "target_r_abs": null,
+        "threshold_abs": null,
+        "vol_gate_abs": null,
+        "window_step": 1
+      },
+      "min_frac_profitable": 0.7,
+      "min_median_sharpe": 0.5,
+      "mode": "local_perturbation",
+      "neighbor_mode": "single_axis",
+      "perturbation": {
+        "float_rel_step": 0.1,
+        "integer_rel_step": 0.15,
+        "n_per_config": 20,
+        "z_abs": null
+      },
+      "prescreen": null
+    },
+    "performance": {
+      "max_drawdown": -0.3,
+      "max_drawdown_source": "src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct",
+      "min_net_return": 0.0,
+      "min_sharpe": 0.75
+    },
+    "research_history": [
+      {
+        "n_configs": 103680,
+        "name": "path_convexity_v3_15m ZN (pc_zn_v3_15m)",
+        "note": "Different (price-path convexity) family on ZN 15m."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion ZN (mr_zn_v5)",
+        "note": "Different (mean-reversion) family on ZN."
+      },
+      {
+        "n_configs": 3456,
+        "name": "noise_band ZN (nb_zn_v2)",
+        "note": "Different (noise-band intraday momentum) family on ZN."
+      },
+      {
+        "n_configs": 2304,
+        "name": "compression_breakout_nr_v4_15m ZN (cb_nr_zn_v4_15m)",
+        "note": "Different (NR-N squeeze breakout) family on ZN 15m."
+      },
+      {
+        "n_configs": 3840,
+        "name": "compression_breakout_bbkc_v4_15m ZN (cb_bbkc_zn_v4_15m)",
+        "note": "Different (BB/KC squeeze) family on ZN 15m."
+      }
+    ],
+    "seed": 20261122,
+    "strategy": "month_end_v1",
+    "symbol": "ZN",
+    "time_stability": {
+      "min_profitable_years": 3,
+      "top_trades_frac": 0.05,
+      "top_trades_k": 5
+    },
+    "trade_count": {
+      "min_completed_trades": 100,
+      "min_trades_per_year": 10,
+      "min_years_meeting_floor": 4
+    },
+    "validation": {
+      "max_drawdown": -0.3,
+      "min_completed_trades": 40,
+      "min_net_return": 0.0,
+      "min_sharpe": 0.3
+    },
+    "version": 1
+  },
+  "transfer_symbol": "ZB"
+}

@@ -1,0 +1,143 @@
+# ZN futures (10-year T-note) month-end long, day session only, v1: run me_zn_v1 (month_end_v1,
+# 972 configs, 1-minute bars 08:00-17:00 ET) -- the ONE place every threshold lives.
+#
+# Specified 2026-11-22 from reports/Futures papers with strong edges.md (rank 1: Hartley & Schwarz
+# month-end Treasury returns). On each of the last `window` NYSE trading days of the month, buy
+# ZN at `entry` and sell at `exit`; flat every night (the user does not hold overnight).
+#   window 1-6 days; entry 08:20/09:00/10:00/11:00/12:00/14:00 ET; exit 15:00 / 16:00 / strike
+#   (15:00 before 14 Jan 2021, 16:00 after); event filter none / skip FOMC / skip FOMC + coupon
+#   auctions; stop none / 0.25% / 0.50% below the entry. (Enlarged from 180 to 972 configs before
+#   any run, at the user's request.)
+#
+# Gates, data splits and costs are identical to the other ZN funnels. Stage 4 moves one setting
+# at a time: the entry time by +/- 30 min, the exit target by +/- 15 min, the window by +/- 1 day,
+# a stop by +/- 0.10%.
+# Transfer symbol (stage 9) is ZB, where the paper's month-end effect is larger.
+#
+# Thresholds are fixed for the duration of a run and are hashed into every run's
+# outputs. They are NEVER adjusted automatically to hit a survivor count; zero
+# survivors is a valid outcome. Changing a value here is a new research trial
+# and should be recorded under `research_history` below.
+
+version: 1
+strategy: month_end_v1
+symbol: ZN
+seed: 20261122
+
+data:
+  clean_root: data/clean
+  development: {start: 2018-01-01, end: 2022-12-31}
+  validation:  {start: 2023-01-01, end: 2024-12-31}
+  # end: null -> the actual available endpoint, recorded at access time.
+  holdout:     {start: 2025-01-01, end: null}
+  timeframes: ["1min"]
+
+data_history:
+  validation_previously_used_for_selection: true
+  validation_note: >-
+    No month-end strategy has been scored on ZN 2023-2024, but BB/KC squeeze, NR squeeze, noise-band, mean-reversion and convexity strategies were selected there and the researcher has read those results. Treated as used for selection.
+  holdout_previously_inspected: false   # not for this line; see the note
+  holdout_note: >-
+    No month-end metrics have been computed on this project's ZN 2025+ data. But the family was chosen partly on a practitioner futures test (ohlcv.io) that runs to Sep 2026 and reports a positive close-to-close month-end effect over the whole span, so the choice of family is not blind to the holdout period.
+
+metrics:
+  return_frequency: daily          # mark-to-market equity at each session close
+  periods_per_year: 252            # Sharpe = mean/std(daily) * sqrt(252)
+  risk_free_rate_annual: 0.0
+  cash_treatment: >-
+    Idle cash earns 0% and the Sharpe excess return is measured against a 0%
+    risk-free rate, so the two assumptions are consistent.
+  drawdown_basis: daily session-close mark-to-market (understates intraday DD)
+
+execution:
+  baseline: configs/execution/futures.yaml   # $2.50/contract/side + 1 tick/side slippage, unlevered whole contracts
+
+integrity:            # stage 1
+  truncation_check_sample: 40
+  truncation_points: 3
+
+trade_count:          # stage 2 -- hard gate
+  min_completed_trades: 100
+  min_trades_per_year: 10
+  min_years_meeting_floor: 4
+
+performance:          # stage 3 -- hard gate
+  min_net_return: 0.0               # strictly greater than
+  min_sharpe: 0.75                  # annualized, daily MTM returns incl. flat days
+  max_drawdown: -0.30
+  max_drawdown_source: src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct
+
+parameter_stability:  # stage 4 -- hard gate
+  mode: local_perturbation          # gate on `local` moves below; grid neighbors are diagnostic only
+  local:
+    int_rel: 0.20                   # unused by this family; required field
+    stop_atr_abs: 0.25              # unused by this family (no stop); required field
+    entry_shift_abs: 30             # entry time -/+ 30 minutes (never before 08:00)
+    exit_shift_abs: 15              # exit target -/+ 15 minutes
+    window_step: 1                  # last-N-days window -/+ 1 day (never below 1)
+    stop_pct_abs: 0.10              # stop -/+ 0.10% (never below 0.05%; "none" has no move)
+  neighbor_mode: single_axis        # grid-neighbor diagnostic
+  min_frac_profitable: 0.70         # of the local moves, share with dev net return > 0
+  min_median_sharpe: 0.50           # median dev Sharpe of the local moves
+  perturbation:                     # diagnostic only, never a gate
+    n_per_config: 20
+    integer_rel_step: 0.15          # unused by this family's perturbations (minute shifts up to +/- 30)
+    float_rel_step: 0.10            # stop (relative)
+
+time_stability:       # stage 5 -- light hard gate + diagnostics
+  min_profitable_years: 3
+  top_trades_k: 5
+  top_trades_frac: 0.05
+
+dedup:                # stage 6
+  corr_threshold: 0.80
+  return_basis: monthly
+  linkage: complete
+  reps_per_cluster: 2               # best 2 per cluster; a single-member cluster keeps its 1
+
+execution_stress:     # stage 7
+  gate_cost_multiplier: 1.5         # hard gate: positive dev net return
+  diagnostic_cost_multipliers: [2.0]
+  entry_delay_bars: 1               # one 1-minute bar late
+  missed_entry_frac: 0.10
+  missed_entry_sims: 100
+  breakeven_max_multiplier: 25.0
+
+validation:           # stage 8 -- hard gate (frozen representatives only)
+  min_net_return: 0.0
+  min_sharpe: 0.30
+  max_drawdown: -0.30
+  min_completed_trades: 40          # project default from 2026-10-22
+
+confidence:           # stage 9 -- diagnostics only
+  dsr_threshold: 0.95
+  dsr_calibration_verified: false
+  effective_trials_method: li_ji
+  serial_dependence: lag1_effective_n
+  transfer_symbol: ZB                # unchanged rules, development period only
+
+holdout:              # stage 10 -- explicit `final-test` command only
+  acceptance:
+    min_net_return: 0.0
+    min_sharpe: 0.0
+    max_drawdown: -0.30
+    min_completed_trades: null
+
+# Earlier trials on this market (other families). These count toward the DSR "known prior"
+# sensitivity only.
+research_history:
+  - name: "path_convexity_v3_15m ZN (pc_zn_v3_15m)"
+    n_configs: 103680
+    note: "Different (price-path convexity) family on ZN 15m."
+  - name: "mean_reversion ZN (mr_zn_v5)"
+    n_configs: 41472
+    note: "Different (mean-reversion) family on ZN."
+  - name: "noise_band ZN (nb_zn_v2)"
+    n_configs: 3456
+    note: "Different (noise-band intraday momentum) family on ZN."
+  - name: "compression_breakout_nr_v4_15m ZN (cb_nr_zn_v4_15m)"
+    n_configs: 2304
+    note: "Different (NR-N squeeze breakout) family on ZN 15m."
+  - name: "compression_breakout_bbkc_v4_15m ZN (cb_bbkc_zn_v4_15m)"
+    n_configs: 3840
+    note: "Different (BB/KC squeeze) family on ZN 15m."

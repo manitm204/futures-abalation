@@ -1,0 +1,354 @@
+{
+ "acceptance_holdout": {
+  "max_drawdown": -0.3,
+  "min_completed_trades": null,
+  "min_net_return": 0.0,
+  "min_sharpe": 0.0
+ },
+ "acceptance_validation": {
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40,
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3
+ },
+ "candidates": [
+  {
+   "cluster": 5,
+   "config_id": "cfg_1c8e24ffab7a428ff6a8",
+   "dev_net_return": 0.148177,
+   "dev_order": 1,
+   "dev_sharpe": 1.307472883128104,
+   "n_profitable_years": 4,
+   "neighbor_median_sharpe": 0.8396597315924317,
+   "params": {
+    "entry": "14:00",
+    "event_filter": "skip_fomc",
+    "exit": "16:00",
+    "first_days": 2,
+    "stop": "1.00",
+    "symbol": "ES",
+    "timeframe": "1min",
+    "window": 0
+   },
+   "stability_median_sharpe": 0.9639115955555326
+  },
+  {
+   "cluster": 4,
+   "config_id": "cfg_fd440abed17d74db3704",
+   "dev_net_return": 0.23074643749999924,
+   "dev_order": 7,
+   "dev_sharpe": 0.9559722835393283,
+   "n_profitable_years": 5,
+   "neighbor_median_sharpe": 0.7102356709131287,
+   "params": {
+    "entry": "11:00",
+    "event_filter": "none",
+    "exit": "15:00",
+    "first_days": 3,
+    "stop": "0.50",
+    "symbol": "ES",
+    "timeframe": "1min",
+    "window": 3
+   },
+   "stability_median_sharpe": 0.8668058980636011
+  },
+  {
+   "cluster": 18,
+   "config_id": "cfg_ced4e36bd7940b0ab21e",
+   "dev_net_return": 0.16734543750000563,
+   "dev_order": 17,
+   "dev_sharpe": 0.9207082036010985,
+   "n_profitable_years": 5,
+   "neighbor_median_sharpe": 0.7554032033187201,
+   "params": {
+    "entry": "11:00",
+    "event_filter": "skip_fomc",
+    "exit": "16:00",
+    "first_days": 3,
+    "stop": "0.25",
+    "symbol": "ES",
+    "timeframe": "1min",
+    "window": 0
+   },
+   "stability_median_sharpe": 0.7283737051404708
+  }
+ ],
+ "code_version": "d7cd024716c88bf1dc54f540fa22723c26604186",
+ "config_sha256": "556b7b5394695edd95f5ee5331434ca766dbebab95300133963e9cc07013f311",
+ "data_windows": {
+  "clean_root": "data/clean",
+  "development": {
+   "end": "2022-12-31",
+   "start": "2018-01-01"
+  },
+  "holdout": {
+   "end": null,
+   "start": "2025-01-01"
+  },
+  "timeframes": [
+   "1min"
+  ],
+  "validation": {
+   "end": "2024-12-31",
+   "start": "2023-01-01"
+  }
+ },
+ "experiment_id": "me_es_v2",
+ "frozen_at": "2026-11-22T14:54:44.926412+00:00",
+ "frozen_manifest_sha256": "c0267757901125e73bec8e15d99354345e97faa3d7fab80844900ed4a343ed9c",
+ "git_diff_sha256": "d5d1bad97e31e8772e9fce9ca2fd1597251091222833e1a5df51943958aa07b7",
+ "git_dirty": true,
+ "holdout_selection_note": "Chosen by the user on 2026-11-22 after reading the validation and placebo results: #1 (first 2 days of the month, 14:00-16:00 ET, skip FOMC, 1% stop), #7 (last 3 + first 3 days, 11:00-15:00 ET, 0.5% stop) and #17 (first 3 days, 11:00-16:00 ET, skip FOMC, 0.25% stop): the validation passers that beat >= 90% of placebo-day runs, one per distinct day set. #6 was set aside as the same trade as #1 without its (almost never hit) stop. Picked after seeing validation, so the holdout is not a blind test of the funnel's output.",
+ "seed": 20261123,
+ "selection_rules": {
+  "gates": [
+   "1 integrity",
+   "2 trade count",
+   "3 performance & risk",
+   "4 parameter stability",
+   "5 time stability",
+   "6 dedup (complete linkage, best 2 per cluster)",
+   "7 execution stress"
+  ],
+  "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+  "validation_is_not_used_for_ranking": true
+ },
+ "sizing_and_costs": {
+  "allow_overlapping_trades": false,
+  "allow_pyramiding": false,
+  "allow_short": false,
+  "commission_minimum": 0.0,
+  "commission_per_contract": 2.5,
+  "commission_per_share": 0.0,
+  "extended_hours_slippage_multiplier": 1.0,
+  "fractional_shares": false,
+  "include_sec_finra_fees": false,
+  "instrument_type": "futures",
+  "intrabar_collision_mode": "stop_first",
+  "leverage": 1.0,
+  "max_open_positions_per_symbol": 1,
+  "risk_per_trade_pct": 0.0025,
+  "slippage_bps_limit_adverse": 0.0,
+  "slippage_bps_market": 0.0,
+  "slippage_bps_stop": 0.0,
+  "slippage_ticks_market": 1.0,
+  "slippage_ticks_stop": 1.0,
+  "starting_equity": 1000000.0
+ },
+ "symbol": "ES",
+ "validated_at": "2026-11-22T14:55:30.492136+00:00",
+ "validation_summary": [
+  {
+   "config_id": "cfg_1c8e24ffab7a428ff6a8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7cfd8e720dbabd3ed411",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a380b129df4511ae2cbc",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c45cf5b7f4c29afe6070",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_94b4903c886ae65f66f0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c3f41e2420a39c4d68ae",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_fd440abed17d74db3704",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a3bb6809405c1641b1a1",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_573f3cdc8a0584f72b5f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_877c28190466426234fc",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_716d15097d89ecb2c45e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_dec7ae09def10d9de31a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0865c30cc971b725ff71",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_899c0cad061b2e1e998b",
+   "reasons": [
+    "sharpe 0.122 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e4e4846b3c89f64afae1",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f66d1d406f4877e71d2e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ced4e36bd7940b0ab21e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6c945bf6ae31be6afd19",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_97753336d25005cb0837",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_44672579eb81ff8118df",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c84e91faf7c3533388fa",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f63b1386089b5f42fc6c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b985ca907c622639b8a4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_48959f0d237d38d680d4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6f1f26138642dd4e905c",
+   "reasons": [
+    "net_return -0.0224 <= 0.0",
+    "sharpe -0.858 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_489026b7454ad1a0bffd",
+   "reasons": [
+    "net_return -0.0120 <= 0.0",
+    "sharpe -0.642 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8819984cb9450632d558",
+   "reasons": [
+    "sharpe 0.053 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_813911ec70a2173969d5",
+   "reasons": [
+    "net_return -0.0034 <= 0.0",
+    "sharpe -0.094 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_85bde60a53610e202f28",
+   "reasons": [
+    "net_return -0.0118 <= 0.0",
+    "sharpe -0.633 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c2dcb0cbaeeb1277031a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_66a87201947b0afc2d7b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8e899cbb31a5550a6de0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7f798ab24b072b5d5d98",
+   "reasons": [
+    "net_return -0.0218 <= 0.0",
+    "sharpe -0.837 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_bafe23c96046a52c20d3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_049d02ed40a82f443eac",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a9c083eba788f0f30a96",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4cc0ad57ea1890785fd0",
+   "reasons": [
+    "net_return -0.0023 <= 0.0",
+    "sharpe -0.119 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_bbc28b281b6b9196e4cd",
+   "reasons": [],
+   "status": "pass"
+  }
+ ]
+}

@@ -1,0 +1,6217 @@
+{
+ "market": "ES",
+ "market_name": "E-mini S&P 500",
+ "strategy_key": "month_end_v2",
+ "strategy_name": "Month end \u00b7 v2",
+ "variant": null,
+ "variant_label": null,
+ "stability_mode": "local_perturbation",
+ "validation_rules": {
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3,
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40
+ },
+ "run_id": "me_es_v2",
+ "generated_at": "2026-11-22T15:13:44+00:00",
+ "periods": {
+  "dev": [
+   "2018-01-01",
+   "2022-12-31"
+  ],
+  "val": [
+   "2023-01-01",
+   "2024-12-31"
+  ]
+ },
+ "strategy": {
+  "summary": "Buy stock index futures around the turn of the month, day session only. McConnell & Xu (2008) find that the last trading day of a month and the first three of the next carried essentially all of the US equity premium from 1926 to 2005, which they and later work (Etula et al. 2020) tie to month-end pension, payroll and fund flows. Evidence for S&P futures in recent decades is mixed, and most published numbers are close-to-close, overnight included; this run keeps only the day session, because nothing is held overnight.",
+  "formula": "Long on the month's last N and the next month's first M trading days, entry time to exit time",
+  "rules": [
+   {
+    "label": "Days",
+    "text": "The last 1, 2, 3 or 4 NYSE trading days of the month and/or the first 1, 2 or 3 of the next (either side may be none, not both), each day its own trade. Optional filter: skip scheduled FOMC statement days."
+   },
+   {
+    "label": "Enter",
+    "text": "Buy at 09:30, 10:00, 10:30, 11:00, 12:00, 13:00, 14:00 or 15:00 ET, at that minute's open. The day is skipped if the bars have a gap of more than 5 minutes there."
+   },
+   {
+    "label": "Exit",
+    "text": "Sell at 12:00, 13:00, 15:00, 15:30 or 16:00 ET (only exits after the entry are tested), at the close of the minute before. On early-close days the trade closes at the last bar. Optional stop 0.25%, 0.5% or 1% below the entry price, live during the trade."
+   },
+   {
+    "label": "Size",
+    "text": "One position at a time, never held overnight. As many whole ES contracts as the account covers at full contract value (no leverage), starting from $1,000,000."
+   }
+  ],
+  "axes": [
+   {
+    "label": "Bar size",
+    "values": [
+     "1 min"
+    ]
+   },
+   {
+    "label": "Last N trading days",
+    "values": [
+     "none",
+     "last 1",
+     "last 2",
+     "last 3",
+     "last 4"
+    ]
+   },
+   {
+    "label": "First N days of next month",
+    "values": [
+     "none",
+     "first 1",
+     "first 2",
+     "first 3"
+    ]
+   },
+   {
+    "label": "Entry time (ET)",
+    "values": [
+     "09:30",
+     "10:00",
+     "10:30",
+     "11:00",
+     "12:00",
+     "13:00",
+     "14:00",
+     "15:00"
+    ]
+   },
+   {
+    "label": "Exit time (ET)",
+    "values": [
+     "12:00",
+     "13:00",
+     "15:00",
+     "15:30",
+     "16:00"
+    ]
+   },
+   {
+    "label": "Event filter",
+    "values": [
+     "none",
+     "skip FOMC"
+    ]
+   },
+   {
+    "label": "Stop (% below entry)",
+    "values": [
+     "none",
+     "0.25%",
+     "0.5%",
+     "1%"
+    ]
+   }
+  ],
+  "grid_size": 4864,
+  "length_note": "Times are New York clock times on 1-minute bars from 08:00 to 17:00 ET."
+ },
+ "funnel": [
+  {
+   "name": "Start",
+   "sub": "every combination",
+   "n": 4864,
+   "why": "All 4,864 versions backtested once on 2018\u20132022 data."
+  },
+  {
+   "name": "1 \u00b7 Integrity",
+   "sub": "no cheating",
+   "n": 4864,
+   "why": "Per-trade checks on every version: the month-end day count, the FOMC and auction days and the entry and exit bars were recomputed independently; each trade was long, on one of the month's last trading days with the filter met, entered and exited at the set times; no eligible day was skipped; fills were never better than the market; nothing was held overnight. Plus 40 random versions re-run on cut-off data. 0 failed."
+  },
+  {
+   "name": "2 \u00b7 Enough trades",
+   "sub": "\u2265100 trades, spread out",
+   "n": 4352,
+   "why": "Needs \u2265100 completed trades and \u226510 a year in \u22654 of the 5 years. Removed 512 (512 on 1min)."
+  },
+  {
+   "name": "3 \u00b7 Profit",
+   "sub": "net > 0, Sharpe \u2265 0.75",
+   "n": 70,
+   "why": "Needs a net profit, Sharpe \u2265 0.75 and drawdown no worse than 30%. Removed 4,282 (4,282 on 1min); 2,231 of them lost money."
+  },
+  {
+   "name": "4 \u00b7 Stable settings",
+   "sub": "nudged settings also work",
+   "n": 65,
+   "why": "Each setting is nudged one at a time, down and up: the entry time by \u00b130 minutes, the exit time by \u00b115 minutes and the number of month-end days by \u00b11, the number of next-month days by \u00b11 and a stop by \u00b10.1% (\"no stop\" has nothing to nudge). At least 70% of the nudged versions must be profitable, with median Sharpe \u2265 0.5. Removed 5."
+  },
+  {
+   "name": "5 \u00b7 Time stability",
+   "sub": "\u22653 profitable years",
+   "n": 65,
+   "why": "Removed 0."
+  },
+  {
+   "name": "6 \u00b7 Remove duplicates",
+   "sub": "best 2 per group",
+   "n": 38,
+   "why": "Versions whose monthly returns correlate \u2265 0.8 form a group; the best 2 of each go on (a group of one keeps its one). 65 versions formed 22 groups; 38 of the 38 picks are distinct backtests."
+  },
+  {
+   "name": "7 \u00b7 Cost stress",
+   "sub": "profitable at 1.5\u00d7 costs",
+   "n": 38,
+   "why": "Removed 0."
+  },
+  {
+   "name": "8 \u00b7 Validation",
+   "sub": "2023\u20132024, new data",
+   "n": 30,
+   "why": "Frozen finalists run once on unseen data: needs net > 0, Sharpe \u2265 0.3, drawdown no worse than 30% and \u226540 trades."
+  }
+ ],
+ "stable": {
+  "n": 65,
+  "axes": [
+   {
+    "axis": "window",
+    "label": "Last N trading days",
+    "values": [
+     {
+      "v": "none",
+      "n": 22,
+      "median_sharpe": 0.9048156870229016
+     },
+     {
+      "v": "last 1",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "last 2",
+      "n": 22,
+      "median_sharpe": 0.8350645018980716
+     },
+     {
+      "v": "last 3",
+      "n": 9,
+      "median_sharpe": 0.8559232019356665
+     },
+     {
+      "v": "last 4",
+      "n": 12,
+      "median_sharpe": 0.8466685539482632
+     }
+    ]
+   },
+   {
+    "axis": "first_days",
+    "label": "First N days of next month",
+    "values": [
+     {
+      "v": "none",
+      "n": 9,
+      "median_sharpe": 0.833946970817717
+     },
+     {
+      "v": "first 1",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "first 2",
+      "n": 16,
+      "median_sharpe": 0.855407900206576
+     },
+     {
+      "v": "first 3",
+      "n": 40,
+      "median_sharpe": 0.8727039659557959
+     }
+    ]
+   },
+   {
+    "axis": "entry",
+    "label": "Entry time (ET)",
+    "values": [
+     {
+      "v": "09:30",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "10:00",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "10:30",
+      "n": 6,
+      "median_sharpe": 0.8104073622633201
+     },
+     {
+      "v": "11:00",
+      "n": 42,
+      "median_sharpe": 0.8590112699312327
+     },
+     {
+      "v": "12:00",
+      "n": 6,
+      "median_sharpe": 0.926094031712817
+     },
+     {
+      "v": "13:00",
+      "n": 2,
+      "median_sharpe": 0.8408344074124006
+     },
+     {
+      "v": "14:00",
+      "n": 9,
+      "median_sharpe": 0.925301939557329
+     },
+     {
+      "v": "15:00",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "exit",
+    "label": "Exit time (ET)",
+    "values": [
+     {
+      "v": "12:00",
+      "n": 8,
+      "median_sharpe": 0.8721916308547868
+     },
+     {
+      "v": "13:00",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "15:00",
+      "n": 13,
+      "median_sharpe": 0.8861930331341357
+     },
+     {
+      "v": "15:30",
+      "n": 11,
+      "median_sharpe": 0.8345048400922096
+     },
+     {
+      "v": "16:00",
+      "n": 33,
+      "median_sharpe": 0.8620993379267989
+     }
+    ]
+   },
+   {
+    "axis": "event_filter",
+    "label": "Event filter",
+    "values": [
+     {
+      "v": "none",
+      "n": 29,
+      "median_sharpe": 0.8861930331341357
+     },
+     {
+      "v": "skip FOMC",
+      "n": 36,
+      "median_sharpe": 0.8590112699312327
+     }
+    ]
+   },
+   {
+    "axis": "stop",
+    "label": "Stop (% below entry)",
+    "values": [
+     {
+      "v": "none",
+      "n": 7,
+      "median_sharpe": 0.891045296789642
+     },
+     {
+      "v": "0.25%",
+      "n": 19,
+      "median_sharpe": 0.832952352338448
+     },
+     {
+      "v": "0.5%",
+      "n": 28,
+      "median_sharpe": 0.8625964757042028
+     },
+     {
+      "v": "1%",
+      "n": 11,
+      "median_sharpe": 0.922523520019309
+     }
+    ]
+   }
+  ],
+  "by_timeframe": [
+   {
+    "timeframe": "1 min",
+    "n": 65,
+    "axes": [
+     {
+      "axis": "window",
+      "label": "Last N trading days",
+      "values": [
+       {
+        "v": "none",
+        "n": 22,
+        "median_sharpe": 0.9048156870229016
+       },
+       {
+        "v": "last 1",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "last 2",
+        "n": 22,
+        "median_sharpe": 0.8350645018980716
+       },
+       {
+        "v": "last 3",
+        "n": 9,
+        "median_sharpe": 0.8559232019356665
+       },
+       {
+        "v": "last 4",
+        "n": 12,
+        "median_sharpe": 0.8466685539482632
+       }
+      ]
+     },
+     {
+      "axis": "first_days",
+      "label": "First N days of next month",
+      "values": [
+       {
+        "v": "none",
+        "n": 9,
+        "median_sharpe": 0.833946970817717
+       },
+       {
+        "v": "first 1",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "first 2",
+        "n": 16,
+        "median_sharpe": 0.855407900206576
+       },
+       {
+        "v": "first 3",
+        "n": 40,
+        "median_sharpe": 0.8727039659557959
+       }
+      ]
+     },
+     {
+      "axis": "entry",
+      "label": "Entry time (ET)",
+      "values": [
+       {
+        "v": "09:30",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "10:00",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "10:30",
+        "n": 6,
+        "median_sharpe": 0.8104073622633201
+       },
+       {
+        "v": "11:00",
+        "n": 42,
+        "median_sharpe": 0.8590112699312327
+       },
+       {
+        "v": "12:00",
+        "n": 6,
+        "median_sharpe": 0.926094031712817
+       },
+       {
+        "v": "13:00",
+        "n": 2,
+        "median_sharpe": 0.8408344074124006
+       },
+       {
+        "v": "14:00",
+        "n": 9,
+        "median_sharpe": 0.925301939557329
+       },
+       {
+        "v": "15:00",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "exit",
+      "label": "Exit time (ET)",
+      "values": [
+       {
+        "v": "12:00",
+        "n": 8,
+        "median_sharpe": 0.8721916308547868
+       },
+       {
+        "v": "13:00",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "15:00",
+        "n": 13,
+        "median_sharpe": 0.8861930331341357
+       },
+       {
+        "v": "15:30",
+        "n": 11,
+        "median_sharpe": 0.8345048400922096
+       },
+       {
+        "v": "16:00",
+        "n": 33,
+        "median_sharpe": 0.8620993379267989
+       }
+      ]
+     },
+     {
+      "axis": "event_filter",
+      "label": "Event filter",
+      "values": [
+       {
+        "v": "none",
+        "n": 29,
+        "median_sharpe": 0.8861930331341357
+       },
+       {
+        "v": "skip FOMC",
+        "n": 36,
+        "median_sharpe": 0.8590112699312327
+       }
+      ]
+     },
+     {
+      "axis": "stop",
+      "label": "Stop (% below entry)",
+      "values": [
+       {
+        "v": "none",
+        "n": 7,
+        "median_sharpe": 0.891045296789642
+       },
+       {
+        "v": "0.25%",
+        "n": 19,
+        "median_sharpe": 0.832952352338448
+       },
+       {
+        "v": "0.5%",
+        "n": 28,
+        "median_sharpe": 0.8625964757042028
+       },
+       {
+        "v": "1%",
+        "n": 11,
+        "median_sharpe": 0.922523520019309
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "ablation": [
+  {
+   "axis": "window",
+   "label": "Last N trading days",
+   "values": [
+    {
+     "v": "none",
+     "n": 768,
+     "pct_profitable": 0.54296875,
+     "median_sharpe": 0.05352880125017387,
+     "p90_sharpe": 0.5298770900370033,
+     "n_stage3": 27,
+     "n_survivors": 17
+    },
+    {
+     "v": "last 1",
+     "n": 1024,
+     "pct_profitable": 0.296875,
+     "median_sharpe": -0.16309040593064314,
+     "p90_sharpe": 0.25945921644381387,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "last 2",
+     "n": 1024,
+     "pct_profitable": 0.58203125,
+     "median_sharpe": 0.10720098485137222,
+     "p90_sharpe": 0.5187926054104933,
+     "n_stage3": 22,
+     "n_survivors": 11
+    },
+    {
+     "v": "last 3",
+     "n": 1024,
+     "pct_profitable": 0.4228515625,
+     "median_sharpe": -0.04626255945037017,
+     "p90_sharpe": 0.4345868432672941,
+     "n_stage3": 9,
+     "n_survivors": 4
+    },
+    {
+     "v": "last 4",
+     "n": 1024,
+     "pct_profitable": 0.4921875,
+     "median_sharpe": 0.012878599619677522,
+     "p90_sharpe": 0.44878438391529574,
+     "n_stage3": 12,
+     "n_survivors": 6
+    }
+   ]
+  },
+  {
+   "axis": "first_days",
+   "label": "First N days of next month",
+   "values": [
+    {
+     "v": "none",
+     "n": 1024,
+     "pct_profitable": 0.388671875,
+     "median_sharpe": -0.1391887676110442,
+     "p90_sharpe": 0.4871752937294215,
+     "n_stage3": 9,
+     "n_survivors": 5
+    },
+    {
+     "v": "first 1",
+     "n": 1280,
+     "pct_profitable": 0.31015625,
+     "median_sharpe": -0.15117760771763866,
+     "p90_sharpe": 0.31544794819721195,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "first 2",
+     "n": 1280,
+     "pct_profitable": 0.52265625,
+     "median_sharpe": 0.0411773371363916,
+     "p90_sharpe": 0.4546772601444565,
+     "n_stage3": 21,
+     "n_survivors": 7
+    },
+    {
+     "v": "first 3",
+     "n": 1280,
+     "pct_profitable": 0.6171875,
+     "median_sharpe": 0.11204308439998611,
+     "p90_sharpe": 0.5052481299852299,
+     "n_stage3": 40,
+     "n_survivors": 26
+    }
+   ]
+  },
+  {
+   "axis": "entry",
+   "label": "Entry time (ET)",
+   "values": [
+    {
+     "v": "09:30",
+     "n": 760,
+     "pct_profitable": 0.28421052631578947,
+     "median_sharpe": -0.12719774384946514,
+     "p90_sharpe": 0.23626621529027958,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "10:00",
+     "n": 760,
+     "pct_profitable": 0.45921052631578946,
+     "median_sharpe": -0.005686116405234515,
+     "p90_sharpe": 0.3354040105921441,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "10:30",
+     "n": 760,
+     "pct_profitable": 0.7118421052631579,
+     "median_sharpe": 0.2162043112071133,
+     "p90_sharpe": 0.5291091808299568,
+     "n_stage3": 6,
+     "n_survivors": 4
+    },
+    {
+     "v": "11:00",
+     "n": 760,
+     "pct_profitable": 0.7447368421052631,
+     "median_sharpe": 0.25162901418503125,
+     "p90_sharpe": 0.6696734186059066,
+     "n_stage3": 42,
+     "n_survivors": 21
+    },
+    {
+     "v": "12:00",
+     "n": 608,
+     "pct_profitable": 0.22203947368421054,
+     "median_sharpe": -0.22638915905024976,
+     "p90_sharpe": 0.26515819586160094,
+     "n_stage3": 6,
+     "n_survivors": 4
+    },
+    {
+     "v": "13:00",
+     "n": 456,
+     "pct_profitable": 0.40131578947368424,
+     "median_sharpe": -0.04518779040363288,
+     "p90_sharpe": 0.2743285346100586,
+     "n_stage3": 2,
+     "n_survivors": 2
+    },
+    {
+     "v": "14:00",
+     "n": 456,
+     "pct_profitable": 0.4473684210526316,
+     "median_sharpe": -0.08005696836658863,
+     "p90_sharpe": 0.47146499735198455,
+     "n_stage3": 14,
+     "n_survivors": 7
+    },
+    {
+     "v": "15:00",
+     "n": 304,
+     "pct_profitable": 0.19736842105263158,
+     "median_sharpe": -0.2865550368477879,
+     "p90_sharpe": 0.18813808822571462,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "exit",
+   "label": "Exit time (ET)",
+   "values": [
+    {
+     "v": "12:00",
+     "n": 608,
+     "pct_profitable": 0.4128289473684211,
+     "median_sharpe": -0.03378458400963025,
+     "p90_sharpe": 0.3606750102639107,
+     "n_stage3": 8,
+     "n_survivors": 4
+    },
+    {
+     "v": "13:00",
+     "n": 760,
+     "pct_profitable": 0.2657894736842105,
+     "median_sharpe": -0.1708187770542013,
+     "p90_sharpe": 0.23779931106605787,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "15:00",
+     "n": 1064,
+     "pct_profitable": 0.5216165413533834,
+     "median_sharpe": 0.040990009099905626,
+     "p90_sharpe": 0.48494254278870264,
+     "n_stage3": 16,
+     "n_survivors": 6
+    },
+    {
+     "v": "15:30",
+     "n": 1216,
+     "pct_profitable": 0.4292763157894737,
+     "median_sharpe": -0.053971187962032784,
+     "p90_sharpe": 0.41366665205542436,
+     "n_stage3": 12,
+     "n_survivors": 6
+    },
+    {
+     "v": "16:00",
+     "n": 1216,
+     "pct_profitable": 0.5953947368421053,
+     "median_sharpe": 0.12985040346993768,
+     "p90_sharpe": 0.5521101960409022,
+     "n_stage3": 34,
+     "n_survivors": 22
+    }
+   ]
+  },
+  {
+   "axis": "event_filter",
+   "label": "Event filter",
+   "values": [
+    {
+     "v": "none",
+     "n": 2432,
+     "pct_profitable": 0.4263980263157895,
+     "median_sharpe": -0.04085531200002246,
+     "p90_sharpe": 0.4347108674039235,
+     "n_stage3": 31,
+     "n_survivors": 18
+    },
+    {
+     "v": "skip FOMC",
+     "n": 2432,
+     "pct_profitable": 0.5004111842105263,
+     "median_sharpe": 0.016506693233702574,
+     "p90_sharpe": 0.46625814187761966,
+     "n_stage3": 39,
+     "n_survivors": 20
+    }
+   ]
+  },
+  {
+   "axis": "stop",
+   "label": "Stop (% below entry)",
+   "values": [
+    {
+     "v": "none",
+     "n": 1216,
+     "pct_profitable": 0.49835526315789475,
+     "median_sharpe": 0.01872251102244974,
+     "p90_sharpe": 0.3743083687846564,
+     "n_stage3": 10,
+     "n_survivors": 2
+    },
+    {
+     "v": "0.25%",
+     "n": 1216,
+     "pct_profitable": 0.4440789473684211,
+     "median_sharpe": -0.049485988275895315,
+     "p90_sharpe": 0.4269428719364344,
+     "n_stage3": 20,
+     "n_survivors": 13
+    },
+    {
+     "v": "0.5%",
+     "n": 1216,
+     "pct_profitable": 0.4194078947368421,
+     "median_sharpe": -0.05505484601139252,
+     "p90_sharpe": 0.5170899351372805,
+     "n_stage3": 28,
+     "n_survivors": 13
+    },
+    {
+     "v": "1%",
+     "n": 1216,
+     "pct_profitable": 0.4917763157894737,
+     "median_sharpe": 0.00997091352679991,
+     "p90_sharpe": 0.4765696601889678,
+     "n_stage3": 12,
+     "n_survivors": 10
+    }
+   ]
+  }
+ ],
+ "length_map": {
+  "title": "Last N trading days \u00d7 First N days of next month",
+  "pair_text": "last n trading days and first n days of next month",
+  "corner": "Last \u2193 \u00b7 First \u2192",
+  "row_short": "last",
+  "col_short": "first",
+  "order": 1,
+  "fixed": {
+   "Entry time (ET)": "14:00",
+   "Exit time (ET)": "16:00",
+   "Event filter": "skip FOMC",
+   "Stop (% below entry)": "1%"
+  },
+  "center": [
+   "none",
+   "first 2"
+  ],
+  "rows": [
+   "none",
+   "last 1",
+   "last 2",
+   "last 3",
+   "last 4"
+  ],
+  "cols": [
+   "none",
+   "first 1",
+   "first 2",
+   "first 3"
+  ],
+  "sharpe": [
+   [
+    null,
+    0.8902120105289829,
+    1.307472883128104,
+    0.9639115955555326
+   ],
+   [
+    -0.2869121106866626,
+    0.3098626276274272,
+    0.6757401735924536,
+    0.5694507436987996
+   ],
+   [
+    -0.3763100521233024,
+    0.12868673380914508,
+    0.5187926054104933,
+    0.40315531894181766
+   ],
+   [
+    -0.4245798716142294,
+    -0.03541979055328534,
+    0.27051774209307644,
+    0.20295406695331086
+   ],
+   [
+    -0.2681921417850143,
+    0.10502149062913088,
+    0.37435584079609374,
+    0.33550419368377504
+   ]
+  ],
+  "trades": [
+   [
+    null,
+    58,
+    114,
+    171
+   ],
+   [
+    57,
+    115,
+    171,
+    228
+   ],
+   [
+    113,
+    171,
+    227,
+    284
+   ],
+   [
+    165,
+    223,
+    279,
+    336
+   ],
+   [
+    223,
+    281,
+    337,
+    394
+   ]
+  ]
+ },
+ "luck": {
+  "n_sims": 100,
+  "levels": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16
+  ],
+  "method": "Per clock and stop (entry time x exit rule x stop): the same long trade at the same clock, but on random validation-window NYSE trading days that are not among the month's last 5 or first 4 trading days. The number of days is scaled so the time in market matches each level. Same fills, slippage, commission and whole-contract sizing as the strategy; scored with the same daily-Sharpe and time-in-market code.",
+  "curves": [
+   {
+    "timeframe": "10:30 \u2192 12:00 \u00b7 stop 1%",
+    "match": {
+     "entry": "10:30",
+     "exit": "12:00",
+     "stop": "1%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.020003063155706772,
+      "exposure_pct": 2,
+      "frac_profitable": 0.65,
+      "mean_return": 0.007548409999999978,
+      "mean_sharpe": 0.2161556271979084,
+      "mean_trades": 61.0,
+      "median_return": 0.00898500000000002,
+      "median_sharpe": 0.2995140390754717,
+      "p10_return": -0.015830149999999977,
+      "p10_sharpe": -0.5213441253920773,
+      "p90_return": 0.03105859999999989,
+      "p90_sharpe": 0.8813582883535734
+     }
+    ],
+    "trade_bars": [
+     90.0,
+     90.0
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "10:30 \u2192 16:00 \u00b7 stop 0.5%",
+    "match": {
+     "entry": "10:30",
+     "exit": "16:00",
+     "stop": "0.5%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.1215547703180212,
+      "exposure_pct": 12,
+      "frac_profitable": 0.66,
+      "mean_return": 0.021691487499999825,
+      "mean_sharpe": 0.2989787075784941,
+      "mean_trades": 117.0,
+      "median_return": 0.020059156249999655,
+      "median_sharpe": 0.30473366732875506,
+      "p10_return": -0.030130200000000117,
+      "p10_sharpe": -0.44077802079529693,
+      "p90_return": 0.07189338749999995,
+      "p90_sharpe": 0.9361623073191171
+     }
+    ],
+    "trade_bars": [
+     330.0,
+     280.6666666666667
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "10:30 \u2192 16:00 \u00b7 stop 1%",
+    "match": {
+     "entry": "10:30",
+     "exit": "16:00",
+     "stop": "1%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.13118927020315285,
+      "exposure_pct": 13,
+      "frac_profitable": 0.72,
+      "mean_return": 0.033059993749999975,
+      "mean_sharpe": 0.42965676812581227,
+      "mean_trades": 111.0,
+      "median_return": 0.037762062500000027,
+      "median_sharpe": 0.519300467172815,
+      "p10_return": -0.026694187500000133,
+      "p10_sharpe": -0.3207727009049056,
+      "p90_return": 0.09118792499999995,
+      "p90_sharpe": 1.1558526089562788
+     }
+    ],
+    "trade_bars": [
+     330.0,
+     321.8859649122807
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "11:00 \u2192 12:00 \u00b7 stop 1%",
+    "match": {
+     "entry": "11:00",
+     "exit": "12:00",
+     "stop": "1%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.010064654465096436,
+      "exposure_pct": 1,
+      "frac_profitable": 0.63,
+      "mean_return": 0.004030349999999988,
+      "mean_sharpe": 0.18360300705900973,
+      "mean_trades": 46.0,
+      "median_return": 0.003802500000000042,
+      "median_sharpe": 0.20867368120741403,
+      "p10_return": -0.011086000000000007,
+      "p10_sharpe": -0.6073936785911537,
+      "p90_return": 0.01779750000000006,
+      "p90_sharpe": 0.905363532140637
+     }
+    ],
+    "trade_bars": [
+     60.0,
+     60.0
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "11:00 \u2192 15:00 \u00b7 stop 0.25%",
+    "match": {
+     "entry": "11:00",
+     "exit": "15:00",
+     "stop": "0.25%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.04749791231352129,
+      "exposure_pct": 5,
+      "frac_profitable": 0.66,
+      "mean_return": 0.013301900937501871,
+      "mean_sharpe": 0.28138595372084985,
+      "mean_trades": 74.0,
+      "median_return": 0.008222171875001849,
+      "median_sharpe": 0.20992086203380217,
+      "p10_return": -0.01900760624999759,
+      "p10_sharpe": -0.5155676612435663,
+      "p90_return": 0.050337390625001865,
+      "p90_sharpe": 1.134235596339276
+     }
+    ],
+    "trade_bars": [
+     240.0,
+     185.9264705882353
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "11:00 \u2192 15:00 \u00b7 stop 0.5%",
+    "match": {
+     "entry": "11:00",
+     "exit": "15:00",
+     "stop": "0.5%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.04061091723280349,
+      "exposure_pct": 4,
+      "frac_profitable": 0.79,
+      "mean_return": 0.020398643124999945,
+      "mean_sharpe": 0.5050417428146458,
+      "mean_trades": 50.0,
+      "median_return": 0.017541937499999882,
+      "median_sharpe": 0.49129939758159646,
+      "p10_return": -0.009676981250000072,
+      "p10_sharpe": -0.25208646693612585,
+      "p90_return": 0.049308068750000295,
+      "p90_sharpe": 1.3032572985585973
+     },
+     {
+      "actual_exposure": 0.051001615449973926,
+      "exposure_pct": 5,
+      "frac_profitable": 0.74,
+      "mean_return": 0.020253799374999933,
+      "mean_sharpe": 0.45092266074461707,
+      "mean_trades": 63.0,
+      "median_return": 0.02062200000000003,
+      "median_sharpe": 0.4651448142786495,
+      "p10_return": -0.013907337500000371,
+      "p10_sharpe": -0.3440257495678715,
+      "p90_return": 0.058222537500000004,
+      "p90_sharpe": 1.2147346705060942
+     },
+     {
+      "actual_exposure": 0.060722029559452564,
+      "exposure_pct": 6,
+      "frac_profitable": 0.8,
+      "mean_return": 0.025136908749999912,
+      "mean_sharpe": 0.5211722050049606,
+      "mean_trades": 75.0,
+      "median_return": 0.02206687499999993,
+      "median_sharpe": 0.47779879825960636,
+      "p10_return": -0.01036850625000021,
+      "p10_sharpe": -0.21197374432594057,
+      "p90_return": 0.060969837500000054,
+      "p90_sharpe": 1.3011201860009511
+     },
+     {
+      "actual_exposure": 0.0714245132682048,
+      "exposure_pct": 7,
+      "frac_profitable": 0.8,
+      "mean_return": 0.02411756999999988,
+      "mean_sharpe": 0.46918156225424895,
+      "mean_trades": 88.0,
+      "median_return": 0.02718668749999975,
+      "median_sharpe": 0.5470760526090772,
+      "p10_return": -0.013719612499999922,
+      "p10_sharpe": -0.29058207532856073,
+      "p90_return": 0.05821146874999976,
+      "p90_sharpe": 1.1242538788740817
+     },
+     {
+      "actual_exposure": 0.08094979706593441,
+      "exposure_pct": 8,
+      "frac_profitable": 0.88,
+      "mean_return": 0.02734649999999986,
+      "mean_sharpe": 0.5007483212688221,
+      "mean_trades": 100.0,
+      "median_return": 0.026581062499999808,
+      "median_sharpe": 0.4803085259793305,
+      "p10_return": -0.0010680000000000676,
+      "p10_sharpe": -0.008693356792062656,
+      "p90_return": 0.059407312499999844,
+      "p90_sharpe": 1.0659787382443027
+     },
+     {
+      "actual_exposure": 0.09151815831409746,
+      "exposure_pct": 9,
+      "frac_profitable": 0.82,
+      "mean_return": 0.029460309999999837,
+      "mean_sharpe": 0.5089574266090964,
+      "mean_trades": 113.0,
+      "median_return": 0.02784315624999978,
+      "median_sharpe": 0.47728000966812084,
+      "p10_return": -0.010763237500000411,
+      "p10_sharpe": -0.1789763802212097,
+      "p90_return": 0.06487521250000008,
+      "p90_sharpe": 1.1162519996231157
+     },
+     {
+      "actual_exposure": 0.10098702899422742,
+      "exposure_pct": 10,
+      "frac_profitable": 0.86,
+      "mean_return": 0.03261260937499988,
+      "mean_sharpe": 0.5363070547118574,
+      "mean_trades": 125.0,
+      "median_return": 0.03274465624999989,
+      "median_sharpe": 0.5593695159551101,
+      "p10_return": -0.0019621437500003114,
+      "p10_sharpe": -0.017786952353938894,
+      "p90_return": 0.06878156874999995,
+      "p90_sharpe": 1.118267607731765
+     },
+     {
+      "actual_exposure": 0.11184777574782935,
+      "exposure_pct": 11,
+      "frac_profitable": 0.88,
+      "mean_return": 0.037905039999999834,
+      "mean_sharpe": 0.5902347372866118,
+      "mean_trades": 138.0,
+      "median_return": 0.041845281249999866,
+      "median_sharpe": 0.638189850105138,
+      "p10_return": -0.0029492437500000077,
+      "p10_sharpe": -0.033855909375593185,
+      "p90_return": 0.07114588124999971,
+      "p90_sharpe": 1.0609134735098429
+     },
+     {
+      "actual_exposure": 0.12158536540894951,
+      "exposure_pct": 12,
+      "frac_profitable": 0.92,
+      "mean_return": 0.04159443937499981,
+      "mean_sharpe": 0.6171426523374023,
+      "mean_trades": 150.0,
+      "median_return": 0.035414531249999714,
+      "median_sharpe": 0.5486592105670519,
+      "p10_return": 0.003408274999999761,
+      "p10_sharpe": 0.06822042951171803,
+      "p90_return": 0.08901820624999984,
+      "p90_sharpe": 1.2694879059480824
+     },
+     {
+      "actual_exposure": 0.13215438304762114,
+      "exposure_pct": 13,
+      "frac_profitable": 0.93,
+      "mean_return": 0.047757469999999795,
+      "mean_sharpe": 0.6837016499878612,
+      "mean_trades": 163.0,
+      "median_return": 0.04754415624999986,
+      "median_sharpe": 0.7072974611092,
+      "p10_return": 0.005540768749999715,
+      "p10_sharpe": 0.1005421396310836,
+      "p90_return": 0.08584898124999993,
+      "p90_sharpe": 1.1912426836614793
+     }
+    ],
+    "trade_bars": [
+     240.0,
+     218.41041666666666
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "11:00 \u2192 15:30 \u00b7 stop 0.25%",
+    "match": {
+     "entry": "11:00",
+     "exit": "15:30",
+     "stop": "0.25%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.04668697830629369,
+      "exposure_pct": 5,
+      "frac_profitable": 0.64,
+      "mean_return": 0.00910853375000183,
+      "mean_sharpe": 0.1775411302046326,
+      "mean_trades": 67.0,
+      "median_return": 0.007135609375001684,
+      "median_sharpe": 0.18847273291712136,
+      "p10_return": -0.023861009374997844,
+      "p10_sharpe": -0.6416348973736333,
+      "p90_return": 0.042376918750002095,
+      "p90_sharpe": 0.8830449113941199
+     }
+    ],
+    "trade_bars": [
+     270.0,
+     204.2058823529412
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "11:00 \u2192 15:30 \u00b7 stop 0.5%",
+    "match": {
+     "entry": "11:00",
+     "exit": "15:30",
+     "stop": "0.5%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.11254438840814361,
+      "exposure_pct": 11,
+      "frac_profitable": 0.81,
+      "mean_return": 0.02791832937499989,
+      "mean_sharpe": 0.428371405299809,
+      "mean_trades": 125.0,
+      "median_return": 0.028487124999999613,
+      "median_sharpe": 0.4651866075494928,
+      "p10_return": -0.01037287500000007,
+      "p10_sharpe": -0.15878967064640342,
+      "p90_return": 0.06775366875000001,
+      "p90_sharpe": 1.0211644114974538
+     },
+     {
+      "actual_exposure": 0.12278316868871411,
+      "exposure_pct": 12,
+      "frac_profitable": 0.86,
+      "mean_return": 0.036305866249999826,
+      "mean_sharpe": 0.5371616656055828,
+      "mean_trades": 136.0,
+      "median_return": 0.037320312499999786,
+      "median_sharpe": 0.5768726765550491,
+      "p10_return": -0.006035362500000208,
+      "p10_sharpe": -0.07415706777498242,
+      "p90_return": 0.07818731874999928,
+      "p90_sharpe": 1.0769298669761294
+     },
+     {
+      "actual_exposure": 0.13252881736663422,
+      "exposure_pct": 13,
+      "frac_profitable": 0.87,
+      "mean_return": 0.03421825187499985,
+      "mean_sharpe": 0.48851347452932503,
+      "mean_trades": 147.0,
+      "median_return": 0.0366090312499997,
+      "median_sharpe": 0.5197987637977994,
+      "p10_return": -0.007292400000000309,
+      "p10_sharpe": -0.09694158457861426,
+      "p90_return": 0.08087968749999949,
+      "p90_sharpe": 1.089592222402566
+     },
+     {
+      "actual_exposure": 0.14313911467506846,
+      "exposure_pct": 14,
+      "frac_profitable": 0.86,
+      "mean_return": 0.03613176749999981,
+      "mean_sharpe": 0.49123879920112934,
+      "mean_trades": 159.0,
+      "median_return": 0.03207703124999961,
+      "median_sharpe": 0.46349097723956356,
+      "p10_return": -0.009007787500000197,
+      "p10_sharpe": -0.11554519822784162,
+      "p90_return": 0.08335298749999996,
+      "p90_sharpe": 1.0754975529093294
+     },
+     {
+      "actual_exposure": 0.15320916612879112,
+      "exposure_pct": 15,
+      "frac_profitable": 0.89,
+      "mean_return": 0.040236024374999776,
+      "mean_sharpe": 0.5271577234010645,
+      "mean_trades": 170.0,
+      "median_return": 0.03627231249999996,
+      "median_sharpe": 0.504177536094768,
+      "p10_return": -0.0034005312500003716,
+      "p10_sharpe": -0.027719407251628997,
+      "p90_return": 0.0853229874999998,
+      "p90_sharpe": 1.070022774999314
+     }
+    ],
+    "trade_bars": [
+     270.0,
+     242.26388888888889
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "11:00 \u2192 16:00 \u00b7 stop 0.25%",
+    "match": {
+     "entry": "11:00",
+     "exit": "16:00",
+     "stop": "0.25%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.058684666353057864,
+      "exposure_pct": 6,
+      "frac_profitable": 0.68,
+      "mean_return": 0.01576583187500217,
+      "mean_sharpe": 0.29375525943555525,
+      "mean_trades": 77.0,
+      "median_return": 0.012714859375002274,
+      "median_sharpe": 0.27510152767966883,
+      "p10_return": -0.019346643749997693,
+      "p10_sharpe": -0.490299919322796,
+      "p90_return": 0.059616153125001826,
+      "p90_sharpe": 1.1857321360140918
+     },
+     {
+      "actual_exposure": 0.0682996203874892,
+      "exposure_pct": 7,
+      "frac_profitable": 0.75,
+      "mean_return": 0.01889315531250246,
+      "mean_sharpe": 0.3524690271378721,
+      "mean_trades": 90.0,
+      "median_return": 0.018064625000002832,
+      "median_sharpe": 0.3626536359776964,
+      "p10_return": -0.014857256249997697,
+      "p10_sharpe": -0.3077207679709136,
+      "p90_return": 0.055750884375002356,
+      "p90_sharpe": 1.0619751702262163
+     },
+     {
+      "actual_exposure": 0.07839669325048226,
+      "exposure_pct": 8,
+      "frac_profitable": 0.79,
+      "mean_return": 0.02589127437500291,
+      "mean_sharpe": 0.45339767404273273,
+      "mean_trades": 103.0,
+      "median_return": 0.021487468750002736,
+      "median_sharpe": 0.4038275226857117,
+      "p10_return": -0.011006521874996544,
+      "p10_sharpe": -0.2026003462775045,
+      "p90_return": 0.07014448750000248,
+      "p90_sharpe": 1.1787549199723457
+     },
+     {
+      "actual_exposure": 0.0882662903361084,
+      "exposure_pct": 9,
+      "frac_profitable": 0.78,
+      "mean_return": 0.022913675000003277,
+      "mean_sharpe": 0.38013880796986443,
+      "mean_trades": 116.0,
+      "median_return": 0.021328531250003224,
+      "median_sharpe": 0.37844035572847684,
+      "p10_return": -0.015321212499996573,
+      "p10_sharpe": -0.28660595979053194,
+      "p90_return": 0.06121828125000318,
+      "p90_sharpe": 0.988013952915988
+     },
+     {
+      "actual_exposure": 0.09789181955095595,
+      "exposure_pct": 10,
+      "frac_profitable": 0.78,
+      "mean_return": 0.02297938125000365,
+      "mean_sharpe": 0.36960349640417234,
+      "mean_trades": 129.0,
+      "median_return": 0.024802062500003608,
+      "median_sharpe": 0.43008153989676823,
+      "p10_return": -0.014892456249996397,
+      "p10_sharpe": -0.25420002221370636,
+      "p90_return": 0.06601895937500361,
+      "p90_sharpe": 1.0996760158255723
+     },
+     {
+      "actual_exposure": 0.10714761857876867,
+      "exposure_pct": 11,
+      "frac_profitable": 0.77,
+      "mean_return": 0.025705400312504078,
+      "mean_sharpe": 0.3971076151717395,
+      "mean_trades": 142.0,
+      "median_return": 0.027638812500004106,
+      "median_sharpe": 0.4484105233789412,
+      "p10_return": -0.01652259062499518,
+      "p10_sharpe": -0.27730978532877576,
+      "p90_return": 0.06261221562500388,
+      "p90_sharpe": 0.971002698538211
+     },
+     {
+      "actual_exposure": 0.11745349655577314,
+      "exposure_pct": 12,
+      "frac_profitable": 0.83,
+      "mean_return": 0.029110639062504412,
+      "mean_sharpe": 0.43155220996555455,
+      "mean_trades": 155.0,
+      "median_return": 0.029444218750004802,
+      "median_sharpe": 0.45375510233424765,
+      "p10_return": -0.00786722812499534,
+      "p10_sharpe": -0.11503433258107963,
+      "p90_return": 0.07232308750000421,
+      "p90_sharpe": 1.0651241493321
+     },
+     {
+      "actual_exposure": 0.12728699216342665,
+      "exposure_pct": 13,
+      "frac_profitable": 0.86,
+      "mean_return": 0.03486771812500475,
+      "mean_sharpe": 0.5053561876185971,
+      "mean_trades": 167.0,
+      "median_return": 0.03254623437500437,
+      "median_sharpe": 0.4907365117995916,
+      "p10_return": -0.009024349999995629,
+      "p10_sharpe": -0.13199983260843354,
+      "p90_return": 0.07659860937500505,
+      "p90_sharpe": 1.0759101742255626
+     }
+    ],
+    "trade_bars": [
+     300.0,
+     211.29161118508654
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "11:00 \u2192 16:00 \u00b7 stop 0.5%",
+    "match": {
+     "entry": "11:00",
+     "exit": "16:00",
+     "stop": "0.5%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.1128558457044711,
+      "exposure_pct": 11,
+      "frac_profitable": 0.81,
+      "mean_return": 0.041742974999999696,
+      "mean_sharpe": 0.6236821648764953,
+      "mean_trades": 114.0,
+      "median_return": 0.03765118749999974,
+      "median_sharpe": 0.5968726137722158,
+      "p10_return": -0.00886351250000039,
+      "p10_sharpe": -0.1264530231776992,
+      "p90_return": 0.09615508749999986,
+      "p90_sharpe": 1.3557250070178184
+     },
+     {
+      "actual_exposure": 0.12225200290270466,
+      "exposure_pct": 12,
+      "frac_profitable": 0.89,
+      "mean_return": 0.04167761999999968,
+      "mean_sharpe": 0.6065214555384703,
+      "mean_trades": 124.0,
+      "median_return": 0.04302059374999967,
+      "median_sharpe": 0.6580794549309903,
+      "p10_return": -0.0011543250000004776,
+      "p10_sharpe": -0.0005123842817059282,
+      "p90_return": 0.08113481874999953,
+      "p90_sharpe": 1.1342142783150524
+     },
+     {
+      "actual_exposure": 0.1336929623997637,
+      "exposure_pct": 13,
+      "frac_profitable": 0.93,
+      "mean_return": 0.05173376437499964,
+      "mean_sharpe": 0.7152130819857229,
+      "mean_trades": 135.0,
+      "median_return": 0.0546693749999998,
+      "median_sharpe": 0.7684491148465031,
+      "p10_return": 0.008347387499999793,
+      "p10_sharpe": 0.13745885924229506,
+      "p90_return": 0.09462169999999961,
+      "p90_sharpe": 1.2184284673226844
+     },
+     {
+      "actual_exposure": 0.14326802247772832,
+      "exposure_pct": 14,
+      "frac_profitable": 0.95,
+      "mean_return": 0.05349981374999959,
+      "mean_sharpe": 0.7163750426006608,
+      "mean_trades": 145.0,
+      "median_return": 0.05211621874999972,
+      "median_sharpe": 0.7203483731483156,
+      "p10_return": 0.007381887499999307,
+      "p10_sharpe": 0.11747628820121021,
+      "p90_return": 0.09856072499999961,
+      "p90_sharpe": 1.2571523020195212
+     },
+     {
+      "actual_exposure": 0.1534825527756202,
+      "exposure_pct": 15,
+      "frac_profitable": 0.92,
+      "mean_return": 0.059086992499999595,
+      "mean_sharpe": 0.7630038709782987,
+      "mean_trades": 155.0,
+      "median_return": 0.0572021874999995,
+      "median_sharpe": 0.7533723739916318,
+      "p10_return": 0.010270499999999808,
+      "p10_sharpe": 0.15608233187872558,
+      "p90_return": 0.11765790624999928,
+      "p90_sharpe": 1.4407966350666457
+     },
+     {
+      "actual_exposure": 0.16414740342854642,
+      "exposure_pct": 16,
+      "frac_profitable": 0.98,
+      "mean_return": 0.06187636124999954,
+      "mean_sharpe": 0.7699085048159131,
+      "mean_trades": 166.0,
+      "median_return": 0.05959912499999942,
+      "median_sharpe": 0.7658096339253734,
+      "p10_return": 0.021375562499999456,
+      "p10_sharpe": 0.2990236632357362,
+      "p90_return": 0.10436420624999962,
+      "p90_sharpe": 1.2830747713820083
+     }
+    ],
+    "trade_bars": [
+     300.0,
+     264.86845827439885
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "12:00 \u2192 15:30 \u00b7 stop 0.25%",
+    "match": {
+     "entry": "12:00",
+     "exit": "15:30",
+     "stop": "0.25%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.03763965619723805,
+      "exposure_pct": 4,
+      "frac_profitable": 0.48,
+      "mean_return": -0.00012452968749846139,
+      "mean_sharpe": -0.03628572715077254,
+      "mean_trades": 67.0,
+      "median_return": -0.0031679374999983856,
+      "median_sharpe": -0.08518603243196018,
+      "p10_return": -0.02831179374999807,
+      "p10_sharpe": -0.8351629448637391,
+      "p90_return": 0.026765871875001162,
+      "p90_sharpe": 0.7640874624036544
+     }
+    ],
+    "trade_bars": [
+     210.0,
+     162.86428571428573
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "12:00 \u2192 16:00 \u00b7 stop 0.25%",
+    "match": {
+     "entry": "12:00",
+     "exit": "16:00",
+     "stop": "0.25%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.04731430530181201,
+      "exposure_pct": 5,
+      "frac_profitable": 0.59,
+      "mean_return": 0.0045393350000018685,
+      "mean_sharpe": 0.09644143289041787,
+      "mean_trades": 76.0,
+      "median_return": 0.0022094375000019095,
+      "median_sharpe": 0.06651954052014358,
+      "p10_return": -0.023675103124998143,
+      "p10_sharpe": -0.6325565893953874,
+      "p90_return": 0.03286946875000184,
+      "p90_sharpe": 0.7886716585661941
+     }
+    ],
+    "trade_bars": [
+     240.0,
+     181.07857142857142
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "13:00 \u2192 16:00 \u00b7 stop 0.25%",
+    "match": {
+     "entry": "13:00",
+     "exit": "16:00",
+     "stop": "0.25%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.01936913578896316,
+      "exposure_pct": 2,
+      "frac_profitable": 0.66,
+      "mean_return": 0.00669997687500078,
+      "mean_sharpe": 0.22254318624555902,
+      "mean_trades": 38.0,
+      "median_return": 0.004006671875000922,
+      "median_sharpe": 0.1763338015818952,
+      "p10_return": -0.011842206249998986,
+      "p10_sharpe": -0.49714102099101964,
+      "p90_return": 0.029688778125000443,
+      "p90_sharpe": 1.0733698046535873
+     }
+    ],
+    "trade_bars": [
+     180.0,
+     143.35555555555555
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "13:00 \u2192 16:00 \u00b7 stop none",
+    "match": {
+     "entry": "13:00",
+     "exit": "16:00",
+     "stop": "none"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.030850353903882563,
+      "exposure_pct": 3,
+      "frac_profitable": 0.49,
+      "mean_return": -0.003606600000000004,
+      "mean_sharpe": -0.019810105988696862,
+      "mean_trades": 47.0,
+      "median_return": -0.0014350000000000196,
+      "median_sharpe": -0.026343658720411695,
+      "p10_return": -0.03587224999999998,
+      "p10_sharpe": -0.7786661132973982,
+      "p90_return": 0.028485749999999952,
+      "p90_sharpe": 0.9548438869934341
+     }
+    ],
+    "trade_bars": [
+     180.0,
+     176.33333333333334
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "14:00 \u2192 15:00 \u00b7 stop 1%",
+    "match": {
+     "entry": "14:00",
+     "exit": "15:00",
+     "stop": "1%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.010052401842269363,
+      "exposure_pct": 1,
+      "frac_profitable": 0.32,
+      "mean_return": -0.005879049999999999,
+      "mean_sharpe": -0.2735335173357406,
+      "mean_trades": 46.0,
+      "median_return": -0.0066950000000000065,
+      "median_sharpe": -0.3041869898043066,
+      "p10_return": -0.019437749999999997,
+      "p10_sharpe": -0.9423435223189038,
+      "p90_return": 0.008314500000000028,
+      "p90_sharpe": 0.39261628679548566
+     }
+    ],
+    "trade_bars": [
+     60.0,
+     60.0
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "14:00 \u2192 15:30 \u00b7 stop 1%",
+    "match": {
+     "entry": "14:00",
+     "exit": "15:30",
+     "stop": "1%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.009825582455411026,
+      "exposure_pct": 1,
+      "frac_profitable": 0.25,
+      "mean_return": -0.007120650000000005,
+      "mean_sharpe": -0.3359189256511899,
+      "mean_trades": 30.0,
+      "median_return": -0.008043750000000016,
+      "median_sharpe": -0.39454938907056314,
+      "p10_return": -0.024625499999999988,
+      "p10_sharpe": -1.1200229064097351,
+      "p90_return": 0.012139249999999945,
+      "p90_sharpe": 0.6279953974462018
+     }
+    ],
+    "trade_bars": [
+     90.0,
+     90.0
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "14:00 \u2192 16:00 \u00b7 stop 0.5%",
+    "match": {
+     "entry": "14:00",
+     "exit": "16:00",
+     "stop": "0.5%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.02008813865884833,
+      "exposure_pct": 2,
+      "frac_profitable": 0.3,
+      "mean_return": -0.007462212500000013,
+      "mean_sharpe": -0.27211998192004844,
+      "mean_trades": 48.0,
+      "median_return": -0.006539093749999891,
+      "median_sharpe": -0.22554918248634248,
+      "p10_return": -0.03148845000000004,
+      "p10_sharpe": -1.1428233363158553,
+      "p90_return": 0.013510125000000046,
+      "p90_sharpe": 0.4103935833595665
+     }
+    ],
+    "trade_bars": [
+     120.0,
+     113.61363636363636
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "14:00 \u2192 16:00 \u00b7 stop 1%",
+    "match": {
+     "entry": "14:00",
+     "exit": "16:00",
+     "stop": "1%"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.020052511240687458,
+      "exposure_pct": 2,
+      "frac_profitable": 0.31,
+      "mean_return": -0.007149761250000032,
+      "mean_sharpe": -0.23172313884180704,
+      "mean_trades": 46.0,
+      "median_return": -0.008256250000000076,
+      "median_sharpe": -0.2777673767610518,
+      "p10_return": -0.030476450000000023,
+      "p10_sharpe": -0.9877406334456829,
+      "p90_return": 0.021135999999999915,
+      "p90_sharpe": 0.6472854163036764
+     },
+     {
+      "actual_exposure": 0.030062721759710018,
+      "exposure_pct": 3,
+      "frac_profitable": 0.33,
+      "mean_return": -0.009399978750000032,
+      "mean_sharpe": -0.248070779666487,
+      "mean_trades": 69.0,
+      "median_return": -0.009822500000000012,
+      "median_sharpe": -0.27157974071831353,
+      "p10_return": -0.035389950000000024,
+      "p10_sharpe": -0.9831763911360764,
+      "p90_return": 0.015999000000000034,
+      "p90_sharpe": 0.4328296122887122
+     }
+    ],
+    "trade_bars": [
+     120.0,
+     120.0
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "14:00 \u2192 16:00 \u00b7 stop none",
+    "match": {
+     "entry": "14:00",
+     "exit": "16:00",
+     "stop": "none"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.020129308930192873,
+      "exposure_pct": 2,
+      "frac_profitable": 0.39,
+      "mean_return": -0.009154374999999994,
+      "mean_sharpe": -0.25428527917498284,
+      "mean_trades": 46.0,
+      "median_return": -0.007869999999999988,
+      "median_sharpe": -0.2753565614126606,
+      "p10_return": -0.033060999999999986,
+      "p10_sharpe": -0.985819547790339,
+      "p90_return": 0.018454999999999982,
+      "p90_sharpe": 0.586553870141762
+     }
+    ],
+    "trade_bars": [
+     120.0,
+     120.0
+    ],
+    "p_long": 1.0
+   }
+  ],
+  "text": "For every whole-percent time in market in each group's 2023\u20132024 range, 100 placebo runs buy ES at the same clock (same entry and exit times) but on random ordinary days: never among the month's last 5 or first 4 trading days. So they test whether the month-end calendar matters, or whether the same hours on any day would have done as well. Each group is one entry-and-exit clock and stop setting. They pay the same costs and use the same sizing and Sharpe math as the strategy."
+ },
+ "finalists": [
+  {
+   "order": 1,
+   "group": 5,
+   "config_id": "cfg_1c8e",
+   "settings": {
+    "window": "none",
+    "first_days": "first 2",
+    "entry": "14:00",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "1%"
+   },
+   "dev": {
+    "net_return": 0.148177,
+    "cagr": 0.027317085867731405,
+    "sharpe": 1.307472883128104,
+    "max_drawdown": -0.014432121570545853,
+    "exposure": 0.02021660542671091,
+    "win_rate": 0.6228070175438597,
+    "profit_factor": 2.3347716033257386,
+    "n_completed_trades": 114.0,
+    "turnover_annual": 51.00396219916746
+   },
+   "val": {
+    "net_return": 0.019796599304811036,
+    "cagr": 0.00960093170499432,
+    "sharpe": 1.0008905018542267,
+    "max_drawdown": -0.008942184458805236,
+    "exposure": 0.019254121585401875,
+    "win_rate": 0.5227272727272727,
+    "profit_factor": 1.770116889717093,
+    "n_completed_trades": 44.0,
+    "turnover_annual": 44.698805604851934
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 112,
+    "eod": 0,
+    "stop": 2
+   },
+   "stress_1_5x": 0.1366345,
+   "breakeven_cost_x": 8.313501588422172,
+   "transfer_sharpe": 1.400871352748754,
+   "neighbor_median_sharpe": 0.8396597315924317,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9639115955555326,
+   "local_detail": [
+    {
+     "move": "entry=13:30",
+     "sharpe": 1.2847911263557452,
+     "net_return": 0.15946425000000009,
+     "trades": 114
+    },
+    {
+     "move": "entry=14:30",
+     "sharpe": 0.8577920628210585,
+     "net_return": 0.09735749999999999,
+     "trades": 114
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.8302296693990721,
+     "net_return": 0.073237,
+     "trades": 114
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 1.0618079143647117,
+     "net_return": 0.1089420000000001,
+     "trades": 114
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.6757401735924536,
+     "net_return": 0.10784637499999983,
+     "trades": 171
+    },
+    {
+     "move": "first_days=1",
+     "sharpe": 0.8902120105289829,
+     "net_return": 0.07863700000000007,
+     "trades": 58
+    },
+    {
+     "move": "first_days=3",
+     "sharpe": 0.9639115955555326,
+     "net_return": 0.13267525000000013,
+     "trades": 171
+    },
+    {
+     "move": "stop_pct=0.9",
+     "sharpe": 1.1152084276065488,
+     "net_return": 0.11763662500000005,
+     "trades": 114
+    },
+    {
+     "move": "stop_pct=1.1",
+     "sharpe": 1.270842987803903,
+     "net_return": 0.14575695,
+     "trades": 114
+    }
+   ],
+   "dsr": 0.7248693713865434,
+   "luck": {
+    "exposure_level": 2,
+    "luck_pct_sharpe": 0.95,
+    "luck_pct_return": 0.88
+   }
+  },
+  {
+   "order": 2,
+   "group": 12,
+   "config_id": "cfg_7cfd",
+   "settings": {
+    "window": "last 4",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "15:30",
+    "event_filter": "none",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.2803768749999991,
+    "cagr": 0.04938743538644963,
+    "sharpe": 0.93763717367693,
+    "max_drawdown": -0.04614747792032903,
+    "exposure": 0.14495616248078214,
+    "win_rate": 0.5095238095238095,
+    "profit_factor": 1.3274089687270316,
+    "n_completed_trades": 420.0,
+    "turnover_annual": 190.81346548517348
+   },
+   "val": {
+    "net_return": 0.06036752850601124,
+    "cagr": 0.028982901649583948,
+    "sharpe": 0.7631169847933079,
+    "max_drawdown": -0.046779106808617965,
+    "exposure": 0.14863598405700387,
+    "win_rate": 0.5119047619047619,
+    "profit_factor": 1.225400879119035,
+    "n_completed_trades": 168.0,
+    "turnover_annual": 172.56849397901584
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 319,
+    "eod": 4,
+    "stop": 97
+   },
+   "stress_1_5x": 0.24205593749999932,
+   "breakeven_cost_x": 4.626160154980396,
+   "transfer_sharpe": 1.0848717956409737,
+   "neighbor_median_sharpe": 0.7197078739089837,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.912041203368345,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.6026350866409127,
+     "net_return": 0.17925324999999903,
+     "trades": 420
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.45843074713861376,
+     "net_return": 0.10866199999999915,
+     "trades": 420
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.9185199429311627,
+     "net_return": 0.2606763749999996,
+     "trades": 420
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.9065933328695149,
+     "net_return": 0.28295068749999897,
+     "trades": 420
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.9174890738671752,
+     "net_return": 0.24778531249999913,
+     "trades": 360
+    },
+    {
+     "move": "window=5",
+     "sharpe": 1.0310610177484767,
+     "net_return": 0.3409615624999991,
+     "trades": 480
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.7598172463335002,
+     "net_return": 0.19504337499999935,
+     "trades": 360
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.0042327238141493,
+     "net_return": 0.32155824999999894,
+     "trades": 480
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 1.0950561768599156,
+     "net_return": 0.31937479999999985,
+     "trades": 420
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.9003736191437433,
+     "net_return": 0.2771103499999996,
+     "trades": 420
+    }
+   ],
+   "dsr": 0.36613287258335203,
+   "luck": {
+    "exposure_level": 15,
+    "luck_pct_sharpe": 0.69,
+    "luck_pct_return": 0.7
+   }
+  },
+  {
+   "order": 3,
+   "group": 4,
+   "config_id": "cfg_a380",
+   "settings": {
+    "window": "last 3",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "16:00",
+    "event_filter": "none",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.2607860624999989,
+    "cagr": 0.046236209542916074,
+    "sharpe": 0.8630936134816067,
+    "max_drawdown": -0.055167556000015106,
+    "exposure": 0.1363919673756255,
+    "win_rate": 0.48333333333333334,
+    "profit_factor": 1.3423236376652568,
+    "n_completed_trades": 360.0,
+    "turnover_annual": 161.21323007398115
+   },
+   "val": {
+    "net_return": 0.06605650829836951,
+    "cagr": 0.03167010277426008,
+    "sharpe": 0.855834274669607,
+    "max_drawdown": -0.04112789903255121,
+    "exposure": 0.13927147946774024,
+    "win_rate": 0.5555555555555556,
+    "profit_factor": 1.2772298032492873,
+    "n_completed_trades": 144.0,
+    "turnover_annual": 146.57255252125688
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 261,
+    "eod": 3,
+    "stop": 96
+   },
+   "stress_1_5x": 0.2160420624999988,
+   "breakeven_cost_x": 4.8434785633517485,
+   "transfer_sharpe": 1.1508098411696062,
+   "neighbor_median_sharpe": 0.7222236214463278,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9101638934014444,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.5706596513197608,
+     "net_return": 0.1753368749999995,
+     "trades": 360
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.35671684844805746,
+     "net_return": 0.08586043749999939,
+     "trades": 360
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.9015750152869283,
+     "net_return": 0.25123593749999906,
+     "trades": 360
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.9378660938657378,
+     "net_return": 0.2814772499999989,
+     "trades": 360
+    },
+    {
+     "move": "window=2",
+     "sharpe": 0.9712459740967418,
+     "net_return": 0.2699645624999989,
+     "trades": 300
+    },
+    {
+     "move": "window=4",
+     "sharpe": 0.9187527715159607,
+     "net_return": 0.3202841249999988,
+     "trades": 420
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.6502946215591467,
+     "net_return": 0.163189937499999,
+     "trades": 300
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 0.9990449818471542,
+     "net_return": 0.3325386249999984,
+     "trades": 420
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 1.0308956190245806,
+     "net_return": 0.3058244000000001,
+     "trades": 360
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.7835427739843929,
+     "net_return": 0.24515297499999944,
+     "trades": 360
+    }
+   ],
+   "dsr": 0.2973469417213249,
+   "luck": {
+    "exposure_level": 14,
+    "luck_pct_sharpe": 0.6,
+    "luck_pct_return": 0.64
+   }
+  },
+  {
+   "order": 4,
+   "group": 6,
+   "config_id": "cfg_c45c",
+   "settings": {
+    "window": "last 4",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "16:00",
+    "event_filter": "none",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.3202841249999988,
+    "cagr": 0.055688393938147174,
+    "sharpe": 0.9187527715159607,
+    "max_drawdown": -0.05864698591422013,
+    "exposure": 0.15888948908662437,
+    "win_rate": 0.47619047619047616,
+    "profit_factor": 1.3242592597982734,
+    "n_completed_trades": 420.0,
+    "turnover_annual": 189.89036247522495
+   },
+   "val": {
+    "net_return": 0.06349068993009355,
+    "cagr": 0.030459045566329612,
+    "sharpe": 0.7884695945965512,
+    "max_drawdown": -0.04696478675137894,
+    "exposure": 0.16284683856804763,
+    "win_rate": 0.5416666666666666,
+    "profit_factor": 1.2306759853518947,
+    "n_completed_trades": 168.0,
+    "turnover_annual": 170.50017196389612
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 304,
+    "eod": 4,
+    "stop": 112
+   },
+   "stress_1_5x": 0.27060256249999903,
+   "breakeven_cost_x": 5.053869512920687,
+   "transfer_sharpe": 1.1142373039467006,
+   "neighbor_median_sharpe": 0.7653823376129875,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8848434731755608,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.6340528353614009,
+     "net_return": 0.22404368749999937,
+     "trades": 420
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.40067182920623856,
+     "net_return": 0.10726293749999938,
+     "trades": 420
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.9065933328695149,
+     "net_return": 0.28295068749999897,
+     "trades": 420
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.9894385847043573,
+     "net_return": 0.3410665624999989,
+     "trades": 420
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.8630936134816067,
+     "net_return": 0.2607860624999989,
+     "trades": 360
+    },
+    {
+     "move": "window=5",
+     "sharpe": 1.0333262107252539,
+     "net_return": 0.389518749999999,
+     "trades": 480
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.7813573106000651,
+     "net_return": 0.24333837499999933,
+     "trades": 360
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.0196849097075102,
+     "net_return": 0.3819848749999988,
+     "trades": 480
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 1.0598547305771082,
+     "net_return": 0.36561474999999954,
+     "trades": 420
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.8399054525055277,
+     "net_return": 0.2994461499999994,
+     "trades": 420
+    }
+   ],
+   "dsr": 0.344906744515061,
+   "luck": {
+    "exposure_level": 16,
+    "luck_pct_sharpe": 0.57,
+    "luck_pct_return": 0.61
+   }
+  },
+  {
+   "order": 5,
+   "group": 12,
+   "config_id": "cfg_94b4",
+   "settings": {
+    "window": "last 4",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "15:00",
+    "event_filter": "none",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.23249793749999936,
+    "cagr": 0.041615719256758776,
+    "sharpe": 0.8861930331341357,
+    "max_drawdown": -0.054155171622307985,
+    "exposure": 0.13054350213399976,
+    "win_rate": 0.5571428571428572,
+    "profit_factor": 1.294313457531021,
+    "n_completed_trades": 420.0,
+    "turnover_annual": 191.20549810050323
+   },
+   "val": {
+    "net_return": 0.06938480170884653,
+    "cagr": 0.03323882168650227,
+    "sharpe": 0.9462905507134222,
+    "max_drawdown": -0.0439281098936799,
+    "exposure": 0.1338380247021628,
+    "win_rate": 0.5654761904761905,
+    "profit_factor": 1.2924861491551818,
+    "n_completed_trades": 168.0,
+    "turnover_annual": 172.1208947826768
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 328,
+    "eod": 4,
+    "stop": 88
+   },
+   "stress_1_5x": 0.19310212499999935,
+   "breakeven_cost_x": 4.038685136362773,
+   "transfer_sharpe": 1.0753540613624162,
+   "neighbor_median_sharpe": 0.5949919474594823,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.871594265831516,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.5813392094784839,
+     "net_return": 0.1577616874999992,
+     "trades": 420
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.3995611520284226,
+     "net_return": 0.08279912499999909,
+     "trades": 420
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.7890399129139644,
+     "net_return": 0.1924093749999991,
+     "trades": 420
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.9185199429311627,
+     "net_return": 0.2606763749999996,
+     "trades": 420
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.9559722835393283,
+     "net_return": 0.23074643749999924,
+     "trades": 360
+    },
+    {
+     "move": "window=5",
+     "sharpe": 0.9755893029202269,
+     "net_return": 0.289180749999999,
+     "trades": 480
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.6734693019100446,
+     "net_return": 0.1524982499999994,
+     "trades": 360
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 0.921385588573275,
+     "net_return": 0.25620393749999915,
+     "trades": 480
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 1.0449203063191168,
+     "net_return": 0.26625359999999976,
+     "trades": 420
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.8246685887318693,
+     "net_return": 0.22252559999999977,
+     "trades": 420
+    }
+   ],
+   "dsr": 0.3234947596765356,
+   "luck": {
+    "exposure_level": 13,
+    "luck_pct_sharpe": 0.75,
+    "luck_pct_return": 0.75
+   }
+  },
+  {
+   "order": 6,
+   "group": 5,
+   "config_id": "cfg_c3f4",
+   "settings": {
+    "window": "none",
+    "first_days": "first 2",
+    "entry": "14:00",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.14869500000000002,
+    "cagr": 0.027407468422139702,
+    "sharpe": 1.3012415501496297,
+    "max_drawdown": -0.017590294253441052,
+    "exposure": 0.02030119373393564,
+    "win_rate": 0.6228070175438597,
+    "profit_factor": 2.331885258750028,
+    "n_completed_trades": 114.0,
+    "turnover_annual": 51.24374310323171
+   },
+   "val": {
+    "net_return": 0.019787672097467235,
+    "cagr": 0.00959662383312776,
+    "sharpe": 1.0008884358971082,
+    "max_drawdown": -0.00893826376765594,
+    "exposure": 0.019254121585401875,
+    "win_rate": 0.5227272727272727,
+    "profit_factor": 1.770116889717093,
+    "n_completed_trades": 44.0,
+    "turnover_annual": 44.6788294672407
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 114,
+    "eod": 0,
+    "stop": 0
+   },
+   "stress_1_5x": 0.136185,
+   "breakeven_cost_x": 8.237362637362635,
+   "transfer_sharpe": 1.3682594909787777,
+   "neighbor_median_sharpe": 0.8487164624863531,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8712335076162124,
+   "local_detail": [
+    {
+     "move": "entry=13:30",
+     "sharpe": 1.1859380380408704,
+     "net_return": 0.15214250000000007,
+     "trades": 114
+    },
+    {
+     "move": "entry=14:30",
+     "sharpe": 0.887885209628347,
+     "net_return": 0.10042250000000008,
+     "trades": 114
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.8534331931459153,
+     "net_return": 0.0749375000000001,
+     "trades": 114
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 1.0216755079128195,
+     "net_return": 0.1064425,
+     "trades": 114
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.7276224964340496,
+     "net_return": 0.1153074999999999,
+     "trades": 171
+    },
+    {
+     "move": "first_days=1",
+     "sharpe": 0.8712335076162124,
+     "net_return": 0.07818750000000008,
+     "trades": 58
+    },
+    {
+     "move": "first_days=3",
+     "sharpe": 0.7251154658110467,
+     "net_return": 0.11099499999999995,
+     "trades": 171
+    }
+   ],
+   "dsr": 0.7129067600925234,
+   "luck": {
+    "exposure_level": 2,
+    "luck_pct_sharpe": 0.96,
+    "luck_pct_return": 0.9
+   }
+  },
+  {
+   "order": 7,
+   "group": 4,
+   "config_id": "cfg_fd44",
+   "settings": {
+    "window": "last 3",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "15:00",
+    "event_filter": "none",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.23074643749999924,
+    "cagr": 0.04132683888592226,
+    "sharpe": 0.9559722835393283,
+    "max_drawdown": -0.03863219337833068,
+    "exposure": 0.11201124282483393,
+    "win_rate": 0.575,
+    "profit_factor": 1.3645565213029385,
+    "n_completed_trades": 360.0,
+    "turnover_annual": 162.45499136423416
+   },
+   "val": {
+    "net_return": 0.07998799305888693,
+    "cagr": 0.03821979018965105,
+    "sharpe": 1.1672216428963502,
+    "max_drawdown": -0.04045777242252813,
+    "exposure": 0.11463860232581037,
+    "win_rate": 0.5902777777777778,
+    "profit_factor": 1.4059835129019531,
+    "n_completed_trades": 144.0,
+    "turnover_annual": 147.0822768089293
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 282,
+    "eod": 3,
+    "stop": 75
+   },
+   "stress_1_5x": 0.1809474374999991,
+   "breakeven_cost_x": 4.369746835791239,
+   "transfer_sharpe": 1.1881198775409554,
+   "neighbor_median_sharpe": 0.7102356709131287,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8668058980636011,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.6603012807815205,
+     "net_return": 0.16803118749999935,
+     "trades": 360
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.4382195948961132,
+     "net_return": 0.08578093749999915,
+     "trades": 360
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.8474187629930665,
+     "net_return": 0.18836268749999907,
+     "trades": 360
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.9571318417228946,
+     "net_return": 0.2479067499999994,
+     "trades": 360
+    },
+    {
+     "move": "window=2",
+     "sharpe": 0.9451307242482484,
+     "net_return": 0.20149024999999932,
+     "trades": 300
+    },
+    {
+     "move": "window=4",
+     "sharpe": 0.8861930331341357,
+     "net_return": 0.23249793749999936,
+     "trades": 420
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.7102356709131287,
+     "net_return": 0.14498006249999906,
+     "trades": 300
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 0.9898870317730758,
+     "net_return": 0.25799981249999915,
+     "trades": 420
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 1.1413839954966225,
+     "net_return": 0.26873970000000047,
+     "trades": 360
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.8110184473090702,
+     "net_return": 0.1979735499999995,
+     "trades": 360
+    }
+   ],
+   "dsr": 0.3854312096036894,
+   "luck": {
+    "exposure_level": 11,
+    "luck_pct_sharpe": 0.94,
+    "luck_pct_return": 0.94
+   }
+  },
+  {
+   "order": 8,
+   "group": 14,
+   "config_id": "cfg_a3bb",
+   "settings": {
+    "window": "last 2",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.2641080624999985,
+    "cagr": 0.04677332287295055,
+    "sharpe": 0.9808534286348695,
+    "max_drawdown": -0.04579685851273951,
+    "exposure": 0.10957747398538552,
+    "win_rate": 0.4895833333333333,
+    "profit_factor": 1.4446211749841695,
+    "n_completed_trades": 288.0,
+    "turnover_annual": 130.8026952626083
+   },
+   "val": {
+    "net_return": 0.06044701775644268,
+    "cagr": 0.029020499394251775,
+    "sharpe": 0.9063190388525991,
+    "max_drawdown": -0.03728976063827416,
+    "exposure": 0.10950052328909991,
+    "win_rate": 0.5614035087719298,
+    "profit_factor": 1.3408287207336267,
+    "n_completed_trades": 114.0,
+    "turnover_annual": 115.73790609933745
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 214,
+    "eod": 3,
+    "stop": 71
+   },
+   "stress_1_5x": 0.22286274999999867,
+   "breakeven_cost_x": 5.640689512489816,
+   "transfer_sharpe": 1.1080205540867856,
+   "neighbor_median_sharpe": 0.7143848819471685,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8624958154500151,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.7120513818780929,
+     "net_return": 0.19970749999999993,
+     "trades": 288
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.46203146352679736,
+     "net_return": 0.09629431249999909,
+     "trades": 288
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.7591344099837157,
+     "net_return": 0.16812293749999885,
+     "trades": 288
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.9981444112417237,
+     "net_return": 0.2618140624999985,
+     "trades": 288
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.6987412545920313,
+     "net_return": 0.15405668749999912,
+     "trades": 231
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.8559232019356665,
+     "net_return": 0.24403168749999882,
+     "trades": 341
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.8690684289643638,
+     "net_return": 0.1960301874999988,
+     "trades": 230
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.0750649829724972,
+     "net_return": 0.3125286874999982,
+     "trades": 347
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 1.062346285944799,
+     "net_return": 0.27615265000000044,
+     "trades": 288
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.91193458361567,
+     "net_return": 0.255032025,
+     "trades": 288
+    }
+   ],
+   "dsr": 0.4030020148361946,
+   "luck": {
+    "exposure_level": 11,
+    "luck_pct_sharpe": 0.69,
+    "luck_pct_return": 0.7
+   }
+  },
+  {
+   "order": 9,
+   "group": 6,
+   "config_id": "cfg_573f",
+   "settings": {
+    "window": "last 4",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.29847099999999904,
+    "cagr": 0.05226362395617623,
+    "sharpe": 0.9021054458084653,
+    "max_drawdown": -0.05234617290750232,
+    "exposure": 0.15118156509144443,
+    "win_rate": 0.4825,
+    "profit_factor": 1.3200584632591323,
+    "n_completed_trades": 400.0,
+    "turnover_annual": 180.9680794306613
+   },
+   "val": {
+    "net_return": 0.057245598862046165,
+    "cagr": 0.027505111011634664,
+    "sharpe": 0.7368596457874507,
+    "max_drawdown": -0.047432718326498646,
+    "exposure": 0.15548067841605678,
+    "win_rate": 0.546583850931677,
+    "profit_factor": 1.2177576876570495,
+    "n_completed_trades": 161.0,
+    "turnover_annual": 165.19579568080232
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 292,
+    "eod": 4,
+    "stop": 104
+   },
+   "stress_1_5x": 0.2662786249999991,
+   "breakeven_cost_x": 5.053578356789643,
+   "transfer_sharpe": 1.099190163097026,
+   "neighbor_median_sharpe": 0.7902371743917093,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8623103093859905,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.5856599891511732,
+     "net_return": 0.19401556249999952,
+     "trades": 400
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.3898634534849026,
+     "net_return": 0.09833287499999899,
+     "trades": 400
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.8625212808451821,
+     "net_return": 0.2547245624999992,
+     "trades": 400
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 1.0151224120706275,
+     "net_return": 0.3425617499999991,
+     "trades": 400
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.8559232019356665,
+     "net_return": 0.24403168749999882,
+     "trades": 341
+    },
+    {
+     "move": "window=5",
+     "sharpe": 1.0535561846867003,
+     "net_return": 0.38035462499999917,
+     "trades": 460
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.8620993379267989,
+     "net_return": 0.2647727499999992,
+     "trades": 342
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.069853442868015,
+     "net_return": 0.38627562499999857,
+     "trades": 459
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 1.0804492618075006,
+     "net_return": 0.3549999499999994,
+     "trades": 400
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.8367204990730706,
+     "net_return": 0.28920442499999965,
+     "trades": 400
+    }
+   ],
+   "dsr": 0.32959157242608345,
+   "luck": {
+    "exposure_level": 16,
+    "luck_pct_sharpe": 0.47,
+    "luck_pct_return": 0.45
+   }
+  },
+  {
+   "order": 10,
+   "group": 14,
+   "config_id": "cfg_877c",
+   "settings": {
+    "window": "last 2",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "16:00",
+    "event_filter": "none",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.2699645624999989,
+    "cagr": 0.04771746269399135,
+    "sharpe": 0.9712459740967418,
+    "max_drawdown": -0.04731914676779203,
+    "exposure": 0.11424318693125493,
+    "win_rate": 0.4866666666666667,
+    "profit_factor": 1.4342898986091521,
+    "n_completed_trades": 300.0,
+    "turnover_annual": 135.4307374398194
+   },
+   "val": {
+    "net_return": 0.06359921558834802,
+    "cagr": 0.03051029960736118,
+    "sharpe": 0.8850459797944028,
+    "max_drawdown": -0.039732392265537375,
+    "exposure": 0.11577269926010203,
+    "win_rate": 0.55,
+    "profit_factor": 1.3250464064551468,
+    "n_completed_trades": 120.0,
+    "turnover_annual": 122.86676529750856
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 221,
+    "eod": 3,
+    "stop": 76
+   },
+   "stress_1_5x": 0.23352856249999876,
+   "breakeven_cost_x": 5.893853115881512,
+   "transfer_sharpe": 1.1480979090400372,
+   "neighbor_median_sharpe": 0.7630208945483875,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8463357949711822,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.7598275740931179,
+     "net_return": 0.22943343749999978,
+     "trades": 300
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.5005958279736797,
+     "net_return": 0.11216393749999964,
+     "trades": 300
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.8295779764607576,
+     "net_return": 0.2001898124999988,
+     "trades": 300
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 1.0130966861250055,
+     "net_return": 0.28201043749999855,
+     "trades": 300
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.6186494919424328,
+     "net_return": 0.14134712499999913,
+     "trades": 240
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.8630936134816067,
+     "net_return": 0.2607860624999989,
+     "trades": 360
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.7662142150036572,
+     "net_return": 0.17267212499999918,
+     "trades": 240
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.0762353127238542,
+     "net_return": 0.3303666874999984,
+     "trades": 360
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 1.1022231818663126,
+     "net_return": 0.30457185000000053,
+     "trades": 300
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.9110674547887239,
+     "net_return": 0.26810144999999963,
+     "trades": 300
+    }
+   ],
+   "dsr": 0.3940496892245114,
+   "luck": {
+    "exposure_level": 12,
+    "luck_pct_sharpe": 0.68,
+    "luck_pct_return": 0.73
+   }
+  },
+  {
+   "order": 11,
+   "group": 10,
+   "config_id": "cfg_716d",
+   "settings": {
+    "window": "last 2",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "15:00",
+    "event_filter": "none",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.20149024999999932,
+    "cagr": 0.03645189781723657,
+    "sharpe": 0.9451307242482484,
+    "max_drawdown": -0.03483717260124941,
+    "exposure": 0.09365409615167722,
+    "win_rate": 0.5733333333333334,
+    "profit_factor": 1.396792715990484,
+    "n_completed_trades": 300.0,
+    "turnover_annual": 135.18604406124186
+   },
+   "val": {
+    "net_return": 0.06877453853662119,
+    "cagr": 0.0329513749390129,
+    "sharpe": 1.131878773789254,
+    "max_drawdown": -0.039640801454278174,
+    "exposure": 0.09526414248049973,
+    "win_rate": 0.5916666666666667,
+    "profit_factor": 1.438649471193066,
+    "n_completed_trades": 120.0,
+    "turnover_annual": 119.66552607084977
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 238,
+    "eod": 3,
+    "stop": 59
+   },
+   "stress_1_5x": 0.16357631249999938,
+   "breakeven_cost_x": 4.6108392612522335,
+   "transfer_sharpe": 1.118885757687419,
+   "neighbor_median_sharpe": 0.6881481352364267,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8068403344501835,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.7237999138733056,
+     "net_return": 0.1684776874999998,
+     "trades": 300
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.585435237234849,
+     "net_return": 0.10736931249999926,
+     "trades": 300
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.7736091245739984,
+     "net_return": 0.15304843749999897,
+     "trades": 300
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.9063957605985022,
+     "net_return": 0.2056289999999994,
+     "trades": 300
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.45731993297130413,
+     "net_return": 0.07748181249999964,
+     "trades": 240
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.9559722835393283,
+     "net_return": 0.23074643749999924,
+     "trades": 360
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.6881481352364267,
+     "net_return": 0.12093712499999931,
+     "trades": 240
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 0.9810540975211759,
+     "net_return": 0.23099974999999917,
+     "trades": 360
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 1.0935198303816165,
+     "net_return": 0.2288335500000005,
+     "trades": 300
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.8400715443263688,
+     "net_return": 0.18347429999999987,
+     "trades": 300
+    }
+   ],
+   "dsr": 0.3749146151634889,
+   "luck": {
+    "exposure_level": 10,
+    "luck_pct_sharpe": 0.9,
+    "luck_pct_return": 0.9
+   }
+  },
+  {
+   "order": 12,
+   "group": 10,
+   "config_id": "cfg_dec7",
+   "settings": {
+    "window": "last 2",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "15:30",
+    "event_filter": "none",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.17770793749999902,
+    "cagr": 0.0324181511865822,
+    "sharpe": 0.7828460544949754,
+    "max_drawdown": -0.039229873129749016,
+    "exposure": 0.10410297810201646,
+    "win_rate": 0.5166666666666667,
+    "profit_factor": 1.3299214812200169,
+    "n_completed_trades": 300.0,
+    "turnover_annual": 134.51129498093536
+   },
+   "val": {
+    "net_return": 0.040177883661414615,
+    "cagr": 0.01938613354267038,
+    "sharpe": 0.6330684881767492,
+    "max_drawdown": -0.04201320739327208,
+    "exposure": 0.1057955635294847,
+    "win_rate": 0.5166666666666667,
+    "profit_factor": 1.2188312485999377,
+    "n_completed_trades": 120.0,
+    "turnover_annual": 119.83713491398575
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 231,
+    "eod": 3,
+    "stop": 66
+   },
+   "stress_1_5x": 0.1463068124999991,
+   "breakeven_cost_x": 4.415035812949494,
+   "transfer_sharpe": 0.9899696367086517,
+   "neighbor_median_sharpe": 0.5811558779407323,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7874798511415577,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.5811558779407323,
+     "net_return": 0.13800149999999944,
+     "trades": 300
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.4614996331188905,
+     "net_return": 0.09215312499999939,
+     "trades": 300
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.9063957605985022,
+     "net_return": 0.2056289999999994,
+     "trades": 300
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.8295779764607576,
+     "net_return": 0.2001898124999988,
+     "trades": 300
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.44646559065210645,
+     "net_return": 0.08558806249999962,
+     "trades": 240
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.9174890738671752,
+     "net_return": 0.24778531249999913,
+     "trades": 360
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.5470789945117618,
+     "net_return": 0.100672874999999,
+     "trades": 240
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 0.9079391018978888,
+     "net_return": 0.23275506249999856,
+     "trades": 360
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 0.9533764270023461,
+     "net_return": 0.21732470000000048,
+     "trades": 300
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.7453817258223577,
+     "net_return": 0.17510027499999992,
+     "trades": 300
+    }
+   ],
+   "dsr": 0.23704898512116845,
+   "luck": {
+    "exposure_level": 11,
+    "luck_pct_sharpe": 0.68,
+    "luck_pct_return": 0.68
+   }
+  },
+  {
+   "order": 13,
+   "group": 1,
+   "config_id": "cfg_0865",
+   "settings": {
+    "window": "none",
+    "first_days": "first 3",
+    "entry": "14:00",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "1%"
+   },
+   "dev": {
+    "net_return": 0.13267525000000013,
+    "cagr": 0.024596971264990053,
+    "sharpe": 0.9639115955555326,
+    "max_drawdown": -0.04262263238917263,
+    "exposure": 0.030198025679229266,
+    "win_rate": 0.5789473684210527,
+    "profit_factor": 1.6152990867341688,
+    "n_completed_trades": 171.0,
+    "turnover_annual": 77.25064975673638
+   },
+   "val": {
+    "net_return": 0.01744763117230641,
+    "cagr": 0.008466757144640846,
+    "sharpe": 0.7028176292100892,
+    "max_drawdown": -0.011573715334084689,
+    "exposure": 0.02888118237810281,
+    "win_rate": 0.5,
+    "profit_factor": 1.368875408306113,
+    "n_completed_trades": 66.0,
+    "turnover_annual": 65.37821929556985
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 167,
+    "eod": 0,
+    "stop": 4
+   },
+   "stress_1_5x": 0.11823275000000022,
+   "breakeven_cost_x": 5.32850354242268,
+   "transfer_sharpe": 1.1097500931304047,
+   "neighbor_median_sharpe": 0.4745115609277304,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7819983448072187,
+   "local_detail": [
+    {
+     "move": "entry=13:30",
+     "sharpe": 0.7819983448072187,
+     "net_return": 0.11936662500000006,
+     "trades": 171
+    },
+    {
+     "move": "entry=14:30",
+     "sharpe": 0.44763566401695043,
+     "net_return": 0.05847287500000009,
+     "trades": 171
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.4304624534156676,
+     "net_return": 0.04738275000000014,
+     "trades": 171
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.7640773778284926,
+     "net_return": 0.09704025000000027,
+     "trades": 171
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.5694507436987996,
+     "net_return": 0.10129212500000007,
+     "trades": 228
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 1.307472883128104,
+     "net_return": 0.148177,
+     "trades": 114
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.184823461978726,
+     "net_return": 0.20960912500000006,
+     "trades": 230
+    },
+    {
+     "move": "stop_pct=0.9",
+     "sharpe": 0.8150064331657956,
+     "net_return": 0.1059158,
+     "trades": 171
+    },
+    {
+     "move": "stop_pct=1.1",
+     "sharpe": 0.9146903250018787,
+     "net_return": 0.1276517749999999,
+     "trades": 171
+    }
+   ],
+   "dsr": 0.39788953637129143,
+   "luck": {
+    "exposure_level": 3,
+    "luck_pct_sharpe": 0.94,
+    "luck_pct_return": 0.91
+   }
+  },
+  {
+   "order": 14,
+   "group": 16,
+   "config_id": "cfg_899c",
+   "settings": {
+    "window": "none",
+    "first_days": "first 3",
+    "entry": "12:00",
+    "exit": "16:00",
+    "event_filter": "none",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.15693568750000608,
+    "cagr": 0.02884094000087023,
+    "sharpe": 0.9609431452118954,
+    "max_drawdown": -0.027365379210417706,
+    "exposure": 0.04754753269263874,
+    "win_rate": 0.4777777777777778,
+    "profit_factor": 1.6019104104376816,
+    "n_completed_trades": 180.0,
+    "turnover_annual": 80.62148621881632
+   },
+   "val": {
+    "net_return": 0.0038711097327104316,
+    "cagr": 0.0018850168511264087,
+    "sharpe": 0.12232930874078055,
+    "max_drawdown": -0.02006737308759121,
+    "exposure": 0.047303875985953245,
+    "win_rate": 0.4861111111111111,
+    "profit_factor": 1.0467112802481426,
+    "n_completed_trades": 72.0,
+    "turnover_annual": 73.41725060473131
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.122 < 0.3"
+   ],
+   "exits": {
+    "time": 106,
+    "eod": 1,
+    "stop": 73
+   },
+   "stress_1_5x": 0.14328146875000614,
+   "breakeven_cost_x": 6.051343455197694,
+   "transfer_sharpe": 0.9651529857785222,
+   "neighbor_median_sharpe": 0.6076389392007626,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7692794483985811,
+   "local_detail": [
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.7692794483985811,
+     "net_return": 0.1261609687500056,
+     "trades": 180
+    },
+    {
+     "move": "entry=12:30",
+     "sharpe": 0.03578629550853304,
+     "net_return": 0.0026914062500054126,
+     "trades": 180
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.916150747121514,
+     "net_return": 0.13176203125000563,
+     "trades": 180
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.8216578326216015,
+     "net_return": 0.12191603125000605,
+     "trades": 180
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.42792972532795687,
+     "net_return": 0.06784031250000755,
+     "trades": 240
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.5521101960409022,
+     "net_return": 0.05692171875000396,
+     "trades": 120
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.1491606028575778,
+     "net_return": 0.21810134375000767,
+     "trades": 240
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.5974190506099798,
+     "net_return": 0.07208400000000736,
+     "trades": 180
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.8799601494496003,
+     "net_return": 0.15105761250000382,
+     "trades": 180
+    }
+   ],
+   "dsr": 0.3710017503559997,
+   "luck": {
+    "exposure_level": 5,
+    "luck_pct_sharpe": 0.55,
+    "luck_pct_return": 0.54
+   }
+  },
+  {
+   "order": 15,
+   "group": 11,
+   "config_id": "cfg_e4e4",
+   "settings": {
+    "window": "last 3",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.19330381250001127,
+    "cagr": 0.03507069928745743,
+    "sharpe": 0.8208074798743721,
+    "max_drawdown": -0.04894646173822148,
+    "exposure": 0.09953817752266077,
+    "win_rate": 0.4046920821114369,
+    "profit_factor": 1.3322520601252041,
+    "n_completed_trades": 341.0,
+    "turnover_annual": 152.96009755380848
+   },
+   "val": {
+    "net_return": 0.046686952783035585,
+    "cagr": 0.022490443807368754,
+    "sharpe": 0.8030067921112719,
+    "max_drawdown": -0.032232442768809655,
+    "exposure": 0.10589037549183705,
+    "win_rate": 0.45652173913043476,
+    "profit_factor": 1.251026303357768,
+    "n_completed_trades": 138.0,
+    "turnover_annual": 136.57522602035831
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 172,
+    "eod": 2,
+    "stop": 167
+   },
+   "stress_1_5x": 0.16120340625001095,
+   "breakeven_cost_x": 4.358731719209553,
+   "transfer_sharpe": 0.8522490135353393,
+   "neighbor_median_sharpe": 0.7091377971734253,
+   "local_frac_profitable": 0.9,
+   "local_median_sharpe": 0.7447360376516198,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.4883731807529572,
+     "net_return": 0.11224253125001216,
+     "trades": 341
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": -0.03474814026462651,
+     "net_return": -0.008823406249990229,
+     "trades": 341
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.6992349009115303,
+     "net_return": 0.14721250000001063,
+     "trades": 341
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.9215311418834025,
+     "net_return": 0.22420137500001136,
+     "trades": 341
+    },
+    {
+     "move": "window=2",
+     "sharpe": 0.8790970067142123,
+     "net_return": 0.19488471875000912,
+     "trades": 288
+    },
+    {
+     "move": "window=4",
+     "sharpe": 0.7902371743917093,
+     "net_return": 0.22061287500001403,
+     "trades": 400
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.6393768955197698,
+     "net_return": 0.13345250000000886,
+     "trades": 283
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.0292553788224361,
+     "net_return": 0.27794096875001406,
+     "trades": 400
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.17280658896171128,
+     "net_return": 0.026746662500013896,
+     "trades": 341
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.0442597967774077,
+     "net_return": 0.292941312500008,
+     "trades": 341
+    }
+   ],
+   "dsr": 0.2555255874315152,
+   "luck": {
+    "exposure_level": 11,
+    "luck_pct_sharpe": 0.79,
+    "luck_pct_return": 0.72
+   }
+  },
+  {
+   "order": 16,
+   "group": 11,
+   "config_id": "cfg_f66d",
+   "settings": {
+    "window": "last 3",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "16:00",
+    "event_filter": "none",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.1907925000000117,
+    "cagr": 0.034645467290521204,
+    "sharpe": 0.7941526213335088,
+    "max_drawdown": -0.047142579434087395,
+    "exposure": 0.10535993066726819,
+    "win_rate": 0.4,
+    "profit_factor": 1.309559736182458,
+    "n_completed_trades": 360.0,
+    "turnover_annual": 160.97308781544845
+   },
+   "val": {
+    "net_return": 0.025406740679005724,
+    "cagr": 0.012304323188939703,
+    "sharpe": 0.4451221947851021,
+    "max_drawdown": -0.03538907242072076,
+    "exposure": 0.10942394439643069,
+    "win_rate": 0.4375,
+    "profit_factor": 1.1253183821082602,
+    "n_completed_trades": 144.0,
+    "turnover_annual": 143.4087940351357
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 179,
+    "eod": 2,
+    "stop": 179
+   },
+   "stress_1_5x": 0.16011371875001168,
+   "breakeven_cost_x": 4.055642287630563,
+   "transfer_sharpe": 0.8312530681407821,
+   "neighbor_median_sharpe": 0.7340748007672848,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7386713603298443,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.4932898172218341,
+     "net_return": 0.1163604375000129,
+     "trades": 360
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.13358089948237062,
+     "net_return": 0.022285000000010546,
+     "trades": 360
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.7119603830467012,
+     "net_return": 0.15417906250001123,
+     "trades": 360
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.9149319288277139,
+     "net_return": 0.22742490625001222,
+     "trades": 360
+    },
+    {
+     "move": "window=2",
+     "sharpe": 0.8361820329784261,
+     "net_return": 0.18504971875000953,
+     "trades": 300
+    },
+    {
+     "move": "window=4",
+     "sharpe": 0.7653823376129875,
+     "net_return": 0.21686815625001454,
+     "trades": 420
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.5939611179643954,
+     "net_return": 0.12520753125000939,
+     "trades": 300
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 0.9928076725480596,
+     "net_return": 0.27211953125001465,
+     "trades": 420
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.2298671847073389,
+     "net_return": 0.037904225000015,
+     "trades": 360
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 1.0448142810151735,
+     "net_return": 0.30341409375000805,
+     "trades": 360
+    }
+   ],
+   "dsr": 0.23585508034700053,
+   "luck": {
+    "exposure_level": 11,
+    "luck_pct_sharpe": 0.49,
+    "luck_pct_return": 0.48
+   }
+  },
+  {
+   "order": 17,
+   "group": 18,
+   "config_id": "cfg_ced4",
+   "settings": {
+    "window": "none",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.16734543750000563,
+    "cagr": 0.03064001904859115,
+    "sharpe": 0.9207082036010985,
+    "max_drawdown": -0.036854038085623375,
+    "exposure": 0.051272386221306754,
+    "win_rate": 0.44508670520231214,
+    "profit_factor": 1.5861546736580123,
+    "n_completed_trades": 173.0,
+    "turnover_annual": 77.82864181342563
+   },
+   "val": {
+    "net_return": 0.052698812856756705,
+    "cagr": 0.025348846350012222,
+    "sharpe": 1.252153264870809,
+    "max_drawdown": -0.015576383737541888,
+    "exposure": 0.055082103512783205,
+    "win_rate": 0.5294117647058824,
+    "profit_factor": 1.674205339825974,
+    "n_completed_trades": 68.0,
+    "turnover_annual": 68.88661660485087
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 90,
+    "eod": 1,
+    "stop": 82
+   },
+   "stress_1_5x": 0.15008337500000546,
+   "breakeven_cost_x": 6.2546816697831105,
+   "transfer_sharpe": 0.8406362770983024,
+   "neighbor_median_sharpe": 0.7554032033187201,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7283737051404708,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.1116558102093368,
+     "net_return": 0.013465875000006067,
+     "trades": 173
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.7139094965783496,
+     "net_return": 0.09940359375000529,
+     "trades": 173
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.8023354393882406,
+     "net_return": 0.12227484375000519,
+     "trades": 173
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.8179523374143284,
+     "net_return": 0.1357612500000056,
+     "trades": 173
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.7283737051404708,
+     "net_return": 0.1434033437500073,
+     "trades": 231
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.704991777575377,
+     "net_return": 0.09946937500000352,
+     "trades": 115
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.117989702475414,
+     "net_return": 0.23461490625000825,
+     "trades": 232
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.39401297051586015,
+     "net_return": 0.05036067500000674,
+     "trades": 173
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.9245485683123489,
+     "net_return": 0.17768183125000414,
+     "trades": 173
+    }
+   ],
+   "dsr": 0.3294283049020993,
+   "luck": {
+    "exposure_level": 6,
+    "luck_pct_sharpe": 0.92,
+    "luck_pct_return": 0.86
+   }
+  },
+  {
+   "order": 18,
+   "group": 7,
+   "config_id": "cfg_6c94",
+   "settings": {
+    "window": "last 4",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.22061287500001403,
+    "cagr": 0.03964895226242615,
+    "sharpe": 0.7902371743917093,
+    "max_drawdown": -0.057523622598254054,
+    "exposure": 0.11523895454788292,
+    "win_rate": 0.39,
+    "profit_factor": 1.304576299003048,
+    "n_completed_trades": 400.0,
+    "turnover_annual": 180.98654462058147
+   },
+   "val": {
+    "net_return": 0.055991979643836176,
+    "cagr": 0.026911070887538635,
+    "sharpe": 0.8477579315796282,
+    "max_drawdown": -0.03815641381974877,
+    "exposure": 0.123226378146572,
+    "win_rate": 0.453416149068323,
+    "profit_factor": 1.2483896595215476,
+    "n_completed_trades": 161.0,
+    "turnover_annual": 162.70327189061368
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 199,
+    "eod": 3,
+    "stop": 198
+   },
+   "stress_1_5x": 0.17076871875001354,
+   "breakeven_cost_x": 3.9118029884460035,
+   "transfer_sharpe": 0.9046993579820406,
+   "neighbor_median_sharpe": 0.6228372561698354,
+   "local_frac_profitable": 0.9,
+   "local_median_sharpe": 0.7184427940742215,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.3939853668563128,
+     "net_return": 0.0926888437500144,
+     "trades": 400
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": -0.05264541978199007,
+     "net_return": -0.014391624999988473,
+     "trades": 400
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.6317695825783355,
+     "net_return": 0.14905328125001338,
+     "trades": 400
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.8603393335856255,
+     "net_return": 0.23845234375001434,
+     "trades": 400
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.8208074798743721,
+     "net_return": 0.19330381250001127,
+     "trades": 341
+    },
+    {
+     "move": "window=5",
+     "sharpe": 0.8051160055701077,
+     "net_return": 0.2347295000000158,
+     "trades": 460
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.5927031678090768,
+     "net_return": 0.14401081250001146,
+     "trades": 342
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 0.9297962245314824,
+     "net_return": 0.27672593750001706,
+     "trades": 459
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.31802150352489267,
+     "net_return": 0.06405391250001657,
+     "trades": 400
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.9637564762917287,
+     "net_return": 0.29679937500001063,
+     "trades": 400
+    }
+   ],
+   "dsr": 0.22513108334594273,
+   "luck": {
+    "exposure_level": 12,
+    "luck_pct_sharpe": 0.81,
+    "luck_pct_return": 0.81
+   }
+  },
+  {
+   "order": 19,
+   "group": 18,
+   "config_id": "cfg_9775",
+   "settings": {
+    "window": "none",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "16:00",
+    "event_filter": "none",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.15135934375000604,
+    "cagr": 0.027871835285961932,
+    "sharpe": 0.8301234369315683,
+    "max_drawdown": -0.03723870154870634,
+    "exposure": 0.05271335545490701,
+    "win_rate": 0.43333333333333335,
+    "profit_factor": 1.499271065125255,
+    "n_completed_trades": 180.0,
+    "turnover_annual": 80.70018667585563
+   },
+   "val": {
+    "net_return": 0.042156093806401174,
+    "cagr": 0.020330633630059713,
+    "sharpe": 0.977530198641061,
+    "max_drawdown": -0.016728324310347986,
+    "exposure": 0.057167966684535075,
+    "win_rate": 0.5,
+    "profit_factor": 1.472765669640141,
+    "n_completed_trades": 72.0,
+    "turnover_annual": 72.89662055602817
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 91,
+    "eod": 1,
+    "stop": 88
+   },
+   "stress_1_5x": 0.1279635000000059,
+   "breakeven_cost_x": 5.724394533445481,
+   "transfer_sharpe": 0.7690370827653041,
+   "neighbor_median_sharpe": 0.6728985326194851,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7182066719869571,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.026756767540026354,
+     "net_return": 0.0018479375000064469,
+     "trades": 180
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.7692794483985811,
+     "net_return": 0.1261609687500056,
+     "trades": 180
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.7182066719869571,
+     "net_return": 0.11000250000000555,
+     "trades": 180
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.7365317235627289,
+     "net_return": 0.12188278125000584,
+     "trades": 180
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.6280500929657935,
+     "net_return": 0.12231550000000735,
+     "trades": 240
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.5795964068010713,
+     "net_return": 0.08064828125000378,
+     "trades": 120
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.0321957929805472,
+     "net_return": 0.2168910312500083,
+     "trades": 240
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.35980316421937064,
+     "net_return": 0.04629390625000718,
+     "trades": 180
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.9490393795178164,
+     "net_return": 0.20137228750000458,
+     "trades": 180
+    }
+   ],
+   "dsr": 0.2480177408140284,
+   "luck": {
+    "exposure_level": 6,
+    "luck_pct_sharpe": 0.82,
+    "luck_pct_return": 0.77
+   }
+  },
+  {
+   "order": 20,
+   "group": 7,
+   "config_id": "cfg_4467",
+   "settings": {
+    "window": "last 4",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "16:00",
+    "event_filter": "none",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.21686815625001454,
+    "cagr": 0.03902607437297312,
+    "sharpe": 0.7653823376129875,
+    "max_drawdown": -0.06010827016920883,
+    "exposure": 0.12139460890521954,
+    "win_rate": 0.38571428571428573,
+    "profit_factor": 1.2841268508388333,
+    "n_completed_trades": 420.0,
+    "turnover_annual": 189.4505211101279
+   },
+   "val": {
+    "net_return": 0.042366442687496786,
+    "cagr": 0.020431011018787082,
+    "sharpe": 0.636880001715363,
+    "max_drawdown": -0.04106634226208339,
+    "exposure": 0.12785393123215438,
+    "win_rate": 0.44047619047619047,
+    "profit_factor": 1.1746817643733038,
+    "n_completed_trades": 168.0,
+    "turnover_annual": 171.06890063527672
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 206,
+    "eod": 3,
+    "stop": 211
+   },
+   "stress_1_5x": 0.16842059375001428,
+   "breakeven_cost_x": 3.65952292046319,
+   "transfer_sharpe": 0.8731593115379577,
+   "neighbor_median_sharpe": 0.6202231922426145,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7172525725011138,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.3701528554333431,
+     "net_return": 0.08815093750001513,
+     "trades": 420
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.044554027737941974,
+     "net_return": 0.005138937500012597,
+     "trades": 420
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.6514976946647247,
+     "net_return": 0.159890031250014,
+     "trades": 420
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.837301316341138,
+     "net_return": 0.23634240625001546,
+     "trades": 420
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.7941526213335088,
+     "net_return": 0.1907925000000117,
+     "trades": 360
+    },
+    {
+     "move": "window=5",
+     "sharpe": 0.7830074503375029,
+     "net_return": 0.23183909375001632,
+     "trades": 480
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.5608478830007616,
+     "net_return": 0.13855534375001177,
+     "trades": 360
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 0.8933616637933444,
+     "net_return": 0.2708142812500176,
+     "trades": 480
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.3325354513522676,
+     "net_return": 0.0687508187500181,
+     "trades": 420
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.954567200764982,
+     "net_return": 0.3097388562500112,
+     "trades": 420
+    }
+   ],
+   "dsr": 0.20806485799856606,
+   "luck": {
+    "exposure_level": 13,
+    "luck_pct_sharpe": 0.61,
+    "luck_pct_return": 0.58
+   }
+  },
+  {
+   "order": 21,
+   "group": 16,
+   "config_id": "cfg_c84e",
+   "settings": {
+    "window": "none",
+    "first_days": "first 3",
+    "entry": "12:00",
+    "exit": "15:30",
+    "event_filter": "none",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.1250539687500054,
+    "cagr": 0.023248651305977752,
+    "sharpe": 0.9136379256444344,
+    "max_drawdown": -0.02292658314412377,
+    "exposure": 0.0426428948789942,
+    "win_rate": 0.5111111111111111,
+    "profit_factor": 1.5516554722042577,
+    "n_completed_trades": 180.0,
+    "turnover_annual": 80.57303115450806
+   },
+   "val": {
+    "net_return": 0.013521823550299406,
+    "cagr": 0.006568222084307296,
+    "sharpe": 0.3832288356403179,
+    "max_drawdown": -0.01878767644995083,
+    "exposure": 0.04259974400770165,
+    "win_rate": 0.5138888888888888,
+    "profit_factor": 1.1683021195372596,
+    "n_completed_trades": 72.0,
+    "turnover_annual": 72.39042759087098
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 112,
+    "eod": 1,
+    "stop": 67
+   },
+   "stress_1_5x": 0.10661896875000543,
+   "breakeven_cost_x": 5.018175094739781,
+   "transfer_sharpe": 0.7366526023046364,
+   "neighbor_median_sharpe": 0.5580350188732324,
+   "local_frac_profitable": 0.8888888888888888,
+   "local_median_sharpe": 0.7160781886782264,
+   "local_detail": [
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.7160781886782264,
+     "net_return": 0.09819990625000519,
+     "trades": 180
+    },
+    {
+     "move": "entry=12:30",
+     "sharpe": -0.0518142455214848,
+     "net_return": -0.006080687499995352,
+     "trades": 180
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.9173160751332262,
+     "net_return": 0.11852562500000507,
+     "trades": 180
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.916150747121514,
+     "net_return": 0.13176203125000563,
+     "trades": 180
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.28209162037046764,
+     "net_return": 0.03897625000000682,
+     "trades": 240
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.4120211783920503,
+     "net_return": 0.03699121875000344,
+     "trades": 120
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.003188453285173,
+     "net_return": 0.16009203125000648,
+     "trades": 240
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.39239446998623845,
+     "net_return": 0.038911218750006915,
+     "trades": 180
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.8138145562643645,
+     "net_return": 0.11645963125000303,
+     "trades": 180
+    }
+   ],
+   "dsr": 0.33086500652205686,
+   "luck": {
+    "exposure_level": 4,
+    "luck_pct_sharpe": 0.71,
+    "luck_pct_return": 0.72
+   }
+  },
+  {
+   "order": 22,
+   "group": 21,
+   "config_id": "cfg_f63b",
+   "settings": {
+    "window": "none",
+    "first_days": "first 3",
+    "entry": "12:00",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.13561668750000577,
+    "cagr": 0.02511540333636808,
+    "sharpe": 0.9385501377811998,
+    "max_drawdown": -0.03191508710138613,
+    "exposure": 0.04601603913025412,
+    "win_rate": 0.48554913294797686,
+    "profit_factor": 1.549793713369685,
+    "n_completed_trades": 173.0,
+    "turnover_annual": 77.3390546433345
+   },
+   "val": {
+    "net_return": 0.013851779982760215,
+    "cagr": 0.006727935161327192,
+    "sharpe": 0.4230510440699082,
+    "max_drawdown": -0.018871821770603203,
+    "exposure": 0.045141433921532165,
+    "win_rate": 0.5147058823529411,
+    "profit_factor": 1.1879431432507999,
+    "n_completed_trades": 68.0,
+    "turnover_annual": 68.4903446543475
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 103,
+    "eod": 1,
+    "stop": 69
+   },
+   "stress_1_5x": 0.11468387500000565,
+   "breakeven_cost_x": 5.3903387013443105,
+   "transfer_sharpe": 0.9001678498110737,
+   "neighbor_median_sharpe": 0.6579583166497518,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.7139094965783496,
+   "local_detail": [
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.7139094965783496,
+     "net_return": 0.09940359375000529,
+     "trades": 173
+    },
+    {
+     "move": "entry=12:30",
+     "sharpe": 0.10501229091978766,
+     "net_return": 0.009810125000005332,
+     "trades": 173
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.8485047661588355,
+     "net_return": 0.10827771875000525,
+     "trades": 173
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.7828898109353183,
+     "net_return": 0.10629387500000576,
+     "trades": 173
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.3611578952841084,
+     "net_return": 0.051274125000007276,
+     "trades": 231
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.6738552207638278,
+     "net_return": 0.06934425000000366,
+     "trades": 115
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.1185328763534514,
+     "net_return": 0.18540271875000713,
+     "trades": 232
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.649049386143878,
+     "net_return": 0.07773281875000704,
+     "trades": 173
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.8495026419824843,
+     "net_return": 0.12954951875000353,
+     "trades": 173
+    }
+   ],
+   "dsr": 0.3551779885819899,
+   "luck": {
+    "exposure_level": 5,
+    "luck_pct_sharpe": 0.71,
+    "luck_pct_return": 0.68
+   }
+  },
+  {
+   "order": 23,
+   "group": 1,
+   "config_id": "cfg_b985",
+   "settings": {
+    "window": "none",
+    "first_days": "first 3",
+    "entry": "14:00",
+    "exit": "16:00",
+    "event_filter": "none",
+    "stop": "1%"
+   },
+   "dev": {
+    "net_return": 0.14325275000000026,
+    "cagr": 0.026456241334593233,
+    "sharpe": 0.922523520019309,
+    "max_drawdown": -0.037576240592336885,
+    "exposure": 0.03138968200732505,
+    "win_rate": 0.5786516853932584,
+    "profit_factor": 1.6013723199827057,
+    "n_completed_trades": 178.0,
+    "turnover_annual": 79.57289898518053
+   },
+   "val": {
+    "net_return": 0.024891696083827464,
+    "cagr": 0.012056452215762903,
+    "sharpe": 0.7094916457749278,
+    "max_drawdown": -0.021274304624915197,
+    "exposure": 0.030631557067684802,
+    "win_rate": 0.5,
+    "profit_factor": 1.4159389045200423,
+    "n_completed_trades": 70.0,
+    "turnover_annual": 71.24711799584101
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 173,
+    "eod": 0,
+    "stop": 5
+   },
+   "stress_1_5x": 0.12423525000000013,
+   "breakeven_cost_x": 5.373628749576866,
+   "transfer_sharpe": 0.8766055863895647,
+   "neighbor_median_sharpe": 0.457184988032894,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.6934462321430698,
+   "local_detail": [
+    {
+     "move": "entry=13:30",
+     "sharpe": 0.6934462321430698,
+     "net_return": 0.11904537499999979,
+     "trades": 178
+    },
+    {
+     "move": "entry=14:30",
+     "sharpe": 0.3471313676386433,
+     "net_return": 0.04828100000000002,
+     "trades": 178
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.49064716062230795,
+     "net_return": 0.06141775000000016,
+     "trades": 178
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.6659211379347397,
+     "net_return": 0.09344025000000022,
+     "trades": 178
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.457184988032894,
+     "net_return": 0.08520862499999993,
+     "trades": 237
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 1.0114503413275902,
+     "net_return": 0.11891699999999994,
+     "trades": 119
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.1387278757693655,
+     "net_return": 0.21606024999999995,
+     "trades": 238
+    },
+    {
+     "move": "stop_pct=0.9",
+     "sharpe": 0.7885188696032911,
+     "net_return": 0.11713255,
+     "trades": 178
+    },
+    {
+     "move": "stop_pct=1.1",
+     "sharpe": 0.8720075806293387,
+     "net_return": 0.13736752499999993,
+     "trades": 178
+    }
+   ],
+   "dsr": 0.3549426333064851,
+   "luck": {
+    "exposure_level": 3,
+    "luck_pct_sharpe": 0.94,
+    "luck_pct_return": 0.93
+   }
+  },
+  {
+   "order": 24,
+   "group": 8,
+   "config_id": "cfg_4895",
+   "settings": {
+    "window": "last 2",
+    "first_days": "first 3",
+    "entry": "10:30",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "1%"
+   },
+   "dev": {
+    "net_return": 0.2648182499999996,
+    "cagr": 0.04688800119173986,
+    "sharpe": 0.8117076115273364,
+    "max_drawdown": -0.08299352239136215,
+    "exposure": 0.13336459638021406,
+    "win_rate": 0.5381944444444444,
+    "profit_factor": 1.3648919712419347,
+    "n_completed_trades": 288.0,
+    "turnover_annual": 130.48022437399746
+   },
+   "val": {
+    "net_return": 0.06760121464091773,
+    "cagr": 0.03239847831983966,
+    "sharpe": 0.9320937517137361,
+    "max_drawdown": -0.04414403232720088,
+    "exposure": 0.1338124984046064,
+    "win_rate": 0.5701754385964912,
+    "profit_factor": 1.3590472801102715,
+    "n_completed_trades": 114.0,
+    "turnover_annual": 116.29998544021386
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 253,
+    "eod": 4,
+    "stop": 31
+   },
+   "stress_1_5x": 0.24221374999999945,
+   "breakeven_cost_x": 5.957472762136524,
+   "transfer_sharpe": 0.8838571057320488,
+   "neighbor_median_sharpe": 0.638147855357101,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.687673303643836,
+   "local_detail": [
+    {
+     "move": "entry=10:00",
+     "sharpe": 0.6432946984281964,
+     "net_return": 0.2135701249999995,
+     "trades": 288
+    },
+    {
+     "move": "entry=11:00",
+     "sharpe": 0.6330010122860055,
+     "net_return": 0.18168000000000029,
+     "trades": 288
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.5926738198454715,
+     "net_return": 0.15556849999999955,
+     "trades": 288
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.8652768171750719,
+     "net_return": 0.27947074999999955,
+     "trades": 288
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.529276163481125,
+     "net_return": 0.14574899999999968,
+     "trades": 231
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.665192605835735,
+     "net_return": 0.23230824999999977,
+     "trades": 341
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.7294045617620832,
+     "net_return": 0.20378499999999944,
+     "trades": 230
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 0.9038769213363711,
+     "net_return": 0.3248894999999996,
+     "trades": 347
+    },
+    {
+     "move": "stop_pct=0.9",
+     "sharpe": 0.7198480615739049,
+     "net_return": 0.21735218749999952,
+     "trades": 288
+    },
+    {
+     "move": "stop_pct=1.1",
+     "sharpe": 0.7101540014519372,
+     "net_return": 0.22947870000000004,
+     "trades": 288
+    }
+   ],
+   "dsr": 0.2633211808698271,
+   "luck": {
+    "exposure_level": 13,
+    "luck_pct_sharpe": 0.82,
+    "luck_pct_return": 0.78
+   }
+  },
+  {
+   "order": 25,
+   "group": 2,
+   "config_id": "cfg_6f1f",
+   "settings": {
+    "window": "last 2",
+    "first_days": "none",
+    "entry": "10:30",
+    "exit": "12:00",
+    "event_filter": "none",
+    "stop": "1%"
+   },
+   "dev": {
+    "net_return": 0.09548200000000007,
+    "cagr": 0.017946286113354804,
+    "sharpe": 0.833946970817717,
+    "max_drawdown": -0.0285412090535766,
+    "exposure": 0.015941185898387184,
+    "win_rate": 0.5166666666666667,
+    "profit_factor": 1.6680426508451804,
+    "n_completed_trades": 120.0,
+    "turnover_annual": 53.781938431490666
+   },
+   "val": {
+    "net_return": -0.02236230262112937,
+    "cagr": -0.010963184440984652,
+    "sharpe": -0.8580957944625857,
+    "max_drawdown": -0.03368336728553922,
+    "exposure": 0.015753372206237896,
+    "win_rate": 0.4166666666666667,
+    "profit_factor": 0.6307837226827431,
+    "n_completed_trades": 48.0,
+    "turnover_annual": 47.187636819675404
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0224 <= 0.0",
+    "sharpe -0.858 < 0.3"
+   ],
+   "exits": {
+    "time": 119,
+    "eod": 0,
+    "stop": 1
+   },
+   "stress_1_5x": 0.0847595000000001,
+   "breakeven_cost_x": 5.835226314309814,
+   "transfer_sharpe": 1.0008218600054135,
+   "neighbor_median_sharpe": 0.5503041879682535,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.674288018379918,
+   "local_detail": [
+    {
+     "move": "entry=10:00",
+     "sharpe": 0.33342042882741657,
+     "net_return": 0.04300425000000008,
+     "trades": 120
+    },
+    {
+     "move": "entry=11:00",
+     "sharpe": 0.9572345687683388,
+     "net_return": 0.06227500000000008,
+     "trades": 120
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.674288018379918,
+     "net_return": 0.07592200000000005,
+     "trades": 120
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.7003906697950395,
+     "net_return": 0.08422700000000005,
+     "trades": 120
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.46080227475368224,
+     "net_return": 0.036249500000000046,
+     "trades": 60
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.4585043043931167,
+     "net_return": 0.06056637500000006,
+     "trades": 180
+    },
+    {
+     "move": "first_days=1",
+     "sharpe": 0.30815055153882337,
+     "net_return": 0.04229637499999983,
+     "trades": 180
+    },
+    {
+     "move": "stop_pct=0.9",
+     "sharpe": 0.8212588899189264,
+     "net_return": 0.09436023750000011,
+     "trades": 120
+    },
+    {
+     "move": "stop_pct=1.1",
+     "sharpe": 0.8204939500948156,
+     "net_return": 0.0943776999999999,
+     "trades": 120
+    }
+   ],
+   "dsr": 0.2872763384745373,
+   "luck": {
+    "exposure_level": 2,
+    "luck_pct_sharpe": 0.06,
+    "luck_pct_return": 0.05
+   }
+  },
+  {
+   "order": 26,
+   "group": 3,
+   "config_id": "cfg_4890",
+   "settings": {
+    "window": "last 2",
+    "first_days": "none",
+    "entry": "11:00",
+    "exit": "12:00",
+    "event_filter": "skip FOMC",
+    "stop": "1%"
+   },
+   "dev": {
+    "net_return": 0.058652499999999996,
+    "cagr": 0.011179061036602045,
+    "sharpe": 0.9104362908918567,
+    "max_drawdown": -0.0215500369677728,
+    "exposure": 0.010239637190362276,
+    "win_rate": 0.5826086956521739,
+    "profit_factor": 1.6786520104136535,
+    "n_completed_trades": 115.0,
+    "turnover_annual": 51.60254187123086
+   },
+   "val": {
+    "net_return": -0.012029443089210057,
+    "cagr": -0.0058816684399282115,
+    "sharpe": -0.6422287393521392,
+    "max_drawdown": -0.024870974521846723,
+    "exposure": 0.010064654465096435,
+    "win_rate": 0.45652173913043476,
+    "profit_factor": 0.7049009384775808,
+    "n_completed_trades": 46.0,
+    "turnover_annual": 45.87695372531011
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0120 <= 0.0",
+    "sharpe -0.642 < 0.3"
+   ],
+   "exits": {
+    "time": 115,
+    "eod": 0,
+    "stop": 0
+   },
+   "stress_1_5x": 0.046620000000000106,
+   "breakeven_cost_x": 3.9263555787278395,
+   "transfer_sharpe": 1.1535662063763126,
+   "neighbor_median_sharpe": 0.6607763056998409,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.6639026909386639,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.8091071129993038,
+     "net_return": 0.09210950000000007,
+     "trades": 115
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.379521508417203,
+     "net_return": 0.018184999999999896,
+     "trades": 115
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.6639026909386639,
+     "net_return": 0.04421249999999999,
+     "trades": 115
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.555406845651091,
+     "net_return": 0.040124999999999966,
+     "trades": 115
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.511861972537842,
+     "net_return": 0.020729999999999915,
+     "trades": 58
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.6732394387649552,
+     "net_return": 0.056102499999999944,
+     "trades": 168
+    },
+    {
+     "move": "first_days=1",
+     "sharpe": 0.2320887113561725,
+     "net_return": 0.019814999999999916,
+     "trades": 173
+    },
+    {
+     "move": "stop_pct=0.9",
+     "sharpe": 0.9104362908918567,
+     "net_return": 0.058652499999999996,
+     "trades": 115
+    },
+    {
+     "move": "stop_pct=1.1",
+     "sharpe": 0.9104362908918567,
+     "net_return": 0.058652499999999996,
+     "trades": 115
+    }
+   ],
+   "dsr": 0.34670981441264775,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.1,
+    "luck_pct_return": 0.06
+   }
+  },
+  {
+   "order": 27,
+   "group": 15,
+   "config_id": "cfg_8819",
+   "settings": {
+    "window": "none",
+    "first_days": "first 2",
+    "entry": "14:00",
+    "exit": "15:30",
+    "event_filter": "skip FOMC",
+    "stop": "1%"
+   },
+   "dev": {
+    "net_return": 0.06699900000000003,
+    "cagr": 0.012729102481643606,
+    "sharpe": 0.8631862620680317,
+    "max_drawdown": -0.019504824357822192,
+    "exposure": 0.015216991268112285,
+    "win_rate": 0.6403508771929824,
+    "profit_factor": 1.7361435391452928,
+    "n_completed_trades": 114.0,
+    "turnover_annual": 51.28277678169369
+   },
+   "val": {
+    "net_return": 0.0009231498811150818,
+    "cagr": 0.00044986219859177723,
+    "sharpe": 0.052826093786370085,
+    "max_drawdown": -0.01483155871092523,
+    "exposure": 0.014440591189051406,
+    "win_rate": 0.5909090909090909,
+    "profit_factor": 1.0283066312235074,
+    "n_completed_trades": 44.0,
+    "turnover_annual": 43.377752921992965
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "sharpe 0.053 < 0.3"
+   ],
+   "exits": {
+    "time": 113,
+    "eod": 0,
+    "stop": 1
+   },
+   "stress_1_5x": 0.05488150000000003,
+   "breakeven_cost_x": 4.27151246248206,
+   "transfer_sharpe": 1.0053813326194905,
+   "neighbor_median_sharpe": 0.47146499735198455,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.6594805533286758,
+   "local_detail": [
+    {
+     "move": "entry=13:30",
+     "sharpe": 0.8098780162437418,
+     "net_return": 0.06965175000000001,
+     "trades": 114
+    },
+    {
+     "move": "entry=14:30",
+     "sharpe": 0.29011648820864017,
+     "net_return": 0.0197449999999999,
+     "trades": 114
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.9957974031569824,
+     "net_return": 0.06761499999999998,
+     "trades": 114
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.8302296693990721,
+     "net_return": 0.073237,
+     "trades": 114
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.18419066663973677,
+     "net_return": 0.01817837499999997,
+     "trades": 171
+    },
+    {
+     "move": "first_days=1",
+     "sharpe": 0.3923535263040415,
+     "net_return": 0.02325149999999998,
+     "trades": 58
+    },
+    {
+     "move": "first_days=3",
+     "sharpe": 0.4745115609277304,
+     "net_return": 0.04820975000000005,
+     "trades": 171
+    },
+    {
+     "move": "stop_pct=0.9",
+     "sharpe": 0.6594805533286758,
+     "net_return": 0.05178792499999996,
+     "trades": 114
+    },
+    {
+     "move": "stop_pct=1.1",
+     "sharpe": 0.8707943375676352,
+     "net_return": 0.06736750000000002,
+     "trades": 114
+    }
+   ],
+   "dsr": 0.32307567898545175,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.76,
+    "luck_pct_return": 0.76
+   }
+  },
+  {
+   "order": 28,
+   "group": 13,
+   "config_id": "cfg_8139",
+   "settings": {
+    "window": "last 2",
+    "first_days": "none",
+    "entry": "11:00",
+    "exit": "15:00",
+    "event_filter": "none",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.09882756249999947,
+    "cagr": 0.018551896938713064,
+    "sharpe": 0.7567902258288121,
+    "max_drawdown": -0.023643770040537637,
+    "exposure": 0.0385292319381704,
+    "win_rate": 0.5416666666666666,
+    "profit_factor": 1.5485241537589998,
+    "n_completed_trades": 120.0,
+    "turnover_annual": 53.83527145108735
+   },
+   "val": {
+    "net_return": -0.0033505029593761115,
+    "cagr": -0.0016345318883225213,
+    "sharpe": -0.09431366095086106,
+    "max_drawdown": -0.028060650537487963,
+    "exposure": 0.03855929576591656,
+    "win_rate": 0.5208333333333334,
+    "profit_factor": 0.9464308774074048,
+    "n_completed_trades": 48.0,
+    "turnover_annual": 47.20007303428264
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0034 <= 0.0",
+    "sharpe -0.094 < 0.3"
+   ],
+   "exits": {
+    "time": 99,
+    "eod": 2,
+    "stop": 19
+   },
+   "stress_1_5x": 0.0831900624999995,
+   "breakeven_cost_x": 5.467373217413128,
+   "transfer_sharpe": 0.9187130057663448,
+   "neighbor_median_sharpe": 0.5499219797094869,
+   "local_frac_profitable": 0.8888888888888888,
+   "local_median_sharpe": 0.6590192672491223,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.6590192672491223,
+     "net_return": 0.10317687499999995,
+     "trades": 120
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.39173730427934905,
+     "net_return": 0.04326768749999976,
+     "trades": 120
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.528691614312811,
+     "net_return": 0.06250268749999943,
+     "trades": 120
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.6818347653545832,
+     "net_return": 0.08945756249999959,
+     "trades": 120
+    },
+    {
+     "move": "window=1",
+     "sharpe": -0.23871503264505323,
+     "net_return": -0.018407187500000255,
+     "trades": 60
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.7399721383151933,
+     "net_return": 0.1215246249999995,
+     "trades": 180
+    },
+    {
+     "move": "first_days=1",
+     "sharpe": 0.5717763114084701,
+     "net_return": 0.08576331249999947,
+     "trades": 180
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 0.8414080104609476,
+     "net_return": 0.10829240000000029,
+     "trades": 120
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.6735452660821788,
+     "net_return": 0.08994584999999988,
+     "trades": 120
+    }
+   ],
+   "dsr": 0.2056514898058467,
+   "luck": {
+    "exposure_level": 4,
+    "luck_pct_sharpe": 0.15,
+    "luck_pct_return": 0.15
+   }
+  },
+  {
+   "order": 29,
+   "group": 3,
+   "config_id": "cfg_85bd",
+   "settings": {
+    "window": "last 2",
+    "first_days": "none",
+    "entry": "11:00",
+    "exit": "12:00",
+    "event_filter": "none",
+    "stop": "1%"
+   },
+   "dev": {
+    "net_return": 0.06227500000000008,
+    "cagr": 0.011853004974016867,
+    "sharpe": 0.9572345687683388,
+    "max_drawdown": -0.021474852103061992,
+    "exposure": 0.010684838807334548,
+    "win_rate": 0.5833333333333334,
+    "profit_factor": 1.7014727830812988,
+    "n_completed_trades": 120.0,
+    "turnover_annual": 53.83429591869412
+   },
+   "val": {
+    "net_return": -0.01182603374832314,
+    "cagr": -0.00578190944699597,
+    "sharpe": -0.6333534003460579,
+    "max_drawdown": -0.024626506136261495,
+    "exposure": 0.010502248137491932,
+    "win_rate": 0.4791666666666667,
+    "profit_factor": 0.7088981578032673,
+    "n_completed_trades": 48.0,
+    "turnover_annual": 47.85329808122052
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0118 <= 0.0",
+    "sharpe -0.633 < 0.3"
+   ],
+   "exits": {
+    "time": 120,
+    "eod": 0,
+    "stop": 0
+   },
+   "stress_1_5x": 0.050489999999999924,
+   "breakeven_cost_x": 3.9559950556242303,
+   "transfer_sharpe": 1.1710929518063093,
+   "neighbor_median_sharpe": 0.6414332565512094,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.6581486374153762,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.833946970817717,
+     "net_return": 0.09548200000000007,
+     "trades": 120
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.4115374447875527,
+     "net_return": 0.019762499999999905,
+     "trades": 120
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.6690843966328457,
+     "net_return": 0.044785000000000075,
+     "trades": 120
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.6581486374153762,
+     "net_return": 0.04852499999999993,
+     "trades": 120
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.5082612826297013,
+     "net_return": 0.020702500000000068,
+     "trades": 60
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.5784332916028251,
+     "net_return": 0.0497749999999999,
+     "trades": 180
+    },
+    {
+     "move": "first_days=1",
+     "sharpe": 0.23934582679280395,
+     "net_return": 0.020652499999999963,
+     "trades": 180
+    },
+    {
+     "move": "stop_pct=0.9",
+     "sharpe": 0.9572345687683388,
+     "net_return": 0.06227500000000008,
+     "trades": 120
+    },
+    {
+     "move": "stop_pct=1.1",
+     "sharpe": 0.9572345687683388,
+     "net_return": 0.06227500000000008,
+     "trades": 120
+    }
+   ],
+   "dsr": 0.38906911173917613,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.1,
+    "luck_pct_return": 0.06
+   }
+  },
+  {
+   "order": 30,
+   "group": 21,
+   "config_id": "cfg_c2dc",
+   "settings": {
+    "window": "none",
+    "first_days": "first 3",
+    "entry": "12:00",
+    "exit": "15:30",
+    "event_filter": "skip FOMC",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.10278306250000546,
+    "cagr": 0.01926600630021591,
+    "sharpe": 0.8345048400922096,
+    "max_drawdown": -0.028470559607277623,
+    "exposure": 0.041256833844820526,
+    "win_rate": 0.5202312138728323,
+    "profit_factor": 1.4714020646158075,
+    "n_completed_trades": 173.0,
+    "turnover_annual": 77.81133764986821
+   },
+   "val": {
+    "net_return": 0.011438559793804703,
+    "cagr": 0.005559217068112909,
+    "sharpe": 0.3655508942325779,
+    "max_drawdown": -0.019200921986091468,
+    "exposure": 0.04054670036137944,
+    "win_rate": 0.5294117647058824,
+    "profit_factor": 1.1581758847373016,
+    "n_completed_trades": 68.0,
+    "turnover_annual": 68.20958167191941
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 108,
+    "eod": 1,
+    "stop": 64
+   },
+   "stress_1_5x": 0.08577971875000534,
+   "breakeven_cost_x": 4.536002745334674,
+   "transfer_sharpe": 0.5972010376240362,
+   "neighbor_median_sharpe": 0.5042392025561362,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.656798002902509,
+   "local_detail": [
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.656798002902509,
+     "net_return": 0.07985990625000472,
+     "trades": 173
+    },
+    {
+     "move": "entry=12:30",
+     "sharpe": 0.02916553239068359,
+     "net_return": 0.0019148125000043592,
+     "trades": 173
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.8573459733271448,
+     "net_return": 0.10131887500000514,
+     "trades": 173
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.8485047661588355,
+     "net_return": 0.10827771875000525,
+     "trades": 173
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.22565117476749208,
+     "net_return": 0.027945750000006653,
+     "trades": 231
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.5042392025561362,
+     "net_return": 0.04522425000000352,
+     "trades": 115
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 0.9739357023884594,
+     "net_return": 0.13828715625000654,
+     "trades": 232
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.4626382187900535,
+     "net_return": 0.0453682750000064,
+     "trades": 173
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.7789767733501713,
+     "net_return": 0.10159048125000303,
+     "trades": 173
+    }
+   ],
+   "dsr": 0.27729152338149576,
+   "luck": {
+    "exposure_level": 4,
+    "luck_pct_sharpe": 0.7,
+    "luck_pct_return": 0.69
+   }
+  },
+  {
+   "order": 31,
+   "group": 8,
+   "config_id": "cfg_66a8",
+   "settings": {
+    "window": "last 2",
+    "first_days": "first 3",
+    "entry": "10:30",
+    "exit": "16:00",
+    "event_filter": "none",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.22943343749999978,
+    "cagr": 0.04111006459076472,
+    "sharpe": 0.7598275740931179,
+    "max_drawdown": -0.0661848162451556,
+    "exposure": 0.11814760511210176,
+    "win_rate": 0.49,
+    "profit_factor": 1.3313744791998123,
+    "n_completed_trades": 300.0,
+    "turnover_annual": 134.4409121094691
+   },
+   "val": {
+    "net_return": 0.024853622870493197,
+    "cagr": 0.012038126521850323,
+    "sharpe": 0.3789406636684965,
+    "max_drawdown": -0.04219459584133922,
+    "exposure": 0.12281795738566954,
+    "win_rate": 0.5416666666666666,
+    "profit_factor": 1.117946010992342,
+    "n_completed_trades": 120.0,
+    "turnover_annual": 119.75374641586073
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 207,
+    "eod": 3,
+    "stop": 90
+   },
+   "stress_1_5x": 0.173796375,
+   "breakeven_cost_x": 4.998311373570455,
+   "transfer_sharpe": 0.9575349289994225,
+   "neighbor_median_sharpe": 0.5759077646302466,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.6557127663889799,
+   "local_detail": [
+    {
+     "move": "entry=10:00",
+     "sharpe": 0.42504236241052357,
+     "net_return": 0.11226993750000003,
+     "trades": 300
+    },
+    {
+     "move": "entry=11:00",
+     "sharpe": 0.9712459740967418,
+     "net_return": 0.2699645624999989,
+     "trades": 300
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.5563450829900461,
+     "net_return": 0.13734424999999972,
+     "trades": 300
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.7903422653835175,
+     "net_return": 0.23392768750000004,
+     "trades": 300
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.4879985833113364,
+     "net_return": 0.12146968749999987,
+     "trades": 240
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.5706596513197608,
+     "net_return": 0.1753368749999995,
+     "trades": 360
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.6104038779410832,
+     "net_return": 0.15561281250000003,
+     "trades": 240
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 0.9721470869196039,
+     "net_return": 0.3201096874999998,
+     "trades": 360
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 0.7010216548368765,
+     "net_return": 0.19548564999999973,
+     "trades": 300
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.8641933775392716,
+     "net_return": 0.2720163749999991,
+     "trades": 300
+    }
+   ],
+   "dsr": 0.2250037395244518,
+   "luck": {
+    "exposure_level": 12,
+    "luck_pct_sharpe": 0.56,
+    "luck_pct_return": 0.55
+   }
+  },
+  {
+   "order": 32,
+   "group": 17,
+   "config_id": "cfg_8e89",
+   "settings": {
+    "window": "none",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "15:00",
+    "event_filter": "skip FOMC",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.10472193750000502,
+    "cagr": 0.01961528989760719,
+    "sharpe": 0.8154648000664826,
+    "max_drawdown": -0.02433973972595871,
+    "exposure": 0.04284471961202163,
+    "win_rate": 0.5144508670520231,
+    "profit_factor": 1.429288443076782,
+    "n_completed_trades": 173.0,
+    "turnover_annual": 77.30399413253383
+   },
+   "val": {
+    "net_return": 0.0527224582701844,
+    "cagr": 0.025360072269507095,
+    "sharpe": 1.3134347783253995,
+    "max_drawdown": -0.016666240439804247,
+    "exposure": 0.046104140000802256,
+    "win_rate": 0.5588235294117647,
+    "profit_factor": 1.7043926918101597,
+    "n_completed_trades": 68.0,
+    "turnover_annual": 68.37779462493961
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 97,
+    "eod": 1,
+    "stop": 75
+   },
+   "stress_1_5x": 0.09002743750000497,
+   "breakeven_cost_x": 4.671853761669427,
+   "transfer_sharpe": 0.5367328688161235,
+   "neighbor_median_sharpe": 0.4956269236731108,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.654309002394242,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.07965591132422314,
+     "net_return": 0.00836453125000558,
+     "trades": 173
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.654309002394242,
+     "net_return": 0.07167050000000441,
+     "trades": 173
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.8596722094373385,
+     "net_return": 0.111236000000005,
+     "trades": 173
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.8730201261611128,
+     "net_return": 0.1225267187500052,
+     "trades": 173
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.481682849657797,
+     "net_return": 0.06890003125000677,
+     "trades": 231
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.4956269236731108,
+     "net_return": 0.04888756250000337,
+     "trades": 115
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 0.8947644348364999,
+     "net_return": 0.13440993750000718,
+     "trades": 232
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.24213740567138856,
+     "net_return": 0.02225896250000603,
+     "trades": 173
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.6991589953109208,
+     "net_return": 0.09442065000000355,
+     "trades": 173
+    }
+   ],
+   "dsr": 0.2558841625510435,
+   "luck": {
+    "exposure_level": 5,
+    "luck_pct_sharpe": 0.95,
+    "luck_pct_return": 0.92
+   }
+  },
+  {
+   "order": 33,
+   "group": 2,
+   "config_id": "cfg_7f79",
+   "settings": {
+    "window": "last 2",
+    "first_days": "none",
+    "entry": "10:30",
+    "exit": "12:00",
+    "event_filter": "skip FOMC",
+    "stop": "1%"
+   },
+   "dev": {
+    "net_return": 0.09210950000000007,
+    "cagr": 0.017334290404248387,
+    "sharpe": 0.8091071129993038,
+    "max_drawdown": -0.028643860267072996,
+    "exposure": 0.015273383472928774,
+    "win_rate": 0.5130434782608696,
+    "profit_factor": 1.6623818838182625,
+    "n_completed_trades": 115.0,
+    "turnover_annual": 51.487426875981036
+   },
+   "val": {
+    "net_return": -0.021849915232858952,
+    "cagr": -0.010710554614295487,
+    "sharpe": -0.8371154030257086,
+    "max_drawdown": -0.03320942480476341,
+    "exposure": 0.015096981697644653,
+    "win_rate": 0.41304347826086957,
+    "profit_factor": 0.6344592524509803,
+    "n_completed_trades": 46.0,
+    "turnover_annual": 45.491884103242626
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0218 <= 0.0",
+    "sharpe -0.837 < 0.3"
+   ],
+   "exits": {
+    "time": 114,
+    "eod": 0,
+    "stop": 1
+   },
+   "stress_1_5x": 0.07842700000000002,
+   "breakeven_cost_x": 5.883206901680794,
+   "transfer_sharpe": 1.0063197607743877,
+   "neighbor_median_sharpe": 0.5430977906550516,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.6372612370185226,
+   "local_detail": [
+    {
+     "move": "entry=10:00",
+     "sharpe": 0.3041385062737364,
+     "net_return": 0.03888175000000005,
+     "trades": 115
+    },
+    {
+     "move": "entry=11:00",
+     "sharpe": 0.9104362908918567,
+     "net_return": 0.058652499999999996,
+     "trades": 115
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.6693808126026299,
+     "net_return": 0.0751195,
+     "trades": 115
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.6372612370185226,
+     "net_return": 0.07541949999999997,
+     "trades": 115
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.48086847996893767,
+     "net_return": 0.03763950000000005,
+     "trades": 58
+    },
+    {
+     "move": "window=3",
+     "sharpe": 0.4670880793662758,
+     "net_return": 0.060736375000000065,
+     "trades": 168
+    },
+    {
+     "move": "first_days=1",
+     "sharpe": 0.29923241898365627,
+     "net_return": 0.0407663749999998,
+     "trades": 173
+    },
+    {
+     "move": "stop_pct=0.9",
+     "sharpe": 0.7892604499431295,
+     "net_return": 0.08998023750000006,
+     "trades": 115
+    },
+    {
+     "move": "stop_pct=1.1",
+     "sharpe": 0.7956632875238959,
+     "net_return": 0.0910051999999999,
+     "trades": 115
+    }
+   ],
+   "dsr": 0.268708921799856,
+   "luck": {
+    "exposure_level": 2,
+    "luck_pct_sharpe": 0.07,
+    "luck_pct_return": 0.05
+   }
+  },
+  {
+   "order": 34,
+   "group": 17,
+   "config_id": "cfg_bafe",
+   "settings": {
+    "window": "none",
+    "first_days": "first 3",
+    "entry": "11:00",
+    "exit": "15:30",
+    "event_filter": "skip FOMC",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.11532003125000512,
+    "cagr": 0.02151583718075889,
+    "sharpe": 0.8040517219211045,
+    "max_drawdown": -0.027133739809061086,
+    "exposure": 0.047121623145735266,
+    "win_rate": 0.4682080924855491,
+    "profit_factor": 1.4478665770021377,
+    "n_completed_trades": 173.0,
+    "turnover_annual": 77.41447688624028
+   },
+   "val": {
+    "net_return": 0.04850225023697785,
+    "cagr": 0.0233544310545033,
+    "sharpe": 1.1844528472492055,
+    "max_drawdown": -0.015344569695646237,
+    "exposure": 0.05063688112403228,
+    "win_rate": 0.5147058823529411,
+    "profit_factor": 1.6301941523840409,
+    "n_completed_trades": 68.0,
+    "turnover_annual": 68.36708950872439
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 95,
+    "eod": 1,
+    "stop": 77
+   },
+   "stress_1_5x": 0.1012142812500052,
+   "breakeven_cost_x": 5.133575075853062,
+   "transfer_sharpe": 0.5969658108264836,
+   "neighbor_median_sharpe": 0.557419413516414,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.631361503052142,
+   "local_detail": [
+    {
+     "move": "entry=10:30",
+     "sharpe": 0.053041235030556494,
+     "net_return": 0.005271281250005533,
+     "trades": 173
+    },
+    {
+     "move": "entry=11:30",
+     "sharpe": 0.656798002902509,
+     "net_return": 0.07985990625000472,
+     "trades": 173
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.8730201261611128,
+     "net_return": 0.1225267187500052,
+     "trades": 173
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.8023354393882406,
+     "net_return": 0.12227484375000519,
+     "trades": 173
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.524502048141336,
+     "net_return": 0.08421162500000667,
+     "trades": 231
+    },
+    {
+     "move": "first_days=2",
+     "sharpe": 0.5231726822971764,
+     "net_return": 0.05714690625000318,
+     "trades": 115
+    },
+    {
+     "move": "first_days=4",
+     "sharpe": 1.0058197273120864,
+     "net_return": 0.17321965625000746,
+     "trades": 232
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.1455237798350091,
+     "net_return": 0.0141267875000064,
+     "trades": 173
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.631361503052142,
+     "net_return": 0.09472143750000406,
+     "trades": 173
+    }
+   ],
+   "dsr": 0.2416811984999488,
+   "luck": {
+    "exposure_level": 5,
+    "luck_pct_sharpe": 0.95,
+    "luck_pct_return": 0.92
+   }
+  },
+  {
+   "order": 35,
+   "group": 0,
+   "config_id": "cfg_049d",
+   "settings": {
+    "window": "none",
+    "first_days": "first 2",
+    "entry": "13:00",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.11394250000000006,
+    "cagr": 0.02126962979148428,
+    "sharpe": 0.8487164624863531,
+    "max_drawdown": -0.022713442008020945,
+    "exposure": 0.030475534687141984,
+    "win_rate": 0.591304347826087,
+    "profit_factor": 1.7077723425731812,
+    "n_completed_trades": 115.0,
+    "turnover_annual": 51.490258514350415
+   },
+   "val": {
+    "net_return": 0.032607158807568704,
+    "cagr": 0.015762945332923994,
+    "sharpe": 1.1784332028463929,
+    "max_drawdown": -0.009582470387130892,
+    "exposure": 0.02893588158715225,
+    "win_rate": 0.6,
+    "profit_factor": 2.0249012415349887,
+    "n_completed_trades": 45.0,
+    "turnover_annual": 45.307351556206044
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 114,
+    "eod": 1,
+    "stop": 0
+   },
+   "stress_1_5x": 0.10418250000000007,
+   "breakeven_cost_x": 6.810788941335135,
+   "transfer_sharpe": 0.9396351162537109,
+   "neighbor_median_sharpe": 0.5475679213844548,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.6078289790189285,
+   "local_detail": [
+    {
+     "move": "entry=12:30",
+     "sharpe": 0.6192546943158989,
+     "net_return": 0.08446749999999992,
+     "trades": 115
+    },
+    {
+     "move": "entry=13:30",
+     "sharpe": 1.1859380380408704,
+     "net_return": 0.15214250000000007,
+     "trades": 114
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.37340558779162786,
+     "net_return": 0.04157000000000011,
+     "trades": 115
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.6078289790189285,
+     "net_return": 0.07635250000000005,
+     "trades": 115
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.5475679213844548,
+     "net_return": 0.09668750000000004,
+     "trades": 173
+    },
+    {
+     "move": "first_days=1",
+     "sharpe": 0.6658192924759972,
+     "net_return": 0.0665150000000001,
+     "trades": 58
+    },
+    {
+     "move": "first_days=3",
+     "sharpe": 0.3819772495259704,
+     "net_return": 0.06403000000000003,
+     "trades": 173
+    }
+   ],
+   "dsr": 0.30649720893753907,
+   "luck": {
+    "exposure_level": 3,
+    "luck_pct_sharpe": 0.94,
+    "luck_pct_return": 0.92
+   }
+  },
+  {
+   "order": 36,
+   "group": 19,
+   "config_id": "cfg_a9c0",
+   "settings": {
+    "window": "none",
+    "first_days": "first 2",
+    "entry": "13:00",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "0.25%"
+   },
+   "dev": {
+    "net_return": 0.0808833125000028,
+    "cagr": 0.015286092007417373,
+    "sharpe": 0.832952352338448,
+    "max_drawdown": -0.019821013487898553,
+    "exposure": 0.023801962448727614,
+    "win_rate": 0.4956521739130435,
+    "profit_factor": 1.5881388137632482,
+    "n_completed_trades": 115.0,
+    "turnover_annual": 51.69117848116773
+   },
+   "val": {
+    "net_return": 0.01862443754769383,
+    "cagr": 0.009035133301571463,
+    "sharpe": 0.6490938475275004,
+    "max_drawdown": -0.013927429470199426,
+    "exposure": 0.023524306505194603,
+    "win_rate": 0.5111111111111111,
+    "profit_factor": 1.426418206743547,
+    "n_completed_trades": 45.0,
+    "turnover_annual": 45.1944929657406
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 75,
+    "eod": 1,
+    "stop": 39
+   },
+   "stress_1_5x": 0.07112831250000284,
+   "breakeven_cost_x": 5.256897411635422,
+   "transfer_sharpe": 0.9313389434629773,
+   "neighbor_median_sharpe": 0.5469782840537526,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.5628158833639645,
+   "local_detail": [
+    {
+     "move": "entry=12:30",
+     "sharpe": 0.02559432666323515,
+     "net_return": 0.0014095000000036162,
+     "trades": 115
+    },
+    {
+     "move": "entry=13:30",
+     "sharpe": 0.9434842007371221,
+     "net_return": 0.08278131250000142,
+     "trades": 114
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.6336120529208241,
+     "net_return": 0.055672781250002634,
+     "trades": 115
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.620010404135613,
+     "net_return": 0.05733637500000288,
+     "trades": 115
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.5049455201366367,
+     "net_return": 0.06805115625000435,
+     "trades": 173
+    },
+    {
+     "move": "first_days=1",
+     "sharpe": 0.5628158833639645,
+     "net_return": 0.03901884375000142,
+     "trades": 58
+    },
+    {
+     "move": "first_days=3",
+     "sharpe": 0.41263044622613115,
+     "net_return": 0.04584218750000435,
+     "trades": 173
+    },
+    {
+     "move": "stop_pct=0.15",
+     "sharpe": 0.45582383146802374,
+     "net_return": 0.037492525000003774,
+     "trades": 115
+    },
+    {
+     "move": "stop_pct=0.35",
+     "sharpe": 0.8302388823624621,
+     "net_return": 0.08591227500000209,
+     "trades": 115
+    }
+   ],
+   "dsr": 0.27584363175049764,
+   "luck": {
+    "exposure_level": 2,
+    "luck_pct_sharpe": 0.76,
+    "luck_pct_return": 0.75
+   }
+  },
+  {
+   "order": 37,
+   "group": 9,
+   "config_id": "cfg_4cc0",
+   "settings": {
+    "window": "none",
+    "first_days": "first 2",
+    "entry": "14:00",
+    "exit": "15:00",
+    "event_filter": "skip FOMC",
+    "stop": "1%"
+   },
+   "dev": {
+    "net_return": 0.051144999999999996,
+    "cagr": 0.009776405270228716,
+    "sharpe": 0.925301939557329,
+    "max_drawdown": -0.02261771140019264,
+    "exposure": 0.01015059686696782,
+    "win_rate": 0.6403508771929824,
+    "profit_factor": 1.768750939425823,
+    "n_completed_trades": 114.0,
+    "turnover_annual": 51.127997748249264
+   },
+   "val": {
+    "net_return": -0.002268954330753581,
+    "cagr": -0.0011065945093516882,
+    "sharpe": -0.11858772484414312,
+    "max_drawdown": -0.012750892776475453,
+    "exposure": 0.009627060792700938,
+    "win_rate": 0.6136363636363636,
+    "profit_factor": 0.9231450898251833,
+    "n_completed_trades": 44.0,
+    "turnover_annual": 42.48789369092532
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0023 <= 0.0",
+    "sharpe -0.119 < 0.3"
+   ],
+   "exits": {
+    "time": 114,
+    "eod": 0,
+    "stop": 0
+   },
+   "stress_1_5x": 0.041312500000000085,
+   "breakeven_cost_x": 3.586108959462948,
+   "transfer_sharpe": 1.251613098189586,
+   "neighbor_median_sharpe": 0.5199287095383341,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.5546899615764057,
+   "local_detail": [
+    {
+     "move": "entry=13:30",
+     "sharpe": 0.7597249434690312,
+     "net_return": 0.05275074999999996,
+     "trades": 114
+    },
+    {
+     "move": "entry=14:30",
+     "sharpe": 0.17546768998198,
+     "net_return": 0.006852499999999928,
+     "trades": 114
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.5546899615764057,
+     "net_return": 0.031497499999999956,
+     "trades": 114
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.9957974031569824,
+     "net_return": 0.06761499999999998,
+     "trades": 114
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.4679897578258537,
+     "net_return": 0.03383500000000006,
+     "trades": 171
+    },
+    {
+     "move": "first_days=1",
+     "sharpe": 0.4521353138643378,
+     "net_return": 0.020227500000000065,
+     "trades": 58
+    },
+    {
+     "move": "first_days=3",
+     "sharpe": 0.5199287095383341,
+     "net_return": 0.03999575000000011,
+     "trades": 171
+    },
+    {
+     "move": "stop_pct=0.9",
+     "sharpe": 0.8382747665324081,
+     "net_return": 0.04816707500000006,
+     "trades": 114
+    },
+    {
+     "move": "stop_pct=1.1",
+     "sharpe": 0.925301939557329,
+     "net_return": 0.051144999999999996,
+     "trades": 114
+    }
+   ],
+   "dsr": 0.37913137488023874,
+   "luck": {
+    "exposure_level": 1,
+    "luck_pct_sharpe": 0.63,
+    "luck_pct_return": 0.62
+   }
+  },
+  {
+   "order": 38,
+   "group": 20,
+   "config_id": "cfg_bbc2",
+   "settings": {
+    "window": "none",
+    "first_days": "first 2",
+    "entry": "14:00",
+    "exit": "16:00",
+    "event_filter": "skip FOMC",
+    "stop": "0.5%"
+   },
+   "dev": {
+    "net_return": 0.07271287500000034,
+    "cagr": 0.013784616502635405,
+    "sharpe": 0.8161332011168316,
+    "max_drawdown": -0.02394549064128948,
+    "exposure": 0.019213417783133388,
+    "win_rate": 0.5964912280701754,
+    "profit_factor": 1.565497537079904,
+    "n_completed_trades": 114.0,
+    "turnover_annual": 51.19225653006672
+   },
+   "val": {
+    "net_return": 0.008456363498014374,
+    "cagr": 0.004112968610257894,
+    "sharpe": 0.3591644381438368,
+    "max_drawdown": -0.011740693578827566,
+    "exposure": 0.018229423069209084,
+    "win_rate": 0.5,
+    "profit_factor": 1.2299211101606333,
+    "n_completed_trades": 44.0,
+    "turnover_annual": 43.57271645491797
+   },
+   "status": "pass",
+   "reasons": [],
+   "exits": {
+    "time": 101,
+    "eod": 0,
+    "stop": 13
+   },
+   "stress_1_5x": 0.06337537500000012,
+   "breakeven_cost_x": 4.751737776480252,
+   "transfer_sharpe": 1.0839649879429614,
+   "neighbor_median_sharpe": 0.5215458393136446,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.5198831231165381,
+   "local_detail": [
+    {
+     "move": "entry=13:30",
+     "sharpe": 0.7804353756678905,
+     "net_return": 0.0782044374999995,
+     "trades": 114
+    },
+    {
+     "move": "entry=14:30",
+     "sharpe": 0.6920259939955199,
+     "net_return": 0.06811156249999994,
+     "trades": 114
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.48403111413146716,
+     "net_return": 0.03713006250000017,
+     "trades": 114
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.5135247363969285,
+     "net_return": 0.043672875000000166,
+     "trades": 114
+    },
+    {
+     "move": "window=1",
+     "sharpe": 0.3944259534202956,
+     "net_return": 0.0478689375000001,
+     "trades": 171
+    },
+    {
+     "move": "first_days=1",
+     "sharpe": 0.5198831231165381,
+     "net_return": 0.03251868750000009,
+     "trades": 58
+    },
+    {
+     "move": "first_days=3",
+     "sharpe": 0.4267881325446697,
+     "net_return": 0.047562000000000104,
+     "trades": 171
+    },
+    {
+     "move": "stop_pct=0.4",
+     "sharpe": 0.775052093590608,
+     "net_return": 0.06591884999999986,
+     "trades": 114
+    },
+    {
+     "move": "stop_pct=0.6",
+     "sharpe": 0.8985450717538028,
+     "net_return": 0.09014100000000003,
+     "trades": 114
+    }
+   ],
+   "dsr": 0.29843260918486914,
+   "luck": {
+    "exposure_level": 2,
+    "luck_pct_sharpe": 0.86,
+    "luck_pct_return": 0.85
+   }
+  }
+ ],
+ "short_labels": {
+  "timeframe": "Bar",
+  "window": "Last",
+  "first_days": "First",
+  "entry": "In",
+  "exit": "Out",
+  "event_filter": "Filter",
+  "stop": "Stop"
+ },
+ "exit_labels": [
+  [
+   "time",
+   "time",
+   "time exit"
+  ],
+  [
+   "eod",
+   "close",
+   "early close"
+  ],
+  [
+   "stop",
+   "stop",
+   "stop"
+  ]
+ ],
+ "local_moves": [
+  [
+   "entry",
+   "Entry"
+  ],
+  [
+   "exit_shift",
+   "Exit"
+  ],
+  [
+   "window",
+   "Last days"
+  ],
+  [
+   "first_days",
+   "First days"
+  ],
+  [
+   "stop_pct",
+   "Stop"
+  ]
+ ],
+ "benchmark": {
+  "label": "Holding ES (rolled, unlevered)",
+  "dev": {
+   "net_return": 0.4357527781535482,
+   "sharpe": 0.43792499955561653,
+   "max_drawdown": -0.3416619588824057
+  },
+  "val": {
+   "net_return": 0.40501066912751904,
+   "sharpe": 1.3851880562061438,
+   "max_drawdown": -0.11377856254054164
+  }
+ },
+ "transfer_symbol": "NQ",
+ "dsr": {
+  "effective_trials": 230.00000000000017,
+  "raw_trials": 4864.0
+ },
+ "assumptions": [
+  "Data: Databento CME continuous front month (ES.v.0), 1-minute bars from 08:00 to 17:00 ET only. Rolls are back-adjusted; positions never cross a session.",
+  "Costs: 1 tick slippage per side and $2.50 commission per contract per side.",
+  "Every published month-end figure is close-to-close and includes the overnight session. This run measures only the day-session part; failing here means that part is too small, not that the month-end effect is gone.",
+  "Month-turn days come from the NYSE calendar. This ES grid was specified after the ZN month-end run (me_zn_v1) failed validation; its day-session results (morning entries best, afternoons worst) were seen before this grid was set.",
+  "Long only on a calendar: part of every version's profit is the market's own upward drift. The placebo test (same clock on ordinary days) separates the calendar from that drift.",
+  "Each trade uses the whole account in whole contracts with no leverage, the same as the other families.",
+  "Sharpe uses daily mark-to-market returns (\u221a252), with idle cash earning 0%. Time in market is the share of 1-minute bars with an open position.",
+  "Other strategy families were already selected on this market's 2023\u20132024 data, so 2023\u20132024 is not untouched; only the 2025+ holdout is.",
+  "Holdout (2025 onward) was run once for #1, #7, #17; the results are on this market's separate holdout tab."
+ ],
+ "source": "month-end-backtest/runs/funnel/me_es_v2/ \u00b7 configs/funnel/me_funnel_es_v2.yaml"
+}

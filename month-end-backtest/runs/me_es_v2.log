@@ -1,0 +1,57 @@
+=== me_es_v2 develop 2026-11-22T14:50:40Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-22T14:52:11.739757Z"}
+{"n": 4864, "elapsed_s": 137.6, "event": "prep_built", "level": "info", "timestamp": "2026-11-22T14:52:58.680247Z"}
+{"stage": "1 backtest integrity", "evaluated": 4864, "passed": 4864, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T14:52:58.749045Z"}
+{"stage": "2 trade count & coverage", "evaluated": 4864, "passed": 4352, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T14:52:58.792401Z"}
+{"stage": "3 performance & risk", "evaluated": 4352, "passed": 70, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T14:52:58.814872Z"}
+{"step": "s4_local_moves", "total": 398, "saved": 0, "to_run": 398, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T14:52:58.900515Z"}
+{"step": "s4_local_moves", "saved": 392, "of": 398, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T14:53:20.032500Z"}
+{"reused_from_prep": 246, "backtested": 398, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-22T14:53:20.032980Z"}
+{"stage": "4 parameter stability", "evaluated": 70, "passed": 65, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T14:53:20.039376Z"}
+{"stage": "5 time stability", "evaluated": 65, "passed": 65, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T14:53:20.039937Z"}
+{"step": "s6_intervals", "total": 65, "saved": 0, "to_run": 65, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T14:53:20.045240Z"}
+{"step": "s6_intervals", "saved": 65, "of": 65, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T14:53:38.195448Z"}
+{"step": "s6_perturbations", "total": 760, "saved": 0, "to_run": 760, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T14:53:38.242995Z"}
+{"step": "s6_perturbations", "saved": 760, "of": 760, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T14:54:03.072888Z"}
+{"step": "s7_execution_stress", "total": 4294, "saved": 0, "to_run": 4294, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T14:54:03.228493Z"}
+{"step": "s7_execution_stress", "saved": 4294, "of": 4294, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T14:54:44.899335Z"}
+{"stage": "7 execution stress", "evaluated": 38, "passed": 38, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T14:54:44.926257Z"}
+{"step": "s9_transfer", "total": 38, "saved": 0, "to_run": 38, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T14:54:46.749670Z"}
+{"step": "s9_transfer", "saved": 38, "of": 38, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T14:55:04.592286Z"}
+develop done: 4864 configs -> 38 representatives -> 38 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/month-end-backtest/runs/funnel/me_es_v2
+=== me_es_v2 validate 2026-11-22T14:55:05Z
+validate: 38 frozen -> 30 pass validation (previously-inspected data). Selection manifest sha256 fc677c1e1b52200c
+=== me_es_v2 placebo 2026-11-22T14:55:30Z
+me_es_v2: 38 finalists re-run on validation and matched exactly
+me_es_v2 1min|10:30-12:00-1.00: 1 levels x 100 sims (median trade 90 bars, 286 placebo days)
+me_es_v2 1min|10:30-16:00-0.50: 1 levels x 100 sims (median trade 330 bars, 286 placebo days)
+me_es_v2 1min|10:30-16:00-1.00: 1 levels x 100 sims (median trade 330 bars, 286 placebo days)
+me_es_v2 1min|11:00-12:00-1.00: 1 levels x 100 sims (median trade 60 bars, 286 placebo days)
+me_es_v2 1min|11:00-15:00-0.25: 1 levels x 100 sims (median trade 240 bars, 286 placebo days)
+me_es_v2 1min|11:00-15:00-0.50: 10 levels x 100 sims (median trade 240 bars, 286 placebo days)
+me_es_v2 1min|11:00-15:30-0.25: 1 levels x 100 sims (median trade 270 bars, 286 placebo days)
+me_es_v2 1min|11:00-15:30-0.50: 5 levels x 100 sims (median trade 270 bars, 286 placebo days)
+me_es_v2 1min|11:00-16:00-0.25: 8 levels x 100 sims (median trade 300 bars, 286 placebo days)
+me_es_v2 1min|11:00-16:00-0.50: 6 levels x 100 sims (median trade 300 bars, 286 placebo days)
+me_es_v2 1min|12:00-15:30-0.25: 1 levels x 100 sims (median trade 210 bars, 286 placebo days)
+me_es_v2 1min|12:00-16:00-0.25: 1 levels x 100 sims (median trade 240 bars, 286 placebo days)
+me_es_v2 1min|13:00-16:00-none: 1 levels x 100 sims (median trade 180 bars, 286 placebo days)
+me_es_v2 1min|13:00-16:00-0.25: 1 levels x 100 sims (median trade 180 bars, 286 placebo days)
+me_es_v2 1min|14:00-15:00-1.00: 1 levels x 100 sims (median trade 60 bars, 286 placebo days)
+me_es_v2 1min|14:00-15:30-1.00: 1 levels x 100 sims (median trade 90 bars, 286 placebo days)
+me_es_v2 1min|14:00-16:00-none: 1 levels x 100 sims (median trade 120 bars, 286 placebo days)
+me_es_v2 1min|14:00-16:00-0.50: 1 levels x 100 sims (median trade 120 bars, 286 placebo days)
+me_es_v2 1min|14:00-16:00-1.00: 2 levels x 100 sims (median trade 120 bars, 286 placebo days)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/month-end-backtest/runs/funnel/me_es_v2/random_benchmark.json
+=== me_es_v2 export 2026-11-22T14:56:03Z
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/futures-results/data/ES/month_end_v2.json
+mean reversion/index.html: 41 run(s) across 10 market(s)
+noise-band breakout/index.html: 15 run(s) across 6 market(s)
+bb-kc squeeze/index.html: 25 run(s) across 10 market(s)
+nr squeeze/index.html: 20 run(s) across 11 market(s)
+price-path convexity/index.html: 10 run(s) across 6 market(s)
+emrt spread/index.html: 4 run(s) across 2 market(s)
+fx fix/index.html: 1 run(s) across 1 market(s)
+drift burst/index.html: 2 run(s) across 1 market(s)
+month end/index.html: 2 run(s) across 2 market(s)
+=== me_es_v2 done 2026-11-22T14:56:06Z

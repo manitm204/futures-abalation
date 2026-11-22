@@ -1,0 +1,40 @@
+=== me_zn_v1 develop 2026-11-22T14:39:51Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-22T14:40:59.233753Z"}
+{"n": 972, "elapsed_s": 85.0, "event": "prep_built", "level": "info", "timestamp": "2026-11-22T14:41:17.420817Z"}
+{"stage": "1 backtest integrity", "evaluated": 972, "passed": 972, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T14:41:17.449594Z"}
+{"stage": "2 trade count & coverage", "evaluated": 972, "passed": 756, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T14:41:17.458029Z"}
+{"stage": "3 performance & risk", "evaluated": 756, "passed": 10, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T14:41:17.461655Z"}
+{"step": "s4_local_moves", "total": 52, "saved": 0, "to_run": 52, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T14:41:17.477259Z"}
+{"step": "s4_local_moves", "saved": 52, "of": 52, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T14:41:30.009936Z"}
+{"reused_from_prep": 20, "backtested": 52, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-22T14:41:30.010198Z"}
+{"stage": "4 parameter stability", "evaluated": 10, "passed": 10, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T14:41:30.011897Z"}
+{"stage": "5 time stability", "evaluated": 10, "passed": 10, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T14:41:30.012120Z"}
+{"step": "s6_intervals", "total": 10, "saved": 0, "to_run": 10, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T14:41:30.015710Z"}
+{"step": "s6_intervals", "saved": 10, "of": 10, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T14:41:36.896932Z"}
+{"step": "s6_perturbations", "total": 40, "saved": 0, "to_run": 40, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T14:41:36.901913Z"}
+{"step": "s6_perturbations", "saved": 40, "of": 40, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T14:41:49.103306Z"}
+{"step": "s7_execution_stress", "total": 226, "saved": 0, "to_run": 226, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T14:41:49.110239Z"}
+{"step": "s7_execution_stress", "saved": 226, "of": 226, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T14:42:02.132574Z"}
+{"stage": "7 execution stress", "evaluated": 2, "passed": 2, "event": "stage_done", "level": "info", "timestamp": "2026-11-22T14:42:02.133964Z"}
+{"step": "s9_transfer", "total": 2, "saved": 0, "to_run": 2, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-22T14:42:02.976346Z"}
+{"step": "s9_transfer", "saved": 2, "of": 2, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-22T14:42:05.537712Z"}
+develop done: 972 configs -> 2 representatives -> 2 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/month-end-backtest/runs/funnel/me_zn_v1
+=== me_zn_v1 validate 2026-11-22T14:42:05Z
+validate: 2 frozen -> 0 pass validation (previously-inspected data). Selection manifest sha256 3aea0bd591080097
+=== me_zn_v1 placebo 2026-11-22T14:42:11Z
+me_zn_v1: 2 finalists re-run on validation and matched exactly
+me_zn_v1 1min|09:00-15:00-none: 1 levels x 100 sims (median trade 360 bars, 382 placebo days)
+me_zn_v1 1min|09:00-strike-none: 1 levels x 100 sims (median trade 420 bars, 382 placebo days)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/month-end-backtest/runs/funnel/me_zn_v1/random_benchmark.json
+=== me_zn_v1 export 2026-11-22T14:42:15Z
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/futures-results/data/ZN/month_end_v1.json
+mean reversion/index.html: 41 run(s) across 10 market(s)
+noise-band breakout/index.html: 15 run(s) across 6 market(s)
+bb-kc squeeze/index.html: 25 run(s) across 10 market(s)
+nr squeeze/index.html: 20 run(s) across 11 market(s)
+price-path convexity/index.html: 10 run(s) across 6 market(s)
+emrt spread/index.html: 4 run(s) across 2 market(s)
+fx fix/index.html: 1 run(s) across 1 market(s)
+drift burst/index.html: 2 run(s) across 1 market(s)
+month end/index.html: 1 run(s) across 1 market(s)
+=== me_zn_v1 done 2026-11-22T14:42:18Z

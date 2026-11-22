@@ -1,0 +1,118 @@
+{
+  "curves": {
+    "1min|09:00-15:00-none": [
+      {
+        "actual_exposure": 0.06184096195199016,
+        "exposure_pct": 6,
+        "frac_profitable": 0.16,
+        "mean_return": -0.01664714375,
+        "mean_sharpe": -0.6467973365218888,
+        "mean_trades": 47.0,
+        "median_return": -0.017625937499999966,
+        "median_sharpe": -0.6481595937753648,
+        "p10_return": -0.03833856249999999,
+        "p10_sharpe": -1.3899090638768203,
+        "p90_return": 0.00385937499999991,
+        "p90_sharpe": 0.13494764051906985
+      }
+    ],
+    "1min|09:00-strike-none": [
+      {
+        "actual_exposure": 0.07214127938444437,
+        "exposure_pct": 7,
+        "frac_profitable": 0.18,
+        "mean_return": -0.013822750000000003,
+        "mean_sharpe": -0.5669453025059564,
+        "mean_trades": 47.0,
+        "median_return": -0.014093750000000016,
+        "median_sharpe": -0.5696918267125746,
+        "p10_return": -0.030022749999999997,
+        "p10_sharpe": -1.3112816085879175,
+        "p90_return": 0.00776987499999995,
+        "p90_sharpe": 0.309021367525784
+      }
+    ]
+  },
+  "data_access": {
+    "actual_last_session": "2024-12-31",
+    "command": "random_benchmark",
+    "experiment_id": "me_zn_v1",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 84,
+    "partition_fingerprint": "f81ca53909fe94b4",
+    "phase": "validation",
+    "phase_end": "2024-12-31",
+    "rows": 2319047,
+    "symbol": "ZN"
+  },
+  "experiment_id": "me_zn_v1",
+  "finalists": [
+    {
+      "config_id": "cfg_f4191b16cc60913a74ae",
+      "dev_order": 1,
+      "direction": "long",
+      "exposure": 0.07016793200801627,
+      "exposure_level": 7,
+      "group": "1min|09:00-strike-none",
+      "luck_pct_return": 0.73,
+      "luck_pct_sharpe": 0.69,
+      "net_return": -0.004322012406675624,
+      "sharpe": -0.26671056042395086,
+      "status": "hard_reject",
+      "timeframe": "1min"
+    },
+    {
+      "config_id": "cfg_e58330febfe529ed7982",
+      "dev_order": 2,
+      "direction": "long",
+      "exposure": 0.06039262152396834,
+      "exposure_level": 6,
+      "group": "1min|09:00-15:00-none",
+      "luck_pct_return": 0.57,
+      "luck_pct_sharpe": 0.25,
+      "net_return": -0.015256049677700112,
+      "sharpe": -1.0405769622065248,
+      "status": "hard_reject",
+      "timeframe": "1min"
+    }
+  ],
+  "group_levels": {
+    "1min|09:00-15:00-none": [
+      6
+    ],
+    "1min|09:00-strike-none": [
+      7
+    ]
+  },
+  "groups": {
+    "1min|09:00-15:00-none": {
+      "direction": "long",
+      "mean_trade_bars": 351.36170212765956,
+      "median_trade_bars": 360.0,
+      "n_pool_trades": 47,
+      "p_long": 1.0,
+      "placebo_pool_days": 382,
+      "timeframe": "1min"
+    },
+    "1min|09:00-strike-none": {
+      "direction": "long",
+      "mean_trade_bars": 408.2340425531915,
+      "median_trade_bars": 420.0,
+      "n_pool_trades": 47,
+      "p_long": 1.0,
+      "placebo_pool_days": 382,
+      "timeframe": "1min"
+    }
+  },
+  "levels": [
+    6,
+    7
+  ],
+  "method": "Per clock and stop (entry time x exit rule x stop): the same long trade at the same clock, but on random validation-window NYSE trading days that are not among the month's last 5 trading days. The number of days is scaled so the time in market matches each level. Same fills, slippage, commission and whole-contract sizing as the strategy; scored with the same daily-Sharpe and time-in-market code.",
+  "n_sims": 100,
+  "window": [
+    "2023-01-01",
+    "2024-12-31"
+  ]
+}

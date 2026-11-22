@@ -1,0 +1,1130 @@
+{
+ "market": "ZN",
+ "market_name": "10-year T-note",
+ "strategy_key": "month_end_v1",
+ "strategy_name": "Month end \u00b7 v1",
+ "variant": null,
+ "variant_label": null,
+ "stability_mode": "local_perturbation",
+ "validation_rules": {
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3,
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40
+ },
+ "run_id": "me_zn_v1",
+ "generated_at": "2026-11-22T14:42:16+00:00",
+ "periods": {
+  "dev": [
+   "2018-01-01",
+   "2022-12-31"
+  ],
+  "val": [
+   "2023-01-01",
+   "2024-12-31"
+  ]
+ },
+ "strategy": {
+  "summary": "Buy Treasury futures on the last few trading days of each month, day session only. Hartley & Schwarz (Federal Reserve) find coupon Treasuries earn positive, significant returns only over the month's last few days (Sharpe about 1, 1990\u20132018), driven by index funds and other benchmarked holders buying at the month-end index rebalance (the \"strike\"). Their numbers are close-to-close, overnight included; this run keeps only the 08:00\u201317:00 ET part, because nothing is held overnight.",
+  "formula": "Long on each of the month's last N trading days, from the entry time to the exit time",
+  "rules": [
+   {
+    "label": "Days",
+    "text": "Each of the last 1, 2, 3, 4, 5 or 6 NYSE trading days of the calendar month, each its own trade. Optional filters: skip scheduled FOMC statement days; also skip days with a Treasury note or bond auction."
+   },
+   {
+    "label": "Enter",
+    "text": "Buy at 08:20, 09:00, 10:00, 11:00, 12:00 or 14:00 ET, at that minute's open. The day is skipped if the bars have a gap of more than 5 minutes there."
+   },
+   {
+    "label": "Exit",
+    "text": "Sell at 15:00 ET (CBOT settlement), 16:00 ET, or at the index strike: 15:00 ET on month-ends before 14 Jan 2021 and 16:00 ET after, when Bloomberg moved its Treasury index pricing time. On early-close days the trade closes at the last bar. Optional stop 0.25% or 0.5% below the entry price, live during the trade."
+   },
+   {
+    "label": "Size",
+    "text": "One position at a time, never held overnight. As many whole ZN contracts as the account covers at full contract value (no leverage), starting from $1,000,000."
+   }
+  ],
+  "axes": [
+   {
+    "label": "Bar size",
+    "values": [
+     "1 min"
+    ]
+   },
+   {
+    "label": "Last N trading days",
+    "values": [
+     "last 1",
+     "last 2",
+     "last 3",
+     "last 4",
+     "last 5",
+     "last 6"
+    ]
+   },
+   {
+    "label": "Entry time (ET)",
+    "values": [
+     "08:20",
+     "09:00",
+     "10:00",
+     "11:00",
+     "12:00",
+     "14:00"
+    ]
+   },
+   {
+    "label": "Exit time (ET)",
+    "values": [
+     "15:00",
+     "16:00",
+     "index strike"
+    ]
+   },
+   {
+    "label": "Event filter",
+    "values": [
+     "none",
+     "skip FOMC",
+     "skip FOMC + auctions"
+    ]
+   },
+   {
+    "label": "Stop (% below entry)",
+    "values": [
+     "none",
+     "0.25%",
+     "0.5%"
+    ]
+   }
+  ],
+  "grid_size": 972,
+  "length_note": "Times are New York clock times on 1-minute bars from 08:00 to 17:00 ET."
+ },
+ "funnel": [
+  {
+   "name": "Start",
+   "sub": "every combination",
+   "n": 972,
+   "why": "All 972 versions backtested once on 2018\u20132022 data."
+  },
+  {
+   "name": "1 \u00b7 Integrity",
+   "sub": "no cheating",
+   "n": 972,
+   "why": "Per-trade checks on every version: the month-end day count, the FOMC and auction days and the entry and exit bars were recomputed independently; each trade was long, on one of the month's last trading days with the filter met, entered and exited at the set times; no eligible day was skipped; fills were never better than the market; nothing was held overnight. Plus 40 random versions re-run on cut-off data. 0 failed."
+  },
+  {
+   "name": "2 \u00b7 Enough trades",
+   "sub": "\u2265100 trades, spread out",
+   "n": 756,
+   "why": "Needs \u2265100 completed trades and \u226510 a year in \u22654 of the 5 years. Removed 216 (216 on 1min)."
+  },
+  {
+   "name": "3 \u00b7 Profit",
+   "sub": "net > 0, Sharpe \u2265 0.75",
+   "n": 10,
+   "why": "Needs a net profit, Sharpe \u2265 0.75 and drawdown no worse than 30%. Removed 746 (746 on 1min); 520 of them lost money."
+  },
+  {
+   "name": "4 \u00b7 Stable settings",
+   "sub": "nudged settings also work",
+   "n": 10,
+   "why": "Each setting is nudged one at a time, down and up: the entry time by \u00b130 minutes, the exit time by \u00b115 minutes and the number of month-end days by \u00b11 and a stop by \u00b10.1% (\"no stop\" has nothing to nudge). At least 70% of the nudged versions must be profitable, with median Sharpe \u2265 0.5. Removed 0."
+  },
+  {
+   "name": "5 \u00b7 Time stability",
+   "sub": "\u22653 profitable years",
+   "n": 10,
+   "why": "Removed 0."
+  },
+  {
+   "name": "6 \u00b7 Remove duplicates",
+   "sub": "best 2 per group",
+   "n": 2,
+   "why": "Versions whose monthly returns correlate \u2265 0.8 form a group; the best 2 of each go on (a group of one keeps its one). 10 versions formed 1 groups; 2 of the 2 picks are distinct backtests."
+  },
+  {
+   "name": "7 \u00b7 Cost stress",
+   "sub": "profitable at 1.5\u00d7 costs",
+   "n": 2,
+   "why": "Removed 0."
+  },
+  {
+   "name": "8 \u00b7 Validation",
+   "sub": "2023\u20132024, new data",
+   "n": 0,
+   "why": "Frozen finalists run once on unseen data: needs net > 0, Sharpe \u2265 0.3, drawdown no worse than 30% and \u226540 trades."
+  }
+ ],
+ "stable": {
+  "n": 10,
+  "axes": [
+   {
+    "axis": "window",
+    "label": "Last N trading days",
+    "values": [
+     {
+      "v": "last 1",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "last 2",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "last 3",
+      "n": 6,
+      "median_sharpe": 0.8433051198285146
+     },
+     {
+      "v": "last 4",
+      "n": 4,
+      "median_sharpe": 0.8281922142065252
+     },
+     {
+      "v": "last 5",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "last 6",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "entry",
+    "label": "Entry time (ET)",
+    "values": [
+     {
+      "v": "08:20",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "09:00",
+      "n": 10,
+      "median_sharpe": 0.8373724480164313
+     },
+     {
+      "v": "10:00",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "11:00",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "12:00",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "14:00",
+      "n": 0,
+      "median_sharpe": null
+     }
+    ]
+   },
+   {
+    "axis": "exit",
+    "label": "Exit time (ET)",
+    "values": [
+     {
+      "v": "15:00",
+      "n": 5,
+      "median_sharpe": 0.8182450491379801
+     },
+     {
+      "v": "16:00",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "index strike",
+      "n": 5,
+      "median_sharpe": 0.8571242982067495
+     }
+    ]
+   },
+   {
+    "axis": "event_filter",
+    "label": "Event filter",
+    "values": [
+     {
+      "v": "none",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "skip FOMC",
+      "n": 0,
+      "median_sharpe": null
+     },
+     {
+      "v": "skip FOMC + auctions",
+      "n": 10,
+      "median_sharpe": 0.8373724480164313
+     }
+    ]
+   },
+   {
+    "axis": "stop",
+    "label": "Stop (% below entry)",
+    "values": [
+     {
+      "v": "none",
+      "n": 4,
+      "median_sharpe": 0.87578909977087
+     },
+     {
+      "v": "0.25%",
+      "n": 3,
+      "median_sharpe": 0.7870376549432209
+     },
+     {
+      "v": "0.5%",
+      "n": 3,
+      "median_sharpe": 0.8381393792750703
+     }
+    ]
+   }
+  ],
+  "by_timeframe": [
+   {
+    "timeframe": "1 min",
+    "n": 10,
+    "axes": [
+     {
+      "axis": "window",
+      "label": "Last N trading days",
+      "values": [
+       {
+        "v": "last 1",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "last 2",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "last 3",
+        "n": 6,
+        "median_sharpe": 0.8433051198285146
+       },
+       {
+        "v": "last 4",
+        "n": 4,
+        "median_sharpe": 0.8281922142065252
+       },
+       {
+        "v": "last 5",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "last 6",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "entry",
+      "label": "Entry time (ET)",
+      "values": [
+       {
+        "v": "08:20",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "09:00",
+        "n": 10,
+        "median_sharpe": 0.8373724480164313
+       },
+       {
+        "v": "10:00",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "11:00",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "12:00",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "14:00",
+        "n": 0,
+        "median_sharpe": null
+       }
+      ]
+     },
+     {
+      "axis": "exit",
+      "label": "Exit time (ET)",
+      "values": [
+       {
+        "v": "15:00",
+        "n": 5,
+        "median_sharpe": 0.8182450491379801
+       },
+       {
+        "v": "16:00",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "index strike",
+        "n": 5,
+        "median_sharpe": 0.8571242982067495
+       }
+      ]
+     },
+     {
+      "axis": "event_filter",
+      "label": "Event filter",
+      "values": [
+       {
+        "v": "none",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "skip FOMC",
+        "n": 0,
+        "median_sharpe": null
+       },
+       {
+        "v": "skip FOMC + auctions",
+        "n": 10,
+        "median_sharpe": 0.8373724480164313
+       }
+      ]
+     },
+     {
+      "axis": "stop",
+      "label": "Stop (% below entry)",
+      "values": [
+       {
+        "v": "none",
+        "n": 4,
+        "median_sharpe": 0.87578909977087
+       },
+       {
+        "v": "0.25%",
+        "n": 3,
+        "median_sharpe": 0.7870376549432209
+       },
+       {
+        "v": "0.5%",
+        "n": 3,
+        "median_sharpe": 0.8381393792750703
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "ablation": [
+  {
+   "axis": "window",
+   "label": "Last N trading days",
+   "values": [
+    {
+     "v": "last 1",
+     "n": 162,
+     "pct_profitable": 0.5061728395061729,
+     "median_sharpe": 0.004641170549542613,
+     "p90_sharpe": 0.45625761388530084,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "last 2",
+     "n": 162,
+     "pct_profitable": 0.2716049382716049,
+     "median_sharpe": -0.24346232798841164,
+     "p90_sharpe": 0.41667416618567316,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "last 3",
+     "n": 162,
+     "pct_profitable": 0.47530864197530864,
+     "median_sharpe": -0.041307037453653404,
+     "p90_sharpe": 0.6249789590411842,
+     "n_stage3": 6,
+     "n_survivors": 2
+    },
+    {
+     "v": "last 4",
+     "n": 162,
+     "pct_profitable": 0.37037037037037035,
+     "median_sharpe": -0.507941309781091,
+     "p90_sharpe": 0.37846473506348743,
+     "n_stage3": 4,
+     "n_survivors": 0
+    },
+    {
+     "v": "last 5",
+     "n": 162,
+     "pct_profitable": 0.30864197530864196,
+     "median_sharpe": -0.725843682800352,
+     "p90_sharpe": 0.27505343613436206,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "last 6",
+     "n": 162,
+     "pct_profitable": 0.18518518518518517,
+     "median_sharpe": -0.9306561286850688,
+     "p90_sharpe": 0.1623745021460821,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "entry",
+   "label": "Entry time (ET)",
+   "values": [
+    {
+     "v": "08:20",
+     "n": 162,
+     "pct_profitable": 0.6790123456790124,
+     "median_sharpe": 0.12275145617540746,
+     "p90_sharpe": 0.4722275007631631,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "09:00",
+     "n": 162,
+     "pct_profitable": 0.9012345679012346,
+     "median_sharpe": 0.4315595156339613,
+     "p90_sharpe": 0.743252596345394,
+     "n_stage3": 10,
+     "n_survivors": 2
+    },
+    {
+     "v": "10:00",
+     "n": 162,
+     "pct_profitable": 0.35802469135802467,
+     "median_sharpe": -0.14386392150921679,
+     "p90_sharpe": 0.3168366066961599,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "11:00",
+     "n": 162,
+     "pct_profitable": 0.17901234567901234,
+     "median_sharpe": -0.31553621231868545,
+     "p90_sharpe": 0.09733023650288397,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "12:00",
+     "n": 162,
+     "pct_profitable": 0.0,
+     "median_sharpe": -0.7175790191102333,
+     "p90_sharpe": -0.14239972048339009,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "14:00",
+     "n": 162,
+     "pct_profitable": 0.0,
+     "median_sharpe": -1.1412725384760958,
+     "p90_sharpe": -0.7744213625722484,
+     "n_stage3": 0,
+     "n_survivors": 0
+    }
+   ]
+  },
+  {
+   "axis": "exit",
+   "label": "Exit time (ET)",
+   "values": [
+    {
+     "v": "15:00",
+     "n": 324,
+     "pct_profitable": 0.35185185185185186,
+     "median_sharpe": -0.1903257922322591,
+     "p90_sharpe": 0.4369955110728688,
+     "n_stage3": 5,
+     "n_survivors": 1
+    },
+    {
+     "v": "16:00",
+     "n": 324,
+     "pct_profitable": 0.2932098765432099,
+     "median_sharpe": -0.27999351806417994,
+     "p90_sharpe": 0.37967610231927257,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "index strike",
+     "n": 324,
+     "pct_profitable": 0.41358024691358025,
+     "median_sharpe": -0.10917912732509082,
+     "p90_sharpe": 0.5039629305059506,
+     "n_stage3": 5,
+     "n_survivors": 1
+    }
+   ]
+  },
+  {
+   "axis": "event_filter",
+   "label": "Event filter",
+   "values": [
+    {
+     "v": "none",
+     "n": 324,
+     "pct_profitable": 0.31790123456790126,
+     "median_sharpe": -0.39839506148186643,
+     "p90_sharpe": 0.3600836168440798,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "skip FOMC",
+     "n": 324,
+     "pct_profitable": 0.2777777777777778,
+     "median_sharpe": -0.3730780788685448,
+     "p90_sharpe": 0.35673150588434277,
+     "n_stage3": 0,
+     "n_survivors": 0
+    },
+    {
+     "v": "skip FOMC + auctions",
+     "n": 324,
+     "pct_profitable": 0.46296296296296297,
+     "median_sharpe": -0.029791519946689722,
+     "p90_sharpe": 0.5932259850476405,
+     "n_stage3": 10,
+     "n_survivors": 2
+    }
+   ]
+  },
+  {
+   "axis": "stop",
+   "label": "Stop (% below entry)",
+   "values": [
+    {
+     "v": "none",
+     "n": 324,
+     "pct_profitable": 0.38580246913580246,
+     "median_sharpe": -0.1414623413516783,
+     "p90_sharpe": 0.4951420621454218,
+     "n_stage3": 4,
+     "n_survivors": 2
+    },
+    {
+     "v": "0.25%",
+     "n": 324,
+     "pct_profitable": 0.2993827160493827,
+     "median_sharpe": -0.3448274315626223,
+     "p90_sharpe": 0.37846473506348743,
+     "n_stage3": 3,
+     "n_survivors": 0
+    },
+    {
+     "v": "0.5%",
+     "n": 324,
+     "pct_profitable": 0.3734567901234568,
+     "median_sharpe": -0.14588314599355806,
+     "p90_sharpe": 0.4632222448762709,
+     "n_stage3": 3,
+     "n_survivors": 0
+    }
+   ]
+  }
+ ],
+ "length_map": {
+  "title": "Last N trading days \u00d7 Entry time (ET)",
+  "pair_text": "last n trading days and entry time",
+  "corner": "Days \u2193 \u00b7 In \u2192",
+  "row_short": "days",
+  "col_short": "in",
+  "order": 1,
+  "fixed": {
+   "Exit time (ET)": "index strike",
+   "Event filter": "skip FOMC + auctions",
+   "Stop (% below entry)": "none"
+  },
+  "center": [
+   "last 3",
+   "09:00"
+  ],
+  "rows": [
+   "last 1",
+   "last 2",
+   "last 3",
+   "last 4",
+   "last 5",
+   "last 6"
+  ],
+  "cols": [
+   "08:20",
+   "09:00",
+   "10:00",
+   "11:00",
+   "12:00",
+   "14:00"
+  ],
+  "sharpe": [
+   [
+    0.2449913703640134,
+    0.611157212431198,
+    0.38408752428032106,
+    0.17478478972488926,
+    -0.08968290163863243,
+    -0.8366600911131898
+   ],
+   [
+    0.4339801463974706,
+    0.9115623092030858,
+    0.4005338625377229,
+    0.09697920039384803,
+    -0.23741372048007703,
+    -0.5739572338096226
+   ],
+   [
+    0.6929834345284309,
+    0.9227447562058838,
+    0.4661311983450898,
+    0.09318737326198662,
+    -0.26818310046323046,
+    -0.5167226989225341
+   ],
+   [
+    0.657409891111097,
+    0.9015734766425029,
+    0.436067692968912,
+    0.0039158870242991285,
+    -0.3607141603445192,
+    -0.5603607929826891
+   ],
+   [
+    0.3813114339411664,
+    0.5676662490410275,
+    0.16010110462809626,
+    -0.31087436007633407,
+    -0.6830270588768607,
+    -0.7420228877311811
+   ],
+   [
+    0.4951420621454218,
+    0.5932259850476405,
+    0.09837893815418201,
+    -0.38281321776003097,
+    -0.8045061373806349,
+    -0.9083083128456196
+   ]
+  ],
+  "trades": [
+   [
+    58,
+    57,
+    57,
+    56,
+    56,
+    55
+   ],
+   [
+    97,
+    96,
+    96,
+    95,
+    95,
+    93
+   ],
+   [
+    116,
+    115,
+    115,
+    114,
+    114,
+    111
+   ],
+   [
+    128,
+    127,
+    127,
+    126,
+    126,
+    122
+   ],
+   [
+    152,
+    151,
+    151,
+    150,
+    150,
+    145
+   ],
+   [
+    182,
+    181,
+    181,
+    180,
+    180,
+    174
+   ]
+  ]
+ },
+ "luck": {
+  "n_sims": 100,
+  "levels": [
+   6,
+   7
+  ],
+  "method": "Per clock and stop (entry time x exit rule x stop): the same long trade at the same clock, but on random validation-window NYSE trading days that are not among the month's last 5 trading days. The number of days is scaled so the time in market matches each level. Same fills, slippage, commission and whole-contract sizing as the strategy; scored with the same daily-Sharpe and time-in-market code.",
+  "curves": [
+   {
+    "timeframe": "09:00 \u2192 15:00 \u00b7 stop none",
+    "match": {
+     "entry": "09:00",
+     "exit": "15:00",
+     "stop": "none"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.06184096195199016,
+      "exposure_pct": 6,
+      "frac_profitable": 0.16,
+      "mean_return": -0.01664714375,
+      "mean_sharpe": -0.6467973365218888,
+      "mean_trades": 47.0,
+      "median_return": -0.017625937499999966,
+      "median_sharpe": -0.6481595937753648,
+      "p10_return": -0.03833856249999999,
+      "p10_sharpe": -1.3899090638768203,
+      "p90_return": 0.00385937499999991,
+      "p90_sharpe": 0.13494764051906985
+     }
+    ],
+    "trade_bars": [
+     360.0,
+     351.36170212765956
+    ],
+    "p_long": 1.0
+   },
+   {
+    "timeframe": "09:00 \u2192 index strike \u00b7 stop none",
+    "match": {
+     "entry": "09:00",
+     "exit": "index strike",
+     "stop": "none"
+    },
+    "rows": [
+     {
+      "actual_exposure": 0.07214127938444437,
+      "exposure_pct": 7,
+      "frac_profitable": 0.18,
+      "mean_return": -0.013822750000000003,
+      "mean_sharpe": -0.5669453025059564,
+      "mean_trades": 47.0,
+      "median_return": -0.014093750000000016,
+      "median_sharpe": -0.5696918267125746,
+      "p10_return": -0.030022749999999997,
+      "p10_sharpe": -1.3112816085879175,
+      "p90_return": 0.00776987499999995,
+      "p90_sharpe": 0.309021367525784
+     }
+    ],
+    "trade_bars": [
+     420.0,
+     408.2340425531915
+    ],
+    "p_long": 1.0
+   }
+  ],
+  "text": "For every whole-percent time in market in each group's 2023\u20132024 range, 100 placebo runs buy ZN at the same clock (same entry and exit times) but on random ordinary days: never among the month's last 5 trading days. So they test whether the month-end calendar matters, or whether the same hours on any day would have done as well. Each group is one entry-and-exit clock and stop setting. They pay the same costs and use the same sizing and Sharpe math as the strategy."
+ },
+ "finalists": [
+  {
+   "order": 1,
+   "group": 0,
+   "config_id": "cfg_f419",
+   "settings": {
+    "window": "last 3",
+    "entry": "09:00",
+    "exit": "index strike",
+    "event_filter": "skip FOMC + auctions",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.042483124999999955,
+    "cagr": 0.008154355149285974,
+    "sharpe": 0.9227447562058838,
+    "max_drawdown": -0.011058196497579331,
+    "exposure": 0.06248585511523121,
+    "win_rate": 0.6,
+    "profit_factor": 1.7833337174729758,
+    "n_completed_trades": 115.0,
+    "turnover_annual": 42.40262364654224
+   },
+   "val": {
+    "net_return": -0.004322012406675624,
+    "cagr": -0.0021090061524356996,
+    "sharpe": -0.26671056042395086,
+    "max_drawdown": -0.014004784032800699,
+    "exposure": 0.07016793200801627,
+    "win_rate": 0.48936170212765956,
+    "profit_factor": 0.8668771813195945,
+    "n_completed_trades": 47.0,
+    "turnover_annual": 44.163817690280815
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0043 <= 0.0",
+    "sharpe -0.267 < 0.3"
+   ],
+   "exits": {
+    "time": 111,
+    "eod": 4,
+    "stop": 0
+   },
+   "stress_1_5x": 0.02617687499999999,
+   "breakeven_cost_x": 2.3234354140539675,
+   "transfer_sharpe": 0.8379146828716761,
+   "neighbor_median_sharpe": 0.8500047228992372,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.9065678929227943,
+   "local_detail": [
+    {
+     "move": "entry=08:30",
+     "sharpe": 0.9368380303667622,
+     "net_return": 0.04409437500000002,
+     "trades": 116
+    },
+    {
+     "move": "entry=09:30",
+     "sharpe": 0.9301584502384804,
+     "net_return": 0.04150374999999995,
+     "trades": 115
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.7840071972216034,
+     "net_return": 0.034419999999999895,
+     "trades": 115
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.6943759490780136,
+     "net_return": 0.03371750000000007,
+     "trades": 115
+    },
+    {
+     "move": "window=2",
+     "sharpe": 0.9115623092030858,
+     "net_return": 0.03737999999999997,
+     "trades": 96
+    },
+    {
+     "move": "window=4",
+     "sharpe": 0.9015734766425029,
+     "net_return": 0.04246562499999995,
+     "trades": 127
+    }
+   ],
+   "dsr": 0.011366640020296215,
+   "luck": {
+    "exposure_level": 7,
+    "luck_pct_sharpe": 0.69,
+    "luck_pct_return": 0.73
+   }
+  },
+  {
+   "order": 2,
+   "group": 0,
+   "config_id": "cfg_e583",
+   "settings": {
+    "window": "last 3",
+    "entry": "09:00",
+    "exit": "15:00",
+    "event_filter": "skip FOMC + auctions",
+    "stop": "none"
+   },
+   "dev": {
+    "net_return": 0.036883750000000104,
+    "cagr": 0.007095070821079297,
+    "sharpe": 0.8500047228992372,
+    "max_drawdown": -0.009282016341400245,
+    "exposure": 0.058688412804317094,
+    "win_rate": 0.591304347826087,
+    "profit_factor": 1.680700378333487,
+    "n_completed_trades": 115.0,
+    "turnover_annual": 42.397951957423636
+   },
+   "val": {
+    "net_return": -0.015256049677700112,
+    "cagr": -0.007465518434402352,
+    "sharpe": -1.0405769622065248,
+    "max_drawdown": -0.017724447640458108,
+    "exposure": 0.06039262152396834,
+    "win_rate": 0.3829787234042553,
+    "profit_factor": 0.5762030742439972,
+    "n_completed_trades": 47.0,
+    "turnover_annual": 44.46241862114475
+   },
+   "status": "hard_reject",
+   "reasons": [
+    "net_return -0.0153 <= 0.0",
+    "sharpe -1.041 < 0.3"
+   ],
+   "exits": {
+    "time": 111,
+    "eod": 4,
+    "stop": 0
+   },
+   "stress_1_5x": 0.02002687500000011,
+   "breakeven_cost_x": 2.158083613803172,
+   "transfer_sharpe": 0.576625566922515,
+   "neighbor_median_sharpe": 0.7928232240119235,
+   "local_frac_profitable": 1.0,
+   "local_median_sharpe": 0.8522615033524198,
+   "local_detail": [
+    {
+     "move": "entry=08:30",
+     "sharpe": 0.867958520750603,
+     "net_return": 0.038974375000000006,
+     "trades": 116
+    },
+    {
+     "move": "entry=09:30",
+     "sharpe": 0.8490829754990808,
+     "net_return": 0.035763750000000094,
+     "trades": 115
+    },
+    {
+     "move": "exit_shift=-15min",
+     "sharpe": 0.8635831609214542,
+     "net_return": 0.034701249999999906,
+     "trades": 115
+    },
+    {
+     "move": "exit_shift=+15min",
+     "sharpe": 0.7152808018309608,
+     "net_return": 0.03152437500000005,
+     "trades": 115
+    },
+    {
+     "move": "window=2",
+     "sharpe": 0.8554400312057587,
+     "net_return": 0.03235374999999996,
+     "trades": 96
+    },
+    {
+     "move": "window=4",
+     "sharpe": 0.8182450491379801,
+     "net_return": 0.036444375000000084,
+     "trades": 127
+    }
+   ],
+   "dsr": 0.008917818041544272,
+   "luck": {
+    "exposure_level": 6,
+    "luck_pct_sharpe": 0.25,
+    "luck_pct_return": 0.57
+   }
+  }
+ ],
+ "short_labels": {
+  "timeframe": "Bar",
+  "window": "Days",
+  "entry": "In",
+  "exit": "Out",
+  "event_filter": "Filter",
+  "stop": "Stop"
+ },
+ "exit_labels": [
+  [
+   "time",
+   "time",
+   "time exit"
+  ],
+  [
+   "eod",
+   "close",
+   "early close"
+  ],
+  [
+   "stop",
+   "stop",
+   "stop"
+  ]
+ ],
+ "local_moves": [
+  [
+   "entry",
+   "Entry"
+  ],
+  [
+   "exit_shift",
+   "Exit"
+  ],
+  [
+   "window",
+   "Days"
+  ],
+  [
+   "stop_pct",
+   "Stop"
+  ]
+ ],
+ "benchmark": {
+  "label": "Holding ZN (rolled, unlevered)",
+  "dev": {
+   "net_return": -0.06261484249309557,
+   "sharpe": -0.21164124351362515,
+   "max_drawdown": -0.19576611951237866
+  },
+  "val": {
+   "net_return": -0.06096852544194575,
+   "sharpe": -0.4241631288427215,
+   "max_drawdown": -0.10467732877545677
+  }
+ },
+ "transfer_symbol": "ZB",
+ "dsr": {
+  "effective_trials": 74.00000000000114,
+  "raw_trials": 972.0
+ },
+ "assumptions": [
+  "Data: Databento CME continuous front month (ZN.v.0), 1-minute bars from 08:00 to 17:00 ET only. Rolls are back-adjusted; positions never cross a session.",
+  "Costs: 1 tick slippage per side and $2.50 commission per contract per side.",
+  "Every published month-end figure is close-to-close and includes the overnight session. This run measures only the day-session part; failing here means that part is too small, not that the month-end effect is gone.",
+  "Month-end days come from the NYSE calendar. The family was chosen partly on a practitioner futures test (ohlcv.io) that runs to Sep 2026, so the choice of strategy is not blind to the holdout years.",
+  "Long only on a calendar: part of every version's profit or loss is the market's own drift (bonds rose in 2018\u20132020 and fell in 2021\u20132022). The placebo test separates the calendar from that drift.",
+  "Each trade uses the whole account in whole contracts with no leverage, the same as the other families.",
+  "Sharpe uses daily mark-to-market returns (\u221a252), with idle cash earning 0%. Time in market is the share of 1-minute bars with an open position.",
+  "Other strategy families were already selected on this market's 2023\u20132024 data, so 2023\u20132024 is not untouched; only the 2025+ holdout is.",
+  "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead."
+ ],
+ "source": "month-end-backtest/runs/funnel/me_zn_v1/ \u00b7 configs/funnel/me_funnel_zn_v1.yaml"
+}

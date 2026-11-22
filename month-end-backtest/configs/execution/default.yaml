@@ -1,0 +1,20 @@
+# Conservative default execution assumptions. See ASSUMPTIONS.md and
+# src/utils/config_models.py:ExecutionConfig for the authoritative typed schema.
+starting_equity: 100000.0
+risk_per_trade_pct: 0.0025
+max_open_positions_per_symbol: 1
+allow_pyramiding: false
+allow_overlapping_trades: false
+allow_short: true
+fractional_shares: false
+leverage: 1.0
+
+commission_per_share: 0.005
+commission_minimum: 1.00
+slippage_bps_market: 1.0
+slippage_bps_stop: 1.0
+slippage_bps_limit_adverse: 0.0
+extended_hours_slippage_multiplier: 2.0
+include_sec_finra_fees: false
+
+intrabar_collision_mode: stop_first
