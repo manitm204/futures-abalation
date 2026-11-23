@@ -1,0 +1,27 @@
+# Futures execution assumptions (instrument_type: futures). See
+# src/utils/config_models.py:ExecutionConfig and src/data/futures.py for the
+# per-root contract multiplier and tick size.
+starting_equity: 1000000.0
+risk_per_trade_pct: 0.0025          # unused by the mean-reversion sizing (full-equity, unlevered)
+max_open_positions_per_symbol: 1
+allow_pyramiding: false
+allow_overlapping_trades: false
+allow_short: false
+fractional_shares: false
+leverage: 1.0
+
+instrument_type: futures
+commission_per_contract: 2.50       # per side, all-in (broker + exchange + NFA), conservative retail
+slippage_ticks_market: 1.0          # per side, market orders at the next bar's open
+slippage_ticks_stop: 1.0            # per side, stop exits
+
+# Equity-only fields (unused for futures)
+commission_per_share: 0.0
+commission_minimum: 0.0
+slippage_bps_market: 0.0
+slippage_bps_stop: 0.0
+slippage_bps_limit_adverse: 0.0
+extended_hours_slippage_multiplier: 1.0
+include_sec_finra_fees: false
+
+intrabar_collision_mode: stop_first

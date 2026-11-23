@@ -1,0 +1,114 @@
+{
+  "calibration_verified": false,
+  "effective_trials": {
+    "li_ji": 382.0,
+    "n_components_95": 219,
+    "n_series": 1728,
+    "participation_ratio": 47.99997112242957,
+    "rank_bound_T": 1292
+  },
+  "n_configs_with_defined_sharpe": 1728,
+  "primary_method": "li_ji",
+  "research_history": [
+    {
+      "n_configs": 24300,
+      "name": "open_sweep_v1 NQ (os_nq_v1)",
+      "note": "Related ICT family (NY-open sweep, fade vs continuation) on NQ; 210 passed validation, #64 held on the holdout but not on ES/YM/RTY."
+    },
+    {
+      "n_configs": 500,
+      "name": "last_half_hour_v1 NQ (lh_nq_v1)",
+      "note": "Different (last-half-hour momentum) family on NQ; #49 passed the holdout weakly, not added."
+    },
+    {
+      "n_configs": 400,
+      "name": "ict_silver_bullet SPY pilot (spy_pilot_400)",
+      "note": "Related ICT family (Silver Bullet) on SPY, not NQ; median PF 1.005."
+    },
+    {
+      "n_configs": 4864,
+      "name": "month_end_v2 NQ (me_nq_v2)",
+      "note": "Different (turn-of-month) family on NQ; diagnostic, development only."
+    },
+    {
+      "n_configs": 8100,
+      "name": "noise_band NQ (nb_nq_v1)",
+      "note": "Closest family: noise-band intraday momentum on NQ (also trades the day's direction into the close); 757 frozen."
+    },
+    {
+      "n_configs": 3456,
+      "name": "noise_band_v6 NQ (nb_nq_v2)",
+      "note": "Noise-band intraday momentum on NQ; 374 frozen."
+    },
+    {
+      "n_configs": 432,
+      "name": "noise_band_v7 NQ (nb_nq_v3)",
+      "note": "Noise-band intraday momentum on NQ; 71 frozen; part of the noise-band NQ book."
+    },
+    {
+      "n_configs": 28800,
+      "name": "compression_breakout_bbkc_v3_15m NQ",
+      "note": "Different (BB/KC squeeze) family on NQ."
+    },
+    {
+      "n_configs": 27648,
+      "name": "compression_breakout_bbkc_v3_5m NQ",
+      "note": "Different (BB/KC squeeze) family on NQ."
+    },
+    {
+      "n_configs": 2304,
+      "name": "compression_breakout_nr_v4_15m NQ",
+      "note": "Different (NR-N squeeze) family on NQ."
+    },
+    {
+      "n_configs": 51840,
+      "name": "emrt_spread_v1 ES-NQ",
+      "note": "Different (spread mean reversion) family on ES-NQ."
+    },
+    {
+      "n_configs": 13824,
+      "name": "emrt_spread_v2 ES-NQ",
+      "note": "Different (spread mean reversion) family on ES-NQ."
+    },
+    {
+      "n_configs": 41472,
+      "name": "mean_reversion_v5 NQ (mr_nq_v5)",
+      "note": "Different (mean-reversion) family on NQ."
+    },
+    {
+      "n_configs": 21600,
+      "name": "mean_reversion_v6 NQ (mr_nq_v6)",
+      "note": "Different (mean-reversion) family on NQ."
+    },
+    {
+      "n_configs": 1152,
+      "name": "mean_reversion_v12 NQ 15m",
+      "note": "Different (mean-reversion) family on NQ."
+    },
+    {
+      "n_configs": 3456,
+      "name": "mean_reversion_v13 NQ 1h",
+      "note": "Different (mean-reversion) family on NQ."
+    },
+    {
+      "n_configs": 103680,
+      "name": "path_convexity_v3_15m NQ",
+      "note": "Different (price-path convexity) family on NQ."
+    }
+  ],
+  "serial_dependence": "lag1_effective_n",
+  "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+  "trial_count_options": {
+    "li_ji": 382.0,
+    "participation_ratio": 47.99997112242957,
+    "raw": 1728.0,
+    "raw_plus_known_prior": 339556.0
+  },
+  "unresolved": [
+    "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+    "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+    "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+    "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+  ],
+  "variance_of_trial_sharpes_per_period": 0.0012409337117832403
+}
