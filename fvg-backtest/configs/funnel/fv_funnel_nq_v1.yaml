@@ -1,0 +1,190 @@
+# NQ futures (E-mini Nasdaq-100) FVG after displacement, with and against the gap, v1: run
+# fv_nq_v1 (fvg_v1, 24,192 configs, 1-minute bars; setups 09:45-15:30 ET) -- the ONE place every
+# threshold lives.
+#
+# Specified 2026-11-23 from reports/ICT strategies to backtest.md (rank 4, "FVG continuation after
+# displacement", a 216-cell grid). ICT says price returns to a displacement leg's fair value gap and
+# continues from it; a placebo-zone study found real gaps no better than random ones, so every
+# setting also trades AGAINST the gap as the control. The grid was widened before any run at the
+# user's request ("roughly 25k"):
+#   window am / pm / rth; mode with / against; displacement 1.0 / 1.5 / 2.0 / 3.0 ATR; gap
+#   minimum 0 / 0.5 ATR; VWAP gate off / on; entry near edge / midpoint (resting 5 / 15 / 30 bars)
+#   or market; stop struct / 1.5 ATR / 3.0 ATR; target 1R / 2R / 3R / none; hold 15 / 30 / 60 min.
+# Fixed: 14-bar 1-minute ATR at the gap's first bar, stop >= 1 ATR, 1-tick trade-through for
+# limits, one trade per session.
+#
+# Gates, data splits and costs are identical to the other NQ / ES funnels. Stage 4 moves one
+# setting at a time: displacement +/- 0.25 ATR, gap minimum +/- 0.25 ATR, wait +/- 5 bars, ATR stop
+# +/- 0.5, R target +/- 0.5, hold +/- 5 minutes.
+#
+# Thresholds are fixed for the duration of a run and are hashed into every run's
+# outputs. They are NEVER adjusted automatically to hit a survivor count; zero
+# survivors is a valid outcome. Changing a value here is a new research trial
+# and should be recorded under `research_history` below.
+
+version: 1
+strategy: fvg_v1
+symbol: NQ
+seed: 20261128
+
+data:
+  clean_root: data/clean
+  development: {start: 2018-01-01, end: 2022-12-31}
+  validation:  {start: 2023-01-01, end: 2024-12-31}
+  # end: null -> the actual available endpoint, recorded at access time.
+  holdout:     {start: 2025-01-01, end: null}
+  timeframes: ["1min"]
+
+data_history:
+  validation_previously_used_for_selection: true
+  validation_note: >-
+    No FVG strategy has been scored on NQ 2023-2024, but the noise-band, mean-reversion, squeeze, convexity, EMRT, last-half-hour and NY-open sweep families were selected there (the Silver Bullet run loaded it with nothing to score) and the researcher has read those results.
+  holdout_previously_inspected: true
+  holdout_note: >-
+    No FVG metrics have been computed on NQ 2025+. Noise-band NQ picks, the month-end #7 transfer check, last-half-hour #49/#56 and NY-open sweep #64/#195 were scored there, so the researcher has seen how that period treated intraday NQ strategies.
+
+metrics:
+  return_frequency: daily          # mark-to-market equity at each session close
+  periods_per_year: 252            # Sharpe = mean/std(daily) * sqrt(252)
+  risk_free_rate_annual: 0.0
+  cash_treatment: >-
+    Idle cash earns 0% and the Sharpe excess return is measured against a 0%
+    risk-free rate, so the two assumptions are consistent.
+  drawdown_basis: daily session-close mark-to-market (understates intraday DD)
+
+execution:
+  baseline: configs/execution/futures.yaml   # $2.50/contract/side + 1 tick/side slippage, unlevered whole contracts
+
+integrity:            # stage 1
+  truncation_check_sample: 40
+  truncation_points: 3
+
+trade_count:          # stage 2 -- hard gate
+  min_completed_trades: 100
+  min_trades_per_year: 10
+  min_years_meeting_floor: 4
+
+performance:          # stage 3 -- hard gate
+  min_net_return: 0.0               # strictly greater than
+  min_sharpe: 0.75                  # annualized, daily MTM returns incl. flat days
+  max_drawdown: -0.30
+  max_drawdown_source: src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct
+
+parameter_stability:  # stage 4 -- hard gate
+  mode: local_perturbation          # gate on `local` moves below; grid neighbors are diagnostic only
+  local:
+    int_rel: 0.20                   # unused by this family; required field
+    stop_atr_abs: 0.25              # unused by this family; required field
+    disp_abs: 0.25                  # displacement -/+ 0.25 ATR (>= 0)
+    fvg_min_abs: 0.25               # gap minimum -/+ 0.25 ATR (>= 0)
+    wait_step: 5                    # resting order life -/+ 5 bars (>= 1); mkt has no move
+    stop_mult_abs: 0.5              # ATR stop -/+ 0.5 (>= 1); struct has no move
+    target_r_abs: 0.5               # R target -/+ 0.5 R (>= 0.5); none has no move
+    hold_step: 5                    # hold -/+ 5 minutes (>= 5)
+  neighbor_mode: single_axis        # grid-neighbor diagnostic
+  min_frac_profitable: 0.70         # of the local moves, share with dev net return > 0
+  min_median_sharpe: 0.50           # median dev Sharpe of the local moves
+  prescreen:                        # big grids: fixed before the run, like every gate
+    max_configs: 3000
+    per_cluster: 3
+  perturbation:                     # diagnostic only, never a gate
+    n_per_config: 20
+    integer_rel_step: 0.15          # unused by this family's perturbations (wait +/- 1..5 bars, hold +/- 1..5 min)
+    float_rel_step: 0.10            # displacement, gap minimum, ATR stop and R target (relative)
+
+time_stability:       # stage 5 -- light hard gate + diagnostics
+  min_profitable_years: 3
+  top_trades_k: 5
+  top_trades_frac: 0.05
+
+dedup:                # stage 6
+  corr_threshold: 0.80
+  return_basis: monthly
+  linkage: complete
+  reps_per_cluster: 2               # best 2 per cluster; a single-member cluster keeps its 1
+
+execution_stress:     # stage 7
+  gate_cost_multiplier: 1.5         # hard gate: positive dev net return
+  diagnostic_cost_multipliers: [2.0]
+  entry_delay_bars: 1               # one 1-minute bar late
+  missed_entry_frac: 0.10
+  missed_entry_sims: 100
+  breakeven_max_multiplier: 25.0
+
+validation:           # stage 8 -- hard gate (frozen representatives only)
+  min_net_return: 0.0
+  min_sharpe: 0.30
+  max_drawdown: -0.30
+  min_completed_trades: 40          # project default from 2026-10-22
+
+confidence:           # stage 9 -- diagnostics only
+  dsr_threshold: 0.95
+  dsr_calibration_verified: false
+  effective_trials_method: li_ji
+  serial_dependence: lag1_effective_n
+  transfer_symbol: ES                # unchanged rules, development period only
+
+holdout:              # stage 10 -- explicit `final-test` command only
+  acceptance:
+    min_net_return: 0.0
+    min_sharpe: 0.0
+    max_drawdown: -0.30
+    min_completed_trades: null
+
+# Earlier trials on this market (other families). These count toward the DSR "known prior"
+# sensitivity only.
+research_history:
+  - name: "silver_bullet_v1 NQ (sb_nq_v1)"
+    n_configs: 1728
+    note: "Related ICT family (Silver Bullet: sweep + FVG in fixed hours) on NQ; 0 passed the profit gate."
+  - name: "open_sweep_v1 NQ (os_nq_v1)"
+    n_configs: 24300
+    note: "Related ICT family (NY-open sweep, fade vs continuation) on NQ; 210 passed validation, #64 held on the holdout but not on ES/YM/RTY."
+  - name: "last_half_hour_v1 NQ (lh_nq_v1)"
+    n_configs: 500
+    note: "Different (last-half-hour momentum) family on NQ; #49 passed the holdout weakly, not added."
+  - name: "ict_silver_bullet SPY pilot (spy_pilot_400)"
+    n_configs: 400
+    note: "Related ICT family (Silver Bullet) on SPY, not NQ; median PF 1.005."
+  - name: "month_end_v2 NQ (me_nq_v2)"
+    n_configs: 4864
+    note: "Different (turn-of-month) family on NQ; diagnostic, development only."
+  - name: "noise_band NQ (nb_nq_v1)"
+    n_configs: 8100
+    note: "Closest family: noise-band intraday momentum on NQ (also trades the day's direction into the close); 757 frozen."
+  - name: "noise_band_v6 NQ (nb_nq_v2)"
+    n_configs: 3456
+    note: "Noise-band intraday momentum on NQ; 374 frozen."
+  - name: "noise_band_v7 NQ (nb_nq_v3)"
+    n_configs: 432
+    note: "Noise-band intraday momentum on NQ; 71 frozen; part of the noise-band NQ book."
+  - name: "compression_breakout_bbkc_v3_15m NQ"
+    n_configs: 28800
+    note: "Different (BB/KC squeeze) family on NQ."
+  - name: "compression_breakout_bbkc_v3_5m NQ"
+    n_configs: 27648
+    note: "Different (BB/KC squeeze) family on NQ."
+  - name: "compression_breakout_nr_v4_15m NQ"
+    n_configs: 2304
+    note: "Different (NR-N squeeze) family on NQ."
+  - name: "emrt_spread_v1 ES-NQ"
+    n_configs: 51840
+    note: "Different (spread mean reversion) family on ES-NQ."
+  - name: "emrt_spread_v2 ES-NQ"
+    n_configs: 13824
+    note: "Different (spread mean reversion) family on ES-NQ."
+  - name: "mean_reversion_v5 NQ (mr_nq_v5)"
+    n_configs: 41472
+    note: "Different (mean-reversion) family on NQ."
+  - name: "mean_reversion_v6 NQ (mr_nq_v6)"
+    n_configs: 21600
+    note: "Different (mean-reversion) family on NQ."
+  - name: "mean_reversion_v12 NQ 15m"
+    n_configs: 1152
+    note: "Different (mean-reversion) family on NQ."
+  - name: "mean_reversion_v13 NQ 1h"
+    n_configs: 3456
+    note: "Different (mean-reversion) family on NQ."
+  - name: "path_convexity_v3_15m NQ"
+    n_configs: 103680
+    note: "Different (price-path convexity) family on NQ."

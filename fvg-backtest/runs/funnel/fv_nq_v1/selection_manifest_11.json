@@ -1,0 +1,498 @@
+{
+ "acceptance_holdout": {
+  "max_drawdown": -0.3,
+  "min_completed_trades": null,
+  "min_net_return": 0.0,
+  "min_sharpe": 0.0
+ },
+ "acceptance_validation": {
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40,
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3
+ },
+ "candidates": [
+  {
+   "cluster": 13,
+   "config_id": "cfg_fa42119422ef96dbff26",
+   "dev_net_return": 0.15396571428571781,
+   "dev_order": 11,
+   "dev_sharpe": 0.7975147391072699,
+   "n_profitable_years": 4,
+   "neighbor_median_sharpe": 0.47676329657659094,
+   "params": {
+    "disp": "2.0",
+    "entry": "mkt",
+    "fvg_min": "0.0",
+    "hold": 60,
+    "mode": "with",
+    "stop": "a1.5",
+    "symbol": "NQ",
+    "target": "3R",
+    "timeframe": "1min",
+    "vwap": "off",
+    "wait": 0,
+    "window": "am"
+   },
+   "stability_median_sharpe": 0.8377231237017342
+  }
+ ],
+ "code_version": "5e2c41f3de6e7a17f00d4001d9d67d84c0f483fa",
+ "config_sha256": "7b012984e34bbe77d7b9936743844dadebedf9017769065b3d1fe64fce6850b9",
+ "data_windows": {
+  "clean_root": "data/clean",
+  "development": {
+   "end": "2022-12-31",
+   "start": "2018-01-01"
+  },
+  "holdout": {
+   "end": null,
+   "start": "2025-01-01"
+  },
+  "timeframes": [
+   "1min"
+  ],
+  "validation": {
+   "end": "2024-12-31",
+   "start": "2023-01-01"
+  }
+ },
+ "experiment_id": "fv_nq_v1",
+ "frozen_at": "2026-11-23T03:08:14.846163+00:00",
+ "frozen_manifest_sha256": "6e03ffe1ea13f3ff3c46cde00461fcc3ec7651d05c8c5a8ba3d3dea63eb050b1",
+ "git_diff_sha256": "e7dc91a3d623842aa47c37af5d78cfbf37a5c08ef10b21317c04ba632eecf4c2",
+ "git_dirty": true,
+ "seed": 20261128,
+ "selection_rules": {
+  "gates": [
+   "1 integrity",
+   "2 trade count",
+   "3 performance & risk",
+   "4 parameter stability",
+   "5 time stability",
+   "6 dedup (complete linkage, best 2 per cluster)",
+   "7 execution stress"
+  ],
+  "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+  "validation_is_not_used_for_ranking": true
+ },
+ "sizing_and_costs": {
+  "allow_overlapping_trades": false,
+  "allow_pyramiding": false,
+  "allow_short": false,
+  "commission_minimum": 0.0,
+  "commission_per_contract": 2.5,
+  "commission_per_share": 0.0,
+  "extended_hours_slippage_multiplier": 1.0,
+  "fractional_shares": false,
+  "include_sec_finra_fees": false,
+  "instrument_type": "futures",
+  "intrabar_collision_mode": "stop_first",
+  "leverage": 1.0,
+  "max_open_positions_per_symbol": 1,
+  "risk_per_trade_pct": 0.0025,
+  "slippage_bps_limit_adverse": 0.0,
+  "slippage_bps_market": 0.0,
+  "slippage_bps_stop": 0.0,
+  "slippage_ticks_market": 1.0,
+  "slippage_ticks_stop": 1.0,
+  "starting_equity": 1000000.0
+ },
+ "symbol": "NQ",
+ "validated_at": "2026-11-23T03:09:29.276415+00:00",
+ "validation_summary": [
+  {
+   "config_id": "cfg_26562eddc81a9bfb6d93",
+   "reasons": [
+    "sharpe 0.051 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_9828d6d8ce434e82e214",
+   "reasons": [
+    "sharpe 0.113 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_36518522c3c93dd6f0d0",
+   "reasons": [
+    "net_return -0.0001 <= 0.0",
+    "sharpe 0.011 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6840aec26108ed542d3c",
+   "reasons": [
+    "sharpe 0.116 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_d899504216ce1cd8576a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c48d23619315d89e8f83",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1c71b67fbf64177a715d",
+   "reasons": [
+    "net_return -0.0177 <= 0.0",
+    "sharpe -0.312 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7da81b8f1d99039337ab",
+   "reasons": [
+    "net_return -0.0217 <= 0.0",
+    "sharpe -0.819 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_34004c7f64b6f211e044",
+   "reasons": [
+    "net_return -0.0375 <= 0.0",
+    "sharpe -0.857 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c40688e11e4a467b4a75",
+   "reasons": [
+    "sharpe 0.114 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_fa42119422ef96dbff26",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_33276d238dc6e3a5ce14",
+   "reasons": [
+    "net_return -0.0180 <= 0.0",
+    "sharpe -0.717 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_83970cb8039db9b60785",
+   "reasons": [
+    "net_return -0.0288 <= 0.0",
+    "sharpe -0.617 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_27e8a26d1a5a4d298f11",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_92297cb1c739ce686420",
+   "reasons": [
+    "net_return -0.0416 <= 0.0",
+    "sharpe -1.042 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5c3573821c31bdd3d880",
+   "reasons": [
+    "sharpe 0.105 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_89cb8c41e555f4eea918",
+   "reasons": [
+    "net_return -0.0200 <= 0.0",
+    "sharpe -0.310 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_591f6735adcf6bc564db",
+   "reasons": [
+    "net_return -0.0285 <= 0.0",
+    "sharpe -0.889 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_02b5d6955cd68be5c80d",
+   "reasons": [
+    "sharpe 0.044 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3a705698809fa3cf2f19",
+   "reasons": [
+    "net_return -0.0132 <= 0.0",
+    "sharpe -0.216 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e0240aa048ef06c4838a",
+   "reasons": [
+    "net_return -0.0588 <= 0.0",
+    "sharpe -1.512 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e3b4058f55f56ca7c2c9",
+   "reasons": [
+    "net_return -0.0394 <= 0.0",
+    "sharpe -0.880 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_771ec191a144af866641",
+   "reasons": [
+    "net_return -0.0394 <= 0.0",
+    "sharpe -1.189 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_094ef59cfe2e4deb2248",
+   "reasons": [
+    "net_return -0.0205 <= 0.0",
+    "sharpe -0.753 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_f28a02167f4581577308",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_38dc738f0dfe1beb27d9",
+   "reasons": [
+    "net_return -0.0083 <= 0.0",
+    "sharpe -0.127 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_fb7c299bc3a112795c31",
+   "reasons": [
+    "net_return -0.0172 <= 0.0",
+    "sharpe -0.607 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7410d2cb6b6facbf9b32",
+   "reasons": [
+    "net_return -0.0215 <= 0.0",
+    "sharpe -0.876 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8a679ce8fbcba25dfbcc",
+   "reasons": [
+    "net_return -0.0261 <= 0.0",
+    "sharpe -0.858 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_693e19ad171fd577d109",
+   "reasons": [
+    "net_return -0.0217 <= 0.0",
+    "sharpe -0.876 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a9050560af4e22ebd68c",
+   "reasons": [
+    "net_return -0.0344 <= 0.0",
+    "sharpe -1.036 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_57cbaed57efb5a3e43c4",
+   "reasons": [
+    "sharpe 0.246 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8b8027044785cde14ebc",
+   "reasons": [
+    "net_return -0.0295 <= 0.0",
+    "sharpe -0.461 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_47ff487220c8e6db6446",
+   "reasons": [
+    "net_return -0.0056 <= 0.0",
+    "sharpe -0.099 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_07a6ebacc1044b455241",
+   "reasons": [
+    "net_return -0.0098 <= 0.0",
+    "sharpe -0.237 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_21e41b427a5316aaa151",
+   "reasons": [
+    "net_return -0.0251 <= 0.0",
+    "sharpe -0.400 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2aa76d469b9e5a51946d",
+   "reasons": [
+    "net_return -0.0087 <= 0.0",
+    "sharpe -0.379 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_518444d09fb299da5037",
+   "reasons": [
+    "sharpe 0.251 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b358954ffe469032b578",
+   "reasons": [
+    "net_return -0.0437 <= 0.0",
+    "sharpe -1.180 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_493467802b709ad0e191",
+   "reasons": [
+    "net_return -0.0307 <= 0.0",
+    "sharpe -0.762 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_9f0efd7aa0a43f41da0f",
+   "reasons": [
+    "net_return -0.0279 <= 0.0",
+    "sharpe -0.624 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_dbc44f5519b2432aa0f1",
+   "reasons": [
+    "net_return -0.0262 <= 0.0",
+    "sharpe -0.630 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5c927e31a242cdb69547",
+   "reasons": [
+    "net_return -0.0379 <= 0.0",
+    "sharpe -0.635 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_84575830dcaa907f2518",
+   "reasons": [
+    "net_return -0.0380 <= 0.0",
+    "sharpe -0.636 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_fef0a8cce40aae94717f",
+   "reasons": [
+    "net_return -0.0108 <= 0.0",
+    "sharpe -0.218 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2aabae4d331a3a87d823",
+   "reasons": [
+    "sharpe 0.039 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8184c9b6a0b3839e0937",
+   "reasons": [
+    "net_return -0.0078 <= 0.0",
+    "sharpe -0.350 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_77b66cfc46c8be097a87",
+   "reasons": [
+    "net_return -0.0164 <= 0.0",
+    "sharpe -0.282 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1864fb6d78d273f92376",
+   "reasons": [
+    "net_return -0.0229 <= 0.0",
+    "sharpe -0.528 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_142f4f21580d030e2214",
+   "reasons": [
+    "net_return -0.0197 <= 0.0",
+    "sharpe -0.343 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_168fafab6462f4432f93",
+   "reasons": [
+    "net_return -0.0262 <= 0.0",
+    "sharpe -0.819 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_77fb24de1594800f3ffe",
+   "reasons": [
+    "net_return -0.0204 <= 0.0",
+    "sharpe -0.229 < 0.3"
+   ],
+   "status": "hard_reject"
+  }
+ ],
+ "holdout_selection_note": "Chosen by the user on 2026-11-23 after reading the validation results and the random-entry benchmark: #11 (with the gap, 09:45-12:00, market entry), the highest validation Sharpe (0.43, PF 1.07) of the 5 validation passes; beats 85% of random-entry runs on 2023-24. Its ES dev Sharpe is negative. Picked after seeing validation, so the holdout is not a blind test of the funnel's output; the assistant recommended against running it. Bar stated beforehand: net > 0, Sharpe >= 0.3, max DD >= -30%; a convincing edge would need Sharpe well above 1."
+}

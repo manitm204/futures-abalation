@@ -42,7 +42,7 @@ FAMILIES = [
     ("mean reversion", "Mean Reversion Funnels", "Mean-reversion strategy funnels",
      lambda run: not run["strategy_key"].startswith(("noise_band", "squeeze_breakout", "nr_breakout", "path_convexity",
                                                        "emrt_spread", "fx_fix", "drift_burst",
-                                                       "month_end", "last_half_hour", "open_sweep"))),
+                                                       "month_end", "last_half_hour", "open_sweep", "fvg"))),
     ("noise-band breakout", "Noise-Band Breakout Funnels", "Noise-band breakout strategy funnels",
      lambda run: run["strategy_key"].startswith("noise_band")),
     ("bb-kc squeeze", "BB-inside-KC Squeeze Funnels", "BB-inside-KC squeeze strategy funnels",
@@ -63,6 +63,8 @@ FAMILIES = [
      lambda run: run["strategy_key"].startswith("last_half_hour")),
     ("ny open sweep", "NY-Open Sweep Funnels", "ICT NY-open liquidity sweep funnels",
      lambda run: run["strategy_key"].startswith("open_sweep")),
+    ("fvg", "FVG Funnels", "ICT fair value gap funnels",
+     lambda run: run["strategy_key"].startswith("fvg")),
 ]
 
 

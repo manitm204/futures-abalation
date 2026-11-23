@@ -1,0 +1,84 @@
+{
+  "actual_data_endpoint": "2026-10-19",
+  "data_access": {
+    "actual_last_session": "2026-10-19",
+    "command": "final-test",
+    "experiment_id": "fv_nq_v1",
+    "first_session": "2018-01-02",
+    "manifest_sha256": "858b6b7c010960a65eb4ee6a043ead3b0140b87bca54c152f78897220258b5a2",
+    "n_partitions": 106,
+    "partition_fingerprint": "7df5e9b4a8dc6e72",
+    "phase": "holdout",
+    "phase_end": null,
+    "rows": 3099436,
+    "symbol": "NQ"
+  },
+  "holdout_previously_inspected": true,
+  "holdout_window": [
+    "2025-01-01",
+    "2026-10-19"
+  ],
+  "label": "holdout previously inspected -- NOT an untouched test",
+  "manifest": "runs/funnel/fv_nq_v1/selection_manifest_11.json",
+  "manifest_sha256": "858b6b7c010960a65eb4ee6a043ead3b0140b87bca54c152f78897220258b5a2",
+  "note": "Results in frozen development order; holdout performance is not used to rank or pick a winner.",
+  "prior_holdout_accesses": 0,
+  "results": [
+    {
+      "accepted": false,
+      "config_id": "cfg_fa42119422ef96dbff26",
+      "dev_order": 11,
+      "metrics": {
+        "autocorr_lag1": 0.06491508568801016,
+        "best_year": 2025,
+        "best_year_contribution": null,
+        "cagr": -0.011848758824941408,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1153310.5357142906,
+        "excess_kurtosis": 26.9056318007409,
+        "excl_best_year_return": -0.01889137293463028,
+        "excl_best_year_sharpe": -1.026275434676258,
+        "exposure": 0.010135407331891838,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 396,
+        "max_drawdown": -0.03868666443815427,
+        "n_completed_trades": 397,
+        "n_days": 465,
+        "n_forced_close": 0,
+        "n_profitable_years": 0,
+        "n_trades": 397,
+        "net_pnl": -25647.321428571362,
+        "net_return": -0.02175423088550954,
+        "profit_factor": 0.9200532366123623,
+        "same_session_trade_frac": 0.0,
+        "sharpe": -0.41351825283532184,
+        "sharpe_per_period": -0.026049201418766467,
+        "skew": 3.638036713625465,
+        "start_equity": 1178957.857142862,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 341.4524295893201,
+        "win_rate": 0.25440806045340053,
+        "year_pnl": {
+          "2025": -3440.1785714281723,
+          "2026": -22207.14285714319
+        },
+        "year_return": {
+          "2025": -0.0029179826493249683,
+          "2026": -0.018891372934629724
+        },
+        "year_sharpe": {
+          "2025": -0.07448280621235627,
+          "2026": -1.026275434676258
+        },
+        "year_trades": {
+          "2025": 230,
+          "2026": 167
+        }
+      }
+    }
+  ]
+}

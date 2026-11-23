@@ -1,0 +1,576 @@
+{
+  "data_access": {
+    "actual_last_session": "2022-12-30",
+    "command": "develop",
+    "experiment_id": "fv_nq_v1",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 60,
+    "partition_fingerprint": "e3cd5f1caf0a7064",
+    "phase": "development",
+    "phase_end": "2022-12-31",
+    "rows": 1756201,
+    "symbol": "NQ"
+  },
+  "data_history": {
+    "holdout_note": "No FVG metrics have been computed on NQ 2025+. Noise-band NQ picks, the month-end #7 transfer check, last-half-hour #49/#56 and NY-open sweep #64/#195 were scored there, so the researcher has seen how that period treated intraday NQ strategies.",
+    "holdout_previously_inspected": true,
+    "validation_note": "No FVG strategy has been scored on NQ 2023-2024, but the noise-band, mean-reversion, squeeze, convexity, EMRT, last-half-hour and NY-open sweep families were selected there (the Silver Bullet run loaded it with nothing to score) and the researcher has read those results.",
+    "validation_previously_used_for_selection": true
+  },
+  "dsr": {
+    "calibration_verified": false,
+    "effective_trials": {
+      "li_ji": 1407.9999999999955,
+      "n_components_95": 408,
+      "n_series": 24192,
+      "participation_ratio": 56.575673643443416,
+      "rank_bound_T": 1292
+    },
+    "n_configs_with_defined_sharpe": 24192,
+    "primary_method": "li_ji",
+    "research_history": [
+      {
+        "n_configs": 1728,
+        "name": "silver_bullet_v1 NQ (sb_nq_v1)",
+        "note": "Related ICT family (Silver Bullet: sweep + FVG in fixed hours) on NQ; 0 passed the profit gate."
+      },
+      {
+        "n_configs": 24300,
+        "name": "open_sweep_v1 NQ (os_nq_v1)",
+        "note": "Related ICT family (NY-open sweep, fade vs continuation) on NQ; 210 passed validation, #64 held on the holdout but not on ES/YM/RTY."
+      },
+      {
+        "n_configs": 500,
+        "name": "last_half_hour_v1 NQ (lh_nq_v1)",
+        "note": "Different (last-half-hour momentum) family on NQ; #49 passed the holdout weakly, not added."
+      },
+      {
+        "n_configs": 400,
+        "name": "ict_silver_bullet SPY pilot (spy_pilot_400)",
+        "note": "Related ICT family (Silver Bullet) on SPY, not NQ; median PF 1.005."
+      },
+      {
+        "n_configs": 4864,
+        "name": "month_end_v2 NQ (me_nq_v2)",
+        "note": "Different (turn-of-month) family on NQ; diagnostic, development only."
+      },
+      {
+        "n_configs": 8100,
+        "name": "noise_band NQ (nb_nq_v1)",
+        "note": "Closest family: noise-band intraday momentum on NQ (also trades the day's direction into the close); 757 frozen."
+      },
+      {
+        "n_configs": 3456,
+        "name": "noise_band_v6 NQ (nb_nq_v2)",
+        "note": "Noise-band intraday momentum on NQ; 374 frozen."
+      },
+      {
+        "n_configs": 432,
+        "name": "noise_band_v7 NQ (nb_nq_v3)",
+        "note": "Noise-band intraday momentum on NQ; 71 frozen; part of the noise-band NQ book."
+      },
+      {
+        "n_configs": 28800,
+        "name": "compression_breakout_bbkc_v3_15m NQ",
+        "note": "Different (BB/KC squeeze) family on NQ."
+      },
+      {
+        "n_configs": 27648,
+        "name": "compression_breakout_bbkc_v3_5m NQ",
+        "note": "Different (BB/KC squeeze) family on NQ."
+      },
+      {
+        "n_configs": 2304,
+        "name": "compression_breakout_nr_v4_15m NQ",
+        "note": "Different (NR-N squeeze) family on NQ."
+      },
+      {
+        "n_configs": 51840,
+        "name": "emrt_spread_v1 ES-NQ",
+        "note": "Different (spread mean reversion) family on ES-NQ."
+      },
+      {
+        "n_configs": 13824,
+        "name": "emrt_spread_v2 ES-NQ",
+        "note": "Different (spread mean reversion) family on ES-NQ."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion_v5 NQ (mr_nq_v5)",
+        "note": "Different (mean-reversion) family on NQ."
+      },
+      {
+        "n_configs": 21600,
+        "name": "mean_reversion_v6 NQ (mr_nq_v6)",
+        "note": "Different (mean-reversion) family on NQ."
+      },
+      {
+        "n_configs": 1152,
+        "name": "mean_reversion_v12 NQ 15m",
+        "note": "Different (mean-reversion) family on NQ."
+      },
+      {
+        "n_configs": 3456,
+        "name": "mean_reversion_v13 NQ 1h",
+        "note": "Different (mean-reversion) family on NQ."
+      },
+      {
+        "n_configs": 103680,
+        "name": "path_convexity_v3_15m NQ",
+        "note": "Different (price-path convexity) family on NQ."
+      }
+    ],
+    "serial_dependence": "lag1_effective_n",
+    "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+    "trial_count_options": {
+      "li_ji": 1407.9999999999955,
+      "participation_ratio": 56.575673643443416,
+      "raw": 24192.0,
+      "raw_plus_known_prior": 363748.0
+    },
+    "unresolved": [
+      "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+      "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+      "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+      "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+    ],
+    "variance_of_trial_sharpes_per_period": 0.001767519901298875
+  },
+  "elapsed_s": 3250.8,
+  "experiment_id": "fv_nq_v1",
+  "frozen_manifest_sha256": "6e03ffe1ea13f3ff3c46cde00461fcc3ec7651d05c8c5a8ba3d3dea63eb050b1",
+  "instrument_type": "futures",
+  "integrity": {
+    "checks_per_config": [
+      "setup_not_per_rule",
+      "entry_not_per_rule",
+      "wrong_direction",
+      "trade_skipped_while_flat",
+      "reference_not_per_rule",
+      "entry_fill_better_than_rule",
+      "exit_before_entry",
+      "bar_after_session_end",
+      "position_held_overnight",
+      "more_than_one_trade_per_session",
+      "stop_not_per_rule",
+      "target_not_per_rule",
+      "stop_exit_without_touch",
+      "stop_fill_better_than_rule",
+      "target_exit_without_trade_through",
+      "target_fill_not_at_target",
+      "exit_not_at_first_touch",
+      "time_exit_not_per_rule",
+      "exit_fill_better_than_market",
+      "overlapping_positions",
+      "position_exceeds_equity",
+      "forced_close_not_final_trade",
+      "commission_below_minimum"
+    ],
+    "cut_fractions": [
+      0.3,
+      0.6000000000000001,
+      0.9
+    ],
+    "failures": {},
+    "truncation_sample": 40
+  },
+  "mode": "development_only",
+  "n_configs": 24192,
+  "n_frozen_candidates": 52,
+  "provenance": {
+    "available_data_endpoint_per_manifest": {
+      "ES": "2026-10-16",
+      "NQ": "2026-10-16"
+    },
+    "config_path": "configs/funnel/fv_funnel_nq_v1.yaml",
+    "config_sha256": "7b012984e34bbe77d7b9936743844dadebedf9017769065b3d1fe64fce6850b9",
+    "created_at": "2026-11-23T02:14:35.853195+00:00",
+    "data_manifests": {
+      "ES": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3099325,
+        "schema_version": "1.0.0"
+      },
+      "NQ": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3099436,
+        "schema_version": "1.0.0"
+      }
+    },
+    "git_commit": "5e2c41f3de6e7a17f00d4001d9d67d84c0f483fa",
+    "git_diff_sha256": "e7dc91a3d623842aa47c37af5d78cfbf37a5c08ef10b21317c04ba632eecf4c2",
+    "git_dirty": true,
+    "seed": 20261128
+  },
+  "rejection_reason_counts": {
+    "s2:hard_reject:completed_trades": 756,
+    "s2:hard_reject:years_with_>=10_trades": 540,
+    "s3:hard_reject:max_drawdown": 47,
+    "s3:hard_reject:net_return": 19757,
+    "s3:hard_reject:sharpe": 23350,
+    "s4:hard_reject:local_median_sharpe": 3
+  },
+  "survivor_table": [
+    {
+      "evaluated": 24192,
+      "kind": "universe",
+      "passed": 24192,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "0 universe"
+    },
+    {
+      "evaluated": 24192,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 24192,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "1 backtest integrity",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 24192,
+      "hard_reject": 756,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 23436,
+      "pct_of_previous": 96.875,
+      "pct_of_universe": 96.875,
+      "stage": "2 trade count & coverage",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 23436,
+      "hard_reject": 23350,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 86,
+      "pct_of_previous": 0.3669568185697218,
+      "pct_of_universe": 0.35548941798941797,
+      "stage": "3 performance & risk",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 86,
+      "hard_reject": 3,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 83,
+      "pct_of_previous": 96.51162790697674,
+      "pct_of_universe": 0.34308862433862436,
+      "stage": "4 parameter stability",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 83,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 83,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 0.34308862433862436,
+      "stage": "5 time stability",
+      "with_warnings": 81
+    },
+    {
+      "deduplicated": 31,
+      "evaluated": 83,
+      "kind": "dedup",
+      "n_clusters": 29,
+      "note": "best 2 per cluster",
+      "passed": 52,
+      "pct_of_previous": 62.65060240963855,
+      "pct_of_universe": 0.21494708994708994,
+      "stage": "6 deduplication"
+    },
+    {
+      "evaluated": 52,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 52,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 0.21494708994708994,
+      "stage": "7 execution stress",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": null,
+      "kind": "hard_gate",
+      "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "8 frozen validation"
+    },
+    {
+      "evaluated": 52,
+      "kind": "diagnostic_only",
+      "note": "diagnostic only: unverified: 52",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "9 DSR / transfer"
+    },
+    {
+      "evaluated": null,
+      "kind": "explicit_command",
+      "note": "not run; `final-test` command only",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "10 final holdout"
+    }
+  ],
+  "symbol": "NQ",
+  "thresholds": {
+    "confidence": {
+      "dsr_calibration_verified": false,
+      "dsr_threshold": 0.95,
+      "effective_trials_method": "li_ji",
+      "serial_dependence": "lag1_effective_n",
+      "transfer_symbol": "ES"
+    },
+    "data": {
+      "clean_root": "data/clean",
+      "development": {
+        "end": "2022-12-31",
+        "start": "2018-01-01"
+      },
+      "holdout": {
+        "end": null,
+        "start": "2025-01-01"
+      },
+      "timeframes": [
+        "1min"
+      ],
+      "validation": {
+        "end": "2024-12-31",
+        "start": "2023-01-01"
+      }
+    },
+    "data_history": {
+      "holdout_note": "No FVG metrics have been computed on NQ 2025+. Noise-band NQ picks, the month-end #7 transfer check, last-half-hour #49/#56 and NY-open sweep #64/#195 were scored there, so the researcher has seen how that period treated intraday NQ strategies.",
+      "holdout_previously_inspected": true,
+      "validation_note": "No FVG strategy has been scored on NQ 2023-2024, but the noise-band, mean-reversion, squeeze, convexity, EMRT, last-half-hour and NY-open sweep families were selected there (the Silver Bullet run loaded it with nothing to score) and the researcher has read those results.",
+      "validation_previously_used_for_selection": true
+    },
+    "dedup": {
+      "corr_threshold": 0.8,
+      "linkage": "complete",
+      "reps_per_cluster": 2,
+      "return_basis": "monthly"
+    },
+    "execution": {
+      "baseline": "configs/execution/futures.yaml"
+    },
+    "execution_stress": {
+      "breakeven_max_multiplier": 25.0,
+      "diagnostic_cost_multipliers": [
+        2.0
+      ],
+      "entry_delay_bars": 1,
+      "gate_cost_multiplier": 1.5,
+      "missed_entry_frac": 0.1,
+      "missed_entry_sims": 100
+    },
+    "holdout": {
+      "acceptance": {
+        "max_drawdown": -0.3,
+        "min_completed_trades": null,
+        "min_net_return": 0.0,
+        "min_sharpe": 0.0
+      }
+    },
+    "integrity": {
+      "truncation_check_sample": 40,
+      "truncation_points": 3
+    },
+    "metrics": {
+      "cash_treatment": "Idle cash earns 0% and the Sharpe excess return is measured against a 0% risk-free rate, so the two assumptions are consistent.",
+      "drawdown_basis": "daily session-close mark-to-market (understates intraday DD)",
+      "periods_per_year": 252,
+      "return_frequency": "daily",
+      "risk_free_rate_annual": 0.0
+    },
+    "parameter_stability": {
+      "local": {
+        "band_mult_abs": null,
+        "disp_abs": 0.25,
+        "entry_shift_abs": null,
+        "entry_z_abs": null,
+        "exit_shift_abs": null,
+        "exit_z_abs": null,
+        "first_days_step": null,
+        "fvg_min_abs": 0.25,
+        "hold_step": 5,
+        "int_rel": 0.2,
+        "kc_mult_abs": null,
+        "max_age_step": null,
+        "max_range_atr_abs": null,
+        "max_trades_step": null,
+        "min_box_atr_abs": null,
+        "min_move_atr_abs": null,
+        "post_hold_abs": null,
+        "stop_atr_abs": 0.25,
+        "stop_burst_abs": null,
+        "stop_mult_abs": 0.5,
+        "stop_pct_abs": null,
+        "swing_step": null,
+        "switch_offset_abs": null,
+        "target_abs": null,
+        "target_r_abs": 0.5,
+        "threshold_abs": null,
+        "vol_gate_abs": null,
+        "wait_step": 5,
+        "window_step": null
+      },
+      "min_frac_profitable": 0.7,
+      "min_median_sharpe": 0.5,
+      "mode": "local_perturbation",
+      "neighbor_mode": "single_axis",
+      "perturbation": {
+        "float_rel_step": 0.1,
+        "integer_rel_step": 0.15,
+        "n_per_config": 20,
+        "z_abs": null
+      },
+      "prescreen": {
+        "max_configs": 3000,
+        "per_cluster": 3
+      }
+    },
+    "performance": {
+      "max_drawdown": -0.3,
+      "max_drawdown_source": "src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct",
+      "min_net_return": 0.0,
+      "min_sharpe": 0.75
+    },
+    "research_history": [
+      {
+        "n_configs": 1728,
+        "name": "silver_bullet_v1 NQ (sb_nq_v1)",
+        "note": "Related ICT family (Silver Bullet: sweep + FVG in fixed hours) on NQ; 0 passed the profit gate."
+      },
+      {
+        "n_configs": 24300,
+        "name": "open_sweep_v1 NQ (os_nq_v1)",
+        "note": "Related ICT family (NY-open sweep, fade vs continuation) on NQ; 210 passed validation, #64 held on the holdout but not on ES/YM/RTY."
+      },
+      {
+        "n_configs": 500,
+        "name": "last_half_hour_v1 NQ (lh_nq_v1)",
+        "note": "Different (last-half-hour momentum) family on NQ; #49 passed the holdout weakly, not added."
+      },
+      {
+        "n_configs": 400,
+        "name": "ict_silver_bullet SPY pilot (spy_pilot_400)",
+        "note": "Related ICT family (Silver Bullet) on SPY, not NQ; median PF 1.005."
+      },
+      {
+        "n_configs": 4864,
+        "name": "month_end_v2 NQ (me_nq_v2)",
+        "note": "Different (turn-of-month) family on NQ; diagnostic, development only."
+      },
+      {
+        "n_configs": 8100,
+        "name": "noise_band NQ (nb_nq_v1)",
+        "note": "Closest family: noise-band intraday momentum on NQ (also trades the day's direction into the close); 757 frozen."
+      },
+      {
+        "n_configs": 3456,
+        "name": "noise_band_v6 NQ (nb_nq_v2)",
+        "note": "Noise-band intraday momentum on NQ; 374 frozen."
+      },
+      {
+        "n_configs": 432,
+        "name": "noise_band_v7 NQ (nb_nq_v3)",
+        "note": "Noise-band intraday momentum on NQ; 71 frozen; part of the noise-band NQ book."
+      },
+      {
+        "n_configs": 28800,
+        "name": "compression_breakout_bbkc_v3_15m NQ",
+        "note": "Different (BB/KC squeeze) family on NQ."
+      },
+      {
+        "n_configs": 27648,
+        "name": "compression_breakout_bbkc_v3_5m NQ",
+        "note": "Different (BB/KC squeeze) family on NQ."
+      },
+      {
+        "n_configs": 2304,
+        "name": "compression_breakout_nr_v4_15m NQ",
+        "note": "Different (NR-N squeeze) family on NQ."
+      },
+      {
+        "n_configs": 51840,
+        "name": "emrt_spread_v1 ES-NQ",
+        "note": "Different (spread mean reversion) family on ES-NQ."
+      },
+      {
+        "n_configs": 13824,
+        "name": "emrt_spread_v2 ES-NQ",
+        "note": "Different (spread mean reversion) family on ES-NQ."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion_v5 NQ (mr_nq_v5)",
+        "note": "Different (mean-reversion) family on NQ."
+      },
+      {
+        "n_configs": 21600,
+        "name": "mean_reversion_v6 NQ (mr_nq_v6)",
+        "note": "Different (mean-reversion) family on NQ."
+      },
+      {
+        "n_configs": 1152,
+        "name": "mean_reversion_v12 NQ 15m",
+        "note": "Different (mean-reversion) family on NQ."
+      },
+      {
+        "n_configs": 3456,
+        "name": "mean_reversion_v13 NQ 1h",
+        "note": "Different (mean-reversion) family on NQ."
+      },
+      {
+        "n_configs": 103680,
+        "name": "path_convexity_v3_15m NQ",
+        "note": "Different (price-path convexity) family on NQ."
+      }
+    ],
+    "seed": 20261128,
+    "strategy": "fvg_v1",
+    "symbol": "NQ",
+    "time_stability": {
+      "min_profitable_years": 3,
+      "top_trades_frac": 0.05,
+      "top_trades_k": 5
+    },
+    "trade_count": {
+      "min_completed_trades": 100,
+      "min_trades_per_year": 10,
+      "min_years_meeting_floor": 4
+    },
+    "validation": {
+      "max_drawdown": -0.3,
+      "min_completed_trades": 40,
+      "min_net_return": 0.0,
+      "min_sharpe": 0.3
+    },
+    "version": 1
+  },
+  "transfer_symbol": "ES"
+}
