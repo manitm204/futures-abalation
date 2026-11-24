@@ -1,0 +1,35 @@
+{
+  "experiment_id": "nb_nq_v2#1+min_ext_0.10",
+  "base_manifest": "runs/funnel/nb_nq_v2/selection_manifest.json",
+  "base_manifest_sha256": "3ec42bf2bd1b32bf6e2f43972ded8de0a56a05ebf17a7e8d43e9097c643dbe80",
+  "config_sha256": "828b5f1f505b43aa7df022f0cd28190f157bdc9dfc43b0c5e36e732933f67722",
+  "dev_order": 1,
+  "config_id": "cfg_b0ea5f679f280021defe",
+  "params": {
+    "anchor": "open_prev_close",
+    "band_lookback": 1,
+    "band_mult": 1.0,
+    "check_minutes": 15,
+    "direction": "both",
+    "first_entry_minutes": 60,
+    "last_entry_cutoff_minutes": 0,
+    "max_entries_per_session": "none",
+    "momentum_minutes": 30,
+    "stop_atr_multiple": "none",
+    "symbol": "NQ",
+    "timeframe": "15min",
+    "trail": "vwap"
+  },
+  "rule": {
+    "name": "min_extension",
+    "value": 0.1,
+    "definition": "Entry also requires the signal-bar close to be at least 0.10 x the band half-width (band_mult x sigma x raw session open) beyond the band: long close - upper >= 0.10*half, short lower - close >= 0.10*half. Everything else is #1 unchanged; re-arming is unchanged."
+  },
+  "chosen_on": "2018-2024 only (dev + validation), from a 16-variant exploratory sweep on 2026-11-24; threshold plateau 0.05-0.20. Holdout of #1 itself was inspected before (2026-11-02), so this is NOT an untouched test.",
+  "pass_criteria_preregistered": [
+    "variant holdout Sharpe >= baseline #1 holdout Sharpe (same run, same data)",
+    "variant holdout profit factor >= baseline #1 holdout profit factor",
+    "variant holdout net return > 0 and Sharpe >= 0 (the funnel's holdout acceptance)"
+  ],
+  "frozen_at": "2026-11-24T19:38:41.279979+00:00"
+}

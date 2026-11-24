@@ -1,0 +1,111 @@
+{
+ "results": {
+  "base": {
+   "development": {
+    "net_return": 1.5973350000000002,
+    "cagr": 0.21051853594105063,
+    "sharpe": 2.0033795626356206,
+    "max_drawdown": -0.07383212548058926,
+    "profit_factor": 1.4418924077947084,
+    "win_rate": 0.43485915492957744,
+    "exposure": 0.36367817501686395,
+    "n_completed_trades": 1136
+   },
+   "validation": {
+    "net_return": 0.4205964960238091,
+    "cagr": 0.19272163242316864,
+    "sharpe": 2.487356644131896,
+    "max_drawdown": -0.03493669823006995,
+    "profit_factor": 1.5199386028580608,
+    "win_rate": 0.44130434782608696,
+    "exposure": 0.36430110837438423,
+    "n_completed_trades": 460
+   },
+   "holdout": {
+    "net_return": 0.1029672621427109,
+    "cagr": 0.05654537474443466,
+    "sharpe": 0.648812917429719,
+    "max_drawdown": -0.0529342148628269,
+    "profit_factor": 1.1543726560182683,
+    "win_rate": 0.4065656565656566,
+    "exposure": 0.35229420862691185,
+    "n_completed_trades": 395
+   }
+  },
+  "variant": {
+   "development": {
+    "net_return": 1.66194,
+    "cagr": 0.21648623152829138,
+    "sharpe": 2.0932780947673195,
+    "max_drawdown": -0.07310548949067952,
+    "profit_factor": 1.4879820538267747,
+    "win_rate": 0.43922651933701656,
+    "exposure": 0.35132151836634573,
+    "n_completed_trades": 1086
+   },
+   "validation": {
+    "net_return": 0.4527543821423472,
+    "cagr": 0.20619962492253308,
+    "sharpe": 2.7110965525472017,
+    "max_drawdown": -0.030845194512552965,
+    "profit_factor": 1.5966361386138614,
+    "win_rate": 0.4502262443438914,
+    "exposure": 0.3536791871921182,
+    "n_completed_trades": 442
+   },
+   "holdout": {
+    "net_return": 0.13969478775685928,
+    "cagr": 0.07614903944252638,
+    "sharpe": 0.8127840331642767,
+    "max_drawdown": -0.055747926047865715,
+    "profit_factor": 1.2185453236187695,
+    "win_rate": 0.4117647058823529,
+    "exposure": 0.3363980065303317,
+    "n_completed_trades": 373
+   }
+  }
+ },
+ "holdout_extra": {
+  "base": {
+   "by_year": {
+    "2025": 0.07325805301963717,
+    "2026": 0.02768132886539898
+   },
+   "best_day": [
+    "2025-04-09",
+    0.08127887899512738
+   ],
+   "net_return_ex_best_day": 0.020058084522783126
+  },
+  "variant": {
+   "by_year": {
+    "2025": 0.10006348352595862,
+    "2026": 0.03602637922665197
+   },
+   "best_day": [
+    "2025-04-09",
+    0.090452080864663
+   ],
+   "net_return_ex_best_day": 0.04515806586672588
+  },
+  "removed_holdout_trades": {
+   "n": 64,
+   "points": 432.0,
+   "wins": 28
+  }
+ },
+ "luck_variant_holdout": {
+  "n_sims": 200,
+  "exposure": 0.3363980065303317,
+  "pct_sharpe": 0.88,
+  "pct_return": 0.92,
+  "random_mean_sharpe": -0.0979316631753507
+ },
+ "preregistered_checks": {
+  "sharpe_ge_base": true,
+  "pf_ge_base": true,
+  "acceptance": true
+ },
+ "passed": true
+}
+-> runs/funnel/nb_nq_v2/rule_check_results_20261124T193926Z.json

@@ -1,0 +1,147 @@
+{
+  "data_access": {
+    "actual_last_session": "2026-10-19",
+    "command": "rule_check",
+    "experiment_id": "nb_nq_v2#1+min_ext_0.10",
+    "first_session": "2018-01-02",
+    "manifest_sha256": "3a1a5aff1a37f9a5eb7227bd090bd6362b4a45ae0fa1ce2965a88c1695a69d26",
+    "n_partitions": 106,
+    "partition_fingerprint": "7df5e9b4a8dc6e72",
+    "phase": "holdout",
+    "phase_end": null,
+    "rows": 3099436,
+    "symbol": "NQ"
+  },
+  "experiment_id": "nb_nq_v2#1+min_ext_0.10",
+  "holdout_extra": {
+    "base": {
+      "best_day": [
+        "2025-04-09",
+        0.08127887899512738
+      ],
+      "by_year": {
+        "2025": 0.07325805301963717,
+        "2026": 0.02768132886539898
+      },
+      "net_return_ex_best_day": 0.020058084522783126
+    },
+    "removed_holdout_trades": {
+      "n": 64,
+      "points": 432.0,
+      "wins": 28
+    },
+    "variant": {
+      "best_day": [
+        "2025-04-09",
+        0.090452080864663
+      ],
+      "by_year": {
+        "2025": 0.10006348352595862,
+        "2026": 0.03602637922665197
+      },
+      "net_return_ex_best_day": 0.04515806586672588
+    }
+  },
+  "label": "holdout previously inspected for this pick -- NOT an untouched test",
+  "luck_variant_holdout": {
+    "exposure": 0.3363980065303317,
+    "n_sims": 200,
+    "pct_return": 0.92,
+    "pct_sharpe": 0.88,
+    "random_mean_sharpe": -0.0979316631753507
+  },
+  "manifest": "runs/funnel/nb_nq_v2/holdout_selection_1_minext010.json",
+  "manifest_sha256": "3a1a5aff1a37f9a5eb7227bd090bd6362b4a45ae0fa1ce2965a88c1695a69d26",
+  "passed": true,
+  "preregistered_checks": {
+    "acceptance": true,
+    "pf_ge_base": true,
+    "sharpe_ge_base": true
+  },
+  "prior_holdout_accesses_for_symbol": 5,
+  "results": {
+    "base": {
+      "development": {
+        "cagr": 0.21051853594105063,
+        "exposure": 0.36367817501686395,
+        "max_drawdown": -0.07383212548058926,
+        "n_completed_trades": 1136,
+        "net_return": 1.5973350000000002,
+        "profit_factor": 1.4418924077947084,
+        "sharpe": 2.0033795626356206,
+        "win_rate": 0.43485915492957744
+      },
+      "holdout": {
+        "cagr": 0.05654537474443466,
+        "exposure": 0.35229420862691185,
+        "max_drawdown": -0.0529342148628269,
+        "n_completed_trades": 395,
+        "net_return": 0.1029672621427109,
+        "profit_factor": 1.1543726560182683,
+        "sharpe": 0.648812917429719,
+        "win_rate": 0.4065656565656566
+      },
+      "validation": {
+        "cagr": 0.19272163242316864,
+        "exposure": 0.36430110837438423,
+        "max_drawdown": -0.03493669823006995,
+        "n_completed_trades": 460,
+        "net_return": 0.4205964960238091,
+        "profit_factor": 1.5199386028580608,
+        "sharpe": 2.487356644131896,
+        "win_rate": 0.44130434782608696
+      }
+    },
+    "variant": {
+      "development": {
+        "cagr": 0.21648623152829138,
+        "exposure": 0.35132151836634573,
+        "max_drawdown": -0.07310548949067952,
+        "n_completed_trades": 1086,
+        "net_return": 1.66194,
+        "profit_factor": 1.4879820538267747,
+        "sharpe": 2.0932780947673195,
+        "win_rate": 0.43922651933701656
+      },
+      "holdout": {
+        "cagr": 0.07614903944252638,
+        "exposure": 0.3363980065303317,
+        "max_drawdown": -0.055747926047865715,
+        "n_completed_trades": 373,
+        "net_return": 0.13969478775685928,
+        "profit_factor": 1.2185453236187695,
+        "sharpe": 0.8127840331642767,
+        "win_rate": 0.4117647058823529
+      },
+      "validation": {
+        "cagr": 0.20619962492253308,
+        "exposure": 0.3536791871921182,
+        "max_drawdown": -0.030845194512552965,
+        "n_completed_trades": 442,
+        "net_return": 0.4527543821423472,
+        "profit_factor": 1.5966361386138614,
+        "sharpe": 2.7110965525472017,
+        "win_rate": 0.4502262443438914
+      }
+    }
+  },
+  "rule": {
+    "definition": "Entry also requires the signal-bar close to be at least 0.10 x the band half-width (band_mult x sigma x raw session open) beyond the band: long close - upper >= 0.10*half, short lower - close >= 0.10*half. Everything else is #1 unchanged; re-arming is unchanged.",
+    "name": "min_extension",
+    "value": 0.1
+  },
+  "windows": {
+    "development": [
+      "2018-01-01",
+      "2022-12-31"
+    ],
+    "holdout": [
+      "2025-01-01",
+      "2026-10-19"
+    ],
+    "validation": [
+      "2023-01-01",
+      "2024-12-31"
+    ]
+  }
+}
