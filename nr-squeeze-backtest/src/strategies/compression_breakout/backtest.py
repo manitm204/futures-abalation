@@ -123,6 +123,34 @@ class CBData:
         self.tf_minutes = self._bar_minutes(df)
         self._df = df
         self._cache: dict[tuple, object] = {}
+        self.minutes: dict[str, np.ndarray] | None = None  # set by attach_minutes (opt-in)
+
+    def attach_minutes(self, df_1min: pl.DataFrame) -> None:
+        """Opt-in 1-minute resolution of wick bars that break BOTH box edges.
+
+        Without it such a bar is skipped (side 0: the order of the two touches is unknown on
+        the aggregated bar). With it, `setups` asks the bar's own regular-session 1-minute bars
+        which edge broke first, and the simulator walks those minutes from the entry minute to
+        the end of the entry bar. Every other setup and trade is unchanged."""
+        m = df_1min.filter(pl.col("is_regular_session")).sort("bar_open_ts")
+        mts = m["bar_open_ts"].to_numpy()
+        step = np.timedelta64(self.tf_minutes, "m")
+        start = np.searchsorted(mts, self.bar_open, side="left")
+        end = np.searchsorted(mts, self.bar_open + step, side="left")
+        self.minutes = {"open": m["open"].to_numpy().astype(float), "high": m["high"].to_numpy().astype(float),
+                        "low": m["low"].to_numpy().astype(float), "start": start, "end": end}
+
+    def first_break(self, k: int, box_hi: float, box_lo: float) -> tuple[int, int]:
+        """(side, minute index) of the first 1-minute bar inside bar k that trades beyond an
+        edge: +1 high first, -1 low first, 0 both in the same minute (still unknown)."""
+        mn = self.minutes
+        a, b = int(mn["start"][k]), int(mn["end"][k])
+        h, l = mn["high"][a:b], mn["low"][a:b]
+        if b <= a or not (np.isclose(h.max(), self.high[k]) and np.isclose(l.min(), self.low[k])):
+            raise ValueError(f"1-minute bars do not rebuild 15-minute bar {k} ({self.ts[k]})")
+        up, dn = h > box_hi, l < box_lo
+        i = int(np.flatnonzero(up | dn)[0])
+        return (0 if up[i] and dn[i] else (1 if up[i] else -1)), a + i
 
     @staticmethod
     def _bar_minutes(df: pl.DataFrame) -> int:
@@ -344,6 +372,15 @@ def setups(data: CBData, p: CBParams) -> dict[str, np.ndarray]:
         _, first = np.unique(s[ks], return_index=True)
         ks = np.sort(ks[first])
     side = np.where(up[ks] & ~dn[ks], 1, np.where(dn[ks] & ~up[ks], -1, 0)).astype(np.int64)
+    first_min = np.full(len(ks), -1, dtype=np.int64)  # 1-minute entry bar of a resolved setup
+    same_min = np.zeros(len(ks), dtype=bool)          # both edges in one 1-minute bar
+    if p.entry_type == "wick" and data.minutes is not None:
+        for i in np.flatnonzero(side == 0):
+            s1, mi = data.first_break(int(ks[i]), float(bh[ks[i]]), float(bl[ks[i]]))
+            if s1 == 0:  # still unknown: assume the order the strategy would take (it is then
+                same_min[i] = True  # checked against its stop on that same minute, conservatively)
+                s1 = -1 if p.direction == "short" else 1
+            side[i], first_min[i] = s1, mi
     ok = side != 0
     if p.direction == "long":
         ok &= side > 0
@@ -356,7 +393,7 @@ def setups(data: CBData, p: CBParams) -> dict[str, np.ndarray]:
     to_close = data.tod[data.sess_end[ks]] - data.tod[ks]  # bar close to the session's last close, minutes
     ok &= ~data.is_last[ks] & (to_close >= p.last_entry_cutoff)
     return {"k": ks, "side": side, "box_hi": bh[ks], "box_lo": bl[ks], "run_start": s[ks],
-            "last_comp": r[ks], "ok": ok}
+            "last_comp": r[ks], "ok": ok, "first_min": first_min, "same_min": same_min}
 
 
 def simulate_compression_breakout(
@@ -400,7 +437,12 @@ def simulate_compression_breakout(
             e = k + entry_delay_bars
         if e >= n or e > data.sess_end[k]:
             continue
-        if intrabar:
+        m0 = int(st["first_min"][i]) if intrabar else -1  # >= 0: a both-edges bar settled on 1-minute bars
+        if m0 >= 0:
+            mo = data.minutes["open"][m0]
+            base = max(mo, bh) if d > 0 else min(mo, bl)
+            fill_px = costs.fill(base, "buy" if d > 0 else "sell", stop=True)
+        elif intrabar:
             base = max(o[e], bh) if d > 0 else min(o[e], bl)
             fill_px = costs.fill(base, "buy" if d > 0 else "sell", stop=True)
         else:
@@ -428,7 +470,27 @@ def simulate_compression_breakout(
         entry_fill = Fill(order_id=f"e{seq}", symbol=p.symbol, side=side, quantity=qty, fill_price=fill_px,
                           fill_ts=ts[e], commission=costs.commission(qty),
                           slippage_points=abs(fill_px - base), bar_open_ts=ts[e])
-        for j in range(e, L + 1):
+        j0, why = e, None
+        if m0 >= 0:
+            # The entry bar, minute by minute from the entry minute. On the entry minute only the
+            # stop is checked and a touch counts (its order within the minute is unknown) -- the
+            # same conservative rule the 15-minute entry bar uses; later minutes check the stop
+            # first, then the target, and gap through either at the minute's open.
+            mn = data.minutes
+            for mi in range(m0, int(mn["end"][e])):
+                if (d > 0 and mn["low"][mi] <= stop) or (d < 0 and mn["high"][mi] >= stop):
+                    px = stop if mi == m0 else (min(mn["open"][mi], stop) if d > 0 else max(mn["open"][mi], stop))
+                    exit_px, why = costs.fill(px, x_action, stop=True), STOP_EXIT
+                    break
+                if mi > m0 and math.isfinite(target) and \
+                        ((d > 0 and mn["high"][mi] >= target) or (d < 0 and mn["low"][mi] <= target)):
+                    px = max(mn["open"][mi], target) if d > 0 else min(mn["open"][mi], target)
+                    exit_px, why = costs.fill(px, x_action), TARGET_EXIT
+                    break
+            j0 = e if why is not None else e + 1
+        for j in range(j0, L + 1):
+            if why is not None:
+                break  # settled on the entry bar's minutes
             if (d > 0 and lo[j] <= stop) or (d < 0 and hi[j] >= stop):
                 px = stop if (intrabar and j == e) else (min(o[j], stop) if d > 0 else max(o[j], stop))
                 exit_px, why = costs.fill(px, x_action, stop=True), STOP_EXIT

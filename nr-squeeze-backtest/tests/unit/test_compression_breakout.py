@@ -784,3 +784,71 @@ def test_nr_v4_grid_config_and_yamls():
         f = load_funnel_config(CONFIGS / f"cb_nr_funnel_{sym}_v4_15m.yaml")
         assert f.strategy == "compression_breakout_nr_v4_15m" and f.symbol == sym.upper()
         assert f.confidence.transfer_symbol == "ES"
+
+
+# --- 1-minute resolution of wick bars through both edges (opt-in) ----------------------------
+
+def _minutes(bars: pl.DataFrame, k: int, path: list[tuple[float, float, float, float]]) -> pl.DataFrame:
+    """1-minute bars for 15-min bar k only, (o, h, l, c) per minute."""
+    t = bars.sort("bar_open_ts")["bar_open_ts"][k]
+    return pl.DataFrame([{"bar_open_ts": t + timedelta(minutes=i), "open": o, "high": h, "low": lo,
+                          "close": c, "is_regular_session": True} for i, (o, h, lo, c) in enumerate(path)])
+
+
+# Bar 7 runs through both edges of the [99.95, 100.05] box: high 100.4, low 99.6.
+BOTH = {**SQUEEZE, 7: (100.0, 100.4, 99.6, 100.0), 8: (100.0, 100.1, 99.9, 100.0)}
+UP_THEN_DOWN = [(100.0, 100.4, 99.99, 100.3)] + [(100.3, 100.3, 99.6, 99.7)] + [(100.0, 100.0, 100.0, 100.0)] * 13
+DOWN_THEN_UP = [(100.0, 100.01, 99.6, 99.7)] + [(99.7, 100.4, 99.7, 100.3)] + [(100.0, 100.0, 100.0, 100.0)] * 13
+
+
+def _sim_min(bars, path, p, k=7):
+    data = CBData(bars)
+    data.attach_minutes(_minutes(bars, k, path))
+    return data, simulate_compression_breakout(data, p, exec_config=EC, starting_equity=1e5)
+
+
+def test_minute_resolution_is_off_by_default():
+    _, sim = _sim(_ohlc([_plain_day(BOTH)]), _p(entry_type="wick"))
+    assert len(sim.entry_idx) == 0
+
+
+def test_minute_resolution_up_first_long_is_stopped_by_the_later_down_break():
+    bars = _ohlc([_plain_day(BOTH)])
+    p = _p(entry_type="wick", direction="long", target_r=3.0)
+    _, sim = _sim_min(bars, UP_THEN_DOWN, p)
+    costs = CostModel.for_symbol(EC, "SPY")
+    assert len(sim.entry_idx) == 1 and sim.side[0] == 1
+    assert sim.entry_idx[0] == sim.exit_idx[0] == 7 and sim.exit_reason[0] == "stop_exit"
+    assert sim.entry_px[0] == pytest.approx(costs.fill(100.05, "buy", stop=True))
+    assert sim.exit_px[0] == pytest.approx(costs.fill(99.95, "sell", stop=True))  # box stop, opened above it
+    assert sim.realized_pnl[0] < 0
+
+
+def test_minute_resolution_down_first_consumes_a_long_only_setup_and_shorts_a_two_sided_one():
+    bars = _ohlc([_plain_day(BOTH)])
+    _, long_only = _sim_min(bars, DOWN_THEN_UP, _p(entry_type="wick", direction="long"))
+    assert len(long_only.entry_idx) == 0
+    _, both = _sim_min(bars, DOWN_THEN_UP, _p(entry_type="wick", direction="both", target_r=3.0))
+    assert both.side[0] == -1 and both.exit_reason[0] == "stop_exit" and both.exit_idx[0] == 7
+
+
+def test_minute_resolution_walks_the_entry_bar_stop_before_target():
+    # Bar 7: high 100.3, low 99.9 (both box edges). Long breaks up in minute 0; 1R target 100.15.
+    bars = _ohlc([_plain_day({**SQUEEZE, 7: (100.0, 100.3, 99.9, 100.2)})])
+    p = _p(entry_type="wick", direction="long", target_r=1.0, stop_atr=None)
+    flat = [(100.0, 100.0, 100.0, 100.0)] * 12
+    up = (100.0, 100.06, 99.99, 100.06)
+    target_first = [up, (100.06, 100.3, 100.0, 100.2), (100.2, 100.2, 99.9, 100.0)] + flat
+    _, sim = _sim_min(bars, target_first, p)
+    assert sim.exit_reason[0] == "target_exit" and sim.exit_idx[0] == 7
+    assert sim.exit_px[0] == pytest.approx(CostModel.for_symbol(EC, "SPY").fill(100.15, "sell"))
+    stop_first = [up, (100.06, 100.1, 99.9, 100.0), (100.0, 100.3, 100.0, 100.2)] + flat
+    _, sim2 = _sim_min(bars, stop_first, p)
+    assert sim2.exit_reason[0] == "stop_exit" and sim2.exit_idx[0] == 7 and sim2.realized_pnl[0] < 0
+
+
+def test_minute_bars_must_rebuild_the_15_minute_bar():
+    bars = _ohlc([_plain_day(BOTH)])
+    bad = [(100.0, 100.3, 99.99, 100.2)] * 15  # never reaches the 15-min high / low
+    with pytest.raises(ValueError, match="do not rebuild"):
+        _sim_min(bars, bad, _p(entry_type="wick"))
