@@ -141,6 +141,9 @@ def main(
     per_trade: float = typer.Option(0.75, help="Each trade's size as a share of the account balance"),
     cap: float = typer.Option(1.0, help="Most the open positions together may use, as a share of the balance"),
     runs_root: Path = typer.Option(PROJECT_ROOT / "runs" / "funnel"),
+    symbol: str = typer.Option("", help="Run the legs unchanged on another market (transfer view; 2018..validation "
+                                       "end only, never with --holdout)"),
+    val_note: str = typer.Option("", help="Replace the page's validation caveat text"),
 ) -> None:
     import hashlib
 
@@ -165,6 +168,10 @@ def main(
         same = sp["fcfg"].data.model_dump(exclude={"timeframes"}) == fcfg.data.model_dump(exclude={"timeframes"})
         if sp["fcfg"].symbol != fcfg.symbol or not same:  # legs may use different bar sizes
             raise typer.BadParameter("all legs must share one market and the same data windows")
+    if symbol:
+        if holdout:
+            raise typer.BadParameter("--symbol is a transfer view and never touches the holdout")
+        fcfg = fcfg.model_copy(update={"symbol": symbol})
     tfs = sorted({sp["tf"] for sp in specs}, key=AGG_INTERVAL_MINUTES.get)
     multi_tf = len(tfs) > 1
     for sp in specs:
@@ -392,7 +399,8 @@ def main(
         "period": [str(start), str(end)], "validation_start": str(fcfg.data.validation.start),
         "holdout": holdout, "prior_holdout_accesses": prior_access,
         "timeframe": " / ".join(tfs), "starting_equity": eq0, "n_sims": n_sims, "hold_bars": None,
-        "notes": _notes(fcfg, holdout, prior_access, n_sims, len(specs), tuple(runs)),
+        "notes": {**_notes(fcfg, holdout, prior_access, n_sims, len(specs), tuple(runs)),
+                  **({"val": val_note} if val_note else {})},
         "config_change_accepted": accepted if holdout else None,
         "days": [str(d) for d in days], "periods": {k: {"range": list(v), "label": labels[k]} for k, v in periods.items()},
         "legs": legs, "combined": combined, "hold": hold,

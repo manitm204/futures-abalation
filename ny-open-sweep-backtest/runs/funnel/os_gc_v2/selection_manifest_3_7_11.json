@@ -1,0 +1,231 @@
+{
+  "acceptance_holdout": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": null,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.0
+  },
+  "acceptance_validation": {
+    "max_drawdown": -0.3,
+    "min_completed_trades": 40,
+    "min_net_return": 0.0,
+    "min_sharpe": 0.3
+  },
+  "candidates": [
+    {
+      "cluster": 2,
+      "config_id": "cfg_16f885c10f36dab5dcc3",
+      "dev_net_return": 0.09460821428572697,
+      "dev_order": 3,
+      "dev_sharpe": 0.9134455163241327,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5651164357696719,
+      "params": {
+        "confirm": 3,
+        "exit": "16:00",
+        "level": "onh",
+        "mode": "cont",
+        "pen": "0.00",
+        "side": "high",
+        "stop": "d0.25",
+        "symbol": "GC",
+        "target": "none",
+        "timeframe": "1min",
+        "window": 60
+      },
+      "stability_median_sharpe": 0.9062168012122959
+    },
+    {
+      "cluster": 1,
+      "config_id": "cfg_b40eb466a38a271f68a9",
+      "dev_net_return": 0.06520914285715973,
+      "dev_order": 7,
+      "dev_sharpe": 0.8745195722628823,
+      "n_profitable_years": 3,
+      "neighbor_median_sharpe": 0.6993003678344267,
+      "params": {
+        "confirm": 5,
+        "exit": "11:00",
+        "level": "onh",
+        "mode": "cont",
+        "pen": "0.00",
+        "side": "both",
+        "stop": "d0.15",
+        "symbol": "GC",
+        "target": "none",
+        "timeframe": "1min",
+        "window": 60
+      },
+      "stability_median_sharpe": 0.8540617142478528
+    },
+    {
+      "cluster": 0,
+      "config_id": "cfg_11f1af6c013ef6793b65",
+      "dev_net_return": 0.09622053571430711,
+      "dev_order": 11,
+      "dev_sharpe": 0.775474489889958,
+      "n_profitable_years": 4,
+      "neighbor_median_sharpe": 0.5848927584178231,
+      "params": {
+        "confirm": 3,
+        "exit": "16:00",
+        "level": "onh",
+        "mode": "cont",
+        "pen": "0.00",
+        "side": "both",
+        "stop": "d0.25",
+        "symbol": "GC",
+        "target": "none",
+        "timeframe": "1min",
+        "window": 60
+      },
+      "stability_median_sharpe": 0.790323232904054
+    }
+  ],
+  "code_version": "46ee6e771bde579cd947a801ff3d4e8c4ac7ecfa",
+  "config_sha256": "694a06b21bd13a8d25aa22920d723c65a06345a9e98558a7f9c81a4d4bac20c2",
+  "data_windows": {
+    "clean_root": "data/clean",
+    "development": {
+      "end": "2022-12-31",
+      "start": "2018-01-01"
+    },
+    "holdout": {
+      "end": null,
+      "start": "2025-01-01"
+    },
+    "timeframes": [
+      "1min"
+    ],
+    "validation": {
+      "end": "2024-12-31",
+      "start": "2023-01-01"
+    }
+  },
+  "experiment_id": "os_gc_v2",
+  "frozen_at": "2026-11-25T03:10:05.323738+00:00",
+  "frozen_manifest_sha256": "59a79802f834be51e2e3e36a42749db9124fecb684970c10b06f69d4b3d96b81",
+  "git_diff_sha256": "9d872acade0da5af95f7f5e0d9bb99ec5308b20af5376b60102632d40d9c2a5b",
+  "git_dirty": true,
+  "holdout_selection_note": "Chosen by Claude on 2026-11-25 at the user's request ('pick the top few strategies based on a holistic review process, and test on holdout') from the 10 os_gc_v2 validation passes: one per dedup cluster, preferring both validation years positive, more trades, and stage-4 / perturbation robustness. #11 (cluster 0: onh, both, 60 min, 3-bar, 0.25 dATR, no target, 16:00; most trades, val Sharpe 0.80 with 2023 0.76 / 2024 0.83); #7 (cluster 1: onh, both, 60 min, 5-bar, 0.15 dATR, 11:00; val 1.01, 2023 1.55 / 2024 0.28); #3 (cluster 2: onh, HIGH side only = long breakouts, 60 min, 3-bar, 0.25 dATR, 16:00; val 0.97, 2023 1.27 / 2024 0.61). Rejected: clusters 3 and 4 (2024 Sharpe ~0 or negative), clusters 5-7 (failed validation). Picked after seeing validation, which also centred the grid, so the holdout is the only clean test. Bar stated beforehand, per pick: net > 0, Sharpe >= 0.3, PF >= 1.1, max DD >= -30%, and beats >= 70% of random-entry runs at the same time in market. #3 is long-only and gold rallied strongly in 2025, so its result must be read against the random-entry benchmark. If no pick clears the bar, gold is dropped from this family.",
+  "seed": 20261125,
+  "selection_rules": {
+    "gates": [
+      "1 integrity",
+      "2 trade count",
+      "3 performance & risk",
+      "4 parameter stability",
+      "5 time stability",
+      "6 dedup (complete linkage, best 2 per cluster)",
+      "7 execution stress"
+    ],
+    "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+    "validation_is_not_used_for_ranking": true
+  },
+  "sizing_and_costs": {
+    "allow_overlapping_trades": false,
+    "allow_pyramiding": false,
+    "allow_short": false,
+    "commission_minimum": 0.0,
+    "commission_per_contract": 2.5,
+    "commission_per_share": 0.0,
+    "extended_hours_slippage_multiplier": 1.0,
+    "fractional_shares": false,
+    "include_sec_finra_fees": false,
+    "instrument_type": "futures",
+    "intrabar_collision_mode": "stop_first",
+    "leverage": 1.0,
+    "max_open_positions_per_symbol": 1,
+    "risk_per_trade_pct": 0.0025,
+    "slippage_bps_limit_adverse": 0.0,
+    "slippage_bps_market": 0.0,
+    "slippage_bps_stop": 0.0,
+    "slippage_ticks_market": 1.0,
+    "slippage_ticks_stop": 1.0,
+    "starting_equity": 1000000.0
+  },
+  "symbol": "GC",
+  "validated_at": "2026-11-25T03:10:15.130666+00:00",
+  "validation_summary": [
+    {
+      "config_id": "cfg_a8d6a94d2ba3d676e95e",
+      "reasons": [
+        "sharpe 0.061 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_34b2cf70a6cbbeba87ca",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_16f885c10f36dab5dcc3",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_614d09d884f30b8ff3c1",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_73e31d73ce1419b6efe5",
+      "reasons": [
+        "net_return -0.0004 <= 0.0",
+        "sharpe -0.018 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_065e4368238dcb6f53a0",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_b40eb466a38a271f68a9",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_77d94b2781143b035262",
+      "reasons": [
+        "sharpe 0.038 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_96940260525688468382",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_5763099e099808f73711",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_11f1af6c013ef6793b65",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_e31d6bbec4b3e9f19545",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_03bd75218a712402f7a6",
+      "reasons": [],
+      "status": "pass"
+    },
+    {
+      "config_id": "cfg_f35ba6994f137eba469f",
+      "reasons": [
+        "net_return -0.0012 <= 0.0",
+        "sharpe -0.050 < 0.3"
+      ],
+      "status": "hard_reject"
+    }
+  ]
+}

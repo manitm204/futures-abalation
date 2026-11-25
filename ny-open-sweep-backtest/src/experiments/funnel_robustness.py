@@ -622,6 +622,9 @@ def local_perturbations_lh(p, lcfg) -> list[tuple[str, object]]:
     return out
 
 
+from src.strategies.open_sweep import config as _os_cfg  # noqa: E402  (session profile)
+
+
 def perturbations_os(p, *, config_id: str, base_seed: int, pcfg: PerturbationCfg) -> list:
     """NY-open sweep counterpart of `perturbations` (diagnostic only): jointly moves the window by
     a non-zero whole number of minutes up to +/- 5 (>= 5), the time exit by up to +/- 15 minutes
@@ -640,8 +643,8 @@ def perturbations_os(p, *, config_id: str, base_seed: int, pcfg: PerturbationCfg
     out = []
     for _ in range(pcfg.n_per_config):
         window = max(5, p.window + nz(5))
-        exit_ = min(16 * 60, p.exit_min + nz(15))
-        exit_ = max(exit_, 9 * 60 + 30 + window + 5)
+        exit_ = min(_os_cfg.DAY_END_MIN, p.exit_min + nz(15))
+        exit_ = max(exit_, _os_cfg.DAY_START_MIN + window + 5)
         kw: dict = {"window": window, "exit_min": exit_,
                     "confirm": max(1, p.confirm + int(rng.integers(-1, 2))),
                     "pen": max(0.0, p.pen * (1 + float(rng.uniform(-rel, rel)))) if p.pen > 0
@@ -670,10 +673,10 @@ def local_perturbations_os(p, lcfg) -> list[tuple[str, object]]:
 
     hhmm = lambda m: f"{m // 60:02d}:{m % 60:02d}"  # noqa: E731
     ws = lcfg.entry_shift_abs or 5
-    add("window", [w for w in (p.window - ws, p.window + ws) if w >= 5 and 9 * 60 + 30 + w < p.exit_min],
+    add("window", [w for w in (p.window - ws, p.window + ws) if w >= 5 and _os_cfg.DAY_START_MIN + w < p.exit_min],
         "window", str)
     xs = lcfg.exit_shift_abs or 15
-    add("exit", [m for m in (p.exit_min - xs, p.exit_min + xs) if 9 * 60 + 30 + p.window < m <= 16 * 60],
+    add("exit", [m for m in (p.exit_min - xs, p.exit_min + xs) if _os_cfg.DAY_START_MIN + p.window < m <= _os_cfg.DAY_END_MIN],
         "exit_min", hhmm)
     pa = lcfg.threshold_abs or 0.025
     add("pen", (max(0.0, round(p.pen - pa, 6)), round(p.pen + pa, 6)), "pen", lambda v: f"{v:g}")

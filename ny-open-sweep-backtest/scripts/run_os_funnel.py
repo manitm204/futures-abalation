@@ -40,7 +40,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.analysis.neighborhood import LATTICE_OS_V1, NeighborhoodStats, neighborhood_stats
+from src.analysis.neighborhood import LATTICE_OS_GC_V1, LATTICE_OS_GC_V2, LATTICE_OS_V1, NeighborhoodStats, neighborhood_stats
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.experiments.data_access import (
     DEFAULT_LEDGER,
@@ -86,10 +86,10 @@ from src.experiments.funnel_robustness import (
     perturbations_os,
     quantile,
 )
-from src.experiments.os_grid import os_grid_v1
+from src.experiments.os_grid import os_grid_gc_v1, os_grid_gc_v2, os_grid_v1
 from src.experiments.os_integrity import CHECKS, check_levels, truncation_invariance
 from src.strategies.open_sweep.backtest import OSParams, os_day_bars
-from src.strategies.open_sweep.config import OpenSweepV1Config
+from src.strategies.open_sweep.config import SESSION as OS_SESSION, OpenSweepGCV1Config, OpenSweepGCV2Config, OpenSweepV1Config
 from src.utils.hashing import canonical_json
 from src.utils.logging import configure_logging, get_logger
 from src.utils.seeds import derive_seed
@@ -106,7 +106,15 @@ OS_KEYS = ("symbol", "timeframe", "level", "side", "window", "pen", "confirm", "
 SPACES = {
     "open_sweep_v1": {
         "grid": os_grid_v1, "cls": OpenSweepV1Config, "lattice": LATTICE_OS_V1,
-        "perturb": perturbations_os, "local": local_perturbations_os, "keys": OS_KEYS,
+        "perturb": perturbations_os, "local": local_perturbations_os, "keys": OS_KEYS, "session": "nyse",
+    },
+    "open_sweep_gc_v1": {
+        "grid": os_grid_gc_v1, "cls": OpenSweepGCV1Config, "lattice": LATTICE_OS_GC_V1,
+        "perturb": perturbations_os, "local": local_perturbations_os, "keys": OS_KEYS, "session": "comex",
+    },
+    "open_sweep_gc_v2": {
+        "grid": os_grid_gc_v2, "cls": OpenSweepGCV2Config, "lattice": LATTICE_OS_GC_V2,
+        "perturb": perturbations_os, "local": local_perturbations_os, "keys": OS_KEYS, "session": "nyse",
     },
 }
 BAR_MINUTES = {"1min": 1}
@@ -121,6 +129,8 @@ def _select_space(fcfg: FunnelConfig) -> None:
         raise typer.BadParameter(f"Unknown strategy {fcfg.strategy!r}; expected one of {sorted(SPACES)}")
     SPACE = SPACES[fcfg.strategy]
     GRID_KEYS = SPACE["keys"]
+    if OS_SESSION != SPACE["session"]:
+        raise typer.BadParameter(f"{fcfg.strategy} needs OS_SESSION={SPACE['session']}, this process has {OS_SESSION!r}")
 BREAKEVEN_GRID = [0.0, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0, 8.0, 11.0, 15.0, 20.0, 25.0]
 
 

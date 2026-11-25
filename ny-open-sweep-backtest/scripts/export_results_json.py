@@ -24,7 +24,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.experiments.os_grid import AXES_OS_V1
+from src.experiments.os_grid import AXES_OS_GC_V2, AXES_OS_V1
 from src.experiments.funnel_config import load_execution_config, load_funnel_config
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +34,7 @@ app = typer.Typer(add_completion=False)
 # strategy -> (axes, file-key prefix, tab label prefix, heat-map axes (rows, cols))
 SPACES = {
     "open_sweep_v1": (AXES_OS_V1, "open_sweep", "NY-open sweep", ("level", "mode")),
+    "open_sweep_gc_v2": (AXES_OS_GC_V2, "open_sweep_gc", "NY-open sweep", ("level", "side")),
 }
 MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini Dow", "RTY": "E-mini Russell 2000",
                 "CL": "Crude oil", "GC": "Gold", "6E": "Euro FX", "6J": "Japanese yen", "ZN": "10-year T-note",

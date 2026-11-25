@@ -634,3 +634,21 @@ LATTICE_OS_V1 = Lattice({
     "target": ["1R", "2R", "3R", "range", "none"],
     "exit": ["11:00", "12:30", "16:00"],
 }, FIXED_AXES_OS)
+LATTICE_OS_GC_V1 = Lattice({
+    "timeframe": ["1min"],
+    "window": [15, 30, 60],
+    "pen": ["0.00"],
+    "confirm": [3, 5, 8],
+    "stop": ["d0.15", "d0.25"],
+    "target": ["1R", "none"],
+    "exit": ["11:00", "13:30"],
+}, FIXED_AXES_OS)
+LATTICE_OS_GC_V2 = Lattice({
+    "timeframe": ["1min"],
+    "window": [15, 30, 60],
+    "pen": ["0.00"],
+    "confirm": [3, 5, 8],
+    "stop": ["d0.15", "d0.25"],
+    "target": ["1R", "none"],
+    "exit": ["11:00", "16:00"],
+}, FIXED_AXES_OS)

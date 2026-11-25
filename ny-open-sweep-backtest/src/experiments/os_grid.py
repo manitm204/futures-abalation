@@ -23,6 +23,8 @@ from src.strategies.open_sweep.config import (
     V1_TARGETS,
     V1_WINDOWS,
     OpenSweepV1Config,
+    GC1_CONFIRMS, GC1_EXITS, GC1_LEVELS, GC1_MODES, GC1_PENS, GC1_SIDES, GC1_STOPS, GC1_TARGETS,
+    GC1_WINDOWS, GC2_EXITS, OpenSweepGCV1Config, OpenSweepGCV2Config,
 )
 from src.utils.hashing import config_id as compute_config_id
 
@@ -60,3 +62,30 @@ def _grid(symbols: tuple[str, ...], axes: dict[str, tuple], cls, valid=lambda kw
 
 def os_grid_v1(symbols: tuple[str, ...]) -> list[ConfigEntry]:
     return _grid(symbols, AXES_OS_V1, OpenSweepV1Config)
+
+
+AXES_OS_GC_V1: dict[str, tuple] = {
+    "timeframe": ("1min",),
+    "level": GC1_LEVELS,
+    "side": GC1_SIDES,
+    "window": GC1_WINDOWS,
+    "pen": GC1_PENS,
+    "confirm": GC1_CONFIRMS,
+    "mode": GC1_MODES,
+    "stop": GC1_STOPS,
+    "target": GC1_TARGETS,
+    "exit": GC1_EXITS,
+}
+
+
+def os_grid_gc_v1(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    """648 configs per contract; COMEX session (OS_SESSION=comex)."""
+    return _grid(symbols, AXES_OS_GC_V1, OpenSweepGCV1Config)
+
+
+AXES_OS_GC_V2: dict[str, tuple] = {**AXES_OS_GC_V1, "exit": GC2_EXITS}
+
+
+def os_grid_gc_v2(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    """648 configs per contract; NYSE session (09:30 anchor)."""
+    return _grid(symbols, AXES_OS_GC_V2, OpenSweepGCV2Config)

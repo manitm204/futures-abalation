@@ -1,0 +1,460 @@
+{
+  "data_access": {
+    "actual_last_session": "2022-12-30",
+    "command": "develop",
+    "experiment_id": "os_gc_v1",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 60,
+    "partition_fingerprint": "6b5285190d955ffb",
+    "phase": "development",
+    "phase_end": "2022-12-31",
+    "rows": 1743315,
+    "symbol": "GC"
+  },
+  "data_history": {
+    "holdout_note": "No open-sweep metrics have been computed on GC 2025+. GC mean-reversion v6 (#17 + #15) and BB/KC squeeze v4 #6 were scored there, so the researcher has seen how that period treated intraday GC strategies.",
+    "holdout_previously_inspected": true,
+    "validation_note": "GC 2023-2024 was read on 2026-11-25 when the 210 NQ open-sweep survivors were run unchanged on GC, and this grid is centred on the settings that did well there. Mean-reversion, BB/KC squeeze, NR-N and convexity GC funnels were also selected on it. Validation is therefore NOT an independent test for this run.",
+    "validation_previously_used_for_selection": true
+  },
+  "dsr": {
+    "calibration_verified": false,
+    "effective_trials": {
+      "li_ji": 131.0000000000007,
+      "n_components_95": 68,
+      "n_series": 648,
+      "participation_ratio": 15.75034631414112,
+      "rank_bound_T": 1291
+    },
+    "n_configs_with_defined_sharpe": 648,
+    "primary_method": "li_ji",
+    "research_history": [
+      {
+        "n_configs": 210,
+        "name": "open_sweep_v1 NQ survivors transferred to GC (os_nq_v1 all210)",
+        "note": "Same family, NQ-chosen rules run unchanged on GC 2018-2024; used to centre this grid."
+      },
+      {
+        "n_configs": 24300,
+        "name": "open_sweep_v1 NQ (os_nq_v1)",
+        "note": "Same family on NQ; the 210 survivors above came from it."
+      },
+      {
+        "n_configs": 3840,
+        "name": "compression_breakout_bbkc_v4 GC",
+        "note": "Different (BB/KC squeeze) family on GC; #6 failed the holdout."
+      },
+      {
+        "n_configs": 2304,
+        "name": "compression_breakout_nr_v4_15m GC",
+        "note": "Different (NR-N squeeze) family on GC."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion_v5 GC",
+        "note": "Different (mean-reversion) family on GC."
+      },
+      {
+        "n_configs": 21504,
+        "name": "mean_reversion_v6 GC 15m",
+        "note": "Different (mean-reversion) family on GC."
+      },
+      {
+        "n_configs": 17280,
+        "name": "mean_reversion_v6 GC 1h",
+        "note": "Different (mean-reversion) family on GC; #17 + #15 passed the holdout weakly."
+      },
+      {
+        "n_configs": 103680,
+        "name": "path_convexity_v3_15m GC",
+        "note": "Different (price-path convexity) family on GC."
+      }
+    ],
+    "serial_dependence": "lag1_effective_n",
+    "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+    "trial_count_options": {
+      "li_ji": 131.0000000000007,
+      "participation_ratio": 15.75034631414112,
+      "raw": 648.0,
+      "raw_plus_known_prior": 215238.0
+    },
+    "unresolved": [
+      "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+      "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+      "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+      "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+    ],
+    "variance_of_trial_sharpes_per_period": 0.0005058273545815499
+  },
+  "elapsed_s": 44.6,
+  "experiment_id": "os_gc_v1",
+  "frozen_manifest_sha256": "0a2ab73b95ec52fbdbb21bed31d89a090e0cee9de5d0c084cfc8fef07f81a42d",
+  "instrument_type": "futures",
+  "integrity": {
+    "checks_per_config": [
+      "signal_mismatch",
+      "entry_not_per_rule",
+      "day_not_allowed",
+      "wrong_direction",
+      "trade_skipped_while_flat",
+      "entry_fill_better_than_market",
+      "exit_before_entry",
+      "bar_outside_day_window",
+      "position_held_overnight",
+      "stop_not_per_rule",
+      "target_not_per_rule",
+      "stop_exit_without_touch",
+      "stop_fill_better_than_rule",
+      "target_exit_without_trade_through",
+      "target_fill_not_at_target",
+      "exit_not_at_first_touch",
+      "time_exit_not_per_rule",
+      "eod_exit_not_at_session_close",
+      "exit_fill_better_than_market",
+      "overlapping_positions",
+      "position_exceeds_equity",
+      "forced_close_not_final_trade",
+      "commission_below_minimum"
+    ],
+    "cut_fractions": [
+      0.3,
+      0.6000000000000001,
+      0.9
+    ],
+    "failures": {},
+    "pre_open_level_check": {
+      "mismatches": [],
+      "symbol": "GC"
+    },
+    "truncation_sample": 40
+  },
+  "mode": "development_only",
+  "n_configs": 648,
+  "n_frozen_candidates": 0,
+  "provenance": {
+    "available_data_endpoint_per_manifest": {
+      "GC": "2026-10-16"
+    },
+    "config_path": "configs/funnel/os_funnel_gc_v1.yaml",
+    "config_sha256": "7bddbf8067cf23f0d69ffdf2a99cf7be8dee3673bc0cc8f942f4450651fe4049",
+    "created_at": "2026-11-25T03:03:29.811168+00:00",
+    "data_manifests": {
+      "GC": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3071271,
+        "schema_version": "1.0.0"
+      }
+    },
+    "git_commit": "46ee6e771bde579cd947a801ff3d4e8c4ac7ecfa",
+    "git_diff_sha256": "a37524e7e04585f35ce4d5b747e23e4dce4842546a410c320aebb0b4a7a92191",
+    "git_dirty": true,
+    "seed": 20261125
+  },
+  "rejection_reason_counts": {
+    "s2:hard_reject:completed_trades": 320,
+    "s2:hard_reject:years_with_>=10_trades": 128,
+    "s3:hard_reject:net_return": 197,
+    "s3:hard_reject:sharpe": 328
+  },
+  "survivor_table": [
+    {
+      "evaluated": 648,
+      "kind": "universe",
+      "passed": 648,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "0 universe"
+    },
+    {
+      "evaluated": 648,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 648,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "1 backtest integrity",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 648,
+      "hard_reject": 320,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 328,
+      "pct_of_previous": 50.617283950617285,
+      "pct_of_universe": 50.617283950617285,
+      "stage": "2 trade count & coverage",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 328,
+      "hard_reject": 328,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 0,
+      "pct_of_previous": 0.0,
+      "pct_of_universe": 0.0,
+      "stage": "3 performance & risk",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 0,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 0,
+      "pct_of_previous": null,
+      "pct_of_universe": 0.0,
+      "stage": "4 parameter stability",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 0,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 0,
+      "pct_of_previous": null,
+      "pct_of_universe": 0.0,
+      "stage": "5 time stability",
+      "with_warnings": 0
+    },
+    {
+      "deduplicated": 0,
+      "evaluated": 0,
+      "kind": "dedup",
+      "n_clusters": 0,
+      "note": "best 2 per cluster",
+      "passed": 0,
+      "pct_of_previous": null,
+      "pct_of_universe": 0.0,
+      "stage": "6 deduplication"
+    },
+    {
+      "evaluated": 0,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 0,
+      "pct_of_previous": null,
+      "pct_of_universe": 0.0,
+      "stage": "7 execution stress",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": null,
+      "kind": "hard_gate",
+      "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "8 frozen validation"
+    },
+    {
+      "evaluated": 0,
+      "kind": "diagnostic_only",
+      "note": "diagnostic only: ",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "9 DSR / transfer"
+    },
+    {
+      "evaluated": null,
+      "kind": "explicit_command",
+      "note": "not run; `final-test` command only",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "10 final holdout"
+    }
+  ],
+  "symbol": "GC",
+  "thresholds": {
+    "confidence": {
+      "dsr_calibration_verified": false,
+      "dsr_threshold": 0.95,
+      "effective_trials_method": "li_ji",
+      "serial_dependence": "lag1_effective_n",
+      "transfer_symbol": null
+    },
+    "data": {
+      "clean_root": "data/clean",
+      "development": {
+        "end": "2022-12-31",
+        "start": "2018-01-01"
+      },
+      "holdout": {
+        "end": null,
+        "start": "2025-01-01"
+      },
+      "timeframes": [
+        "1min"
+      ],
+      "validation": {
+        "end": "2024-12-31",
+        "start": "2023-01-01"
+      }
+    },
+    "data_history": {
+      "holdout_note": "No open-sweep metrics have been computed on GC 2025+. GC mean-reversion v6 (#17 + #15) and BB/KC squeeze v4 #6 were scored there, so the researcher has seen how that period treated intraday GC strategies.",
+      "holdout_previously_inspected": true,
+      "validation_note": "GC 2023-2024 was read on 2026-11-25 when the 210 NQ open-sweep survivors were run unchanged on GC, and this grid is centred on the settings that did well there. Mean-reversion, BB/KC squeeze, NR-N and convexity GC funnels were also selected on it. Validation is therefore NOT an independent test for this run.",
+      "validation_previously_used_for_selection": true
+    },
+    "dedup": {
+      "corr_threshold": 0.8,
+      "linkage": "complete",
+      "reps_per_cluster": 2,
+      "return_basis": "monthly"
+    },
+    "execution": {
+      "baseline": "configs/execution/futures.yaml"
+    },
+    "execution_stress": {
+      "breakeven_max_multiplier": 25.0,
+      "diagnostic_cost_multipliers": [
+        2.0
+      ],
+      "entry_delay_bars": 1,
+      "gate_cost_multiplier": 1.5,
+      "missed_entry_frac": 0.1,
+      "missed_entry_sims": 100
+    },
+    "holdout": {
+      "acceptance": {
+        "max_drawdown": -0.3,
+        "min_completed_trades": null,
+        "min_net_return": 0.0,
+        "min_sharpe": 0.0
+      }
+    },
+    "integrity": {
+      "truncation_check_sample": 40,
+      "truncation_points": 3
+    },
+    "metrics": {
+      "cash_treatment": "Idle cash earns 0% and the Sharpe excess return is measured against a 0% risk-free rate, so the two assumptions are consistent.",
+      "drawdown_basis": "daily session-close mark-to-market (understates intraday DD)",
+      "periods_per_year": 252,
+      "return_frequency": "daily",
+      "risk_free_rate_annual": 0.0
+    },
+    "parameter_stability": {
+      "local": {
+        "band_mult_abs": null,
+        "entry_shift_abs": 5,
+        "entry_z_abs": null,
+        "exit_shift_abs": 15,
+        "exit_z_abs": null,
+        "first_days_step": null,
+        "int_rel": 0.2,
+        "kc_mult_abs": null,
+        "max_range_atr_abs": null,
+        "max_trades_step": null,
+        "min_box_atr_abs": null,
+        "min_move_atr_abs": null,
+        "post_hold_abs": null,
+        "stop_atr_abs": 0.25,
+        "stop_burst_abs": null,
+        "stop_pct_abs": 0.05,
+        "switch_offset_abs": null,
+        "target_abs": null,
+        "target_r_abs": 0.5,
+        "threshold_abs": 0.025,
+        "vol_gate_abs": null,
+        "window_step": 1
+      },
+      "min_frac_profitable": 0.7,
+      "min_median_sharpe": 0.5,
+      "mode": "local_perturbation",
+      "neighbor_mode": "single_axis",
+      "perturbation": {
+        "float_rel_step": 0.1,
+        "integer_rel_step": 0.15,
+        "n_per_config": 20,
+        "z_abs": null
+      },
+      "prescreen": {
+        "max_configs": 3000,
+        "per_cluster": 3
+      }
+    },
+    "performance": {
+      "max_drawdown": -0.3,
+      "max_drawdown_source": "src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct",
+      "min_net_return": 0.0,
+      "min_sharpe": 0.75
+    },
+    "research_history": [
+      {
+        "n_configs": 210,
+        "name": "open_sweep_v1 NQ survivors transferred to GC (os_nq_v1 all210)",
+        "note": "Same family, NQ-chosen rules run unchanged on GC 2018-2024; used to centre this grid."
+      },
+      {
+        "n_configs": 24300,
+        "name": "open_sweep_v1 NQ (os_nq_v1)",
+        "note": "Same family on NQ; the 210 survivors above came from it."
+      },
+      {
+        "n_configs": 3840,
+        "name": "compression_breakout_bbkc_v4 GC",
+        "note": "Different (BB/KC squeeze) family on GC; #6 failed the holdout."
+      },
+      {
+        "n_configs": 2304,
+        "name": "compression_breakout_nr_v4_15m GC",
+        "note": "Different (NR-N squeeze) family on GC."
+      },
+      {
+        "n_configs": 41472,
+        "name": "mean_reversion_v5 GC",
+        "note": "Different (mean-reversion) family on GC."
+      },
+      {
+        "n_configs": 21504,
+        "name": "mean_reversion_v6 GC 15m",
+        "note": "Different (mean-reversion) family on GC."
+      },
+      {
+        "n_configs": 17280,
+        "name": "mean_reversion_v6 GC 1h",
+        "note": "Different (mean-reversion) family on GC; #17 + #15 passed the holdout weakly."
+      },
+      {
+        "n_configs": 103680,
+        "name": "path_convexity_v3_15m GC",
+        "note": "Different (price-path convexity) family on GC."
+      }
+    ],
+    "seed": 20261125,
+    "strategy": "open_sweep_gc_v1",
+    "symbol": "GC",
+    "time_stability": {
+      "min_profitable_years": 3,
+      "top_trades_frac": 0.05,
+      "top_trades_k": 5
+    },
+    "trade_count": {
+      "min_completed_trades": 100,
+      "min_trades_per_year": 10,
+      "min_years_meeting_floor": 4
+    },
+    "validation": {
+      "max_drawdown": -0.3,
+      "min_completed_trades": 40,
+      "min_net_return": 0.0,
+      "min_sharpe": 0.3
+    },
+    "version": 1
+  },
+  "transfer_symbol": null
+}

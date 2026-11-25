@@ -40,12 +40,25 @@ flat by 16:00. 5 x 3 x 3 x 2 x 3 x 2 x 3 x 5 x 3 = 24,300 configs.
 
 from __future__ import annotations
 
+import os
 from typing import Literal
 
 from src.utils.config_models import FrozenModel
 
-DAY_START_MIN = 9 * 60 + 30     # 09:30 ET
-DAY_END_MIN = 16 * 60           # 16:00 ET
+# Session profile, fixed per process from the OS_SESSION environment variable (inherited by the
+# spawned workers). `nyse` (default) = the 09:30-16:00 ET equity session every NQ run used;
+# `comex` = the COMEX gold day session 08:20-13:30 ET (open-outcry hours, settlement 13:30), with
+# the pre-open box shifted to the 80 minutes before it (07:00-08:20). The funnel script checks
+# that the YAML's strategy matches the profile, so a run cannot mix them.
+SESSIONS: dict[str, dict] = {
+    "nyse": {"start": 9 * 60 + 30, "end": 16 * 60, "box": (8 * 60, 9 * 60 + 30)},
+    "comex": {"start": 8 * 60 + 20, "end": 13 * 60 + 30, "box": (7 * 60, 8 * 60 + 20)},
+}
+SESSION = os.environ.get("OS_SESSION", "nyse")
+if SESSION not in SESSIONS:
+    raise ValueError(f"OS_SESSION={SESSION!r}; expected one of {sorted(SESSIONS)}")
+DAY_START_MIN = SESSIONS[SESSION]["start"]   # 09:30 ET (nyse) / 08:20 ET (comex)
+DAY_END_MIN = SESSIONS[SESSION]["end"]       # 16:00 ET (nyse) / 13:30 ET (comex)
 EVENING_START_MIN = 18 * 60     # Globex reopens 18:00 ET; those bars carry the NEXT session date
 # The 09:30 open must come from a bar opening within this many minutes of 09:30.
 MAX_OPEN_LAG_MIN = 2
@@ -66,7 +79,7 @@ LEVEL_WINDOWS: dict[str, tuple[int, int] | None] = {
     "onh": None,
     "asia": (20 * 60, 24 * 60),
     "lon": (2 * 60, 5 * 60),
-    "box": (8 * 60, 9 * 60 + 30),
+    "box": SESSIONS[SESSION]["box"],
     "pdr": None,
 }
 LEVELS = ("onh", "asia", "lon", "box", "pdr")
@@ -133,3 +146,47 @@ class OpenSweepV1Config(FrozenModel):
     stop: Literal["struct", "d0.10", "d0.20"] = "struct"
     target: Literal["none", "1R", "2R", "3R", "range"] = "2R"
     exit: Literal["11:00", "12:30", "16:00"] = "16:00"
+
+
+# --- open_sweep_gc_v1 (648 configs, run with OS_SESSION=comex) -------------------------------
+# Specified 2026-11-25 after the 210 NQ v1 survivors were run unchanged on GC (2018-2024, no
+# holdout): the versions that held up there were continuation trades off the overnight range with
+# a 5-bar confirmation, a 0.20 dATR stop and an early exit. This grid re-anchors the family on
+# gold's own day session (08:20 COMEX open, 13:30 settlement) and is centred on that cluster,
+# extended one step past its edges (confirm 8, stop 0.25, a 1R target). The fade arm is dropped
+# (dead on every market in v1) and penetration is fixed at 0. GC 2023-2024 informed the centring,
+# so validation is NOT a clean test; only the 2025+ holdout is.
+GC1_LEVELS: tuple[str, ...] = ("onh", "lon", "box")
+GC1_SIDES: tuple[str, ...] = ("both", "high", "low")
+GC1_WINDOWS: tuple[int, ...] = (15, 30, 60)
+GC1_PENS: tuple[str, ...] = ("0.00",)
+GC1_CONFIRMS: tuple[int, ...] = (3, 5, 8)
+GC1_MODES: tuple[str, ...] = ("cont",)
+GC1_STOPS: tuple[str, ...] = ("d0.15", "d0.25")
+GC1_TARGETS: tuple[str, ...] = ("none", "1R")
+GC1_EXITS: tuple[str, ...] = ("11:00", "13:30")
+
+
+class OpenSweepGCV1Config(FrozenModel):
+    symbol: str
+    timeframe: Literal["1min"] = "1min"
+    level: Literal["onh", "lon", "box"] = "onh"
+    side: Literal["both", "high", "low"] = "both"
+    window: Literal[15, 30, 60] = 30
+    pen: Literal["0.00"] = "0.00"
+    confirm: Literal[3, 5, 8] = 5
+    mode: Literal["cont"] = "cont"
+    stop: Literal["d0.15", "d0.25"] = "d0.15"
+    target: Literal["none", "1R"] = "none"
+    exit: Literal["11:00", "13:30"] = "13:30"
+
+
+# --- open_sweep_gc_v2 (648 configs, default OS_SESSION=nyse) -----------------------------------
+# Specified 2026-11-25 after os_gc_v1 (08:20 COMEX anchor) had 0 development survivors while the
+# 09:30-anchored NQ transfers had shown signal on GC: the same grid, anchored on the 09:30 NY open
+# (session 09:30-16:00, box 08:00-09:30), time exit 11:00 or 16:00 (the session's last bar).
+GC2_EXITS: tuple[str, ...] = ("11:00", "16:00")
+
+
+class OpenSweepGCV2Config(OpenSweepGCV1Config):
+    exit: Literal["11:00", "16:00"] = "16:00"

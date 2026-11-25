@@ -44,6 +44,9 @@ def main(
     config: Path = typer.Option(...),
     symbol: str = typer.Option(...),
     confirm_holdout_access: bool = typer.Option(False, "--confirm-holdout-access"),
+    phases: str = typer.Option("development,validation,holdout", help="comma list; drop holdout for a no-holdout scan"),
+    workers: int = typer.Option(1),
+    tag: str = typer.Option("", help="suffix for the output file name"),
 ) -> None:
     sel = json.loads(manifest.read_text())
     sel_sha = _sha(sel)
@@ -54,17 +57,21 @@ def main(
     if symbol == fcfg.symbol:
         raise typer.BadParameter("Pick a different market than the one the picks were chosen on.")
     ec = load_execution_config(fcfg)
-    auth = authorize_holdout_access(manifest_sha256=sel_sha, confirm=confirm_holdout_access, command="transfer_check")
+    want = [x.strip() for x in phases.split(",") if x.strip()]
+    auth = (authorize_holdout_access(manifest_sha256=sel_sha, confirm=confirm_holdout_access, command="transfer_check")
+            if "holdout" in want else None)
     prior = [e for e in read_ledger(DEFAULT_LEDGER) if e.get("phase") == "holdout" and e.get("symbol") == symbol]
     exp = sel["experiment_id"]
     windows = {}
     for phase, w in (("development", fcfg.data.development), ("validation", fcfg.data.validation),
                      ("holdout", fcfg.data.holdout)):
+        if phase not in want:
+            continue
         frames, info = _frames(fcfg, symbol, phase, command="transfer_check", experiment_id=f"{exp} -> {symbol}",
                                authorization=auth if phase == "holdout" else None)
         end = date.fromisoformat(info["actual_last_session"]) if phase == "holdout" else w.end
         jobs = [Job(c["config_id"], _params(c["params"], symbol), w.start, end) for c in sel["candidates"]]
-        res = run_jobs(jobs, frames, fcfg=fcfg, exec_config=ec, n_workers=1)
+        res = run_jobs(jobs, frames, fcfg=fcfg, exec_config=ec, n_workers=workers)
         acc = {"development": fcfg.performance, "validation": fcfg.validation, "holdout": fcfg.holdout.acceptance}[phase]
         windows[phase] = {"window": [str(w.start), str(end)], "data_access": info, "results": [
             {"dev_order": c["dev_order"], "config_id": c["config_id"], "metrics": res[c["config_id"]]["metrics"],
@@ -76,7 +83,7 @@ def main(
            "prior_holdout_accesses_for_symbol": len(prior),
            "note": "Frozen picks with unchanged rules; only the symbol is swapped. Nothing re-chosen or re-ranked.",
            "windows": windows}
-    path = manifest.parent / f"transfer_check_{symbol}_{stamp}.json"
+    path = manifest.parent / f"transfer_check_{symbol}{('_' + tag) if tag else ''}_{stamp}.json"
     atomic_write_json(path, out)
     typer.echo(f"wrote {path}")
     for phase, wd in windows.items():

@@ -1,0 +1,22 @@
+=== os_gc_v2 develop 2026-11-25T03:07:37Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-25T03:08:14.330453Z"}
+{"n": 648, "elapsed_s": 55.7, "event": "prep_built", "level": "info", "timestamp": "2026-11-25T03:08:34.210402Z"}
+{"stage": "1 backtest integrity", "evaluated": 648, "passed": 648, "event": "stage_done", "level": "info", "timestamp": "2026-11-25T03:08:34.224212Z"}
+{"stage": "2 trade count & coverage", "evaluated": 648, "passed": 192, "event": "stage_done", "level": "info", "timestamp": "2026-11-25T03:08:34.227935Z"}
+{"stage": "3 performance & risk", "evaluated": 192, "passed": 14, "event": "stage_done", "level": "info", "timestamp": "2026-11-25T03:08:34.228536Z"}
+{"step": "s4_local_moves", "total": 130, "saved": 0, "to_run": 130, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-25T03:08:34.240863Z"}
+{"step": "s4_local_moves", "saved": 124, "of": 130, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-25T03:08:53.332685Z"}
+{"reused_from_prep": 0, "backtested": 130, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-25T03:08:53.332997Z"}
+{"stage": "4 parameter stability", "evaluated": 14, "passed": 14, "event": "stage_done", "level": "info", "timestamp": "2026-11-25T03:08:53.334965Z"}
+{"stage": "5 time stability", "evaluated": 14, "passed": 14, "event": "stage_done", "level": "info", "timestamp": "2026-11-25T03:08:53.335202Z"}
+{"step": "s6_intervals", "total": 14, "saved": 0, "to_run": 14, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-25T03:08:53.338309Z"}
+{"step": "s6_intervals", "saved": 14, "of": 14, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-25T03:08:59.262795Z"}
+{"step": "s6_perturbations", "total": 280, "saved": 0, "to_run": 280, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-25T03:08:59.273540Z"}
+{"step": "s6_perturbations", "saved": 280, "of": 280, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-25T03:09:47.889146Z"}
+{"step": "s7_execution_stress", "total": 1582, "saved": 0, "to_run": 1582, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-25T03:09:47.919420Z"}
+{"step": "s7_execution_stress", "saved": 1582, "of": 1582, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-25T03:10:05.314378Z"}
+{"stage": "7 execution stress", "evaluated": 14, "passed": 14, "event": "stage_done", "level": "info", "timestamp": "2026-11-25T03:10:05.323645Z"}
+develop done: 648 configs -> 14 representatives -> 14 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/ny-open-sweep-backtest/runs/funnel/os_gc_v2
+=== os_gc_v2 validate 2026-11-25T03:10:05Z
+validate: 14 frozen -> 10 pass validation (previously-inspected data). Selection manifest sha256 0e0994c45d5c4041
+=== os_gc_v2 done 2026-11-25T03:10:15Z
