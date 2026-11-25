@@ -354,3 +354,59 @@ class NRBreakoutV4_15mConfig(_BreakoutConfig):
     @property
     def max_range_atr_value(self) -> float | None:
         return None if self.max_range_atr == "off" else float(self.max_range_atr)
+
+
+# --- compression_breakout_nr v5 (close entry only, small ablation grids: 15m 400, 5m 120) ----
+# Specified by the user (2026-11-25) after NR v2-v4 showed the wick entries do not survive
+# 1-minute settling. Close entry (the bar must close outside the box), 1 NR bar, setup live
+# 3 bars, min box 0.3 ATR, no NR range cap, no time stop are fixed. 5m lookbacks are scaled so
+# they cover about the same clock span as the 15m ones.
+V5_NR_LOOKBACKS_15M: tuple[int, ...] = (2, 3, 5, 8, 16)
+V5_NR_LOOKBACKS_5M: tuple[int, ...] = (3, 5, 10, 16, 25)
+V5_NR_STOPS: tuple[str, ...] = ("box", "1.0")
+V5_NR_TARGETS_15M: tuple[str, ...] = ("1.0", "2.0", "3.0", "4.0", "none")
+V5_NR_TARGETS_5M: tuple[str, ...] = ("1.0", "2.5", "none")
+V5_NR_DIRECTIONS: tuple[str, ...] = ("long", "both")
+V5_NR_TREND_FILTERS: tuple[str, ...] = ("none", "ema200")
+
+
+class NRBreakoutV5_15mConfig(_BreakoutConfig):
+    timeframe: Literal["15min"] = "15min"
+    compression: Literal["nr"] = "nr"
+    nr_lookback: Literal[2, 3, 5, 8, 16] = 5
+    inside_bar: bool = False
+    min_nr_bars: Literal[1] = 1
+    entry_type: Literal["close"] = "close"
+    setup_expiry_bars: Literal[3] = 3
+    stop: Literal["box", "1.0"] = "box"
+    target_r: Literal["1.0", "2.0", "3.0", "4.0", "none"] = "2.0"
+    direction: Literal["long", "both"] = "both"
+    trend_filter: Literal["none", "ema200"] = "none"
+    min_box_atr: Literal[0.3] = 0.3
+    max_range_atr: Literal["off"] = "off"
+    max_hold_bars: Literal[0] = 0
+
+    @property
+    def max_range_atr_value(self) -> float | None:
+        return None
+
+
+class NRBreakoutV5_5mConfig(_BreakoutConfig):
+    timeframe: Literal["5min"] = "5min"
+    compression: Literal["nr"] = "nr"
+    nr_lookback: Literal[3, 5, 10, 16, 25] = 10
+    inside_bar: Literal[False] = False
+    min_nr_bars: Literal[1] = 1
+    entry_type: Literal["close"] = "close"
+    setup_expiry_bars: Literal[3] = 3
+    stop: Literal["box", "1.0"] = "box"
+    target_r: Literal["1.0", "2.5", "none"] = "2.5"
+    direction: Literal["long", "both"] = "both"
+    trend_filter: Literal["none", "ema200"] = "none"
+    min_box_atr: Literal[0.3] = 0.3
+    max_range_atr: Literal["off"] = "off"
+    max_hold_bars: Literal[0] = 0
+
+    @property
+    def max_range_atr_value(self) -> float | None:
+        return None

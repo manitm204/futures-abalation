@@ -48,7 +48,7 @@ import typer
 
 from src.analysis.neighborhood import (LATTICE_CB_BBKC_V1, LATTICE_CB_BBKC_V2_5M, LATTICE_CB_BBKC_V2_15M, LATTICE_CB_BBKC_V3_5M, LATTICE_CB_BBKC_V3_15M,
                                      LATTICE_CB_BBKC_V4_15M,
-                                       LATTICE_CB_NR_V1, LATTICE_CB_NR_V2_15M, LATTICE_CB_NR_V3_15M, LATTICE_CB_NR_V4_15M, NeighborhoodStats, neighborhood_stats)
+                                       LATTICE_CB_NR_V1, LATTICE_CB_NR_V2_15M, LATTICE_CB_NR_V3_15M, LATTICE_CB_NR_V4_15M, LATTICE_CB_NR_V5_15M, LATTICE_CB_NR_V5_5M, NeighborhoodStats, neighborhood_stats)
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.data.aggregation import AGG_INTERVAL_MINUTES, aggregate_bars
 from src.experiments.data_access import (
@@ -97,10 +97,10 @@ from src.experiments.funnel_robustness import (
 )
 from src.experiments.cb_grid import (cb_grid_bbkc, cb_grid_bbkc_v2_5m, cb_grid_bbkc_v2_15m, cb_grid_bbkc_v3_5m,
                                      cb_grid_bbkc_v3_15m, cb_grid_bbkc_v4_15m, cb_grid_nr,
-                                     cb_grid_nr_v2_15m, cb_grid_nr_v3_15m, cb_grid_nr_v4_15m)
+                                     cb_grid_nr_v2_15m, cb_grid_nr_v3_15m, cb_grid_nr_v4_15m, cb_grid_nr_v5_15m, cb_grid_nr_v5_5m)
 from src.experiments.cb_integrity import CHECKS, truncation_invariance
 from src.strategies.compression_breakout.backtest import CBParams
-from src.strategies.compression_breakout.config import (NRBreakoutConfig, NRBreakoutV2_15mConfig, NRBreakoutV3_15mConfig, NRBreakoutV4_15mConfig, SqueezeBreakoutConfig,
+from src.strategies.compression_breakout.config import (NRBreakoutConfig, NRBreakoutV2_15mConfig, NRBreakoutV3_15mConfig, NRBreakoutV4_15mConfig, NRBreakoutV5_15mConfig, NRBreakoutV5_5mConfig, SqueezeBreakoutConfig,
                                                         SqueezeBreakoutV2_5mConfig, SqueezeBreakoutV2_15mConfig,
                                                         SqueezeBreakoutV3_5mConfig, SqueezeBreakoutV3_15mConfig,
                                                         SqueezeBreakoutV4_15mConfig)
@@ -173,6 +173,18 @@ SPACES = {
     },
     "compression_breakout_nr_v4_15m": {
         "grid": cb_grid_nr_v4_15m, "cls": NRBreakoutV4_15mConfig, "lattice": LATTICE_CB_NR_V4_15M,
+        "perturb": perturbations_cb, "local": local_perturbations_cb,
+        "keys": ("symbol", "timeframe", "compression", "nr_lookback", "inside_bar", "min_nr_bars",
+                 *CB_SHARED_KEYS, "max_range_atr", "max_hold_bars"),
+    },
+    "compression_breakout_nr_v5_15m": {
+        "grid": cb_grid_nr_v5_15m, "cls": NRBreakoutV5_15mConfig, "lattice": LATTICE_CB_NR_V5_15M,
+        "perturb": perturbations_cb, "local": local_perturbations_cb,
+        "keys": ("symbol", "timeframe", "compression", "nr_lookback", "inside_bar", "min_nr_bars",
+                 *CB_SHARED_KEYS, "max_range_atr", "max_hold_bars"),
+    },
+    "compression_breakout_nr_v5_5m": {
+        "grid": cb_grid_nr_v5_5m, "cls": NRBreakoutV5_5mConfig, "lattice": LATTICE_CB_NR_V5_5M,
         "perturb": perturbations_cb, "local": local_perturbations_cb,
         "keys": ("symbol", "timeframe", "compression", "nr_lookback", "inside_bar", "min_nr_bars",
                  *CB_SHARED_KEYS, "max_range_atr", "max_hold_bars"),

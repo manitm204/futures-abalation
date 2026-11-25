@@ -1,0 +1,257 @@
+{
+ "acceptance_holdout": {
+  "max_drawdown": -0.3,
+  "min_completed_trades": null,
+  "min_net_return": 0.0,
+  "min_sharpe": 0.0
+ },
+ "acceptance_validation": {
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40,
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3
+ },
+ "candidates": [
+  {
+   "cluster": 6,
+   "config_id": "cfg_6c1f5e1eb96cdeac2c5d",
+   "dev_net_return": 0.6311800000000001,
+   "dev_order": 2,
+   "dev_sharpe": 1.1652576316159502,
+   "n_profitable_years": 5,
+   "neighbor_median_sharpe": 1.1241145808084303,
+   "params": {
+    "compression": "nr",
+    "direction": "long",
+    "entry_type": "close",
+    "inside_bar": false,
+    "max_hold_bars": 0,
+    "max_range_atr": "off",
+    "min_box_atr": 0.3,
+    "min_nr_bars": 1,
+    "nr_lookback": 3,
+    "setup_expiry_bars": 3,
+    "stop": "box",
+    "symbol": "NQ",
+    "target_r": "none",
+    "timeframe": "5min",
+    "trend_filter": "ema200"
+   },
+   "stability_median_sharpe": 1.1064926096326075
+  },
+  {
+   "cluster": 0,
+   "config_id": "cfg_6d834d12110248722159",
+   "dev_net_return": 0.4507112134252278,
+   "dev_order": 7,
+   "dev_sharpe": 1.0837447807941702,
+   "n_profitable_years": 4,
+   "neighbor_median_sharpe": 0.8469048231115259,
+   "params": {
+    "compression": "nr",
+    "direction": "long",
+    "entry_type": "close",
+    "inside_bar": false,
+    "max_hold_bars": 0,
+    "max_range_atr": "off",
+    "min_box_atr": 0.3,
+    "min_nr_bars": 1,
+    "nr_lookback": 10,
+    "setup_expiry_bars": 3,
+    "stop": "1.0",
+    "symbol": "NQ",
+    "target_r": "none",
+    "timeframe": "5min",
+    "trend_filter": "ema200"
+   },
+   "stability_median_sharpe": 1.0089324696302366
+  },
+  {
+   "cluster": 0,
+   "config_id": "cfg_095bec46b06db85cbfcd",
+   "dev_net_return": 0.3436650000000001,
+   "dev_order": 9,
+   "dev_sharpe": 0.9131549313836891,
+   "n_profitable_years": 4,
+   "neighbor_median_sharpe": 0.7575063509130506,
+   "params": {
+    "compression": "nr",
+    "direction": "long",
+    "entry_type": "close",
+    "inside_bar": false,
+    "max_hold_bars": 0,
+    "max_range_atr": "off",
+    "min_box_atr": 0.3,
+    "min_nr_bars": 1,
+    "nr_lookback": 10,
+    "setup_expiry_bars": 3,
+    "stop": "box",
+    "symbol": "NQ",
+    "target_r": "none",
+    "timeframe": "5min",
+    "trend_filter": "ema200"
+   },
+   "stability_median_sharpe": 0.9358227509447237
+  }
+ ],
+ "code_version": "46ee6e771bde579cd947a801ff3d4e8c4ac7ecfa",
+ "config_sha256": "4680a1679f87e328b529fb3125f0c00f882479825086427f3d2f6d0a3a3aa060",
+ "data_windows": {
+  "clean_root": "data/clean",
+  "development": {
+   "end": "2022-12-31",
+   "start": "2018-01-01"
+  },
+  "holdout": {
+   "end": null,
+   "start": "2025-01-01"
+  },
+  "timeframes": [
+   "5min"
+  ],
+  "validation": {
+   "end": "2024-12-31",
+   "start": "2023-01-01"
+  }
+ },
+ "experiment_id": "cb_nr_nq_v5_5m",
+ "frozen_at": "2026-11-26T00:12:05.312345+00:00",
+ "frozen_manifest_sha256": "4a4ed57aec887fe9ad847f561857446d50e85e90048d80a6e713351237055ce0",
+ "git_diff_sha256": "b83fa813a0b4a21ff33fbdda5a67b82a05253254e943a2b53f4c50bb89ad8399",
+ "git_dirty": true,
+ "seed": 2026112525,
+ "selection_rules": {
+  "gates": [
+   "1 integrity",
+   "2 trade count",
+   "3 performance & risk",
+   "4 parameter stability",
+   "5 time stability",
+   "6 dedup (complete linkage, best 2 per cluster)",
+   "7 execution stress"
+  ],
+  "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+  "validation_is_not_used_for_ranking": true
+ },
+ "sizing_and_costs": {
+  "allow_overlapping_trades": false,
+  "allow_pyramiding": false,
+  "allow_short": false,
+  "commission_minimum": 0.0,
+  "commission_per_contract": 2.5,
+  "commission_per_share": 0.0,
+  "extended_hours_slippage_multiplier": 1.0,
+  "fractional_shares": false,
+  "include_sec_finra_fees": false,
+  "instrument_type": "futures",
+  "intrabar_collision_mode": "stop_first",
+  "leverage": 1.0,
+  "max_open_positions_per_symbol": 1,
+  "risk_per_trade_pct": 0.0025,
+  "slippage_bps_limit_adverse": 0.0,
+  "slippage_bps_market": 0.0,
+  "slippage_bps_stop": 0.0,
+  "slippage_ticks_market": 1.0,
+  "slippage_ticks_stop": 1.0,
+  "starting_equity": 1000000.0
+ },
+ "symbol": "NQ",
+ "validated_at": "2026-11-26T00:12:27.490015+00:00",
+ "validation_summary": [
+  {
+   "config_id": "cfg_94e6df504dc8abfbe63b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6c1f5e1eb96cdeac2c5d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5dac0533d703180416d8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f86bee85db5c11a4b0ea",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6001219dcea0085c808f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_55d6c0b50bf312ea560f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6d834d12110248722159",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5e458fa2d7a9cd8ce995",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_095bec46b06db85cbfcd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_cb9040c8f58ef260a7d3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5b02f59fda1a0698daef",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2af27715faa3a410f82d",
+   "reasons": [
+    "sharpe 0.209 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4a21ea71d20e94375b0d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bc522c9362b17851e402",
+   "reasons": [
+    "net_return -0.0206 <= 0.0",
+    "sharpe -0.047 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1939205f14ad79dccd34",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_10159ed7788347213c37",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_93dc2df0cab8dd9d25dd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6465663560487a3a41f8",
+   "reasons": [],
+   "status": "pass"
+  }
+ ]
+}

@@ -1,0 +1,445 @@
+{
+  "data_access": {
+    "actual_last_session": "2022-12-30",
+    "command": "develop",
+    "experiment_id": "cb_nr_rty_v5_15m",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 60,
+    "partition_fingerprint": "3a742f2c8e9ad631",
+    "phase": "development",
+    "phase_end": "2022-12-31",
+    "rows": 1658680,
+    "symbol": "RTY"
+  },
+  "data_history": {
+    "holdout_note": "No NR-N metrics have been computed on RTY 2025+ for this grid; other families were scored there.",
+    "holdout_previously_inspected": false,
+    "validation_note": "RTY 2023-2024 was read for other families and for NR v2-v4; this grid is largely in-sample for this line.",
+    "validation_previously_used_for_selection": true
+  },
+  "dsr": {
+    "calibration_verified": false,
+    "effective_trials": {
+      "li_ji": 82.00000000000033,
+      "n_components_95": 51,
+      "n_series": 400,
+      "participation_ratio": 7.951279769431703,
+      "rank_bound_T": 1259
+    },
+    "n_configs_with_defined_sharpe": 400,
+    "primary_method": "li_ji",
+    "research_history": [
+      {
+        "n_configs": 9216,
+        "name": "compression_breakout_nr_v4_15m NQ / YM / RTY / CL",
+        "note": "Same grid on four other markets; results seen before this run."
+      },
+      {
+        "n_configs": 145152,
+        "name": "compression_breakout_nr_v3_15m ES (cb_nr_es_v3_15m)",
+        "note": "Same line on ES 15m; 666 frozen, 608 passed 2023-2024. This grid was specified after its results."
+      },
+      {
+        "n_configs": 207360,
+        "name": "compression_breakout_nr_v2_15m ES (cb_nr_es_v2_15m)",
+        "note": "Same line on ES 15m; 1,118 frozen, 691 passed 2023-2024."
+      },
+      {
+        "n_configs": 3840,
+        "name": "compression_breakout_bbkc_v4_15m NQ",
+        "note": "Sibling line (BB/KC squeeze) round 4."
+      },
+      {
+        "n_configs": 56448,
+        "name": "compression_breakout_bbkc_v3 NQ (cb_bbkc_nq_v3_5m + _15m)",
+        "note": "Sibling line (BB/KC squeeze) on NQ, 5m + 15m."
+      },
+      {
+        "n_configs": 184320,
+        "name": "compression_breakout_bbkc_v2_15m ES (cb_bbkc_es_v2_15m)",
+        "note": "Sibling line (BB/KC squeeze) on ES 15m."
+      }
+    ],
+    "serial_dependence": "lag1_effective_n",
+    "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+    "trial_count_options": {
+      "li_ji": 82.00000000000033,
+      "participation_ratio": 7.951279769431703,
+      "raw": 400.0,
+      "raw_plus_known_prior": 606736.0
+    },
+    "unresolved": [
+      "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+      "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+      "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+      "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+    ],
+    "variance_of_trial_sharpes_per_period": 0.00128705221423125
+  },
+  "elapsed_s": 67.7,
+  "experiment_id": "cb_nr_rty_v5_15m",
+  "frozen_manifest_sha256": "928230e738ba1b49e56c49a6f5d1860d3f94548c806b92b6ec767993065892b1",
+  "instrument_type": "futures",
+  "integrity": {
+    "checks_per_config": [
+      "box_not_from_prior_compression_run",
+      "setup_not_live",
+      "not_first_breakout_of_run",
+      "entry_signal_condition_not_met",
+      "direction_not_allowed",
+      "entry_against_trend",
+      "entry_inside_last_entry_cutoff",
+      "entry_not_after_signal_same_session",
+      "exit_before_entry",
+      "position_held_overnight",
+      "entry_fill_better_than_market",
+      "stop_not_per_rule",
+      "target_not_per_rule",
+      "stop_exit_without_touch",
+      "stop_fill_better_than_rule",
+      "target_exit_without_touch",
+      "target_fill_better_than_rule",
+      "target_taken_when_stop_touched",
+      "exit_not_at_first_touch",
+      "eod_exit_not_at_session_close",
+      "time_exit_not_per_rule",
+      "held_past_time_stop",
+      "exit_fill_better_than_market",
+      "overlapping_positions",
+      "position_exceeds_equity",
+      "forced_close_not_final_trade",
+      "commission_below_minimum"
+    ],
+    "cut_fractions": [
+      0.3,
+      0.6000000000000001,
+      0.9
+    ],
+    "failures": {},
+    "truncation_sample": 40
+  },
+  "mode": "development_only",
+  "n_configs": 400,
+  "n_frozen_candidates": 9,
+  "provenance": {
+    "available_data_endpoint_per_manifest": {
+      "ES": "2026-10-16",
+      "RTY": "2026-10-16"
+    },
+    "config_path": "configs/funnel/cb_nr_funnel_rty_v5_15m.yaml",
+    "config_sha256": "2e796c15b6af5060f8dac47c9a20175949930524f96ac38de8b43705f795831f",
+    "created_at": "2026-11-26T00:04:22.852783+00:00",
+    "data_manifests": {
+      "ES": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 3099325,
+        "schema_version": "1.0.0"
+      },
+      "RTY": {
+        "actual_coverage_end": "2026-10-16",
+        "actual_coverage_start": "2018-01-02",
+        "adjustment_status": "back_adjusted_difference",
+        "cleaning_version": "1.0.0",
+        "download_timestamp": "2026-10-19T17:34:44.225120+00:00",
+        "provider": "databento",
+        "row_count": 2959762,
+        "schema_version": "1.0.0"
+      }
+    },
+    "git_commit": "46ee6e771bde579cd947a801ff3d4e8c4ac7ecfa",
+    "git_diff_sha256": "295affb2b87d619c8d369230162a76fbd787e82c13f10baf7823c47fb7722099",
+    "git_dirty": true,
+    "seed": 2026112530
+  },
+  "rejection_reason_counts": {
+    "s1:hard_reject:integrity:box_not_from_prior_compression_run": 200,
+    "s1:hard_reject:integrity:entry_signal_condition_not_met": 193,
+    "s1:hard_reject:integrity:exit_not_at_first_touch": 25,
+    "s1:hard_reject:integrity:not_first_breakout_of_run": 160,
+    "s1:hard_reject:integrity:stop_exit_without_touch": 100,
+    "s1:hard_reject:integrity:stop_fill_better_than_rule": 100,
+    "s1:hard_reject:integrity:stop_not_per_rule": 100,
+    "s1:hard_reject:integrity:target_not_per_rule": 80,
+    "s3:hard_reject:max_drawdown": 45,
+    "s3:hard_reject:net_return": 124,
+    "s3:hard_reject:sharpe": 186
+  },
+  "survivor_table": [
+    {
+      "evaluated": 400,
+      "kind": "universe",
+      "passed": 400,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 100.0,
+      "stage": "0 universe"
+    },
+    {
+      "evaluated": 400,
+      "hard_reject": 200,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 200,
+      "pct_of_previous": 50.0,
+      "pct_of_universe": 50.0,
+      "stage": "1 backtest integrity",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 200,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 200,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 50.0,
+      "stage": "2 trade count & coverage",
+      "with_warnings": 200
+    },
+    {
+      "evaluated": 200,
+      "hard_reject": 186,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 14,
+      "pct_of_previous": 7.0,
+      "pct_of_universe": 3.5,
+      "stage": "3 performance & risk",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 14,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 14,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 3.5,
+      "stage": "4 parameter stability",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": 14,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 14,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 3.5,
+      "stage": "5 time stability",
+      "with_warnings": 14
+    },
+    {
+      "deduplicated": 5,
+      "evaluated": 14,
+      "kind": "dedup",
+      "n_clusters": 5,
+      "note": "best 2 per cluster",
+      "passed": 9,
+      "pct_of_previous": 64.28571428571429,
+      "pct_of_universe": 2.25,
+      "stage": "6 deduplication"
+    },
+    {
+      "evaluated": 9,
+      "hard_reject": 0,
+      "insufficient_evidence": 0,
+      "kind": "hard_gate",
+      "passed": 9,
+      "pct_of_previous": 100.0,
+      "pct_of_universe": 2.25,
+      "stage": "7 execution stress",
+      "with_warnings": 0
+    },
+    {
+      "evaluated": null,
+      "kind": "hard_gate",
+      "note": "not run in `develop`; run the `validate` command on the frozen manifest",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "8 frozen validation"
+    },
+    {
+      "evaluated": 9,
+      "kind": "diagnostic_only",
+      "note": "diagnostic only: unverified: 9",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "9 DSR / transfer"
+    },
+    {
+      "evaluated": null,
+      "kind": "explicit_command",
+      "note": "not run; `final-test` command only",
+      "passed": null,
+      "pct_of_previous": null,
+      "pct_of_universe": null,
+      "stage": "10 final holdout"
+    }
+  ],
+  "symbol": "RTY",
+  "thresholds": {
+    "confidence": {
+      "dsr_calibration_verified": false,
+      "dsr_threshold": 0.95,
+      "effective_trials_method": "li_ji",
+      "serial_dependence": "lag1_effective_n",
+      "transfer_symbol": "ES"
+    },
+    "data": {
+      "clean_root": "data/clean",
+      "development": {
+        "end": "2022-12-31",
+        "start": "2018-01-01"
+      },
+      "holdout": {
+        "end": null,
+        "start": "2025-01-01"
+      },
+      "timeframes": [
+        "15min"
+      ],
+      "validation": {
+        "end": "2024-12-31",
+        "start": "2023-01-01"
+      }
+    },
+    "data_history": {
+      "holdout_note": "No NR-N metrics have been computed on RTY 2025+ for this grid; other families were scored there.",
+      "holdout_previously_inspected": false,
+      "validation_note": "RTY 2023-2024 was read for other families and for NR v2-v4; this grid is largely in-sample for this line.",
+      "validation_previously_used_for_selection": true
+    },
+    "dedup": {
+      "corr_threshold": 0.8,
+      "linkage": "complete",
+      "reps_per_cluster": 2,
+      "return_basis": "monthly"
+    },
+    "execution": {
+      "baseline": "configs/execution/futures.yaml"
+    },
+    "execution_stress": {
+      "breakeven_max_multiplier": 25.0,
+      "diagnostic_cost_multipliers": [
+        2.0
+      ],
+      "entry_delay_bars": 1,
+      "gate_cost_multiplier": 1.5,
+      "missed_entry_frac": 0.1,
+      "missed_entry_sims": 100
+    },
+    "holdout": {
+      "acceptance": {
+        "max_drawdown": -0.3,
+        "min_completed_trades": null,
+        "min_net_return": 0.0,
+        "min_sharpe": 0.0
+      }
+    },
+    "integrity": {
+      "truncation_check_sample": 40,
+      "truncation_points": 3
+    },
+    "metrics": {
+      "cash_treatment": "Idle cash earns 0% and the Sharpe excess return is measured against a 0% risk-free rate, so the two assumptions are consistent.",
+      "drawdown_basis": "daily session-close mark-to-market (understates intraday DD)",
+      "periods_per_year": 252,
+      "return_frequency": "daily",
+      "risk_free_rate_annual": 0.0
+    },
+    "parameter_stability": {
+      "local": {
+        "band_mult_abs": null,
+        "entry_z_abs": null,
+        "exit_z_abs": null,
+        "int_rel": 0.2,
+        "kc_mult_abs": null,
+        "max_range_atr_abs": 0.1,
+        "min_box_atr_abs": 0.25,
+        "stop_atr_abs": 0.25,
+        "target_r_abs": 0.5
+      },
+      "min_frac_profitable": 0.7,
+      "min_median_sharpe": 0.5,
+      "mode": "local_perturbation",
+      "neighbor_mode": "single_axis",
+      "perturbation": {
+        "float_rel_step": 0.1,
+        "integer_rel_step": 0.15,
+        "n_per_config": 20,
+        "z_abs": null
+      },
+      "prescreen": {
+        "max_configs": 3000,
+        "per_cluster": 3
+      }
+    },
+    "performance": {
+      "max_drawdown": -0.3,
+      "max_drawdown_source": "src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct",
+      "min_net_return": 0.0,
+      "min_sharpe": 0.75
+    },
+    "research_history": [
+      {
+        "n_configs": 9216,
+        "name": "compression_breakout_nr_v4_15m NQ / YM / RTY / CL",
+        "note": "Same grid on four other markets; results seen before this run."
+      },
+      {
+        "n_configs": 145152,
+        "name": "compression_breakout_nr_v3_15m ES (cb_nr_es_v3_15m)",
+        "note": "Same line on ES 15m; 666 frozen, 608 passed 2023-2024. This grid was specified after its results."
+      },
+      {
+        "n_configs": 207360,
+        "name": "compression_breakout_nr_v2_15m ES (cb_nr_es_v2_15m)",
+        "note": "Same line on ES 15m; 1,118 frozen, 691 passed 2023-2024."
+      },
+      {
+        "n_configs": 3840,
+        "name": "compression_breakout_bbkc_v4_15m NQ",
+        "note": "Sibling line (BB/KC squeeze) round 4."
+      },
+      {
+        "n_configs": 56448,
+        "name": "compression_breakout_bbkc_v3 NQ (cb_bbkc_nq_v3_5m + _15m)",
+        "note": "Sibling line (BB/KC squeeze) on NQ, 5m + 15m."
+      },
+      {
+        "n_configs": 184320,
+        "name": "compression_breakout_bbkc_v2_15m ES (cb_bbkc_es_v2_15m)",
+        "note": "Sibling line (BB/KC squeeze) on ES 15m."
+      }
+    ],
+    "seed": 2026112530,
+    "strategy": "compression_breakout_nr_v5_15m",
+    "symbol": "RTY",
+    "time_stability": {
+      "min_profitable_years": 3,
+      "top_trades_frac": 0.05,
+      "top_trades_k": 5
+    },
+    "trade_count": {
+      "min_completed_trades": 100,
+      "min_trades_per_year": 10,
+      "min_years_meeting_floor": 4
+    },
+    "validation": {
+      "max_drawdown": -0.3,
+      "min_completed_trades": 40,
+      "min_net_return": 0.0,
+      "min_sharpe": 0.3
+    },
+    "version": 1
+  },
+  "transfer_symbol": "ES"
+}

@@ -500,3 +500,15 @@ LATTICE_CB_NR_V4_15M = Lattice({
     "max_range_atr": ["0.5", "off"],
     "max_hold_bars": [0],
 }, [*FIXED_AXES_CB, "inside_bar"])
+
+# NR-N v5, close entry (15m / 5m small ablation grids)
+LATTICE_CB_NR_V5_15M = Lattice({
+    "nr_lookback": [2, 3, 5, 8, 16], "min_nr_bars": [1], "setup_expiry_bars": [3],
+    "target_r": ["1.0", "2.0", "3.0", "4.0", "none"], "min_box_atr": [0.3],
+    "max_range_atr": ["off"], "max_hold_bars": [0],
+}, [*FIXED_AXES_CB, "inside_bar"])
+LATTICE_CB_NR_V5_5M = Lattice({
+    "nr_lookback": [3, 5, 10, 16, 25], "min_nr_bars": [1], "setup_expiry_bars": [3],
+    "target_r": ["1.0", "2.5", "none"], "min_box_atr": [0.3],
+    "max_range_atr": ["off"], "max_hold_bars": [0],
+}, [*FIXED_AXES_CB, "inside_bar"])

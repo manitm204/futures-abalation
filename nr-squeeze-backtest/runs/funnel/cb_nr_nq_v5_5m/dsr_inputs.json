@@ -1,0 +1,59 @@
+{
+  "calibration_verified": false,
+  "effective_trials": {
+    "li_ji": 42.00000000000015,
+    "n_components_95": 39,
+    "n_series": 120,
+    "participation_ratio": 6.910493340833179,
+    "rank_bound_T": 1259
+  },
+  "n_configs_with_defined_sharpe": 120,
+  "primary_method": "li_ji",
+  "research_history": [
+    {
+      "n_configs": 9216,
+      "name": "compression_breakout_nr_v4_15m NQ / YM / RTY / CL",
+      "note": "Same grid on four other markets; results seen before this run."
+    },
+    {
+      "n_configs": 145152,
+      "name": "compression_breakout_nr_v3_15m ES (cb_nr_es_v3_15m)",
+      "note": "Same line on ES 15m; 666 frozen, 608 passed 2023-2024. This grid was specified after its results."
+    },
+    {
+      "n_configs": 207360,
+      "name": "compression_breakout_nr_v2_15m ES (cb_nr_es_v2_15m)",
+      "note": "Same line on ES 15m; 1,118 frozen, 691 passed 2023-2024."
+    },
+    {
+      "n_configs": 3840,
+      "name": "compression_breakout_bbkc_v4_15m NQ",
+      "note": "Sibling line (BB/KC squeeze) round 4."
+    },
+    {
+      "n_configs": 56448,
+      "name": "compression_breakout_bbkc_v3 NQ (cb_bbkc_nq_v3_5m + _15m)",
+      "note": "Sibling line (BB/KC squeeze) on NQ, 5m + 15m."
+    },
+    {
+      "n_configs": 184320,
+      "name": "compression_breakout_bbkc_v2_15m ES (cb_bbkc_es_v2_15m)",
+      "note": "Sibling line (BB/KC squeeze) on ES 15m."
+    }
+  ],
+  "serial_dependence": "lag1_effective_n",
+  "sharpe_dispersion_source": "every development backtest in the full grid (not survivors)",
+  "trial_count_options": {
+    "li_ji": 42.00000000000015,
+    "participation_ratio": 6.910493340833179,
+    "raw": 120.0,
+    "raw_plus_known_prior": 606456.0
+  },
+  "unresolved": [
+    "Effective-trial count is estimated from the eigen-spectrum of the full-grid development return correlation matrix; the estimate is bounded by the number of days (rank) and the choice of estimator (Li-Ji vs participation ratio) moves DSR materially.",
+    "The earlier ICT Silver Bullet search has no recorded trial count, so it is not included in any trial total.",
+    "Threshold changes across funnel_v1..v3 are additional researcher degrees of freedom not captured by a config count.",
+    "Trial-Sharpe dispersion includes configs with very few trades, whose noisy Sharpe inflates the variance (and so the benchmark)."
+  ],
+  "variance_of_trial_sharpes_per_period": 0.0036532646151603465
+}

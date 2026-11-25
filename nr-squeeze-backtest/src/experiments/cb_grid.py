@@ -288,6 +288,15 @@ from src.strategies.compression_breakout.config import (  # noqa: E402
     V4_NR_TARGETS,
     V4_NR_TREND_FILTERS,
     NRBreakoutV4_15mConfig,
+    NRBreakoutV5_5mConfig,
+    NRBreakoutV5_15mConfig,
+    V5_NR_DIRECTIONS,
+    V5_NR_LOOKBACKS_5M,
+    V5_NR_LOOKBACKS_15M,
+    V5_NR_STOPS,
+    V5_NR_TARGETS_5M,
+    V5_NR_TARGETS_15M,
+    V5_NR_TREND_FILTERS,
 )
 
 AXES_NR_V4_15M: dict[str, tuple] = {
@@ -309,3 +318,23 @@ AXES_NR_V4_15M: dict[str, tuple] = {
 
 def cb_grid_nr_v4_15m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
     return _grid(symbols, AXES_NR_V4_15M, NRBreakoutV4_15mConfig)
+
+
+AXES_NR_V5_15M: dict[str, tuple] = {
+    "timeframe": ("15min",), "nr_lookback": V5_NR_LOOKBACKS_15M, "inside_bar": INSIDE_BARS,
+    "min_nr_bars": (1,), "entry_type": ("close",), "setup_expiry_bars": (3,), "stop": V5_NR_STOPS,
+    "target_r": V5_NR_TARGETS_15M, "direction": V5_NR_DIRECTIONS, "trend_filter": V5_NR_TREND_FILTERS,
+    "min_box_atr": (0.3,), "max_range_atr": ("off",), "max_hold_bars": (0,),
+}
+AXES_NR_V5_5M: dict[str, tuple] = {
+    **AXES_NR_V5_15M, "timeframe": ("5min",), "nr_lookback": V5_NR_LOOKBACKS_5M, "inside_bar": (False,),
+    "target_r": V5_NR_TARGETS_5M,
+}
+
+
+def cb_grid_nr_v5_15m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_NR_V5_15M, NRBreakoutV5_15mConfig)
+
+
+def cb_grid_nr_v5_5m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_NR_V5_5M, NRBreakoutV5_5mConfig)

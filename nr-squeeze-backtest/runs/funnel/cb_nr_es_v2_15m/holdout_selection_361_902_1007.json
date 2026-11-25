@@ -1,0 +1,6926 @@
+{
+ "acceptance_holdout": {
+  "max_drawdown": -0.3,
+  "min_completed_trades": null,
+  "min_net_return": 0.0,
+  "min_sharpe": 0.0
+ },
+ "acceptance_validation": {
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40,
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3
+ },
+ "candidates": [
+  {
+   "cluster": 46,
+   "config_id": "cfg_27e46f2003d82418dbf9",
+   "dev_net_return": 0.2324333115469257,
+   "dev_order": 361,
+   "dev_sharpe": 1.1636066879356484,
+   "n_profitable_years": 4,
+   "neighbor_median_sharpe": 0.9243298983974861,
+   "params": {
+    "compression": "nr",
+    "direction": "long",
+    "entry_type": "close",
+    "inside_bar": false,
+    "min_box_atr": 0.3,
+    "min_nr_bars": 2,
+    "nr_lookback": 4,
+    "setup_expiry_bars": 1,
+    "stop": "1.5",
+    "symbol": "ES",
+    "target_r": "2.0",
+    "timeframe": "15min",
+    "trend_filter": "ema50"
+   },
+   "stability_median_sharpe": 1.1270058738670956
+  },
+  {
+   "cluster": 154,
+   "config_id": "cfg_0fb15dad04d7736a2838",
+   "dev_net_return": 0.2513385886717554,
+   "dev_order": 902,
+   "dev_sharpe": 0.8572055463483724,
+   "n_profitable_years": 4,
+   "neighbor_median_sharpe": 0.8124475280081969,
+   "params": {
+    "compression": "nr",
+    "direction": "long",
+    "entry_type": "close",
+    "inside_bar": false,
+    "min_box_atr": 0.3,
+    "min_nr_bars": 1,
+    "nr_lookback": 7,
+    "setup_expiry_bars": 1,
+    "stop": "1.5",
+    "symbol": "ES",
+    "target_r": "2.0",
+    "timeframe": "15min",
+    "trend_filter": "ema50"
+   },
+   "stability_median_sharpe": 0.8124475280081969
+  },
+  {
+   "cluster": 147,
+   "config_id": "cfg_60965a8af86c23d408a3",
+   "dev_net_return": 0.208416553263004,
+   "dev_order": 1007,
+   "dev_sharpe": 0.8525133537554994,
+   "n_profitable_years": 4,
+   "neighbor_median_sharpe": 0.7473862568540488,
+   "params": {
+    "compression": "nr",
+    "direction": "long",
+    "entry_type": "close",
+    "inside_bar": false,
+    "min_box_atr": 0.3,
+    "min_nr_bars": 1,
+    "nr_lookback": 6,
+    "setup_expiry_bars": 1,
+    "stop": "1.5",
+    "symbol": "ES",
+    "target_r": "2.0",
+    "timeframe": "15min",
+    "trend_filter": "ema200"
+   },
+   "stability_median_sharpe": 0.7505898164362865
+  }
+ ],
+ "code_version": "278b87465dd401b00b631f31d923a4ab8f566664",
+ "config_sha256": "23eb201b7ef2782acfda57e950d3345476d29c8de11b95c2aa657c88d1864d84",
+ "data_windows": {
+  "clean_root": "data/clean",
+  "development": {
+   "end": "2022-12-31",
+   "start": "2018-01-01"
+  },
+  "holdout": {
+   "end": null,
+   "start": "2025-01-01"
+  },
+  "timeframes": [
+   "15min"
+  ],
+  "validation": {
+   "end": "2024-12-31",
+   "start": "2023-01-01"
+  }
+ },
+ "experiment_id": "cb_nr_es_v2_15m",
+ "frozen_at": "2026-11-13T19:44:54.397355+00:00",
+ "frozen_manifest_sha256": "75ac84fc8ede0f93c9ad20855c9d2d01f5b9430407668ffa484ee3ef5b881e2f",
+ "git_diff_sha256": "1cd6bbbcc62a4e5b94888ad09d318c94342ec72798035b09cb2a0db1720cc7fd",
+ "git_dirty": true,
+ "seed": 20261113,
+ "selection_rules": {
+  "gates": [
+   "1 integrity",
+   "2 trade count",
+   "3 performance & risk",
+   "4 parameter stability",
+   "5 time stability",
+   "6 dedup (complete linkage, best 2 per cluster)",
+   "7 execution stress"
+  ],
+  "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+  "validation_is_not_used_for_ranking": true
+ },
+ "sizing_and_costs": {
+  "allow_overlapping_trades": false,
+  "allow_pyramiding": false,
+  "allow_short": false,
+  "commission_minimum": 0.0,
+  "commission_per_contract": 2.5,
+  "commission_per_share": 0.0,
+  "extended_hours_slippage_multiplier": 1.0,
+  "fractional_shares": false,
+  "include_sec_finra_fees": false,
+  "instrument_type": "futures",
+  "intrabar_collision_mode": "stop_first",
+  "leverage": 1.0,
+  "max_open_positions_per_symbol": 1,
+  "risk_per_trade_pct": 0.0025,
+  "slippage_bps_limit_adverse": 0.0,
+  "slippage_bps_market": 0.0,
+  "slippage_bps_stop": 0.0,
+  "slippage_ticks_market": 1.0,
+  "slippage_ticks_stop": 1.0,
+  "starting_equity": 1000000.0
+ },
+ "symbol": "ES",
+ "validated_at": "2026-11-13T19:46:18.535130+00:00",
+ "validation_summary": [
+  {
+   "config_id": "cfg_a7857d39f92c77362722",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_cd200a786d687ddfc9bf",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9ce3c3f1c36515ce07a7",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a712bb7dc416e98ae7b2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_40fa31c145e6791b4436",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c729935cf78d513644bc",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_609bc6fd5289ab15c306",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_88ae73982b16963b7aea",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_601b112b319479e80100",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a553659397fd40198df9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_49125abe04ce3bed65df",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_dac9f0eb45886794193e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1d8939fb25ce5dc09fb2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_87ad118d0e2e0f394e46",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1a5857ff126e6b15f1c6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_33455ed4b42ebf6c5271",
+   "reasons": [
+    "sharpe 0.246 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_58f2a1db517167af04c5",
+   "reasons": [
+    "sharpe 0.109 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_912ac142f44addfa64c9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d3044e8d90e1999e0672",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2a999586f6992deb79a8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2cce3b475a257ec1a121",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_151c0cde539e516b1030",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_41a386e4bb98429229aa",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_eee98846f9569c8520f8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b092a82649231a4c8ee9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f8e9293f62cc084d5219",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4abc4584b082c9161b54",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7348136afefdbde7653f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_565490cf419e803025ee",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_626afa0289e7b9531c7d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5d326a45f132f227c132",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b00ac000179bf8398dd8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6a4c22cd0ed54ff6f55b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9c34363cfbdc09b3ee32",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_14dfaf1df7045c820e72",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d4fb94911d0373c075d3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_fa6687e0c8762e3f3cce",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d1e29b0d82e033c70ee0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d7a140984141ae591274",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_85fefb9a69e2e678f408",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_22c2719b732d5b07464e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2a6829455d3a5e9de898",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d7e1390ff38685cb4a81",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0bcc6d41bb100e32b374",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ea3deee3e1d409b0511f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b475579c094e8ee2e37b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bf72ee2cdffab21aac92",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_00f54313ab88d2a5ffb9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2984c97723c50b866198",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3ada68f851d545248f01",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1ad81debb9ba39fa14e7",
+   "reasons": [
+    "sharpe 0.235 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_db156d22864b8dfeb893",
+   "reasons": [
+    "sharpe 0.235 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_62cab76d00eba093d40c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_98526ffd15a3ccbf5792",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9bec8acc72d56fd70576",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3fbc09f2178230259a8e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_676fdc2dafb34ad63a04",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_aec407ac0c567d0fffcf",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_eaa2ac1cb865ff5d2ef6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4c852ea5045a6d16aafc",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8c717d4cbf078dd2ded9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9e450a1cdcb11e5097d4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_23d5df7f31b058dd7cd3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_69eff9e1c4b6e9b875f3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4bfea55227dd01b32278",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c014b2d05bf35565ef47",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_59baaff77a548cc7402c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2eee5d430e39f69152eb",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_90b4c970713847956a6e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_37253dd03c83ca93b659",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f93bd2c754d45e70cf44",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_67c59fbb6e135a160164",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e41a2ceaa5aa62970fe5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_48e52999af74151c36be",
+   "reasons": [
+    "net_return -0.0206 <= 0.0",
+    "sharpe -0.564 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_40ccdd6612f12ca96fa8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4e48be7ba788e522220c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f4593e7a519dd14a51c0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_106253c687f7be7fb7f8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e1c6e9d6f4a57dcec038",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e848eafb2a56c6c3fc0b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3ef2c60729f658aeb1db",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ca4c0a2b36da95a47325",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_91babc9b6b78bf496495",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_09380a32e0ddd9d656ca",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5797798f48fe57053a34",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b6c70a46f0cece9d0ce8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_aabfa723841115e10e46",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1b7c50b539274336b15b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7d5ac7fef8a08124498c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6bacb0626929b7642425",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8b985143be1a985dd2d8",
+   "reasons": [
+    "net_return -0.0220 <= 0.0",
+    "sharpe -0.605 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ce7d98fecd8dd65d6782",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4a1f178064ba8c942ff6",
+   "reasons": [
+    "net_return -0.0403 <= 0.0",
+    "sharpe -1.556 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4f0159b894cb7dbea096",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e5ec55621389589a723d",
+   "reasons": [
+    "net_return -0.0069 <= 0.0",
+    "sharpe -0.140 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_24113ba0cb11a2ddc7f8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_fa3591675a7a3c089b34",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c530633da0f8eac0d910",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5246b3ccba2e57bb1371",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e6c3e16c0a13d9921e95",
+   "reasons": [
+    "net_return -0.0072 <= 0.0",
+    "sharpe -0.145 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e0d72742c261f1682da3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bcc7c913548beb361c73",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_012313ddb24fd8043f23",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_247c76291de49fe15bd9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_908e5a3da934f4fa9c05",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8e5c16a6ff0cbf5e5bea",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1cc4613097ac69b406f9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_abe7ee949fd9466430bb",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_625b96a2736e739433d7",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6488ae65c6625a70fdea",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a7f99761a1c61fb020c5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1a1679a32088f2c5cc95",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_214c46becd8d963bdb73",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8a709c8bb4a48d050f53",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_00b8bf4e08737402717f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3207e6ef33a4b78d3b66",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_52b4fa83115b303cced2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_75414192208b69d84c10",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0489e52597830cedbe66",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_83a157b6d620a7235d66",
+   "reasons": [
+    "net_return -0.0536 <= 0.0",
+    "sharpe -1.016 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_33a5105f16b88a491551",
+   "reasons": [
+    "net_return -0.0521 <= 0.0",
+    "sharpe -0.987 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4d87ff5b1dd5b38ae71d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f99ba103180114f93302",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_259b591ed5e7d097eab7",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_daddfca55ac96ae3367f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_415979c552405c359da1",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bdc131cc47934bf33980",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5a91a2dd5e7c41c1d26d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e6b89bde4a30a6b1dab8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f546d5de19e7b3197754",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9de1448345c52f0e7110",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c31be8482822763cfcce",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_513567e9fc0f197b7bf2",
+   "reasons": [
+    "net_return -0.0398 <= 0.0",
+    "sharpe -1.528 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_813107fa92b9fc627112",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3ac5d63348b49ad950a2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d432c23f09fa16b33c4d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_304c15a6eff26c9c6018",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_fa689ba9bde240ba29d5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_720bea392e882b82711a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_898e140e526361bb96a7",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9cc9b24647696a85cada",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_91c23c972dd388ec7550",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d1391988db9928df1cc2",
+   "reasons": [
+    "sharpe 0.061 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5f7770c87a63d0a2fdba",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_58b144f0bd02ceed083f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1e6ec5626021e73fdc52",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_218204ef832e45cdf8d4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_41f1afecd914c8c37e3c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_16f6b747957e7543a82c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f4c312c319f0de883814",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4d68a430200aab92e7eb",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4788bab18405222741e1",
+   "reasons": [
+    "net_return -0.0252 <= 0.0",
+    "sharpe -0.535 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c054458ae0452a9c8c53",
+   "reasons": [
+    "net_return -0.0252 <= 0.0",
+    "sharpe -0.535 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4e034d66362818f68338",
+   "reasons": [
+    "sharpe 0.285 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e1969d85f781c3df11af",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_734534b954cb105e266a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d371fb1a46dde6e6c796",
+   "reasons": [
+    "net_return -0.0809 <= 0.0",
+    "sharpe -1.235 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_20af2b8c8c3c6b8c463f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_43ddd221e9d177c5e573",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ef74f919b5cba29cf8d3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_398cdc54d966ab75d8be",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_25cb1a73849ebc654673",
+   "reasons": [
+    "sharpe 0.061 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8d3cd2d142e589838da5",
+   "reasons": [
+    "sharpe 0.195 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2d4a90692d1b33e7abc9",
+   "reasons": [
+    "sharpe 0.136 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c1f6d3f52018233f707d",
+   "reasons": [
+    "sharpe 0.136 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_77180533fcd4c5dde02c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2fcdf2da82d6cc6949ed",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_451a0617e0055ead7430",
+   "reasons": [
+    "sharpe 0.146 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_71085167b3996cf9a8b9",
+   "reasons": [
+    "sharpe 0.146 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3a8fba3ad49fe84c11b4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1d6aee0ec0fb2506af16",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e26c9b28d467d4422179",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_020a626f8b2873b5c031",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3fe6d47286a52f0198d8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_73d0d311f52d66c4e4f7",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_85ff4c1f53f219e7ad7f",
+   "reasons": [
+    "sharpe 0.137 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3a931a14bf11efee03f9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1f677b9ca56aa986c9c5",
+   "reasons": [
+    "net_return -0.0063 <= 0.0",
+    "sharpe -0.028 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_9490529844f321734a35",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f677a0df23acffb4c701",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d6dfbb567c2faebb08bf",
+   "reasons": [
+    "net_return -0.0203 <= 0.0",
+    "sharpe -0.412 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ff2b1334a739fa0ba021",
+   "reasons": [
+    "net_return -0.0203 <= 0.0",
+    "sharpe -0.412 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3e8e02244af1ef20222c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_cfbe7ced376a1965583f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c17b970fc640b433f339",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d70417e26c2b2f4e6571",
+   "reasons": [
+    "net_return -0.0057 <= 0.0",
+    "sharpe -0.022 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4d05b86e7f1f0861f79a",
+   "reasons": [
+    "net_return -0.0079 <= 0.0",
+    "sharpe -0.117 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_44ac66ea493cedc7c878",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a0ca6a914cada975af71",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_976ae6d8398d03c23294",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d01d0eaea89b7427f64c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f63c72b47468c66fa55e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3cb749662f71b760d126",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9674ba88112ba2c7451a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6a67e90efb1f8cf14a78",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_fb6709e859edf9b3f293",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_288003d868bba5d1ffaa",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1af9f065c543c5d1c070",
+   "reasons": [
+    "net_return -0.0220 <= 0.0",
+    "sharpe -0.303 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_0b009c377797a543ce4c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_acbdd0cfed3842ae3983",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_54c3d1a116ffca67590a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3654f5ded0ca358a9968",
+   "reasons": [
+    "sharpe 0.117 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_25c37c7fa4facf8bad9c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_598cbf3432c358f7e65f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ec042031bb442a01ebf7",
+   "reasons": [
+    "sharpe 0.133 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6302803edb4d33fc84c6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_49d8c7351c6cdb9a187a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8bfc20d27e9608be1d65",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_761b5a8d9a840463caf0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9dca19a65ee044694f27",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_67a38d6c60cb5d801f36",
+   "reasons": [
+    "net_return -0.0346 <= 0.0",
+    "sharpe -0.673 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ad3e3ad28aac78bc6e08",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_29ec33dde1e97a8b6dae",
+   "reasons": [
+    "sharpe 0.134 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_95add5472f171b29a88b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f584af7b1d5c02ae5a5e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_33745237846c53e395b0",
+   "reasons": [
+    "net_return -0.0284 <= 0.0",
+    "sharpe -0.425 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_872c5d2e2d7bf45b105f",
+   "reasons": [
+    "net_return -0.0284 <= 0.0",
+    "sharpe -0.425 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1e1d43743a2fa0c9f351",
+   "reasons": [
+    "net_return -0.0040 <= 0.0",
+    "sharpe -0.049 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2b912ab68625f8017146",
+   "reasons": [
+    "net_return -0.0105 <= 0.0",
+    "sharpe -0.405 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2e558d779405f1254491",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_265b3ce72ab34e564c0d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6011d2d597d738f80229",
+   "reasons": [
+    "net_return -0.0215 <= 0.0",
+    "sharpe -0.923 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_81600fc045791e6ea9e4",
+   "reasons": [
+    "net_return -0.0215 <= 0.0",
+    "sharpe -0.923 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a6a1175323b669920aa5",
+   "reasons": [
+    "sharpe 0.113 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_918148dbeacb4ca7c751",
+   "reasons": [
+    "net_return -0.0045 <= 0.0",
+    "sharpe -0.044 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_f2dac4743ab7e1e5e9f8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4f24ff62651cc2f62c60",
+   "reasons": [
+    "sharpe 0.113 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4e7ad4b1d6a55720affb",
+   "reasons": [
+    "net_return -0.0073 <= 0.0",
+    "sharpe -0.085 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_046e6a044d889a75b445",
+   "reasons": [
+    "net_return -0.0021 <= 0.0",
+    "sharpe -0.018 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_62df1abb324f6179c1e8",
+   "reasons": [
+    "sharpe 0.300 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5994bc6d9981e7ea11ad",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9458b12245a37806dc2d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a0083ad6724819f49138",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_08ad16275e92fb04893c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2a15367f2406128323d6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_52fa6f9947f0190a454d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_364d55e1e0d18f2c0099",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_efc93bf52c50bd416e0b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_22d509bc9cc00ff2d0f0",
+   "reasons": [
+    "net_return -0.0678 <= 0.0",
+    "sharpe -1.383 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_39c4909eba5d40fc9647",
+   "reasons": [
+    "net_return -0.0148 <= 0.0",
+    "sharpe -0.405 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4c133b3ca059b6459a1f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_93e04d7e847093a2d6f7",
+   "reasons": [
+    "sharpe 0.067 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c4454a9486cbab23bfa3",
+   "reasons": [
+    "sharpe 0.221 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2054e43e8220e4025e0b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f0a67278ab4133dc0758",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_49d2edc7c8c2faaf1b0b",
+   "reasons": [
+    "net_return -0.0684 <= 0.0",
+    "sharpe -1.395 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b7b59eff91b905bd151a",
+   "reasons": [
+    "net_return -0.0358 <= 0.0",
+    "sharpe -0.729 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_bbf258fcbe308f23320e",
+   "reasons": [
+    "net_return -0.0119 <= 0.0",
+    "sharpe -0.301 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_d2fcdb6d100e7148356c",
+   "reasons": [
+    "net_return -0.0126 <= 0.0",
+    "sharpe -0.324 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a8432d63644d0f70a6aa",
+   "reasons": [
+    "net_return -0.0182 <= 0.0",
+    "sharpe -0.461 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8e137874b3da411464cb",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_590e6a00c210647dfd22",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_895f5eee1882d1802a67",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c59a7e32ca7190429b70",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ebee034ae92b572f869b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_136586c57d743bbe8334",
+   "reasons": [
+    "sharpe 0.224 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_df3f84ab325bcef98b54",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e6b257b688476bc3093f",
+   "reasons": [
+    "net_return -0.0786 <= 0.0",
+    "sharpe -1.202 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_eef985bc1ef65798d709",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8cd080dce58c883483fb",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c3f5dee832a5bd65905e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ae2189f16db9cb86e228",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_56ce0e738144fb5f778c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_287aae92cfa05c4bdb04",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_343766c82ce2f912b9f0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_38ca310597e65614547f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e876a7673105c99dc100",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bf6e8444af541e8da57a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_85d22ce9613aebc6c7c9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_eaba6229cd5d930cf70d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4cf8bc1165048508066d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c47c1d4ec66d20b0b1fc",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0f910405ec6980852f8f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_47f485a7a8dafbe1e37c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d7dd2d1349aca4ee87b0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1f6c95a2d510b6c8d4bd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_727697a4478c0b4fccab",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2b54a62d9ec4442830b6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6c28a58770e475de6edd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4bd0a2374bd39a444272",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_193757850c6a4b27d290",
+   "reasons": [
+    "net_return -0.0201 <= 0.0",
+    "sharpe -0.445 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2c12624841e55568d89e",
+   "reasons": [
+    "net_return -0.0201 <= 0.0",
+    "sharpe -0.445 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3fb733eb7449770d6c6b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7feaae1f57c7c9be9787",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e1f155bfad4808d75665",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_430037435d6c2f67e219",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2ba73ee83ab35a3b8c86",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f9b0dc762275066d6747",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9f37ca70f1e9b89aa872",
+   "reasons": [
+    "net_return -0.0258 <= 0.0",
+    "sharpe -0.887 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1c66a2640735f2a0e287",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9f9eac8bf5cd9a11aacc",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e141f90132554856307c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_30c61f2a07bf0fb4dd37",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a8c97b2a4799d72abd22",
+   "reasons": [
+    "net_return -0.0005 <= 0.0",
+    "sharpe 0.006 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_65a123e1363d686cb721",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f3ccc2d33b4ebdfcc7bb",
+   "reasons": [
+    "net_return -0.0506 <= 0.0",
+    "sharpe -1.085 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a5e101904dad3c74ec80",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ed4b3aaa477f54e20b41",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4667af087ce15fa41c10",
+   "reasons": [
+    "net_return -0.0185 <= 0.0",
+    "sharpe -0.578 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b801ef7216fbefacf4bb",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d8104acd4b8128ba5689",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3921fa2b18b46e7007f1",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9af570779362b7fd0425",
+   "reasons": [
+    "net_return -0.0318 <= 0.0",
+    "sharpe -0.534 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a7947b8f4363e5cd4186",
+   "reasons": [
+    "net_return -0.0294 <= 0.0",
+    "sharpe -0.492 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ae8e26f6830858a2211d",
+   "reasons": [
+    "net_return -0.0514 <= 0.0",
+    "sharpe -0.613 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_dcaac0985c2a5a6bd0ca",
+   "reasons": [
+    "net_return -0.0226 <= 0.0",
+    "sharpe -0.279 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_cda075e71b3765d654f0",
+   "reasons": [
+    "net_return -0.0101 <= 0.0",
+    "sharpe -0.397 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_34ceb9664ccd6f1ad670",
+   "reasons": [
+    "net_return -0.0154 <= 0.0",
+    "sharpe -0.123 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_01ed2d50ab7010eb6697",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_98e6bd46221d22847a90",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6b0584c5a342e8f1d1ae",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_55ba69c9121cea6c9e83",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2db20b414429502dbc19",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_90c6928ee10e644db977",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9ec7cb97027882f628cc",
+   "reasons": [
+    "net_return -0.0338 <= 0.0",
+    "sharpe -1.222 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c0e60ff4754cf7c3dc7b",
+   "reasons": [
+    "net_return -0.0338 <= 0.0",
+    "sharpe -1.222 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1cc9ac5a204592a8fd12",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_68ec430699cbf3ba436e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f78994f777c6fbc3e597",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bfe5797c8950bea411de",
+   "reasons": [
+    "net_return -0.0058 <= 0.0",
+    "sharpe -0.192 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_f8e1866352ea24de79a8",
+   "reasons": [
+    "net_return -0.0058 <= 0.0",
+    "sharpe -0.192 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e0f69638390315aa3ac7",
+   "reasons": [
+    "net_return -0.0277 <= 0.0",
+    "sharpe -0.969 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_025687c1d3fb5471cc46",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_113cdd8faf4d2be39886",
+   "reasons": [
+    "sharpe 0.170 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_9d055d60bcf9e83d3529",
+   "reasons": [
+    "sharpe 0.170 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_d09f0d95cae58b655ec6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c63301112c8627b5763d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0f1fbda4d7f079c586b4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1cf14e751d391eae4047",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7603011fdd9f40428170",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3ef3d7e7a955e3137fa9",
+   "reasons": [
+    "net_return -0.0189 <= 0.0",
+    "sharpe -0.271 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_deadf6c2984abea623cb",
+   "reasons": [
+    "net_return -0.0189 <= 0.0",
+    "sharpe -0.271 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a60e6b399e121bf62c60",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3db7848c1c47ff145923",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0c071215fd1196bb5ac5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_111dceb5fb595e35e877",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e02b563d0f6632fe3c6f",
+   "reasons": [
+    "net_return -0.0316 <= 0.0",
+    "sharpe -0.658 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e3fc8150c5b32aef3b8d",
+   "reasons": [
+    "net_return -0.0316 <= 0.0",
+    "sharpe -0.658 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1d21417e16a42ef4ecc8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c4e62a544a3ea1fd0908",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_01b445eb022eaf6d2473",
+   "reasons": [
+    "net_return -0.0622 <= 0.0",
+    "sharpe -0.695 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e91196e7dab7385ef91a",
+   "reasons": [
+    "net_return -0.0254 <= 0.0",
+    "sharpe -0.490 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_29831d3c601d2c36311d",
+   "reasons": [
+    "net_return -0.0261 <= 0.0",
+    "sharpe -0.820 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a30f4b31b36e11a87970",
+   "reasons": [
+    "net_return -0.0261 <= 0.0",
+    "sharpe -0.820 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_25168fc23df6258200fd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_49d133e590dbb903ba2c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2f36d719bcc052b40b7e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_57759e38fd9b84b1348d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5afcf5f47c9b23192f3f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_fe8eb092a78f00768862",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_343d9f8a408af657221a",
+   "reasons": [
+    "net_return -0.0780 <= 0.0",
+    "sharpe -1.181 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a84a76460533b1fe0463",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bd6dd97a441fc44ae14d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_09dd15765b4ca89c2dde",
+   "reasons": [
+    "net_return -0.0538 <= 0.0",
+    "sharpe -0.646 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4302e6a7923b26fa8b3e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7a0a268d0fb2ca518c87",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_105e3d423cde8486c9b3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_43887b4089e4504c1d04",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3449ccac12ed63a09b72",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_27948f75f62e30c2d426",
+   "reasons": [
+    "sharpe 0.270 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_27e46f2003d82418dbf9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c86f36075afefb6606b0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e51c9150faa9d3988df5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5ac02b69959b2a444e4e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_639a64a8f9ee6f7030e6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c3dbbe1b6c62bac86b05",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f5525cbdca8025f44a8a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4243a26083cd23e2352b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_49a5fc599a6d6277666a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_cacf4538cba140a9194b",
+   "reasons": [
+    "sharpe 0.173 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3f6eca00e140d29ddb57",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3a7ca0b82215e93aca36",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7c615a1d253ac7b762db",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_310d75adb2511404f7dd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0d2db51e2be658fd59ef",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0774ddda06f33136358d",
+   "reasons": [
+    "sharpe 0.021 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6fd2e9df6f9ea8159ff0",
+   "reasons": [
+    "sharpe 0.021 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_98197f6da8cf7ae909ca",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_55a0374b5770b2cfea23",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_05606ae58476e83d0a03",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_83d0fe46b464b96db8b8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_08e9771c3316c81f8743",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6a92a1be791dedfaf914",
+   "reasons": [
+    "net_return -0.0226 <= 0.0",
+    "sharpe -0.293 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b7cb02d5abd516d33a74",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_fe5808ed6f83f0ced461",
+   "reasons": [
+    "net_return -0.0494 <= 0.0",
+    "sharpe -0.838 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_333c36c3a3ecb3687d01",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a06721d2023c2f8d0dbf",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7f9a4a4cf938f6fcacf7",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3c629b15c8b7726c2645",
+   "reasons": [
+    "sharpe 0.082 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a6594bbd9a9860582726",
+   "reasons": [
+    "sharpe 0.082 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5ce510763c6fa6bbc54d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e60a6d5228742d9c503d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_71eef5e7e001bdea8b96",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_74716b6f9222fd70e23b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d469f2484b5758f6f7f5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2336db7375357cb9c930",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7cdf99a8c795d3f3afd3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3929d8e34e4626830909",
+   "reasons": [
+    "net_return -0.0186 <= 0.0",
+    "sharpe -0.236 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5ecc9015fbb3c5012007",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d2123a15bd0d0c21c3d1",
+   "reasons": [
+    "net_return -0.0908 <= 0.0",
+    "sharpe -1.962 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3511bec07016f1cff1d4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d593d4a6c5c99dc773a9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c6c7076abea676026677",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_477225808c0ef5867870",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_89ee080612bab0190579",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a3c71143405099538ee5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6369ba2b7e50d58378aa",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d7ce33637f4749356ec5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9e14581d54b992f2d51c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1768a5819c786271ff4b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_76bcbc652c5b4e4cb24c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_de5fd079430d37e3bc18",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_754bcf7ebf97e8c6a51b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0ba6c18497ef0f4c5334",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d8721c7ccbf2bd6bd956",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_006ba5c752ce430885e9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4ca195bc12b860d81080",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_420ccf360b566aee6d5f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b69f5ee9eda6284ea8ca",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6817e9e7f0752b791a13",
+   "reasons": [
+    "sharpe 0.268 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_65805a2646069bcb149e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_43a2ebe6c25817de2592",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c03743551bce42b07467",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a642ebe6e4c0584ad922",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_942fb6ff92375d081a37",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_421d764f5ead331add54",
+   "reasons": [
+    "net_return -0.0581 <= 0.0",
+    "sharpe -1.225 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_fcfca3d1279f8ba8eb65",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d957c6bd594dfe386c84",
+   "reasons": [
+    "sharpe 0.096 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e20fd7039aab7fa5a47b",
+   "reasons": [
+    "sharpe 0.096 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_979673906619395e5a0e",
+   "reasons": [
+    "sharpe 0.274 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_952ce690219d6787a3cc",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d53621fe6b55e11d2233",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7211189de1ad687b22c7",
+   "reasons": [
+    "net_return -0.0459 <= 0.0",
+    "sharpe -0.789 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_646ec481d028a712930a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_732d09e2967bf38e60d0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bd5a292b99a49a70eb15",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c46e50710b0565e6de21",
+   "reasons": [
+    "net_return -0.0218 <= 0.0",
+    "sharpe -1.507 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_25d339fbea4187d173f0",
+   "reasons": [
+    "sharpe 0.111 < 0.3",
+    "completed_trades 39 < 40"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c40fab1de0fc45cc34b0",
+   "reasons": [
+    "sharpe 0.111 < 0.3",
+    "completed_trades 39 < 40"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ec5b01181ed3bf0d27aa",
+   "reasons": [
+    "net_return -0.0922 <= 0.0",
+    "sharpe -1.247 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_24b3bcd3be0627ba957f",
+   "reasons": [
+    "net_return -0.0150 <= 0.0",
+    "sharpe -0.258 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_39f4ea5ef3f1cceaba25",
+   "reasons": [
+    "net_return -0.0150 <= 0.0",
+    "sharpe -0.258 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7c53bdd7dec7aae30b1b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e4a7e7b72106c656c496",
+   "reasons": [
+    "net_return -0.0674 <= 0.0",
+    "sharpe -0.747 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_25bab070fa3cf04048e1",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5cae1d1ef0fdf1741f46",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3a475d8c38ac02648053",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_cf897b5dc44333903858",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_761c3d647896cc2f844b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ba619d8ab9fed60a8f54",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2388c19329029a03ea7a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d2ca88aeb3de77aea04e",
+   "reasons": [
+    "net_return -0.0071 <= 0.0",
+    "sharpe -0.086 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_022cd8d5bb775c2ebf64",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_63fc0328e68da66a0f4c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8ab588cab718031f69eb",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4ee93456db980d868daa",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1509b83cb9960c261aae",
+   "reasons": [
+    "net_return -0.0246 <= 0.0",
+    "sharpe -0.562 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_de80601512e1e6863ac2",
+   "reasons": [
+    "net_return -0.0246 <= 0.0",
+    "sharpe -0.562 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_37246d013e8151c815f2",
+   "reasons": [
+    "net_return -0.0488 <= 0.0",
+    "sharpe -1.832 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7c26add8be2b4dbc46f1",
+   "reasons": [
+    "net_return -0.0488 <= 0.0",
+    "sharpe -1.832 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_819621af261a604e58f7",
+   "reasons": [
+    "net_return -0.0593 <= 0.0",
+    "sharpe -0.708 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_83381747d69052f4a1b1",
+   "reasons": [
+    "net_return -0.0593 <= 0.0",
+    "sharpe -0.708 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_d4d49a632e8770673ccd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1e9b23a4e52d67845bc6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2eefe0b27c3204ffd11a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_281d0fccc4cef7194e2e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_89256bf5f4443906aad1",
+   "reasons": [
+    "sharpe 0.285 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5ae9e3d328cf905791ec",
+   "reasons": [
+    "net_return -0.0179 <= 0.0",
+    "sharpe -0.351 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c76b8d392d8425bbb003",
+   "reasons": [
+    "net_return -0.0179 <= 0.0",
+    "sharpe -0.351 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ef72db6a276790b6e026",
+   "reasons": [
+    "net_return -0.0235 <= 0.0",
+    "sharpe -0.405 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ee758d4bbacbb52a8ed9",
+   "reasons": [
+    "net_return -0.0917 <= 0.0",
+    "sharpe -1.691 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4a775eb3c0ca8cb62f68",
+   "reasons": [
+    "net_return -0.0234 <= 0.0",
+    "sharpe -1.592 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_80e2343be9efca78c358",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f9b1ca213cb31215ae36",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4c03f940f44c0b37b61b",
+   "reasons": [
+    "net_return -0.0235 <= 0.0",
+    "sharpe -0.405 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_716d4d3ba6c7ff0961c0",
+   "reasons": [
+    "net_return -0.0347 <= 0.0",
+    "sharpe -0.230 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_96081f7a5ec9e71ed785",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_05765915128b96aef9d7",
+   "reasons": [
+    "net_return -0.0434 <= 0.0",
+    "sharpe -1.128 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_78a6575f800b6ce6c7f8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5c840b2cb4815bbf0b3d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2e26a231864d7fae0ae8",
+   "reasons": [
+    "sharpe 0.180 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_abea9fb63975dd3e3f2c",
+   "reasons": [
+    "net_return -0.0324 <= 0.0",
+    "sharpe -0.887 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2f791b81b66594db3e06",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a806f254d650e3a93d05",
+   "reasons": [
+    "sharpe 0.261 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a54c100d68d4f3589aad",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f53005298442b8f14b20",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5569caa0352e34171dc7",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ee17c4d0fa6adb8a64f1",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a6c596ee8bd21de5dd4f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_65700af034122e0a85ed",
+   "reasons": [
+    "sharpe 0.261 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_50c46e3ae719a9a83416",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_114cdc4611a56c80f713",
+   "reasons": [
+    "net_return -0.0026 <= 0.0",
+    "sharpe -0.006 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b70c9d47a8972d3091f8",
+   "reasons": [
+    "net_return -0.0012 <= 0.0",
+    "sharpe 0.010 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_cffef1195b9043c16df9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_63070a8d24d1ff56eb5f",
+   "reasons": [
+    "net_return -0.0635 <= 0.0",
+    "sharpe -0.515 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_d68cffd4f4c3e7d6a6d0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_933dd11a5804b3598034",
+   "reasons": [
+    "net_return -0.0823 <= 0.0",
+    "sharpe -1.006 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_d16bdf8eda25d5c90456",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2a777a7d75eee394d809",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0c091cf251a8addc999f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_845cb88d8dc50be900c3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0ef74d37d5240c64b8e0",
+   "reasons": [
+    "sharpe 0.118 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_97708fd1b48dd32aa0e5",
+   "reasons": [
+    "net_return -0.0570 <= 0.0",
+    "sharpe -1.057 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_d0e3d8add23d56b56a29",
+   "reasons": [
+    "sharpe 0.131 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_42d977e92a7adfc0ff49",
+   "reasons": [
+    "sharpe 0.095 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_542191086a8a18d5bf28",
+   "reasons": [
+    "net_return -0.0951 <= 0.0",
+    "sharpe -1.759 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_555e22402ae17d179cd0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7ea1550842be5238f10b",
+   "reasons": [
+    "net_return -0.0104 <= 0.0",
+    "sharpe -0.284 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_9a2ec058a8a54040310f",
+   "reasons": [
+    "net_return -0.0104 <= 0.0",
+    "sharpe -0.284 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_058b52cc25d396eb507b",
+   "reasons": [
+    "net_return -0.0171 <= 0.0",
+    "sharpe -0.898 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_80c59c5d5246e9d9cf67",
+   "reasons": [
+    "net_return -0.0908 <= 0.0",
+    "sharpe -1.962 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_410871fdad4d12f16b11",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_797ba925f49f25d2013b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_07226cfe4f440e61e79d",
+   "reasons": [
+    "net_return -0.0237 <= 0.0",
+    "sharpe -0.293 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_032e832109f34a289908",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ff5cece5267e447ab722",
+   "reasons": [
+    "net_return -0.0507 <= 0.0",
+    "sharpe -0.708 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_0c61d03e618f2a207897",
+   "reasons": [
+    "net_return -0.0188 <= 0.0",
+    "sharpe -0.981 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_060d1ef9bc94e32bb3f0",
+   "reasons": [
+    "sharpe 0.096 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_f5c5e535810c94750a71",
+   "reasons": [
+    "net_return -0.0308 <= 0.0",
+    "sharpe -0.444 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_de8ad02d787ab13a12e4",
+   "reasons": [
+    "sharpe 0.297 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7eff25ff10ad691520df",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8373b792818c3709c4a2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_60f939784b6c16776627",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1cade0176a1cd518e929",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_15ef65cf56917c521943",
+   "reasons": [
+    "net_return -0.0101 <= 0.0",
+    "sharpe -0.316 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_18b3c82d75cda8197659",
+   "reasons": [
+    "net_return -0.0101 <= 0.0",
+    "sharpe -0.316 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_47f631870a3b81a1a10b",
+   "reasons": [
+    "sharpe 0.076 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_28f72ff507638867f1cf",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_26bb09f39c71f37bfe21",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_73960a59a5fd8d19f487",
+   "reasons": [
+    "sharpe 0.084 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_019e89f4fdde5231738b",
+   "reasons": [
+    "net_return -0.0403 <= 0.0",
+    "sharpe -0.593 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_635a2de9f109f388dc09",
+   "reasons": [
+    "net_return -0.0349 <= 0.0",
+    "sharpe -1.018 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_71f9a9207cb6450e4fc1",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ba1815ae8ce8f92dd293",
+   "reasons": [
+    "sharpe 0.292 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e879dcb31f980dd44a5d",
+   "reasons": [
+    "sharpe 0.292 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_22b8ad53bc049916fa81",
+   "reasons": [
+    "net_return -0.0215 <= 0.0",
+    "sharpe -0.679 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6648e5985743589c5e5e",
+   "reasons": [
+    "net_return -0.0215 <= 0.0",
+    "sharpe -0.679 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b7d324998ca12ca464c0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_83368675506ce82bc94d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_41428cccc0b8ae2cd6ed",
+   "reasons": [
+    "net_return -0.0582 <= 0.0",
+    "sharpe -1.609 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_851361bd91de0c832fb3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ec5b5c02e7f04cf9f083",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bda7b5ae4ce38217d9f6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_32659669ec8f80550241",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4c1a248eefbd1e831158",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_59bd45da6f95533a2784",
+   "reasons": [
+    "net_return -0.0025 <= 0.0",
+    "sharpe -0.018 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_23de939b635012eb52cc",
+   "reasons": [
+    "net_return -0.0005 <= 0.0",
+    "sharpe 0.006 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_f4569ae054a2fbc62d0f",
+   "reasons": [
+    "net_return -0.0005 <= 0.0",
+    "sharpe 0.006 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_dd1f1718a66ff6d07b69",
+   "reasons": [
+    "net_return -0.0752 <= 0.0",
+    "sharpe -1.780 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_155d574950c287e6aa04",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6720f31629af9d963e9b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_92ace1fdd8f073186851",
+   "reasons": [
+    "net_return -0.0248 <= 0.0",
+    "sharpe -0.475 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5bf4f068d4716521f80c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d34b320e4de1fbd9b15a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9e549c0b6c37fcbdee6c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a47866bb20a7f014bedd",
+   "reasons": [
+    "net_return -0.0568 <= 0.0",
+    "sharpe -2.091 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_23190e48d6a15143b585",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f444fe683dca3a2ae51f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_de217dd93e6eac2cf8b6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_579aaa4ee44f9fc21b70",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f9c57e66e8f049e3f65e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d144ae98b05881246eda",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_132f1a2f879cfcc63b18",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_02a89d7bb8cc483fa0c8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4ed44b725cf1418bba30",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_867a1456f8a48352cd18",
+   "reasons": [
+    "sharpe 0.179 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_72ed94e23c91b74d12e4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e3527f97929e8164b1df",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_66e502bd5bd3ac78efeb",
+   "reasons": [
+    "net_return -0.0807 <= 0.0",
+    "sharpe -1.099 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_97b7f3ec4aff4a00a7c1",
+   "reasons": [
+    "net_return -0.1131 <= 0.0",
+    "sharpe -1.265 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_609ea06193242556e1cf",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f9533d5336a6e77b0beb",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9ae063fbe39f753a8eb5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_eeff2f3507b5206331b2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_98bbdf410c52424f47a0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7205d0d50dcd1cc1c6ed",
+   "reasons": [
+    "net_return -0.0682 <= 0.0",
+    "sharpe -0.883 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_f2fb493c135b3f7d4745",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_120aba2178378ad6bade",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_14dbefa8c8b5acaa0e1c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6bde2c1885adbe1ea32a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_dbb659187b5426bd2c73",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_cb63ca968292464173e7",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f84c894fcf5b0587dc65",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a0b2e07cb13e63bcf6fb",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b07be2e3a7c1c26b0a2e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e82b5dd5a26f5e7d0d34",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a14f4a208bc59cde0c75",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e8c31b355ce3d061a67c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8aa68b5a105f18d5dfd2",
+   "reasons": [
+    "net_return -0.0682 <= 0.0",
+    "sharpe -0.883 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2730188242e6220847af",
+   "reasons": [
+    "sharpe 0.282 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e736863d86bce9296ed6",
+   "reasons": [
+    "sharpe 0.282 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_80c95f0485829af7a31c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0a83907ab52b26a2e19e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d10e8c32be4514a679f4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_68c21ca932f0f093520f",
+   "reasons": [
+    "sharpe 0.038 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b1dfb9922b0f07a8fd90",
+   "reasons": [
+    "sharpe 0.038 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_66584b591efd75ca19e8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f1e1b2b9a3570ea25d08",
+   "reasons": [
+    "net_return -0.0427 <= 0.0",
+    "sharpe -1.104 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a502f954f9875cf79a4e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_cda5e6be0cbed8853e22",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7600a9a3d77952039c1a",
+   "reasons": [
+    "net_return -0.0569 <= 0.0",
+    "sharpe -2.034 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_780cc3b5a6610511dddd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9f1022656645223f077e",
+   "reasons": [
+    "net_return -0.0232 <= 0.0",
+    "sharpe -0.680 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b63e08361ae9d09b3380",
+   "reasons": [
+    "net_return -0.0232 <= 0.0",
+    "sharpe -0.680 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ab6d0340ba093a741fd1",
+   "reasons": [
+    "net_return -0.0136 <= 0.0",
+    "sharpe -0.530 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2a437d272fb8df89ef40",
+   "reasons": [
+    "net_return -0.0133 <= 0.0",
+    "sharpe -0.514 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6f79fdbf01436a30c221",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9b418139a16be7de6125",
+   "reasons": [
+    "net_return -0.0474 <= 0.0",
+    "sharpe -0.928 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_232f239be39ed3527044",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_05f6002d430ed7ceb59f",
+   "reasons": [
+    "net_return -0.0074 <= 0.0",
+    "sharpe -0.262 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_25030d0d9fe0a532e712",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bd1697d201ed340b62ac",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3431be09bd816cf76e8e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_54f257e7ca744c9d2150",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_980ec73c59d68b31dc95",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_de4c1f9992fd9d87c0c7",
+   "reasons": [
+    "sharpe 0.208 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4a5050921c4574c756ae",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f05269c6fbf758e23338",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_00da72997d9e8ba8e816",
+   "reasons": [
+    "net_return -0.0275 <= 0.0",
+    "sharpe -0.548 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1559f78e267ffdbc51c4",
+   "reasons": [
+    "net_return -0.0275 <= 0.0",
+    "sharpe -0.548 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3fdc89ad55a49d37aa58",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9b3759d7854e6d48a29e",
+   "reasons": [
+    "net_return -0.0066 <= 0.0",
+    "sharpe -0.184 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5fb562f5786cfb250aa8",
+   "reasons": [
+    "net_return -0.0965 <= 0.0",
+    "sharpe -0.989 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1d21207b9a3988ee5f46",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_271c3b21e783f6ebe863",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5aa5093319773e008dc7",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e1c40542379b1a501a00",
+   "reasons": [
+    "net_return -0.0141 <= 0.0",
+    "sharpe -0.600 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1b0edec92062256a4b89",
+   "reasons": [
+    "net_return -0.0020 <= 0.0",
+    "sharpe -0.029 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_aa7f318b0e9e239a34c6",
+   "reasons": [
+    "net_return -0.0020 <= 0.0",
+    "sharpe -0.029 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_aa5f37237ccac004b33a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_832f43b53a37891d9226",
+   "reasons": [
+    "net_return -0.0125 <= 0.0",
+    "sharpe -0.139 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c1f149c2d7f764e3e313",
+   "reasons": [
+    "net_return -0.0125 <= 0.0",
+    "sharpe -0.139 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_afb5fa2ac41f24188556",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_20a290fdeb8eeeeb7d73",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b804c1fa9db06f1a6703",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_db1649ed9f6de72fa826",
+   "reasons": [
+    "net_return -0.0675 <= 0.0",
+    "sharpe -1.136 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_23d63c9483ef92681f94",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_098f7a2152749e5207b8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bb9dfd90366471ba116c",
+   "reasons": [
+    "net_return -0.0667 <= 0.0",
+    "sharpe -1.065 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e792e99ea31eae32bb8d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_46153b2d198a6bbfe9c9",
+   "reasons": [
+    "net_return -0.0821 <= 0.0",
+    "sharpe -1.368 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_494291f13e86dd3137c3",
+   "reasons": [
+    "sharpe 0.057 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_bf66c2ec57e4d879c7db",
+   "reasons": [
+    "net_return -0.0504 <= 0.0",
+    "sharpe -0.781 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a19e50dfea0ac5238d3c",
+   "reasons": [
+    "net_return -0.0664 <= 0.0",
+    "sharpe -0.472 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c392ef3cdbdae1152d50",
+   "reasons": [
+    "net_return -0.0664 <= 0.0",
+    "sharpe -0.472 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e45e4e0bf9b966924e8a",
+   "reasons": [
+    "net_return -0.0154 <= 0.0",
+    "sharpe -0.864 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a9f3e91cd426652c333d",
+   "reasons": [
+    "net_return -0.0224 <= 0.0",
+    "sharpe -0.178 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_58bcea56cb40d13ce65c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9125467011f7d4f7fd8b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2305805df02335774911",
+   "reasons": [
+    "net_return -0.0256 <= 0.0",
+    "sharpe -0.512 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_92661fba6152e828a772",
+   "reasons": [
+    "net_return -0.0256 <= 0.0",
+    "sharpe -0.512 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e1da4f99bfc64f9d5540",
+   "reasons": [
+    "net_return -0.0224 <= 0.0",
+    "sharpe -0.178 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_63337e936ef5abe8729e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_dcde2021770df25c74c6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4f701fbbc06102379200",
+   "reasons": [
+    "sharpe 0.166 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_fe39541e49720bd45cf9",
+   "reasons": [
+    "sharpe 0.166 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4600067ea541bbc8ecac",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_97c45f19e74f58260706",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7543ddb288a196ec3b5c",
+   "reasons": [
+    "net_return -0.0240 <= 0.0",
+    "sharpe -0.318 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_9d6838778be9d034b0eb",
+   "reasons": [
+    "sharpe 0.226 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c44041f9bce515a4cd4a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_06601773a63cda3bc9e7",
+   "reasons": [
+    "net_return -0.0315 <= 0.0",
+    "sharpe -0.893 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3c342a3f1ac173848ae7",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9f0d382dc433db116424",
+   "reasons": [
+    "sharpe 0.249 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_d6809df0655eabdeeadf",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3337bd5d5640117bb30f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_dbbde3c50cef67906725",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a29b7f10bcb0333f3df2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b4a3f55aa1802ee6e14a",
+   "reasons": [
+    "net_return -0.0463 <= 0.0",
+    "sharpe -0.442 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5075e75608a25129544d",
+   "reasons": [
+    "net_return -0.0102 <= 0.0",
+    "sharpe -0.152 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_474392a625363f8fcbb8",
+   "reasons": [
+    "net_return -0.0145 <= 0.0",
+    "sharpe -0.620 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3b145f2179e9d5ee1fa5",
+   "reasons": [
+    "net_return -0.0488 <= 0.0",
+    "sharpe -0.956 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b86978342ba1e28e970e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5d81aba565f28a7224c2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7f70867c98b45bfecf96",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_901b63f94d56baaa312a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c10612578e4fb6450df7",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_43bcb17f14232b603fc9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c63805aeda7e5c2321c1",
+   "reasons": [
+    "sharpe 0.243 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6a14cd6e5df0b68abd93",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_594f7d624a702e7e0914",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9a8d5a4ff9b63c8c8bcd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8d39d0551fdc183407d6",
+   "reasons": [
+    "net_return -0.0313 <= 0.0",
+    "sharpe -0.502 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_bf1805a371f6587a0c87",
+   "reasons": [
+    "sharpe 0.208 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_aa3b2fcbf00bc1761a7f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3e489ec97a64ab0debd0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_aa46d695b9dc7ebf9931",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b2a6dc262a9c1f0be8ea",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0f985bb75ab9c3186dac",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_240d7e16cd6672b86470",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2662478296fe65060307",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5d0e3c20df406bb63187",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e28448a50d412e068b8a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8b70a02cdc3ecf626d2a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bcf1a326c8aea4d9bcef",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c707d17225aa4cf19c5c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_929c32db539a7c6d6f10",
+   "reasons": [
+    "sharpe 0.158 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b93cdc379bf2e1fea973",
+   "reasons": [
+    "sharpe 0.158 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8cdb9c07b1a8495f249b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2b8a8c8a37e82071ba74",
+   "reasons": [
+    "net_return -0.0435 <= 0.0",
+    "sharpe -0.431 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_230ededfe32463e73ffa",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1f50448c7cf7608f44d5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0b4be488aaa1be5f504e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9c9de65964292f62eb40",
+   "reasons": [
+    "net_return -0.0410 <= 0.0",
+    "sharpe -0.840 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b1a1837c4144fb6073af",
+   "reasons": [
+    "net_return -0.0301 <= 0.0",
+    "sharpe -0.405 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_594c1f024a71da826f21",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7ed7bed216ba76acf097",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_812b04c4b3ad575f5792",
+   "reasons": [
+    "net_return -0.0326 <= 0.0",
+    "sharpe -0.521 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ab761218d1e438909fde",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_decf9ec3ad4933187a8c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5c4b94b0553148ef36dc",
+   "reasons": [
+    "net_return -0.0030 <= 0.0",
+    "sharpe -0.142 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_001fa3fd6738e818577f",
+   "reasons": [
+    "net_return -0.0030 <= 0.0",
+    "sharpe -0.142 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ab5f44396bf2bbf96f94",
+   "reasons": [
+    "net_return -0.0599 <= 0.0",
+    "sharpe -1.537 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1e95b8c7a454bd0cb64d",
+   "reasons": [
+    "net_return -0.0220 <= 0.0",
+    "sharpe -0.300 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_f8b2ecb6baa3adfd8a50",
+   "reasons": [
+    "net_return -0.0220 <= 0.0",
+    "sharpe -0.300 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_488b876427b6dc8c6f50",
+   "reasons": [
+    "net_return -0.0479 <= 0.0",
+    "sharpe -1.033 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8d0fef84c3595651986a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c63b0df4e0551c2d8a86",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_37d8f307bc40592fbc8a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_152601d9893f5a412659",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_722eedc596079d2e1aa6",
+   "reasons": [
+    "net_return -0.0216 <= 0.0",
+    "sharpe -0.351 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b8c52ed7950340d2061e",
+   "reasons": [
+    "net_return -0.0043 <= 0.0",
+    "sharpe -0.005 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_0879110c804bdd3d897d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_05f31bc4b2ee9693df18",
+   "reasons": [
+    "sharpe 0.046 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c41e308b55366c53b0dd",
+   "reasons": [
+    "sharpe 0.046 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c07b62f37e665b0aa151",
+   "reasons": [
+    "sharpe 0.044 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_f9df9ab493a7e6d9fc2b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_fee8bbec2b38e5af6735",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4839eea4fd0d17278176",
+   "reasons": [
+    "net_return -0.0055 <= 0.0",
+    "sharpe -0.143 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8cfd15a2b3ac08985245",
+   "reasons": [
+    "net_return -0.0459 <= 0.0",
+    "sharpe -1.799 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_be65ca8d57aa2a1ad54a",
+   "reasons": [
+    "net_return -0.0459 <= 0.0",
+    "sharpe -1.799 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_24374632302fcbdac307",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_273645fd8c38666fc58a",
+   "reasons": [
+    "net_return -0.0030 <= 0.0",
+    "sharpe 0.005 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3901c5097631f34e90c2",
+   "reasons": [
+    "net_return -0.0230 <= 0.0",
+    "sharpe -0.524 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_52bc92d8eaf057a4edaf",
+   "reasons": [
+    "net_return -0.0230 <= 0.0",
+    "sharpe -0.524 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6a30cf6d8889b08cd74f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1503fa472a2cbac85508",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_413693fc0bfcd48c77c2",
+   "reasons": [
+    "net_return -0.0462 <= 0.0",
+    "sharpe -1.226 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_075d0eb5124a8919a85f",
+   "reasons": [
+    "net_return -0.0521 <= 0.0",
+    "sharpe -0.532 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3ec101bde1c4ed806158",
+   "reasons": [
+    "net_return -0.0521 <= 0.0",
+    "sharpe -0.532 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_38865214b6eb838dc4f8",
+   "reasons": [
+    "net_return -0.0048 <= 0.0",
+    "sharpe -0.067 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_27d8248f0d518f0b8002",
+   "reasons": [
+    "sharpe 0.180 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_12ba8007ec3a5c9d665e",
+   "reasons": [
+    "net_return -0.0546 <= 0.0",
+    "sharpe -1.021 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_acac44a41c7498aba7f3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_477a21233a242d4dd0df",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4549d8bd9fcba717834b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0769ca2caed1d2e0e745",
+   "reasons": [
+    "net_return -0.0411 <= 0.0",
+    "sharpe -0.606 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_63435e0eac0a0c5849ba",
+   "reasons": [
+    "net_return -0.0155 <= 0.0",
+    "sharpe -0.236 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_fa5c5979bac44fd3ec03",
+   "reasons": [
+    "net_return -0.1011 <= 0.0",
+    "sharpe -1.029 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ad3d0e3e3dd3fdbe6f15",
+   "reasons": [
+    "net_return -0.0145 <= 0.0",
+    "sharpe -0.207 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3f561ed22d5c2488085b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_644be1764accfee1fdf8",
+   "reasons": [
+    "net_return -0.0125 <= 0.0",
+    "sharpe -0.160 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7bc4a79adf183b98880e",
+   "reasons": [
+    "sharpe 0.238 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_9361a514f355619af74c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_116959fad09d25303273",
+   "reasons": [
+    "net_return -0.0606 <= 0.0",
+    "sharpe -0.973 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_20e2c6344e249e2c2720",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5aaed886c46e6dc83ba5",
+   "reasons": [
+    "net_return -0.0300 <= 0.0",
+    "sharpe -0.532 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4c017031727b24c11f8a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ee71a84a2bb1808d9192",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_98de95d0727d26244770",
+   "reasons": [
+    "sharpe 0.214 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_641390cc45838aa40913",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0298f7ec390c6a62bd9c",
+   "reasons": [
+    "net_return -0.0985 <= 0.0",
+    "sharpe -1.846 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8ef7a7b4631ad9c43381",
+   "reasons": [
+    "net_return -0.0346 <= 0.0",
+    "sharpe -0.800 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_02bb6fdaf01b9bff1b84",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e6e878adca1b6b13faf0",
+   "reasons": [
+    "net_return -0.0181 <= 0.0",
+    "sharpe -0.172 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_f39918a36bcd31b6bf9d",
+   "reasons": [
+    "net_return -0.0177 <= 0.0",
+    "sharpe -0.169 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8cd4333c8a83c77c384f",
+   "reasons": [
+    "net_return -0.0109 <= 0.0",
+    "sharpe -0.153 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7bd8ab4b24d36cb78eac",
+   "reasons": [
+    "net_return -0.0300 <= 0.0",
+    "sharpe -0.532 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4e12108754943bdaa52a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_896e238c94bf6c22b105",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b9421a348536a61470c8",
+   "reasons": [
+    "sharpe 0.051 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_cd4ce6a5ed35f24e5ad0",
+   "reasons": [
+    "sharpe 0.263 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a15205c114508b3410fa",
+   "reasons": [
+    "sharpe 0.190 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e760434392f1fbff7b58",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_64485514564465886053",
+   "reasons": [
+    "sharpe 0.070 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6822a7f103612aeea395",
+   "reasons": [
+    "sharpe 0.057 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5db50dd23ccf0ba6e246",
+   "reasons": [
+    "net_return -0.0154 <= 0.0",
+    "sharpe -0.864 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_67422a77f4f14989084f",
+   "reasons": [
+    "sharpe 0.249 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_107b3e7ec4d985417d70",
+   "reasons": [
+    "net_return -0.0612 <= 0.0",
+    "sharpe -1.894 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1f278db0e9d313263a90",
+   "reasons": [
+    "net_return -0.0612 <= 0.0",
+    "sharpe -1.894 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2e890ffe5115a6f65bed",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_be1a1c4c14573aac80ff",
+   "reasons": [
+    "net_return -0.0476 <= 0.0",
+    "sharpe -1.024 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1856aaa51cdb59838e48",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8b55121979856a728d6b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_db312f4a05d186dd6ce6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_583eaf4287c068ab092b",
+   "reasons": [
+    "net_return -0.0360 <= 0.0",
+    "sharpe -0.532 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b3f95fcb47f90990ec68",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_da3c4bf504b2b33fa790",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a0b16acc67b159a7aebe",
+   "reasons": [
+    "net_return -0.0416 <= 0.0",
+    "sharpe -0.846 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_067db221d3f8951833be",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ef23252775de8d8d9262",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_261b78f7cbe3045354aa",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0fe9c6111b6ed2c5e13a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_03f791051161850c2706",
+   "reasons": [
+    "net_return -0.0129 <= 0.0",
+    "sharpe -0.164 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_07ab6e824a9dc48007b9",
+   "reasons": [
+    "net_return -0.0095 <= 0.0",
+    "sharpe -0.203 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ac7708071384d684421c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c117bf6598e487be6be1",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4308569bcdd1ce932a84",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_dfc05444c44b419427eb",
+   "reasons": [
+    "net_return -0.0064 <= 0.0",
+    "sharpe -0.268 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_eee5ac95c215c206e4b2",
+   "reasons": [
+    "net_return -0.0064 <= 0.0",
+    "sharpe -0.268 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_375db8c8566675dc0579",
+   "reasons": [
+    "sharpe 0.263 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3e8f1b547c11efdfe901",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5b9ada86455961a8dc37",
+   "reasons": [
+    "net_return -0.0639 <= 0.0",
+    "sharpe -1.657 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4cc6260cdd9a7079b041",
+   "reasons": [
+    "net_return -0.0213 <= 0.0",
+    "sharpe -0.547 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3eb3a4fdbba871cda14b",
+   "reasons": [
+    "net_return -0.0213 <= 0.0",
+    "sharpe -0.547 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8238d3ecbdd324e3b42f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_cf422c978bf592023028",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_021a1253e9dfd80ccdbd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6fd18ff5fd4844e68b1a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c18463ae652f2f31b7aa",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_138da16c442f68d6555a",
+   "reasons": [
+    "net_return -0.1094 <= 0.0",
+    "sharpe -1.037 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5c6110d9920ad3154dac",
+   "reasons": [
+    "net_return -0.0293 <= 0.0",
+    "sharpe -0.894 < 0.3",
+    "completed_trades 33 < 40"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_644a6541efbcabdd0153",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4600e466e15e27a75eb5",
+   "reasons": [
+    "net_return -0.0206 <= 0.0",
+    "sharpe -0.191 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_139432a9a25925411d49",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_415eb62fd0f33c062644",
+   "reasons": [
+    "net_return -0.0356 <= 0.0",
+    "sharpe -1.907 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_47a7bcad544985544410",
+   "reasons": [
+    "net_return -0.0356 <= 0.0",
+    "sharpe -1.907 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_09b0fcb19f8f1ba79e9c",
+   "reasons": [
+    "sharpe 0.115 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_69b5fb1b5f30dbc43f9a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a95dd36000cdec39b0ac",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bb2e6ae8ad849082765d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d43f2659cc86cbccb32a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b48832a0d37fb8eb4b46",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e7412e8b2ca2f205eb0a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_52ec9019ab4f90ce3c98",
+   "reasons": [
+    "net_return -0.0101 <= 0.0",
+    "sharpe -0.435 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_90052ef6f935c6076901",
+   "reasons": [
+    "net_return -0.1094 <= 0.0",
+    "sharpe -1.037 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_638c42d7b3637563dcd0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_819ed013c97f018dccd7",
+   "reasons": [
+    "sharpe 0.275 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_0da3d6f9887931f349b1",
+   "reasons": [
+    "net_return -0.0235 <= 0.0",
+    "sharpe -0.224 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7cde54f75186397b3ba7",
+   "reasons": [
+    "net_return -0.1015 <= 0.0",
+    "sharpe -1.034 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_87a172857e7fc340cdd5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bb2b2cc45c59bdfba5dc",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_15a9af7b41826661e941",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7d255dd0b00101de386c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d290286030205dfc3bd5",
+   "reasons": [
+    "net_return -0.0376 <= 0.0",
+    "sharpe -0.782 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3b1375f5d8a438bbc535",
+   "reasons": [
+    "net_return -0.0218 <= 0.0",
+    "sharpe -0.563 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7fea1f0797587afb4947",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_29c49843eca7cabd7806",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_360c82c748dcedc91a7c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e5b977b2b8385a2902be",
+   "reasons": [
+    "net_return -0.0332 <= 0.0",
+    "sharpe -1.342 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_84a6a52ef4fc84f225d5",
+   "reasons": [
+    "sharpe 0.013 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4999a30e28d9b319d3e4",
+   "reasons": [
+    "sharpe 0.036 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_d48ec009414debb2e30e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b8b480dc903b8f7a3acc",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5c9d11d66fe9313ff244",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4bef785019e5907f214d",
+   "reasons": [
+    "net_return -0.0987 <= 0.0",
+    "sharpe -1.868 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6ce8eb39b85ac3ab19a0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5396e62dd49e7d2f7b46",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0795ff4e5ae3189c25b2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8a0331f9f48a6f33f33b",
+   "reasons": [
+    "net_return -0.0111 <= 0.0",
+    "sharpe -0.307 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b6a95759d52eab2b80a2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e304a965286c108c170d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_49900e18b8b51148842f",
+   "reasons": [
+    "net_return -0.0129 <= 0.0",
+    "sharpe -0.276 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_841a5936f0080fb2004a",
+   "reasons": [
+    "sharpe 0.216 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_917c8798ae3b965e5224",
+   "reasons": [
+    "sharpe 0.216 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_fdb1e53cc5b27c107d9e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_dd87986cc0268c55d6e0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a79f1c6a289764275a17",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_fdc6e5b70e12c9455817",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4fe76cacc3c6fc9f0ba7",
+   "reasons": [
+    "net_return -0.0040 <= 0.0",
+    "sharpe -0.044 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8e8090dc75e0e320ef3f",
+   "reasons": [
+    "net_return -0.0377 <= 0.0",
+    "sharpe -0.993 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_22ac09e56ccc019c25a5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4aefa11f61357b68539d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a8d1f00f025157210392",
+   "reasons": [
+    "sharpe 0.155 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3631b0a1fc1f1fe23c25",
+   "reasons": [
+    "sharpe 0.145 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_62a34cb227d6a1ddd74e",
+   "reasons": [
+    "net_return -0.0135 <= 0.0",
+    "sharpe -0.520 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_92c3dabc4201b5cafa05",
+   "reasons": [
+    "net_return -0.0135 <= 0.0",
+    "sharpe -0.520 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_f83054ddb40b4f68bdaf",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4cec78ce82d3da9ebc7a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_55982eb6ba235d12efbe",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_027ad9d2d5dfe391ee29",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9078efbb8e9c359b5080",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3a8a751337a0148c27f2",
+   "reasons": [
+    "net_return -0.0218 <= 0.0",
+    "sharpe -0.563 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1e96ae150ccc9de6d6bb",
+   "reasons": [
+    "net_return -0.0353 <= 0.0",
+    "sharpe -1.058 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_25140cc2316bc8c127ee",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3e78d69d22824feca299",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d8772df4e267859c52f6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9317057c245469490da1",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a9bd4a2c3e7bec468c83",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7df0e68f222b87932107",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_973c741772bc6a92c27f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b97f26b6b6857baa9017",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e121283676678bab2dd5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2f4df41e74f2690faf00",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_17bd449533987aa3c59f",
+   "reasons": [
+    "sharpe 0.105 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c8027e3254ca5002ea82",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7466a7c14a4e0cd5d2cf",
+   "reasons": [
+    "net_return -0.0415 <= 0.0",
+    "sharpe -1.781 < 0.3",
+    "completed_trades 36 < 40"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6121fd0fb5b12d8e7abb",
+   "reasons": [
+    "net_return -0.0084 <= 0.0",
+    "sharpe -0.562 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_9c41a445f490e57e18cc",
+   "reasons": [
+    "net_return -0.0367 <= 0.0",
+    "sharpe -1.658 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a284d41d7478de31f921",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a25f2e3752e84603d083",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_dd9b2e0e6859ea6707a2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c14ce86e3241a8e85cf1",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_194eddb52e6d5da41b71",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_29c61f4d810a9e7f790f",
+   "reasons": [
+    "net_return -0.0367 <= 0.0",
+    "sharpe -1.658 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7474999df0d898b5e3b7",
+   "reasons": [
+    "net_return -0.0262 <= 0.0",
+    "sharpe -0.350 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4156d16fbd8087cafb53",
+   "reasons": [
+    "net_return -0.0112 <= 0.0",
+    "sharpe -0.149 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5b616a90885127b95458",
+   "reasons": [
+    "net_return -0.0380 <= 0.0",
+    "sharpe -0.848 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e679c5c10bf197722096",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2c9a8f8d4f0b259b1947",
+   "reasons": [
+    "net_return -0.0016 <= 0.0",
+    "sharpe -0.035 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b64c92cfe93f40658c42",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0fb15dad04d7736a2838",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_178fb23ff3a36699b4e3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9f1392b007142acae425",
+   "reasons": [
+    "net_return -0.0664 <= 0.0",
+    "sharpe -1.610 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b4498131918c60e0ce28",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_948be2f0198cee24c94b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1829fd38a66aa89c5c3c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4108659abe94718a7952",
+   "reasons": [
+    "net_return -0.0332 <= 0.0",
+    "sharpe -0.989 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_165e18571f3b68646dae",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0512a43de72bb07376fb",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c81ead352d60212cf686",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_4e6e3ffd018892c3567e",
+   "reasons": [
+    "net_return -0.0762 <= 0.0",
+    "sharpe -1.351 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_afafb709f906a7ff171b",
+   "reasons": [
+    "net_return -0.0762 <= 0.0",
+    "sharpe -1.351 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_119bae049b87a1c7fb55",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ca1f725572b307615672",
+   "reasons": [
+    "net_return -0.0125 <= 0.0",
+    "sharpe -0.169 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_621fa7854b6d1acca745",
+   "reasons": [
+    "net_return -0.0665 <= 0.0",
+    "sharpe -1.610 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_93f1f5d0565719a0cd00",
+   "reasons": [
+    "net_return -0.0455 <= 0.0",
+    "sharpe -1.033 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6fde5c391a5796931fd9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_549394e29dc872252d13",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b1bf2f50586cf0860aa8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0aa8fb693afcde0f1d12",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f32c7ccf726f1a139ad7",
+   "reasons": [
+    "net_return -0.0201 <= 0.0",
+    "sharpe -0.797 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a22e2c99fb0336c2f980",
+   "reasons": [
+    "sharpe 0.201 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_88bcd4861b9265990723",
+   "reasons": [
+    "sharpe 0.201 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_0dea0997c9f5d9e41891",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_982a32cc94831198b439",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_56fe71e63a28259cb1e0",
+   "reasons": [
+    "net_return -0.0254 <= 0.0",
+    "sharpe -0.909 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_754a196d6ac6304767fd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e19089971c2471d9bd02",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_153b10b68d8825818046",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3d285d19c3b981f0158f",
+   "reasons": [
+    "net_return -0.0171 <= 0.0",
+    "sharpe -0.266 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_499390c44596b20be811",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6116b4c93e4639238bbb",
+   "reasons": [
+    "sharpe 0.167 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4965565f484e14fd154e",
+   "reasons": [
+    "sharpe 0.193 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_67ffda03f9eddb3e364a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_033a4b6bd7eac396908c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3f7a7e4ba42f3a821634",
+   "reasons": [
+    "net_return -0.0105 <= 0.0",
+    "sharpe -0.132 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a2b31a43b4f2692d2685",
+   "reasons": [
+    "net_return -0.0111 <= 0.0",
+    "sharpe -0.141 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ceca16ff4910e6ebb7dd",
+   "reasons": [
+    "net_return -0.0392 <= 0.0",
+    "sharpe -1.101 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_9723ad9dda6b35587c9f",
+   "reasons": [
+    "net_return -0.0365 <= 0.0",
+    "sharpe -1.099 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_d0b20995eb1e6f5acdb0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_97dbb7ff388200732aaf",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_07f44292c55cd8b3fc1f",
+   "reasons": [
+    "net_return -0.0056 <= 0.0",
+    "sharpe -0.129 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1d5f3d5fcbfb3cec5b51",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_962ff1228f08dd7da716",
+   "reasons": [
+    "net_return -0.0455 <= 0.0",
+    "sharpe -1.529 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5d2c7341e82c830c6009",
+   "reasons": [
+    "net_return -0.0246 <= 0.0",
+    "sharpe -0.881 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_15d194ab827702b2e1aa",
+   "reasons": [
+    "sharpe 0.166 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2f58e42ba21b80802c9a",
+   "reasons": [
+    "sharpe 0.031 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_dbd8b26c42b293fe7e0c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_7af5519fa921be9dd438",
+   "reasons": [
+    "net_return -0.0301 <= 0.0",
+    "sharpe -1.237 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_98f1f864af9fed20ee0d",
+   "reasons": [
+    "net_return -0.0301 <= 0.0",
+    "sharpe -1.237 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3ccd3e19a2c2b4c6fcea",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_debf6375b40433fbe4f4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_901f1a2166de5af55d6f",
+   "reasons": [
+    "sharpe 0.054 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_9f4fb5b8441471b67667",
+   "reasons": [
+    "sharpe 0.054 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6cdbd3cb74d33d8c4d34",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0b1a3066282ed2ce2b16",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a2a97748c5ca4a28324e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_948b4cc8a3c3dac4bc8b",
+   "reasons": [
+    "sharpe 0.244 < 0.3",
+    "completed_trades 36 < 40"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_39f133308b65a6307e74",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5b083bf8eeb10d1992be",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_09a033e9304926baebe3",
+   "reasons": [
+    "net_return -0.0377 <= 0.0",
+    "sharpe -1.135 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_6885e6473650985d70f6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6cf8e5a38b9c3a738b87",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9a07c87f2e2ed9eaa09c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f357eb47070666621b58",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b2e6f51bb622d68df41b",
+   "reasons": [
+    "net_return -0.0443 <= 0.0",
+    "sharpe -0.410 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1d8dbbdb12222b53607c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_62b15e4759b71c37aaa6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2de349ca49c473adc293",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1e773e5365d3fb111878",
+   "reasons": [
+    "net_return -0.0466 <= 0.0",
+    "sharpe -2.024 < 0.3",
+    "completed_trades 38 < 40"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a259df3973b030b5d8ad",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ee176115d1f712c4dde5",
+   "reasons": [
+    "net_return -0.0254 <= 0.0",
+    "sharpe -0.447 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2a4791b72dd61b3e642b",
+   "reasons": [
+    "net_return -0.0568 <= 0.0",
+    "sharpe -1.316 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c36f8e62d1878a2ebb93",
+   "reasons": [
+    "net_return -0.0669 <= 0.0",
+    "sharpe -1.440 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_445ca295343a75b00c15",
+   "reasons": [
+    "net_return -0.0336 <= 0.0",
+    "sharpe -1.330 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c1d49a5f1cb4873dc782",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_13161557e3c98c007a78",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f5ab8ad3503998e68aea",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ad10ccddad9d77c370cd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_5ec88736ca17c0075b9a",
+   "reasons": [
+    "net_return -0.0484 <= 0.0",
+    "sharpe -0.847 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c4b59106a2522a6b8470",
+   "reasons": [
+    "net_return -0.0484 <= 0.0",
+    "sharpe -0.847 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_aba214c1d34fb8bea879",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_57257d3c2e6e30ce1d21",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8edc70e7655cb3cf0526",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c942bf4136373196a071",
+   "reasons": [
+    "net_return -0.0394 <= 0.0",
+    "sharpe -0.733 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b110ed76fcd6d3a89553",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ad28d35009e8f884bf52",
+   "reasons": [
+    "net_return -0.0002 <= 0.0",
+    "sharpe 0.004 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_663232114260490c31e7",
+   "reasons": [
+    "net_return -0.0662 <= 0.0",
+    "sharpe -1.427 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_baf3b601006ca7e69ece",
+   "reasons": [
+    "sharpe 0.244 < 0.3",
+    "completed_trades 36 < 40"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2ad2e2e10c7bd627b81d",
+   "reasons": [
+    "net_return -0.0466 <= 0.0",
+    "sharpe -1.622 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_29f476a01c2296238e36",
+   "reasons": [
+    "net_return -0.0194 <= 0.0",
+    "sharpe -0.770 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_cc4940292f677bce5dcc",
+   "reasons": [
+    "net_return -0.0194 <= 0.0",
+    "sharpe -0.770 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8aecf88642f6c5a7d88c",
+   "reasons": [
+    "sharpe 0.241 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_391b65c59f364313c2da",
+   "reasons": [
+    "net_return -0.0570 <= 0.0",
+    "sharpe -1.321 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4e3c35421f50f412d40a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_901c52f20e15be440ac3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6f288e5a500227ea6717",
+   "reasons": [
+    "sharpe 0.241 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_50bcbc430132ac63ece1",
+   "reasons": [
+    "net_return -0.0158 <= 0.0",
+    "sharpe -0.342 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_de700a7fa490e2ddb7f4",
+   "reasons": [
+    "net_return -0.0143 <= 0.0",
+    "sharpe -0.848 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_bee7724f876fa00c0669",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6a55b50cd091cd79c0e9",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9e18f596915ff6cf7d19",
+   "reasons": [
+    "net_return -0.0215 <= 0.0",
+    "sharpe -0.506 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_873f4b4a1eb3e3c195d6",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a56eae4dafc8e3ccab0f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_63e7726442b0e47dc1bc",
+   "reasons": [
+    "net_return -0.0705 <= 0.0",
+    "sharpe -1.373 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_60965a8af86c23d408a3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_052d44b263f7d06aac56",
+   "reasons": [
+    "sharpe 0.232 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_f39cd0d0901cad46cf82",
+   "reasons": [
+    "sharpe 0.232 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_9b5d9109b7e106826c4a",
+   "reasons": [
+    "net_return -0.0480 <= 0.0",
+    "sharpe -1.063 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_dfff3af4fd9417828be2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bfb26bd0ec5b40f56209",
+   "reasons": [
+    "net_return -0.0052 <= 0.0",
+    "sharpe -0.328 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_c5119b45a712188a2a5b",
+   "reasons": [
+    "net_return -0.0052 <= 0.0",
+    "sharpe -0.328 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_cc8ea5e4d27c58187492",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3ab6a5a5e17ce6e06a12",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_1d272e588447c3f403c5",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2c754c37e614d2acf5c4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d7be3a2916d0d246ba35",
+   "reasons": [
+    "net_return -0.0133 <= 0.0",
+    "sharpe -0.774 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_de80201ce0425cb798c4",
+   "reasons": [
+    "net_return -0.0290 <= 0.0",
+    "sharpe -1.000 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_044ec55a4d613b0c5576",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b2ae03ce652deca4a1c1",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e9a86e1d9e5c23140bed",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_66e63491f28d2ab2d897",
+   "reasons": [
+    "net_return -0.0436 <= 0.0",
+    "sharpe -0.960 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4750eaf7266d2bb7aaa2",
+   "reasons": [
+    "sharpe 0.178 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_e804bc0f971a228f2255",
+   "reasons": [
+    "net_return -0.0347 <= 0.0",
+    "sharpe -0.778 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_86d86b1170ea6f14bdc5",
+   "reasons": [
+    "net_return -0.0080 <= 0.0",
+    "sharpe -0.355 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_56095c74033d63fa5c97",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bd33536fb64c1c861306",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_f0f0bf2e2cfc9ea713ec",
+   "reasons": [
+    "sharpe 0.209 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1a00979440b6d0e24cb5",
+   "reasons": [
+    "net_return -0.0150 <= 0.0",
+    "sharpe -0.866 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_d240838bff499aacf40a",
+   "reasons": [
+    "net_return -0.0136 <= 0.0",
+    "sharpe -0.654 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ab8306c80be6354fcac1",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6216a55e8659132438d3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_76fedf05127b24cb2ba8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_98aad2711ce434d7f7d7",
+   "reasons": [
+    "net_return -0.0376 <= 0.0",
+    "sharpe -0.782 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7f580d502155829e9613",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3e0d996463d05b0473db",
+   "reasons": [
+    "sharpe 0.072 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_dcaeccb44c4750c5a17e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b2669dedf121d6452f2a",
+   "reasons": [
+    "net_return -0.0110 <= 0.0",
+    "sharpe -0.284 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_729b12925b3725dd8274",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_eb453f474c110e6fbc28",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3a82c307329e8f62f011",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8ef16161099df7ac89ef",
+   "reasons": [
+    "sharpe 0.204 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a23f08c09f7d2c02e35f",
+   "reasons": [
+    "net_return -0.0089 <= 0.0",
+    "sharpe -0.149 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1ba830873224d4928806",
+   "reasons": [
+    "net_return -0.0097 <= 0.0",
+    "sharpe -0.430 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_94271f5f0191c4708073",
+   "reasons": [
+    "net_return -0.0092 <= 0.0",
+    "sharpe -0.467 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_98c3284d8d79db971373",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_da6105c617c6d337f0ba",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_74185c66f3a7a2bdf7f3",
+   "reasons": [
+    "net_return -0.0584 <= 0.0",
+    "sharpe -0.602 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_3cdb679c999e82f29a0c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_54f1ef1b6e93538bcf85",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_adccd0b269dae9350b3b",
+   "reasons": [
+    "net_return -0.0147 <= 0.0",
+    "sharpe -0.872 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_ce6a2572fdf8463ae6c8",
+   "reasons": [
+    "net_return -0.0444 <= 0.0",
+    "sharpe -1.299 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_b7d2c8e10ca719252c9c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3d152ef64783c1e15a0f",
+   "reasons": [
+    "net_return -0.0366 <= 0.0",
+    "sharpe -0.487 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4a104137d6a631b24b34",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_c7d0ead3a697c9cf719f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3b3ccbae14af47c8ee4f",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_59746adb8f191b1ba9cc",
+   "reasons": [
+    "net_return -0.0317 <= 0.0",
+    "sharpe -0.426 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1441a42840bf6aed92ed",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_29a246fba5bde047ba8a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9ab59cfc86c90f7ff310",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_fd6f8228d10f4d70c6cd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d39831d64ed82e831bee",
+   "reasons": [
+    "net_return -0.0097 <= 0.0",
+    "sharpe -0.185 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4ae5daa5f93189fe64f7",
+   "reasons": [
+    "net_return -0.0132 <= 0.0",
+    "sharpe -0.326 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5ccd29ca751e7b439ade",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ea3f5a151d5ad5ba70aa",
+   "reasons": [
+    "net_return -0.0007 <= 0.0",
+    "sharpe 0.013 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_04b8d0585c0c8f52289b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e635caee0609e7c81b1b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_62c9904fb20e6a0f3f88",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_ddc81cf16c61483ca967",
+   "reasons": [
+    "net_return -0.0571 <= 0.0",
+    "sharpe -0.587 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_39f1dcf2491c725e0ed8",
+   "reasons": [
+    "sharpe 0.224 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_942ba4e73f0da03615cd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_693049d89c16d42991c8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0585dcdf74049bb9f867",
+   "reasons": [
+    "net_return -0.0246 <= 0.0",
+    "sharpe -0.321 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8cf6ba327252fa2360ec",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_9bb3438d7165a32eb6ab",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_b6b76a56aa0d450a55cd",
+   "reasons": [
+    "net_return -0.0059 <= 0.0",
+    "sharpe -0.224 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_9580c9071fed25ec5556",
+   "reasons": [
+    "net_return -0.0195 <= 0.0",
+    "sharpe -0.864 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a27db1d1b889eca0450e",
+   "reasons": [
+    "net_return -0.0195 <= 0.0",
+    "sharpe -0.864 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_93d935775a647a441edf",
+   "reasons": [
+    "net_return -0.0431 <= 0.0",
+    "sharpe -0.935 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_d52f10c030b8c9ae12b2",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0385fa0fac6edbf33369",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bbcbc7603982e9344c73",
+   "reasons": [
+    "net_return -0.0116 <= 0.0",
+    "sharpe -0.738 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7e6d9c00dac871eff9d2",
+   "reasons": [
+    "net_return -0.0058 <= 0.0",
+    "sharpe -0.049 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_cdd8383ae0bebde77c6a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_01b09a3d66101007cfea",
+   "reasons": [
+    "net_return -0.0372 <= 0.0",
+    "sharpe -0.638 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_2f058f5280f4350dcdcd",
+   "reasons": [
+    "net_return -0.0159 <= 0.0",
+    "sharpe -1.142 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_64c8660cef566e2074d4",
+   "reasons": [
+    "net_return -0.0159 <= 0.0",
+    "sharpe -1.142 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_50f404bc46992346e302",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_8efe4d0012436d57cfab",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_31bad591040ceb9efbb4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e18bea40c1db057db786",
+   "reasons": [
+    "net_return -0.0481 <= 0.0",
+    "sharpe -1.563 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7c51d83d9b5b5cdaa26d",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_57c90d399bbc57e0c24e",
+   "reasons": [
+    "net_return -0.0134 <= 0.0",
+    "sharpe -0.248 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_1e593d61fcead617c09e",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_6f0f7b653043bd921fcb",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_232a49d9daefc3fc6ad8",
+   "reasons": [
+    "net_return -0.0481 <= 0.0",
+    "sharpe -1.563 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_baefe9c4255859f2a7b0",
+   "reasons": [
+    "net_return -0.0300 <= 0.0",
+    "sharpe -0.436 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_914bcf9d8c0a171428d1",
+   "reasons": [
+    "net_return -0.0290 <= 0.0",
+    "sharpe -0.422 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_010bfbf285818e64ba2c",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_3b073b00970e1264e3dc",
+   "reasons": [
+    "sharpe 0.185 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_4cffd4b2b9a91ebd37b9",
+   "reasons": [
+    "net_return -0.0265 <= 0.0",
+    "sharpe -0.905 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_16a3786006989e6925d8",
+   "reasons": [
+    "net_return -0.0064 <= 0.0",
+    "sharpe -0.272 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_73308375197df6949290",
+   "reasons": [
+    "sharpe 0.054 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_7b0d3256ee07a6fcedd0",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d5fb6eda06224246f5d2",
+   "reasons": [
+    "net_return -0.0317 <= 0.0",
+    "sharpe -1.498 < 0.3",
+    "completed_trades 38 < 40"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_80444d311e6c4ccacab3",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_637cda591675980a494a",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_84f3b78d62225e147c08",
+   "reasons": [
+    "sharpe 0.287 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_a449de15baee6eabdf7d",
+   "reasons": [
+    "sharpe 0.287 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_5e92a823fdff1b1f88e8",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0920267ba407b808eed0",
+   "reasons": [
+    "net_return -0.0129 <= 0.0",
+    "sharpe -0.624 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_22b31df72c45b9bf15d3",
+   "reasons": [
+    "net_return -0.0639 <= 0.0",
+    "sharpe -1.550 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_079f4b24ac4711767056",
+   "reasons": [
+    "net_return -0.0084 <= 0.0",
+    "sharpe -0.561 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_bd7c366cc25380d25f56",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_bc63d5517f19acb76f24",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a8d97dc0774ba8a8b6af",
+   "reasons": [
+    "net_return -0.0395 <= 0.0",
+    "sharpe -1.394 < 0.3"
+   ],
+   "status": "hard_reject"
+  }
+ ]
+}
