@@ -1,0 +1,170 @@
+{
+  "both_edge_setups": {
+    "development": {
+      "both_edge_setups": 72,
+      "down_first": 31,
+      "now_traded": 23,
+      "pnl": -78650.0,
+      "same_minute": 1,
+      "stopped_on_entry_bar": 23,
+      "trades": 23,
+      "up_first": 40,
+      "wins": 0
+    },
+    "holdout": {
+      "both_edge_setups": 32,
+      "down_first": 11,
+      "now_traded": 14,
+      "pnl": -73105.0,
+      "same_minute": 0,
+      "stopped_on_entry_bar": 14,
+      "trades": 14,
+      "up_first": 21,
+      "wins": 0
+    },
+    "validation": {
+      "both_edge_setups": 36,
+      "down_first": 14,
+      "now_traded": 7,
+      "pnl": -31395.0,
+      "same_minute": 0,
+      "stopped_on_entry_bar": 7,
+      "trades": 7,
+      "up_first": 22,
+      "wins": 0
+    }
+  },
+  "config_id": "cfg_77e6b0682fbd5afff3e3",
+  "data_access": {
+    "actual_last_session": "2026-10-19",
+    "command": "minute_resolve_check",
+    "experiment_id": "cb_bbkc_nq_v3_15m#6 1min both-edges check",
+    "first_session": "2018-01-02",
+    "manifest_sha256": "4349ac3f9b30130c2409086fe51aae925e4ba27de72d50dc6e3ba3c28c4ad1de",
+    "n_partitions": 106,
+    "partition_fingerprint": "7df5e9b4a8dc6e72",
+    "phase": "holdout",
+    "phase_end": null,
+    "rows": 3099436,
+    "symbol": "NQ"
+  },
+  "dev_order": 6,
+  "experiment_id": "cb_bbkc_nq_v3_15m",
+  "label": "holdout previously inspected -- NOT an untouched test (frozen pick re-run, nothing re-chosen)",
+  "method": "A wick entry is a stop order resting at a box edge. When one 15-minute bar trades through BOTH\nedges, the 15-minute backtest cannot tell which filled first, so it skips the setup -- and those\nare mostly losing trades in real life (the order fills, then the far side stops it out). This\nscript runs each frozen pick twice on the same data, with nothing re-chosen:",
+  "params": {
+    "compression": "bbkc",
+    "direction": "long",
+    "entry_type": "wick",
+    "kc_mult": 2.5,
+    "min_box_atr": 0.5,
+    "min_squeeze_bars": 1,
+    "setup_expiry_bars": 7,
+    "squeeze_length": 5,
+    "stop": "box",
+    "symbol": "NQ",
+    "target_r": "2.5",
+    "timeframe": "15min",
+    "trend_filter": "ema50"
+  },
+  "prior_holdout_accesses_for_symbol": 7,
+  "results": {
+    "minute": {
+      "development": {
+        "cagr": 0.07074469002619166,
+        "exposure": 0.196020114061446,
+        "integrity_issues": [
+          "entry_signal_condition_not_met"
+        ],
+        "max_drawdown": -0.05271553288631636,
+        "n_completed_trades": 427,
+        "n_profitable_years": 5,
+        "net_return": 0.40705750000000007,
+        "profit_factor": 1.4137625216635579,
+        "sharpe": 1.259159253819067,
+        "win_rate": 0.468384074941452
+      },
+      "holdout": {
+        "cagr": -0.015078865264176233,
+        "exposure": 0.18499742223749785,
+        "integrity_issues": [
+          "entry_signal_condition_not_met"
+        ],
+        "max_drawdown": -0.048114466542192647,
+        "n_completed_trades": 162,
+        "n_profitable_years": 0,
+        "net_return": -0.02670818356202942,
+        "profit_factor": 0.9140009980344831,
+        "sharpe": -0.33940772662811514,
+        "win_rate": 0.42592592592592593
+      },
+      "validation": {
+        "cagr": 0.06021671203740264,
+        "exposure": 0.17510775862068967,
+        "integrity_issues": [
+          "entry_signal_condition_not_met"
+        ],
+        "max_drawdown": -0.03054758554120518,
+        "n_completed_trades": 181,
+        "n_profitable_years": 2,
+        "net_return": 0.12353795065233641,
+        "profit_factor": 1.3387444094749048,
+        "sharpe": 1.2261433111141575,
+        "win_rate": 0.4419889502762431
+      }
+    },
+    "original": {
+      "development": {
+        "cagr": 0.08727032503876186,
+        "exposure": 0.1953148954436745,
+        "integrity_issues": [],
+        "max_drawdown": -0.049130033177499643,
+        "n_completed_trades": 404,
+        "n_profitable_years": 5,
+        "net_return": 0.51895,
+        "profit_factor": 1.5429625173288692,
+        "sharpe": 1.5418030928482742,
+        "win_rate": 0.49504950495049505
+      },
+      "holdout": {
+        "cagr": 0.013124373147488377,
+        "exposure": 0.18379446640316205,
+        "integrity_issues": [],
+        "max_drawdown": -0.04469487561131191,
+        "n_completed_trades": 148,
+        "n_profitable_years": 2,
+        "net_return": 0.0235041462896024,
+        "profit_factor": 1.0865703903264206,
+        "sharpe": 0.3370412998666949,
+        "win_rate": 0.46621621621621623
+      },
+      "validation": {
+        "cagr": 0.07785562577617577,
+        "exposure": 0.17456896551724138,
+        "integrity_issues": [],
+        "max_drawdown": -0.03273212344046006,
+        "n_completed_trades": 174,
+        "n_profitable_years": 2,
+        "net_return": 0.1610816682576781,
+        "profit_factor": 1.442318295626079,
+        "sharpe": 1.5052952758390568,
+        "win_rate": 0.45977011494252873
+      }
+    }
+  },
+  "symbol": "NQ",
+  "windows": {
+    "development": [
+      "2018-01-01",
+      "2022-12-31"
+    ],
+    "holdout": [
+      "2025-01-01",
+      "2026-10-19"
+    ],
+    "validation": [
+      "2023-01-01",
+      "2024-12-31"
+    ]
+  }
+}
