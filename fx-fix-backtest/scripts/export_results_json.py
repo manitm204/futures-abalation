@@ -24,7 +24,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.experiments.fx_grid import AXES_FX_V1
+from src.experiments.fx_grid import AXES_FX_V1, AXES_FX_V2
 from src.experiments.funnel_config import load_execution_config, load_funnel_config
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -33,6 +33,7 @@ app = typer.Typer(add_completion=False)
 
 # strategy -> (axes, file-key prefix, tab label prefix, heat-map axes (rows, cols))
 SPACES = {
+    "fx_fix_v2": (AXES_FX_V2, "fx_fix", "FX fix", ("post_hold", "stop")),
     "fx_fix_v1": (AXES_FX_V1, "fx_fix", "FX fix", ("switch_offset", "post_hold")),
 }
 MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini Dow", "RTY": "E-mini Russell 2000",
@@ -41,9 +42,12 @@ MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini
 LABELS = {
     "timeframe": "Bar size", "leg": "Leg", "switch_offset": "Switch vs London fix (min)",
     "post_hold": "Post-fix hold", "vol_gate": "Vol gate", "stop": "Stop",
+    "anchor": "Run-up measured from", "direction": "Direction", "move": "Run-up size", "trend": "20-day trend",
+    "month": "Month-end window",
 }
 SHORT = {"timeframe": "Bar", "leg": "Leg", "switch_offset": "Switch", "post_hold": "Hold", "vol_gate": "Vol",
-         "stop": "Stop"}
+         "stop": "Stop",
+         "anchor": "Anchor", "direction": "Dir", "move": "Move", "trend": "Trend", "month": "Month"}
 MOVES = {"switch_offset": "Switch", "post_hold": "Hold", "stop_pct": "Stop"}
 LEG_NAMES = {"post": "post-fix long", "pre": "pre-fix short", "both": "both (W)"}
 
@@ -61,6 +65,16 @@ def _val(axis: str, v) -> str:
         return {"none": "none", "high": "high vol", "low": "low vol"}.get(v, v)
     if axis == "timeframe":
         return "1 min"
+    if axis == "anchor":
+        return {"ecb": "ECB fix", "open": "08:00 open"}.get(v, v)
+    if axis == "direction":
+        return {"long": "always long", "reversal": "fade the run-up", "momentum": "follow the run-up"}.get(v, v)
+    if axis == "move":
+        return {"any": "any size", "small": "small (|z|<1)", "big": "big (|z|>=1)"}.get(v, v)
+    if axis == "trend":
+        return {"any": "any", "aligned": "with trend", "counter": "against trend"}.get(v, v)
+    if axis == "month":
+        return {"any": "every day", "me": "month-end only"}.get(v, v)
     if isinstance(v, float):
         return f"{v:g}"
     return str(v)

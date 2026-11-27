@@ -40,7 +40,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.analysis.neighborhood import LATTICE_FX_V1, NeighborhoodStats, neighborhood_stats
+from src.analysis.neighborhood import LATTICE_FX_V1, LATTICE_FX_V2, NeighborhoodStats, neighborhood_stats
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.experiments.data_access import (
     DEFAULT_LEDGER,
@@ -86,10 +86,10 @@ from src.experiments.funnel_robustness import (
     perturbations_fx,
     quantile,
 )
-from src.experiments.fx_grid import fx_grid_v1
+from src.experiments.fx_grid import fx_grid_v1, fx_grid_v2
 from src.experiments.fx_integrity import CHECKS, truncation_invariance
 from src.strategies.fx_fix.backtest import FXParams, fx_day_bars
-from src.strategies.fx_fix.config import FXFixV1Config
+from src.strategies.fx_fix.config import FXFixV1Config, FXFixV2Config
 from src.utils.hashing import canonical_json
 from src.utils.logging import configure_logging, get_logger
 from src.utils.seeds import derive_seed
@@ -103,7 +103,12 @@ PREP_SOURCES = ["src/strategies/fx_fix/backtest.py", "src/strategies/fx_fix/conf
                 "src/analysis/daily_performance.py", "src/experiments/funnel_prep.py",
                 "src/experiments/fx_integrity.py"]
 FX_KEYS = ("symbol", "timeframe", "leg", "switch_offset", "post_hold", "vol_gate", "stop")
+FX_KEYS_V2 = (*FX_KEYS, "anchor", "direction", "move", "trend", "month")
 SPACES = {
+    "fx_fix_v2": {
+        "grid": fx_grid_v2, "cls": FXFixV2Config, "lattice": LATTICE_FX_V2,
+        "perturb": perturbations_fx, "local": local_perturbations_fx, "keys": FX_KEYS_V2,
+    },
     "fx_fix_v1": {
         "grid": fx_grid_v1, "cls": FXFixV1Config, "lattice": LATTICE_FX_V1,
         "perturb": perturbations_fx, "local": local_perturbations_fx, "keys": FX_KEYS,

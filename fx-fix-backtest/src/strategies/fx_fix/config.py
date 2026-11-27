@@ -98,3 +98,40 @@ class _FXFixConfig(FrozenModel):
 
 class FXFixV1Config(_FXFixConfig):
     pass
+
+
+# --- fx_fix v2 (about 1,200 configs): conditioned post leg -------------------------------------
+# Specified 2026-11-27 after v1 (fx_6e_v1 / fx_6j_v1) found no gross edge in the unconditional legs.
+# Post leg only. Everything below is known before the entry bar opens:
+#   R      : log move of the 1-minute closes from the anchor (ECB fix open, or the 08:00 open) to
+#            the bar BEFORE the entry bar (so the entry bar's own open is never used).
+#   z      : R divided by the standard deviation of R over the previous 20 sessions (>= 10 needed).
+#   trend  : sign of the previous session's last close vs the close 20 sessions earlier.
+#   month  : last two weekdays of a month or the first weekday of the next (calendar rule, no holidays).
+# direction: long      -- always long 6E (the v1 rule)
+#            reversal  -- trade against R: long 6E if R < 0 (USD ran up into the fix), short if R > 0
+#            momentum  -- trade with R
+# move     : any | small (|z| < MOVE_Z) | big (|z| >= MOVE_Z)
+# trend    : any | aligned (trade side == trend sign) | counter (trade side == -trend sign)
+# month    : any | me (month-end window only)
+MOVE_Z = 1.0
+MOVE_LOOKBACK = 20
+MOVE_MIN_SESSIONS = 10
+TREND_DAYS = 20
+V2_ANCHORS: tuple[str, ...] = ("ecb", "open")
+V2_DIRECTIONS: tuple[str, ...] = ("long", "reversal", "momentum")
+V2_MOVES: tuple[str, ...] = ("any", "small", "big")
+V2_TRENDS: tuple[str, ...] = ("any", "aligned", "counter")
+V2_MONTHS: tuple[str, ...] = ("any", "me")
+V2_SWITCH_OFFSETS: tuple[int, ...] = (0,)
+V2_POST_HOLDS: tuple[str, ...] = ("60", "240", "eod")
+V2_VOL_GATES: tuple[str, ...] = ("none", "high")
+V2_STOPS: tuple[str, ...] = ("none", "0.50")
+
+
+class FXFixV2Config(_FXFixConfig):
+    anchor: Literal["ecb", "open"] = "ecb"
+    direction: Literal["long", "reversal", "momentum"] = "long"
+    move: Literal["any", "small", "big"] = "any"
+    trend: Literal["any", "aligned", "counter"] = "any"
+    month: Literal["any", "me"] = "any"

@@ -1,0 +1,859 @@
+{
+ "summary": {
+  "n_configs": 6885,
+  "dev_profitable": 581,
+  "val_profitable": 397,
+  "both_profitable": 298,
+  "passed_dev": 107,
+  "stable": 95,
+  "passed_val": 63,
+  "dev_sharpe_q": [
+   -3.86,
+   -1.92,
+   -0.12,
+   0.95
+  ],
+  "val_sharpe_q": [
+   -4.26,
+   -2.33,
+   -0.4,
+   0.76
+  ],
+  "by_dimension": {
+   "side": [
+    {
+     "side": "both",
+     "dev_median": -1.995,
+     "val_median": -2.437,
+     "share_both_pos": 0.043
+    },
+    {
+     "side": "long_post",
+     "dev_median": -1.19,
+     "val_median": -1.743,
+     "share_both_pos": 0.086
+    },
+    {
+     "side": "short_pre",
+     "dev_median": -1.857,
+     "val_median": -1.684,
+     "share_both_pos": 0.002
+    }
+   ],
+   "stop": [
+    {
+     "stop": "1.0",
+     "dev_median": -2.228,
+     "val_median": -2.694,
+     "share_both_pos": 0.038
+    },
+    {
+     "stop": "2.0",
+     "dev_median": -1.854,
+     "val_median": -2.238,
+     "share_both_pos": 0.044
+    },
+    {
+     "stop": "None",
+     "dev_median": -1.686,
+     "val_median": -2.138,
+     "share_both_pos": 0.047
+    }
+   ],
+   "target": [
+    {
+     "target": "0.5",
+     "dev_median": -3.042,
+     "val_median": -2.997,
+     "share_both_pos": 0.007
+    },
+    {
+     "target": "1.0",
+     "dev_median": -2.184,
+     "val_median": -2.109,
+     "share_both_pos": 0.053
+    },
+    {
+     "target": "None",
+     "dev_median": -1.134,
+     "val_median": -2.041,
+     "share_both_pos": 0.07
+    }
+   ],
+   "days": [
+    {
+     "days": "all",
+     "dev_median": -2.668,
+     "val_median": -2.987,
+     "share_both_pos": 0.001
+    },
+    {
+     "days": "gotobi",
+     "dev_median": -0.686,
+     "val_median": -0.932,
+     "share_both_pos": 0.129
+    },
+    {
+     "days": "non_gotobi",
+     "dev_median": -2.745,
+     "val_median": -2.925,
+     "share_both_pos": 0.0
+    }
+   ]
+  }
+ },
+ "finalists": [
+  {
+   "side": "both",
+   "pre_start": -30,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 30,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.401,
+    "pf": 1.636,
+    "net": 7720,
+    "per_yr": 1535,
+    "maxdd": -1339,
+    "trades": 748,
+    "net_1p5x": 2811,
+    "gross_per_trade": 23.45
+   },
+   "val": {
+    "sharpe": 0.727,
+    "pf": 1.259,
+    "net": 1698,
+    "per_yr": 840,
+    "maxdd": -1465,
+    "trades": 304,
+    "net_1p5x": -297,
+    "gross_per_trade": 18.71
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -75,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 30,
+   "stop": 2.0,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.286,
+    "pf": 1.556,
+    "net": 8726,
+    "per_yr": 1736,
+    "maxdd": -1595,
+    "trades": 724,
+    "net_1p5x": 3892,
+    "gross_per_trade": 25.41
+   },
+   "val": {
+    "sharpe": 1.085,
+    "pf": 1.409,
+    "net": 3136,
+    "per_yr": 1553,
+    "maxdd": -1536,
+    "trades": 304,
+    "net_1p5x": 1098,
+    "gross_per_trade": 23.73
+   }
+  },
+  {
+   "side": "long_post",
+   "pre_start": null,
+   "pre_end": null,
+   "post_start": 0,
+   "post_end": 90,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.118,
+    "pf": 1.47,
+    "net": 6186,
+    "per_yr": 1230,
+    "maxdd": -1208,
+    "trades": 374,
+    "net_1p5x": 2914,
+    "gross_per_trade": 34.04
+   },
+   "val": {
+    "sharpe": 0.773,
+    "pf": 1.286,
+    "net": 1853,
+    "per_yr": 917,
+    "maxdd": -1112,
+    "trades": 152,
+    "net_1p5x": 523,
+    "gross_per_trade": 29.69
+   }
+  },
+  {
+   "side": "long_post",
+   "pre_start": null,
+   "pre_end": null,
+   "post_start": 0,
+   "post_end": 90,
+   "stop": null,
+   "target": 1.0,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.055,
+    "pf": 1.389,
+    "net": 4667,
+    "per_yr": 928,
+    "maxdd": -1070,
+    "trades": 362,
+    "net_1p5x": 1880,
+    "gross_per_trade": 28.28
+   },
+   "val": {
+    "sharpe": 0.856,
+    "pf": 1.287,
+    "net": 1631,
+    "per_yr": 808,
+    "maxdd": -1364,
+    "trades": 152,
+    "net_1p5x": 451,
+    "gross_per_trade": 26.26
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -30,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 90,
+   "stop": null,
+   "target": 1.0,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.038,
+    "pf": 1.389,
+    "net": 5525,
+    "per_yr": 1099,
+    "maxdd": -1189,
+    "trades": 724,
+    "net_1p5x": 1022,
+    "gross_per_trade": 20.07
+   },
+   "val": {
+    "sharpe": 0.765,
+    "pf": 1.247,
+    "net": 1711,
+    "per_yr": 847,
+    "maxdd": -1944,
+    "trades": 304,
+    "net_1p5x": -178,
+    "gross_per_trade": 18.05
+   }
+  }
+ ],
+ "top20_dev": [
+  {
+   "side": "both",
+   "pre_start": -30,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 30,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.401,
+    "pf": 1.636,
+    "net": 7720,
+    "per_yr": 1535,
+    "maxdd": -1339,
+    "trades": 748,
+    "net_1p5x": 2811,
+    "gross_per_trade": 23.45
+   },
+   "val": {
+    "sharpe": 0.727,
+    "pf": 1.259,
+    "net": 1698,
+    "per_yr": 840,
+    "maxdd": -1465,
+    "trades": 304,
+    "net_1p5x": -297,
+    "gross_per_trade": 18.71
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -30,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 90,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.399,
+    "pf": 1.613,
+    "net": 9882,
+    "per_yr": 1966,
+    "maxdd": -1034,
+    "trades": 748,
+    "net_1p5x": 4974,
+    "gross_per_trade": 26.34
+   },
+   "val": {
+    "sharpe": 0.6,
+    "pf": 1.207,
+    "net": 1729,
+    "per_yr": 856,
+    "maxdd": -1886,
+    "trades": 304,
+    "net_1p5x": -266,
+    "gross_per_trade": 18.81
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -75,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 120,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.365,
+    "pf": 1.567,
+    "net": 11832,
+    "per_yr": 2353,
+    "maxdd": -1484,
+    "trades": 748,
+    "net_1p5x": 6924,
+    "gross_per_trade": 28.94
+   },
+   "val": {
+    "sharpe": 0.595,
+    "pf": 1.221,
+    "net": 2323,
+    "per_yr": 1150,
+    "maxdd": -1699,
+    "trades": 304,
+    "net_1p5x": 328,
+    "gross_per_trade": 20.76
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -75,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 90,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.363,
+    "pf": 1.563,
+    "net": 11326,
+    "per_yr": 2253,
+    "maxdd": -1639,
+    "trades": 748,
+    "net_1p5x": 6417,
+    "gross_per_trade": 28.27
+   },
+   "val": {
+    "sharpe": 0.836,
+    "pf": 1.305,
+    "net": 2973,
+    "per_yr": 1472,
+    "maxdd": -1740,
+    "trades": 304,
+    "net_1p5x": 978,
+    "gross_per_trade": 22.9
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -30,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 120,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.359,
+    "pf": 1.607,
+    "net": 10389,
+    "per_yr": 2066,
+    "maxdd": -1554,
+    "trades": 748,
+    "net_1p5x": 5480,
+    "gross_per_trade": 27.01
+   },
+   "val": {
+    "sharpe": 0.327,
+    "pf": 1.113,
+    "net": 1079,
+    "per_yr": 534,
+    "maxdd": -2171,
+    "trades": 304,
+    "net_1p5x": -916,
+    "gross_per_trade": 16.67
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -90,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 30,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.356,
+    "pf": 1.568,
+    "net": 9595,
+    "per_yr": 1908,
+    "maxdd": -1898,
+    "trades": 748,
+    "net_1p5x": 4686,
+    "gross_per_trade": 25.95
+   },
+   "val": {
+    "sharpe": 1.05,
+    "pf": 1.4,
+    "net": 3079,
+    "per_yr": 1524,
+    "maxdd": -1280,
+    "trades": 304,
+    "net_1p5x": 1084,
+    "gross_per_trade": 23.25
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -90,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 90,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.344,
+    "pf": 1.555,
+    "net": 11757,
+    "per_yr": 2339,
+    "maxdd": -1426,
+    "trades": 748,
+    "net_1p5x": 6849,
+    "gross_per_trade": 28.84
+   },
+   "val": {
+    "sharpe": 0.877,
+    "pf": 1.329,
+    "net": 3110,
+    "per_yr": 1540,
+    "maxdd": -1796,
+    "trades": 304,
+    "net_1p5x": 1115,
+    "gross_per_trade": 23.36
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -90,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 120,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.344,
+    "pf": 1.563,
+    "net": 12264,
+    "per_yr": 2439,
+    "maxdd": -1559,
+    "trades": 748,
+    "net_1p5x": 7355,
+    "gross_per_trade": 29.52
+   },
+   "val": {
+    "sharpe": 0.63,
+    "pf": 1.237,
+    "net": 2460,
+    "per_yr": 1218,
+    "maxdd": -1780,
+    "trades": 304,
+    "net_1p5x": 465,
+    "gross_per_trade": 21.22
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -75,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 30,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.343,
+    "pf": 1.571,
+    "net": 9164,
+    "per_yr": 1823,
+    "maxdd": -1824,
+    "trades": 748,
+    "net_1p5x": 4255,
+    "gross_per_trade": 25.38
+   },
+   "val": {
+    "sharpe": 0.972,
+    "pf": 1.374,
+    "net": 2941,
+    "per_yr": 1456,
+    "maxdd": -1452,
+    "trades": 304,
+    "net_1p5x": 946,
+    "gross_per_trade": 22.8
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -60,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 120,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.34,
+    "pf": 1.564,
+    "net": 11526,
+    "per_yr": 2293,
+    "maxdd": -1646,
+    "trades": 748,
+    "net_1p5x": 6617,
+    "gross_per_trade": 28.53
+   },
+   "val": {
+    "sharpe": 0.315,
+    "pf": 1.113,
+    "net": 1235,
+    "per_yr": 611,
+    "maxdd": -1920,
+    "trades": 304,
+    "net_1p5x": -760,
+    "gross_per_trade": 17.19
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -60,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 90,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.334,
+    "pf": 1.559,
+    "net": 11020,
+    "per_yr": 2192,
+    "maxdd": -1508,
+    "trades": 748,
+    "net_1p5x": 6111,
+    "gross_per_trade": 27.86
+   },
+   "val": {
+    "sharpe": 0.54,
+    "pf": 1.188,
+    "net": 1885,
+    "per_yr": 933,
+    "maxdd": -1787,
+    "trades": 304,
+    "net_1p5x": -110,
+    "gross_per_trade": 19.33
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -30,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 60,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.328,
+    "pf": 1.586,
+    "net": 8701,
+    "per_yr": 1731,
+    "maxdd": -1256,
+    "trades": 748,
+    "net_1p5x": 3792,
+    "gross_per_trade": 24.76
+   },
+   "val": {
+    "sharpe": 0.475,
+    "pf": 1.163,
+    "net": 1260,
+    "per_yr": 624,
+    "maxdd": -2104,
+    "trades": 304,
+    "net_1p5x": -735,
+    "gross_per_trade": 17.27
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -75,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 60,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.293,
+    "pf": 1.518,
+    "net": 10145,
+    "per_yr": 2018,
+    "maxdd": -2095,
+    "trades": 748,
+    "net_1p5x": 5236,
+    "gross_per_trade": 26.69
+   },
+   "val": {
+    "sharpe": 0.792,
+    "pf": 1.287,
+    "net": 2504,
+    "per_yr": 1240,
+    "maxdd": -1249,
+    "trades": 304,
+    "net_1p5x": 509,
+    "gross_per_trade": 21.36
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -75,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 30,
+   "stop": 2.0,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.286,
+    "pf": 1.556,
+    "net": 8726,
+    "per_yr": 1736,
+    "maxdd": -1595,
+    "trades": 724,
+    "net_1p5x": 3892,
+    "gross_per_trade": 25.41
+   },
+   "val": {
+    "sharpe": 1.085,
+    "pf": 1.409,
+    "net": 3136,
+    "per_yr": 1553,
+    "maxdd": -1536,
+    "trades": 304,
+    "net_1p5x": 1098,
+    "gross_per_trade": 23.73
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -75,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 120,
+   "stop": 2.0,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.282,
+    "pf": 1.532,
+    "net": 10875,
+    "per_yr": 2163,
+    "maxdd": -1488,
+    "trades": 724,
+    "net_1p5x": 6041,
+    "gross_per_trade": 28.38
+   },
+   "val": {
+    "sharpe": 0.725,
+    "pf": 1.272,
+    "net": 2765,
+    "per_yr": 1369,
+    "maxdd": -1932,
+    "trades": 304,
+    "net_1p5x": 726,
+    "gross_per_trade": 22.51
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -90,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 60,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.281,
+    "pf": 1.524,
+    "net": 10576,
+    "per_yr": 2104,
+    "maxdd": -1658,
+    "trades": 748,
+    "net_1p5x": 5667,
+    "gross_per_trade": 27.26
+   },
+   "val": {
+    "sharpe": 0.863,
+    "pf": 1.311,
+    "net": 2641,
+    "per_yr": 1308,
+    "maxdd": -1280,
+    "trades": 304,
+    "net_1p5x": 646,
+    "gross_per_trade": 21.81
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -60,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 30,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.279,
+    "pf": 1.548,
+    "net": 8857,
+    "per_yr": 1762,
+    "maxdd": -1604,
+    "trades": 748,
+    "net_1p5x": 3949,
+    "gross_per_trade": 24.97
+   },
+   "val": {
+    "sharpe": 0.607,
+    "pf": 1.223,
+    "net": 1854,
+    "per_yr": 918,
+    "maxdd": -1709,
+    "trades": 304,
+    "net_1p5x": -141,
+    "gross_per_trade": 19.22
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -60,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 120,
+   "stop": 2.0,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.26,
+    "pf": 1.527,
+    "net": 10444,
+    "per_yr": 2077,
+    "maxdd": -1592,
+    "trades": 724,
+    "net_1p5x": 5596,
+    "gross_per_trade": 27.82
+   },
+   "val": {
+    "sharpe": 0.297,
+    "pf": 1.102,
+    "net": 1133,
+    "per_yr": 561,
+    "maxdd": -2119,
+    "trades": 304,
+    "net_1p5x": -928,
+    "gross_per_trade": 17.28
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -60,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 60,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.257,
+    "pf": 1.515,
+    "net": 9839,
+    "per_yr": 1957,
+    "maxdd": -1908,
+    "trades": 748,
+    "net_1p5x": 4930,
+    "gross_per_trade": 26.28
+   },
+   "val": {
+    "sharpe": 0.447,
+    "pf": 1.156,
+    "net": 1416,
+    "per_yr": 701,
+    "maxdd": -1630,
+    "trades": 304,
+    "net_1p5x": -579,
+    "gross_per_trade": 17.78
+   }
+  },
+  {
+   "side": "both",
+   "pre_start": -45,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 90,
+   "stop": null,
+   "target": null,
+   "days": "gotobi",
+   "dev": {
+    "sharpe": 1.238,
+    "pf": 1.517,
+    "net": 9345,
+    "per_yr": 1859,
+    "maxdd": -1134,
+    "trades": 748,
+    "net_1p5x": 4436,
+    "gross_per_trade": 25.62
+   },
+   "val": {
+    "sharpe": 0.389,
+    "pf": 1.13,
+    "net": 1266,
+    "per_yr": 627,
+    "maxdd": -1907,
+    "trades": 304,
+    "net_1p5x": -729,
+    "gross_per_trade": 17.29
+   }
+  }
+ ]
+}

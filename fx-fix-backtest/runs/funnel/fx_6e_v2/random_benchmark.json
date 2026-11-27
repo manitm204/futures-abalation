@@ -1,0 +1,152 @@
+{
+  "curves": {
+    "1min|post": [
+      {
+        "actual_exposure": 0.04002442666705613,
+        "exposure_pct": 4,
+        "frac_profitable": 0.39,
+        "mean_return": -0.003411487500005865,
+        "mean_sharpe": -0.21347858366283884,
+        "mean_trades": 31.74,
+        "median_return": -0.005083750000005494,
+        "median_sharpe": -0.2799812192258452,
+        "p10_return": -0.018273500000005584,
+        "p10_sharpe": -1.093230949736273,
+        "p90_return": 0.014425249999993936,
+        "p90_sharpe": 0.6705805044349783
+      },
+      {
+        "actual_exposure": 0.04999225941193439,
+        "exposure_pct": 5,
+        "frac_profitable": 0.33,
+        "mean_return": -0.005868075000007335,
+        "mean_sharpe": -0.2599169917407655,
+        "mean_trades": 39.67,
+        "median_return": -0.005543125000006532,
+        "median_sharpe": -0.22225931026276546,
+        "p10_return": -0.0240493750000073,
+        "p10_sharpe": -1.0619884046116432,
+        "p90_return": 0.011955124999992272,
+        "p90_sharpe": 0.590344752212201
+      },
+      {
+        "actual_exposure": 0.06002117708055688,
+        "exposure_pct": 6,
+        "frac_profitable": 0.36,
+        "mean_return": -0.007631850000008662,
+        "mean_sharpe": -0.33021791167381004,
+        "mean_trades": 47.68,
+        "median_return": -0.007048125000008065,
+        "median_sharpe": -0.3126270730015731,
+        "p10_return": -0.026187875000008676,
+        "p10_sharpe": -1.0905406807266704,
+        "p90_return": 0.010811499999992386,
+        "p90_sharpe": 0.47327228155275386
+      },
+      {
+        "actual_exposure": 0.07003286098707104,
+        "exposure_pct": 7,
+        "frac_profitable": 0.32,
+        "mean_return": -0.009165325000010433,
+        "mean_sharpe": -0.35668965326466584,
+        "mean_trades": 55.62,
+        "median_return": -0.00813312500001001,
+        "median_sharpe": -0.31839360326981425,
+        "p10_return": -0.03449537500001019,
+        "p10_sharpe": -1.3002907172102856,
+        "p90_return": 0.01292812499998882,
+        "p90_sharpe": 0.5855799462447985
+      },
+      {
+        "actual_exposure": 0.08002121359276475,
+        "exposure_pct": 8,
+        "frac_profitable": 0.32,
+        "mean_return": -0.005928725000011756,
+        "mean_sharpe": -0.22258002161131457,
+        "mean_trades": 63.53,
+        "median_return": -0.004851875000011663,
+        "median_sharpe": -0.1710175866729451,
+        "p10_return": -0.025941125000011823,
+        "p10_sharpe": -0.9570361819282365,
+        "p90_return": 0.011052999999987404,
+        "p90_sharpe": 0.39394910001890715
+      }
+    ]
+  },
+  "data_access": {
+    "actual_last_session": "2024-12-31",
+    "command": "random_benchmark",
+    "experiment_id": "fx_6e_v2",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 84,
+    "partition_fingerprint": "fc575931b36a4128",
+    "phase": "validation",
+    "phase_end": "2024-12-31",
+    "rows": 2431740,
+    "symbol": "6E"
+  },
+  "experiment_id": "fx_6e_v2",
+  "finalists": [
+    {
+      "config_id": "cfg_413d933773a3c14e3fdd",
+      "dev_order": 1,
+      "direction": "post",
+      "exposure": 0.04243083675026745,
+      "exposure_level": 4,
+      "group": "1min|post",
+      "luck_pct_return": 0.63,
+      "luck_pct_sharpe": 0.64,
+      "net_return": 0.0006250452494085401,
+      "sharpe": 0.047677445226858114,
+      "status": "hard_reject",
+      "timeframe": "1min"
+    },
+    {
+      "config_id": "cfg_b8dc3f4ff4f2419353cb",
+      "dev_order": 2,
+      "direction": "post",
+      "exposure": 0.08236423848313684,
+      "exposure_level": 8,
+      "group": "1min|post",
+      "luck_pct_return": 0.34,
+      "luck_pct_sharpe": 0.23,
+      "net_return": -0.011892311251455734,
+      "sharpe": -0.5666545591484723,
+      "status": "hard_reject",
+      "timeframe": "1min"
+    }
+  ],
+  "group_levels": {
+    "1min|post": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ]
+  },
+  "groups": {
+    "1min|post": {
+      "direction": "post",
+      "mean_trade_bars": 345.24242424242425,
+      "median_trade_bars": 355.0,
+      "n_pool_trades": 99,
+      "p_long": 0.6161616161616161,
+      "timeframe": "1min"
+    }
+  },
+  "levels": [
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "method": "Per bar size and leg setting (post = long only, pre = short only, both = the finalists' actual long share): random intraday trades on random sessions at random times, never overlapping and always closed by the session's last bar, covering the target share of the validation window's bars. Trade lengths are drawn from that group's own validation trades; each trade is long with the group's actual long share (1.0 for long-only, 0.0 for short-only), else short. Same fills, slippage, commission and whole-contract sizing as the strategy; scored with the same daily-Sharpe and time-in-market code.",
+  "n_sims": 100,
+  "window": [
+    "2023-01-01",
+    "2024-12-31"
+  ]
+}

@@ -28,6 +28,10 @@ from src.strategies.fx_fix.config import (
     ECB_FIX,
     LONDON_FIX,
     MAX_ENTRY_LAG_MIN,
+    MOVE_LOOKBACK,
+    MOVE_MIN_SESSIONS,
+    MOVE_Z,
+    TREND_DAYS,
     RV_LONG_DAYS,
     RV_SAMPLE_MIN,
     RV_SHORT_DAYS,
@@ -88,6 +92,68 @@ def independent_gate(data: FXData, vol_gate: str) -> np.ndarray:
     return out
 
 
+
+def independent_pre_move(data: FXData, anchor: str, sw: np.ndarray) -> np.ndarray:
+    """R per session by scanning bars: log(close of the bar before the entry bar / open of the
+    first bar at/after the anchor)."""
+    ecb = data._get(("indep_ecb",), lambda: independent_fix_minutes(data.days, ECB_FIX))
+    out = np.full(len(data.days), np.nan)
+    for s in range(len(data.days)):
+        a0, b0 = int(data.day_start_idx[s]), int(data.day_end_idx[s])
+        tod = data.tod[a0:b0 + 1]
+        am = DAY_START_MIN if anchor == "open" else int(ecb[s])
+        ia = next((a0 + i for i, t in enumerate(tod) if t >= am), None)
+        ie = next((a0 + i for i, t in enumerate(tod) if t >= int(sw[s])), None)
+        if ia is None or ie is None or ie - 1 < ia:
+            continue
+        out[s] = np.log(data.close[ie - 1] / data.open[ia])
+    return out
+
+
+def independent_post_sides(data: FXData, p, sw: np.ndarray) -> np.ndarray:
+    """+1 / -1 / 0 per session for the post leg under the v2 conditions, with plain loops."""
+    S = len(data.days)
+    side = np.ones(S, dtype=np.int64)
+    R = independent_pre_move(data, p.anchor, sw) if (p.direction != "long" or p.move != "any") else None
+    days = data.days.astype("datetime64[D]")
+    lastc = np.array([data.close[int(data.day_end_idx[s])] for s in range(S)])
+    for s in range(S):
+        sd = 1
+        if p.direction != "long":
+            if not np.isfinite(R[s]) or R[s] == 0:
+                side[s] = 0
+                continue
+            sd = int(np.sign(R[s])) * (-1 if p.direction == "reversal" else 1)
+        if p.move != "any":
+            w = R[max(0, s - MOVE_LOOKBACK):s]
+            w = w[np.isfinite(w)]
+            if len(w) < MOVE_MIN_SESSIONS or not np.isfinite(R[s]):
+                side[s] = 0
+                continue
+            z = R[s] / np.std(w, ddof=1)
+            if not np.isfinite(z) or (abs(z) < MOVE_Z) != (p.move == "small"):
+                side[s] = 0
+                continue
+        if p.trend != "any":
+            if s - 1 - TREND_DAYS < 0:
+                side[s] = 0
+                continue
+            diff = lastc[s - 1] - lastc[s - 1 - TREND_DAYS]
+            t = int(np.sign(diff))
+            if t == 0 or (t == sd) != (p.trend == "aligned"):
+                side[s] = 0
+                continue
+        if p.month != "any":
+            d = pd.Timestamp(days[s])
+            nxt = d + pd.offsets.MonthBegin(1) if d.day != 1 else d + pd.offsets.MonthBegin(1)
+            wd = pd.bdate_range(d.replace(day=1), nxt - pd.Timedelta(days=1))
+            if not (d in (wd[-1], wd[-2], wd[0])):
+                side[s] = 0
+                continue
+        side[s] = sd
+    return side
+
+
 def independent_plan(data: FXData, p) -> list[tuple[int, int, int, str, bool]]:
     """(entry bar, exit bar, side, leg, timed) for every trade the rules call for, by scanning bars."""
     days = data.days
@@ -95,6 +161,9 @@ def independent_plan(data: FXData, p) -> list[tuple[int, int, int, str, bool]]:
     ecb = data._get(("indep_ecb",), lambda: independent_fix_minutes(days, ECB_FIX))
     gate = data._get(("indep_gate", p.vol_gate), lambda: independent_gate(data, p.vol_gate))
     H = p.hold_minutes
+    sw_all = lon + p.switch_offset
+    psides = (independent_post_sides(data, p, sw_all) if p.leg in ("post", "both")
+              else np.zeros(len(days), dtype=np.int64))
     out = []
     for s in range(len(days)):
         if not gate[s]:
@@ -106,8 +175,10 @@ def independent_plan(data: FXData, p) -> list[tuple[int, int, int, str, bool]]:
         if p.leg in ("pre", "both"):
             legs.append(("pre", -1, int(ecb[s]), sw))
         if p.leg in ("post", "both"):
-            legs.append(("post", 1, sw, None if H is None else sw + H))
+            legs.append(("post", int(psides[s]), sw, None if H is None else sw + H))
         for name, side, start, end in legs:
+            if side == 0:
+                continue
             e = next((a + i for i, t in enumerate(tod) if t >= start), None)
             if e is None or data.tod[e] - start > MAX_ENTRY_LAG_MIN:
                 continue
@@ -131,7 +202,7 @@ def check_sim_integrity(sim: SimResult, data: FXData, exec_config: ExecutionConf
     if not (np.array_equal(data.london_min, independent_fix_minutes(data.days, LONDON_FIX))
             and np.array_equal(data.ecb_min, independent_fix_minutes(data.days, ECB_FIX))):
         issues.add("fix_time_mismatch")
-    plan = data._get(("indep_plan", p.leg, p.switch_offset, p.post_hold, p.vol_gate),
+    plan = data._get(("indep_plan", p.leg, p.switch_offset, p.post_hold, p.vol_gate, p.anchor, p.direction, p.move, p.trend, p.month),
                      lambda: independent_plan(data, p))
     by_entry = {e: (x, side, leg, timed) for e, x, side, leg, timed in plan}
     gate = data._get(("indep_gate", p.vol_gate), lambda: independent_gate(data, p.vol_gate))
@@ -154,7 +225,7 @@ def check_sim_integrity(sim: SimResult, data: FXData, exec_config: ExecutionConf
             plan_x, plan_side, plan_leg, timed = by_entry[k]
         if e < k or data.sess[e] != data.sess[k]:
             issues.add("entry_not_at_leg_start")
-        if plan_side != d or (sim.leg[i] == "pre") != (d < 0):
+        if plan_side != d or (sim.leg[i] == "pre" and d > 0):
             issues.add("side_not_per_leg")
         if (p.leg == "pre" and sim.leg[i] != "pre") or (p.leg == "post" and sim.leg[i] != "post"):
             issues.add("leg_not_allowed")

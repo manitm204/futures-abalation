@@ -1,0 +1,149 @@
+# 6J futures (Japanese yen) FX-fix reversal, v1: run fx_6j_v1 (same 405 configs and rules as fx_6e_v1). The paper finds the yen moves the OTHER way after London, so this is a sign-check market.
+# 1-minute bars from 08:00 to 17:00 ET) -- the ONE place every threshold lives.
+#
+# Source: Krohn, Mueller & Whelan, "Foreign Exchange Fixings and Returns Around the Clock", JF
+# 2024 (reports/Distinct futures strategy papers.md, pick 1). The USD rises into the London
+# 16:00 fix and falls after it. Daytime legs only (the user does not trade overnight):
+#   post  -- LONG 6E from the London fix + switch_offset for post_hold minutes (or to 17:00 ET)
+#   pre   -- SHORT 6E from the ECB 14:15 fix to the London fix + switch_offset (exploratory)
+#   both  -- the pre trade then the post trade
+# switch_offset -15 / -5 / 0 / 5 / 15 min; post_hold 60 / 120 / 240 min / eod; vol gate none /
+# high / low (20-day realized vol vs its 250-day median); stop none / 0.25% / 0.50%.
+#
+# Gates, data splits, costs and stage numbering are identical to the other 6E funnels
+# (e.g. ../price-path-convexity-backtest/configs/funnel/pc_funnel_6e_v3_15m.yaml). Only the
+# stage-4 local moves are new (this family has no look-backs or z levels).
+#
+# Thresholds are fixed for the duration of a run and are hashed into every run's
+# outputs. They are NEVER adjusted automatically to hit a survivor count; zero
+# survivors is a valid outcome. Changing a value here is a new research trial
+# and should be recorded under `research_history` below.
+
+version: 1
+strategy: fx_fix_v2
+symbol: 6J
+seed: 20261127
+
+data:
+  clean_root: data/clean
+  development: {start: 2018-01-01, end: 2022-12-31}
+  validation:  {start: 2023-01-01, end: 2024-12-31}
+  # end: null -> the actual available endpoint, recorded at access time.
+  holdout:     {start: 2025-01-01, end: null}
+  timeframes: ["1min"]
+
+data_history:
+  validation_previously_used_for_selection: true
+  validation_note: >-
+    No FX-fix strategy has been scored on 6J 2023-2024, but mean-reversion, BB/KC squeeze, NR-N squeeze and convexity strategies were selected there and the researcher has read those results. Treated as used for selection.
+  holdout_previously_inspected: false
+  holdout_note: >-
+    The data-access ledgers of every project show no 6J holdout (2025+) access to date.
+
+metrics:
+  return_frequency: daily          # mark-to-market equity at each session close (17:00 ET here)
+  periods_per_year: 252            # Sharpe = mean/std(daily) * sqrt(252)
+  risk_free_rate_annual: 0.0
+  cash_treatment: >-
+    Idle cash earns 0% and the Sharpe excess return is measured against a 0%
+    risk-free rate, so the two assumptions are consistent.
+  drawdown_basis: daily session-close mark-to-market (understates intraday DD)
+
+execution:
+  baseline: configs/execution/futures.yaml   # $2.50/contract/side + 1 tick/side slippage, unlevered whole contracts
+
+integrity:            # stage 1
+  truncation_check_sample: 40
+  truncation_points: 3
+
+trade_count:          # stage 2 -- hard gate
+  min_completed_trades: 100
+  min_trades_per_year: 10
+  min_years_meeting_floor: 4
+
+performance:          # stage 3 -- hard gate
+  min_net_return: 0.0               # strictly greater than
+  min_sharpe: 0.75                  # annualized, daily MTM returns incl. flat days
+  max_drawdown: -0.30
+  max_drawdown_source: src/experiments/validation.py::FunnelThresholds.max_dev_drawdown_pct
+
+parameter_stability:  # stage 4 -- hard gate
+  mode: local_perturbation          # gate on `local` moves below; grid neighbors are diagnostic only
+  local:
+    int_rel: 0.20                   # unused by this family (no integer look-backs); required field
+    stop_atr_abs: 0.25              # unused by this family (no ATR stop); required field
+    switch_offset_abs: 5            # switch time -/+ 5 minutes
+    post_hold_abs: 30               # numeric post hold -/+ 30 minutes (never below 5)
+    stop_pct_abs: 0.10              # percent stop -/+ 0.10% (never below 0.05%; "none" has no move)
+  neighbor_mode: single_axis        # grid-neighbor diagnostic
+  min_frac_profitable: 0.70         # of the local moves, share with dev net return > 0
+  min_median_sharpe: 0.50           # median dev Sharpe of the local moves
+  prescreen:                        # big grids only (this one is 405 configs, so it never triggers)
+    max_configs: 3000
+    per_cluster: 3
+  perturbation:                     # diagnostic only, never a gate
+    n_per_config: 20
+    integer_rel_step: 0.15          # numeric post hold (relative); switch time moves +/- 1..10 min
+    float_rel_step: 0.10            # percent stop (relative)
+
+time_stability:       # stage 5 -- light hard gate + diagnostics
+  min_profitable_years: 3
+  top_trades_k: 5
+  top_trades_frac: 0.05
+
+dedup:                # stage 6
+  corr_threshold: 0.80
+  return_basis: monthly
+  linkage: complete
+  reps_per_cluster: 2               # best 2 per cluster; a single-member cluster keeps its 1
+
+execution_stress:     # stage 7
+  gate_cost_multiplier: 1.5         # hard gate: positive dev net return
+  diagnostic_cost_multipliers: [2.0]
+  entry_delay_bars: 1               # one 1-minute bar late
+  missed_entry_frac: 0.10
+  missed_entry_sims: 100
+  breakeven_max_multiplier: 25.0
+
+validation:           # stage 8 -- hard gate (frozen representatives only)
+  min_net_return: 0.0
+  min_sharpe: 0.30
+  max_drawdown: -0.30
+  min_completed_trades: 40          # project default from 2026-10-22
+
+confidence:           # stage 9 -- diagnostics only
+  dsr_threshold: 0.95
+  dsr_calibration_verified: false
+  effective_trials_method: li_ji
+  serial_dependence: lag1_effective_n
+  transfer_symbol: 6E                # unchanged rules, development period only. NEGATIVE CONTROL: the
+                                     # paper finds the yen moves the other way after London.
+
+holdout:              # stage 10 -- explicit `final-test` command only
+  acceptance:
+    min_net_return: 0.0
+    min_sharpe: 0.0
+    max_drawdown: -0.30
+    min_completed_trades: null
+
+# Earlier trials on this market (other families). These count toward the DSR "known prior"
+# sensitivity only.
+research_history:
+  - name: "fx_fix_v1 6J (fx_6j_v1)"
+    n_configs: 405
+    note: "Same family, unconditional legs; 0 passed stage 3, no validation or holdout run."
+  - name: "path_convexity_v3_15m 6E (pc_6e_v3_15m)"
+    n_configs: 103680
+    note: "Different (price-path convexity) family on 6E 15m; 74 frozen candidates."
+  - name: "compression_breakout_nr_v4_15m 6E (cb_nr_6e_v4_15m)"
+    n_configs: 2304
+    note: "Different (NR-N squeeze) family on 6E 15m; 14 frozen candidates."
+  - name: "compression_breakout_bbkc_v4_15m 6E (cb_bbkc_6e_v4_15m)"
+    n_configs: 3840
+    note: "Different (BB/KC squeeze) family on 6E 15m; 23 frozen candidates."
+  - name: "mean_reversion_v21 6E (mr_6e_v6)"
+    n_configs: 24000
+    note: "Different (mean-reversion) family on 6E; 252 frozen candidates."
+  - name: "mean_reversion_v5 6E (mr_6e_v5)"
+    n_configs: 41472
+    note: "Different (mean-reversion) family on 6E; 2 frozen candidates."

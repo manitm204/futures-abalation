@@ -557,3 +557,13 @@ LATTICE_FX_V1 = Lattice({
     "post_hold": ["60", "120", "240", "eod"],
     "stop": ["0.25", "0.50", "none"],
 }, FIXED_AXES_FX)
+
+
+# FX fix v2 (conditioned post leg). The conditioning axes are categorical and never moved.
+FIXED_AXES_FX_V2 = ["symbol", "leg", "vol_gate", "anchor", "direction", "move", "trend", "month"]
+LATTICE_FX_V2 = Lattice({
+    "timeframe": ["1min"],
+    "switch_offset": [-15, -5, 0, 5, 15],
+    "post_hold": ["60", "240", "eod"],
+    "stop": ["0.50", "none"],
+}, FIXED_AXES_FX_V2)

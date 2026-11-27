@@ -59,6 +59,10 @@ from src.strategies.fx_fix.config import (
     RV_SHORT_DAYS,
     VOL_GATES,
     post_hold_minutes,
+    MOVE_LOOKBACK,
+    MOVE_MIN_SESSIONS,
+    MOVE_Z,
+    TREND_DAYS,
 )
 from src.strategies.mean_reversion.backtest import CostModel, scale_variable_costs  # noqa: F401  (re-export)
 from src.utils.config_models import ExecutionConfig
@@ -126,6 +130,77 @@ class FXData(CBData):
             return g.to_numpy(), m.to_numpy()
         return self._get(("vol_regime",), calc)
 
+    def pre_move(self, anchor: str, switch: np.ndarray) -> np.ndarray:
+        """R per session: log(close of the bar BEFORE the entry bar / open of the first bar at/after
+        the anchor time). NaN if the anchor bar is missing or not before the entry bar."""
+        def calc():
+            a_min = self.ecb_min if anchor == "ecb" else np.full(len(self.days), DAY_START_MIN, dtype=np.int64)
+            a = np.minimum(self.bar_at_or_after(a_min), self.n - 1)
+            e = self.bar_at_or_after(switch)
+            last = np.minimum(e, self.n) - 1
+            ok = (e <= self.day_end_idx) & (a >= self.day_start_idx) & (a <= self.day_end_idx) & (last >= a)
+            lc = np.clip(last, 0, self.n - 1)
+            with np.errstate(invalid="ignore", divide="ignore"):
+                r = np.log(self.close[lc] / self.open[a])
+            return np.where(ok, r, np.nan)
+        return self._get(("pre_move", anchor, tuple(int(x) for x in switch[:3]), int(switch.sum())), calc)
+
+    def pre_move_z(self, anchor: str, switch: np.ndarray) -> np.ndarray:
+        """R / std of R over the previous MOVE_LOOKBACK sessions (needs MOVE_MIN_SESSIONS)."""
+        def calc():
+            r = pd.Series(self.pre_move(anchor, switch))
+            sd = r.rolling(MOVE_LOOKBACK, min_periods=MOVE_MIN_SESSIONS).std().shift(1)
+            with np.errstate(invalid="ignore", divide="ignore"):
+                return r.to_numpy() / sd.to_numpy()
+        return self._get(("pre_move_z", anchor, int(switch.sum())), calc)
+
+    def trend_sign(self) -> np.ndarray:
+        """Per session: sign of (previous session's last close) - (the last close TREND_DAYS sessions
+        before that). NaN until enough history."""
+        def calc():
+            lastc = pd.Series(self.close[self.day_end_idx])
+            t = np.sign(lastc.shift(1) - lastc.shift(1 + TREND_DAYS))
+            return t.to_numpy()
+        return self._get(("trend_sign",), calc)
+
+    def month_end_flag(self) -> np.ndarray:
+        """Per session: last two weekdays of the month or the first weekday of the month."""
+        def calc():
+            d = self.days.astype("datetime64[D]")
+            m0 = d.astype("datetime64[M]")
+            first_next = (m0 + 1).astype("datetime64[D]")
+            last1 = np.busday_offset(first_next, -1, roll="forward")
+            last2 = np.busday_offset(first_next, -2, roll="forward")
+            first = np.busday_offset(m0.astype("datetime64[D]"), 0, roll="forward")
+            return (d == last1) | (d == last2) | (d == first)
+        return self._get(("month_end",), calc)
+
+    def post_sides(self, p, switch: np.ndarray) -> np.ndarray:
+        """Per session: +1 long / -1 short / 0 skip for the post leg under the v2 conditions."""
+        S = len(self.days)
+        if p.direction == "long" and p.move == "any" and p.trend == "any" and p.month == "any":
+            return np.ones(S, dtype=np.int64)
+        need_r = p.direction != "long" or p.move != "any"
+        if need_r:
+            R = self.pre_move(p.anchor, switch)
+            Z = self.pre_move_z(p.anchor, switch)
+        if p.direction == "long":
+            side = np.ones(S, dtype=np.int64)
+        else:
+            sg = np.sign(np.nan_to_num(R, nan=0.0)).astype(np.int64)
+            side = -sg if p.direction == "reversal" else sg
+        ok = np.ones(S, dtype=bool)
+        if p.move != "any":
+            with np.errstate(invalid="ignore"):
+                ok &= np.isfinite(Z) & ((np.abs(Z) < MOVE_Z) if p.move == "small" else (np.abs(Z) >= MOVE_Z))
+        if p.trend != "any":
+            t = self.trend_sign()
+            tt = np.nan_to_num(t, nan=0.0).astype(np.int64)
+            ok &= (tt != 0) & ((tt == side) if p.trend == "aligned" else (tt == -side))
+        if p.month != "any":
+            ok &= self.month_end_flag()
+        return np.where(ok, side, 0).astype(np.int64)
+
     def gate_ok(self, vol_gate: str) -> np.ndarray:
         if vol_gate not in VOL_GATES:
             raise ValueError(f"Unknown vol_gate {vol_gate!r}")
@@ -148,11 +223,17 @@ class FXParams:
     post_hold: str
     vol_gate: str
     stop_pct: float | None   # None = no stop
+    anchor: str = "ecb"
+    direction: str = "long"
+    move: str = "any"
+    trend: str = "any"
+    month: str = "any"
 
     @classmethod
     def from_config(cls, cfg) -> "FXParams":
         return cls(cfg.symbol, cfg.timeframe, cfg.leg, int(cfg.switch_offset), cfg.post_hold, cfg.vol_gate,
-                   cfg.stop_pct_value)
+                   cfg.stop_pct_value, getattr(cfg, "anchor", "ecb"), getattr(cfg, "direction", "long"),
+                   getattr(cfg, "move", "any"), getattr(cfg, "trend", "any"), getattr(cfg, "month", "any"))
 
     @property
     def hold_minutes(self) -> int | None:
@@ -195,11 +276,11 @@ def leg_windows(data: FXData, p: FXParams) -> list[dict[str, np.ndarray]]:
     switch = data.london_min + p.switch_offset
     out = []
     if p.leg in ("pre", "both"):
-        out.append({"leg": "pre", "side": -1, "start": data.ecb_min.copy(), "end": switch})
+        out.append({"leg": "pre", "side": np.full(len(switch), -1, dtype=np.int64), "start": data.ecb_min.copy(), "end": switch})
     if p.leg in ("post", "both"):
         H = p.hold_minutes
         end = np.full(len(switch), -1, dtype=np.int64) if H is None else switch + H
-        out.append({"leg": "post", "side": 1, "start": switch, "end": end})
+        out.append({"leg": "post", "side": data.post_sides(p, switch), "start": switch, "end": end})
     return out
 
 
@@ -219,13 +300,13 @@ def planned_trades(data: FXData, p: FXParams) -> dict[str, np.ndarray]:
         eod = w["end"] < 0
         xa = data.bar_at_or_after(np.where(eod, DAY_END_MIN, w["end"]))
         x = np.minimum(xa - 1, de)  # last bar opening before the exit time
-        valid = ok & (e <= de)
+        valid = ok & (e <= de) & (w["side"] != 0)
         e_c = np.minimum(e, data.n - 1)
         valid &= data.tod[e_c] - w["start"] <= MAX_ENTRY_LAG_MIN
         valid &= (e <= x) & (x >= ds)
         timed = ~eod & (x < de)
         for s in np.flatnonzero(valid):
-            rows.append((int(e[s]), int(x[s]), w["side"], w["leg"], bool(timed[s])))
+            rows.append((int(e[s]), int(x[s]), int(w["side"][s]), w["leg"], bool(timed[s])))
     rows.sort()
     if not rows:
         return empty

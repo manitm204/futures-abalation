@@ -1,0 +1,56 @@
+{
+ "experiment": "tokyo_6j_v1",
+ "selection_rule": "(stated before running): dev Sharpe >= 0.75, dev net > 0 at 1.5x costs, >= 100 dev trades,\nmedian dev Sharpe of its timing neighbours (one step on each timing axis) >= 0.5; then validation\nSharpe >= 0.5 and net > 0. Up to 5 distinct finalists (best dev Sharpe first, at most one per\nside x days x stop x target family) are frozen into selection_manifest.json, and only then is the\nholdout read, once.\n\n  PYTHONPATH=. .venv/bin/python scripts/run_6j_tokyo_ablation.py select runs/tokyo_6j_v1\n  PYTHONPATH=. .venv/bin/python scripts/run_6j_tokyo_ablation.py holdout runs/tokyo_6j_v1",
+ "finalists": [
+  {
+   "side": "both",
+   "pre_start": -30,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 30,
+   "stop": null,
+   "target": null,
+   "days": "gotobi"
+  },
+  {
+   "side": "both",
+   "pre_start": -75,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 30,
+   "stop": 2.0,
+   "target": null,
+   "days": "gotobi"
+  },
+  {
+   "side": "long_post",
+   "pre_start": null,
+   "pre_end": null,
+   "post_start": 0,
+   "post_end": 90,
+   "stop": null,
+   "target": null,
+   "days": "gotobi"
+  },
+  {
+   "side": "long_post",
+   "pre_start": null,
+   "pre_end": null,
+   "post_start": 0,
+   "post_end": 90,
+   "stop": null,
+   "target": 1.0,
+   "days": "gotobi"
+  },
+  {
+   "side": "both",
+   "pre_start": -30,
+   "pre_end": 0,
+   "post_start": 0,
+   "post_end": 90,
+   "stop": null,
+   "target": 1.0,
+   "days": "gotobi"
+  }
+ ]
+}

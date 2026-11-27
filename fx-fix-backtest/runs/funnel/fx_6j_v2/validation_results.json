@@ -1,0 +1,141 @@
+{
+  "data_access": {
+    "actual_last_session": "2024-12-31",
+    "command": "validate",
+    "experiment_id": "fx_6j_v2",
+    "first_session": "2018-01-02",
+    "manifest_sha256": null,
+    "n_partitions": 84,
+    "partition_fingerprint": "b7d703f54e6cbad7",
+    "phase": "validation",
+    "phase_end": "2024-12-31",
+    "rows": 2418069,
+    "symbol": "6J"
+  },
+  "experiment_id": "fx_6j_v2",
+  "note": "Ordering is the frozen development ordering; validation results are never used to re-rank.",
+  "results": [
+    {
+      "config_id": "cfg_d3471cd73625300d02a0",
+      "dev_order": 1,
+      "metrics": {
+        "autocorr_lag1": -0.324105518060991,
+        "best_year": 2024,
+        "best_year_contribution": null,
+        "cagr": -0.0004550057038420485,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1040504.2812499827,
+        "excess_kurtosis": 28.420286436798357,
+        "excl_best_year_return": -0.011558112823026434,
+        "excl_best_year_sharpe": -0.988373765830143,
+        "exposure": 0.05989728518314768,
+        "flags": [
+          "contribution_ratios_undefined_nonpositive_total"
+        ],
+        "max_dd_duration_days": 390,
+        "max_drawdown": -0.01739582772785142,
+        "n_completed_trades": 69,
+        "n_days": 517,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 69,
+        "net_pnl": -971.968749998603,
+        "net_return": -0.0009332606000364008,
+        "profit_factor": 0.9846941813481142,
+        "same_session_trade_frac": 0.0,
+        "sharpe": -0.025903520444389632,
+        "sharpe_per_period": -0.0016317684089745784,
+        "skew": 1.4687076518469342,
+        "start_equity": 1041476.2499999813,
+        "top_frac_trades_contribution": null,
+        "top_k_trades_contribution": null,
+        "turnover_annual": 71.52299370275846,
+        "win_rate": 0.4492753623188406,
+        "year_pnl": {
+          "2023": -12037.500000002678,
+          "2024": 11065.531250004075
+        },
+        "year_return": {
+          "2023": -0.011558112823026878,
+          "2024": 0.01074909143453584
+        },
+        "year_sharpe": {
+          "2023": -0.988373765830143,
+          "2024": 0.6610432721051803
+        },
+        "year_trades": {
+          "2023": 35,
+          "2024": 34
+        }
+      },
+      "reasons": [
+        "net_return -0.0009 <= 0.0",
+        "sharpe -0.026 < 0.3"
+      ],
+      "status": "hard_reject"
+    },
+    {
+      "config_id": "cfg_bc3bfdf4eeb98a2bc96f",
+      "dev_order": 2,
+      "metrics": {
+        "autocorr_lag1": -0.1862707439926613,
+        "best_year": 2024,
+        "best_year_contribution": 3.3244026068065,
+        "cagr": 0.002420656393172571,
+        "concurrent_overlap_trades": 0,
+        "dd_recovered": false,
+        "end_equity": 1046654.9999999828,
+        "excess_kurtosis": 30.258574877859594,
+        "excl_best_year_return": -0.011558112823026434,
+        "excl_best_year_sharpe": -0.988373765830143,
+        "exposure": 0.060262805199983754,
+        "flags": [],
+        "max_dd_duration_days": 323,
+        "max_drawdown": -0.01739582772785142,
+        "n_completed_trades": 69,
+        "n_days": 517,
+        "n_forced_close": 0,
+        "n_profitable_years": 1,
+        "n_trades": 69,
+        "net_pnl": 5178.750000001513,
+        "net_return": 0.004972508974642187,
+        "profit_factor": 1.0902555388536967,
+        "same_session_trade_frac": 0.0,
+        "sharpe": 0.19005114295141082,
+        "sharpe_per_period": 0.011972096681738549,
+        "skew": 2.398801163522351,
+        "start_equity": 1041476.2499999813,
+        "top_frac_trades_contribution": 4.463432295436901,
+        "top_k_trades_contribution": 5.20492396813765,
+        "turnover_annual": 71.60080965416039,
+        "win_rate": 0.4492753623188406,
+        "year_pnl": {
+          "2023": -12037.500000002678,
+          "2024": 17216.25000000419
+        },
+        "year_return": {
+          "2023": -0.011558112823026878,
+          "2024": 0.01672391873727741
+        },
+        "year_sharpe": {
+          "2023": -0.988373765830143,
+          "2024": 1.1059005232031895
+        },
+        "year_trades": {
+          "2023": 35,
+          "2024": 34
+        }
+      },
+      "reasons": [
+        "sharpe 0.190 < 0.3"
+      ],
+      "status": "hard_reject"
+    }
+  ],
+  "validation_previously_used_for_selection": true,
+  "validation_window": [
+    "2023-01-01",
+    "2024-12-31"
+  ]
+}

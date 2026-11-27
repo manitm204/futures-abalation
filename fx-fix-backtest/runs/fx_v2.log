@@ -1,0 +1,59 @@
+=== fx_6e_v2 develop 2026-11-27T02:38:54Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-27T02:40:07.746880Z"}
+{"n": 1224, "elapsed_s": 142.9, "event": "prep_built", "level": "info", "timestamp": "2026-11-27T02:41:19.575697Z"}
+{"stage": "1 backtest integrity", "evaluated": 1224, "passed": 1224, "event": "stage_done", "level": "info", "timestamp": "2026-11-27T02:41:19.610640Z"}
+{"stage": "2 trade count & coverage", "evaluated": 1224, "passed": 534, "event": "stage_done", "level": "info", "timestamp": "2026-11-27T02:41:19.621928Z"}
+{"stage": "3 performance & risk", "evaluated": 534, "passed": 2, "event": "stage_done", "level": "info", "timestamp": "2026-11-27T02:41:19.624896Z"}
+{"step": "s4_local_moves", "total": 6, "saved": 0, "to_run": 6, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-27T02:41:19.648087Z"}
+{"step": "s4_local_moves", "saved": 6, "of": 6, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-27T02:41:21.441029Z"}
+{"reused_from_prep": 0, "backtested": 6, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-27T02:41:21.441274Z"}
+{"stage": "4 parameter stability", "evaluated": 2, "passed": 2, "event": "stage_done", "level": "info", "timestamp": "2026-11-27T02:41:21.441939Z"}
+{"stage": "5 time stability", "evaluated": 2, "passed": 2, "event": "stage_done", "level": "info", "timestamp": "2026-11-27T02:41:21.442087Z"}
+{"step": "s6_intervals", "total": 2, "saved": 0, "to_run": 2, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-27T02:41:21.444860Z"}
+{"step": "s6_intervals", "saved": 2, "of": 2, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-27T02:41:22.563548Z"}
+{"step": "s6_perturbations", "total": 40, "saved": 0, "to_run": 40, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-27T02:41:22.565506Z"}
+{"step": "s6_perturbations", "saved": 34, "of": 40, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-27T02:41:33.253367Z"}
+{"step": "s7_execution_stress", "total": 226, "saved": 0, "to_run": 226, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-27T02:41:33.260267Z"}
+{"step": "s7_execution_stress", "saved": 226, "of": 226, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-27T02:41:43.478472Z"}
+{"stage": "7 execution stress", "evaluated": 2, "passed": 2, "event": "stage_done", "level": "info", "timestamp": "2026-11-27T02:41:43.480913Z"}
+{"step": "s9_transfer", "total": 2, "saved": 0, "to_run": 2, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-27T02:41:45.356636Z"}
+{"step": "s9_transfer", "saved": 2, "of": 2, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-27T02:41:46.621733Z"}
+develop done: 1224 configs -> 2 representatives -> 2 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/fx-fix-backtest/runs/funnel/fx_6e_v2
+=== fx_6e_v2 validate 2026-11-27T02:41:47Z
+validate: 2 frozen -> 0 pass validation (previously-inspected data). Selection manifest sha256 2045a5e0ce51b729
+=== fx_6e_v2 luck 2026-11-27T02:41:52Z
+fx_6e_v2: 2 finalists re-run on validation and matched exactly
+fx_6e_v2 1min|post: 5 levels x 100 sims (long share 0.62, median trade 355 bars)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/fx-fix-backtest/runs/funnel/fx_6e_v2/random_benchmark.json
+=== fx_6e_v2 export 2026-11-27T02:42:00Z
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/futures-results/data/6E/fx_fix_v2.json
+=== fx_6j_v2 develop 2026-11-27T02:42:01Z
+{"sample": 40, "event": "stage1_lookahead_ok", "level": "info", "timestamp": "2026-11-27T02:43:21.333439Z"}
+{"n": 1224, "elapsed_s": 169.6, "event": "prep_built", "level": "info", "timestamp": "2026-11-27T02:44:53.377724Z"}
+{"stage": "1 backtest integrity", "evaluated": 1224, "passed": 1224, "event": "stage_done", "level": "info", "timestamp": "2026-11-27T02:44:53.417283Z"}
+{"stage": "2 trade count & coverage", "evaluated": 1224, "passed": 612, "event": "stage_done", "level": "info", "timestamp": "2026-11-27T02:44:53.428988Z"}
+{"stage": "3 performance & risk", "evaluated": 612, "passed": 2, "event": "stage_done", "level": "info", "timestamp": "2026-11-27T02:44:53.432684Z"}
+{"step": "s4_local_moves", "total": 10, "saved": 0, "to_run": 10, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-27T02:44:53.457682Z"}
+{"step": "s4_local_moves", "saved": 10, "of": 10, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-27T02:45:01.258161Z"}
+{"reused_from_prep": 0, "backtested": 10, "event": "stage4_local_moves", "level": "info", "timestamp": "2026-11-27T02:45:01.258311Z"}
+{"stage": "4 parameter stability", "evaluated": 2, "passed": 2, "event": "stage_done", "level": "info", "timestamp": "2026-11-27T02:45:01.258844Z"}
+{"stage": "5 time stability", "evaluated": 2, "passed": 2, "event": "stage_done", "level": "info", "timestamp": "2026-11-27T02:45:01.258939Z"}
+{"step": "s6_intervals", "total": 2, "saved": 0, "to_run": 2, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-27T02:45:01.260964Z"}
+{"step": "s6_intervals", "saved": 2, "of": 2, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-27T02:45:02.580038Z"}
+{"step": "s6_perturbations", "total": 40, "saved": 0, "to_run": 40, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-27T02:45:02.584746Z"}
+{"step": "s6_perturbations", "saved": 40, "of": 40, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-27T02:45:17.558210Z"}
+{"step": "s7_execution_stress", "total": 226, "saved": 0, "to_run": 226, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-27T02:45:17.569045Z"}
+{"step": "s7_execution_stress", "saved": 226, "of": 226, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-27T02:45:27.741137Z"}
+{"stage": "7 execution stress", "evaluated": 2, "passed": 2, "event": "stage_done", "level": "info", "timestamp": "2026-11-27T02:45:27.744977Z"}
+{"step": "s9_transfer", "total": 2, "saved": 0, "to_run": 2, "event": "checkpoint_resume", "level": "info", "timestamp": "2026-11-27T02:45:29.344814Z"}
+{"step": "s9_transfer", "saved": 2, "of": 2, "event": "checkpoint_saved", "level": "info", "timestamp": "2026-11-27T02:45:30.620953Z"}
+develop done: 1224 configs -> 2 representatives -> 2 frozen research candidates (dev only). See /home/manit/Desktop/fun_projects/abalation_backtest/fx-fix-backtest/runs/funnel/fx_6j_v2
+=== fx_6j_v2 validate 2026-11-27T02:45:31Z
+validate: 2 frozen -> 0 pass validation (previously-inspected data). Selection manifest sha256 ee2a5ffc11d3a499
+=== fx_6j_v2 luck 2026-11-27T02:45:35Z
+fx_6j_v2: 2 finalists re-run on validation and matched exactly
+fx_6j_v2 1min|post: 1 levels x 100 sims (long share 1.00, median trade 240 bars)
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/fx-fix-backtest/runs/funnel/fx_6j_v2/random_benchmark.json
+=== fx_6j_v2 export 2026-11-27T02:45:40Z
+wrote /home/manit/Desktop/fun_projects/abalation_backtest/futures-results/data/6J/fx_fix_v2.json
+=== all done 2026-11-27T02:45:41Z
