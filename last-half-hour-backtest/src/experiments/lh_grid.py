@@ -19,7 +19,15 @@ from src.strategies.last_half_hour.config import (
     V1_SIGNALS,
     V1_STOPS,
     V1_WINDOWS,
+    V2_DIRECTIONS,
+    V2_FILTERS,
+    V2_RELS,
+    V2_SIGNALS,
+    V2_STOPS,
+    V2_VOL_GATES,
+    V2_WINDOWS,
     LastHalfHourV1Config,
+    LastHalfHourV2Config,
 )
 from src.utils.hashing import config_id as compute_config_id
 
@@ -57,3 +65,22 @@ def _grid(symbols: tuple[str, ...], axes: dict[str, tuple], cls, valid=lambda kw
 
 def lh_grid_v1(symbols: tuple[str, ...]) -> list[ConfigEntry]:
     return _grid(symbols, AXES_LH_V1, LastHalfHourV1Config, _v1_valid)
+
+
+AXES_LH_V2: dict[str, tuple] = {
+    "timeframe": ("1min",),
+    "signal": V2_SIGNALS,
+    "window": V2_WINDOWS,
+    "filter": V2_FILTERS,
+    "fh_rel": V2_RELS,
+    "late_rel": V2_RELS,
+    "vol_gate": V2_VOL_GATES,
+    "direction": V2_DIRECTIONS,
+    "stop": V2_STOPS,
+}
+
+
+def lh_grid_v2(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    """1,296 configs per contract = 2 signals x 2 windows x 3 filters x 3 first-half relations x
+    3 late-hour relations x 3 volume gates x 2 directions x 2 stops."""
+    return _grid(symbols, AXES_LH_V2, LastHalfHourV2Config)

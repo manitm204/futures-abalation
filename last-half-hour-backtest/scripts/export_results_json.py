@@ -24,7 +24,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.experiments.lh_grid import AXES_LH_V1
+from src.experiments.lh_grid import AXES_LH_V1, AXES_LH_V2
 from src.experiments.funnel_config import load_execution_config, load_funnel_config
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +34,7 @@ app = typer.Typer(add_completion=False)
 # strategy -> (axes, file-key prefix, tab label prefix, heat-map axes (rows, cols))
 SPACES = {
     "last_half_hour_v1": (AXES_LH_V1, "last_half_hour", "Last half hour", ("window", "filter")),
+    "last_half_hour_v2": (AXES_LH_V2, "last_half_hour", "Last half hour", ("window", "filter")),
 }
 MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini Dow", "RTY": "E-mini Russell 2000",
                 "CL": "Crude oil", "GC": "Gold", "6E": "Euro FX", "6J": "Japanese yen", "ZN": "10-year T-note",
@@ -41,8 +42,11 @@ MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini
 LABELS = {
     "timeframe": "Bar size", "signal": "Signal", "agree": "Must agree with first half hour",
     "window": "Trade window (ET)", "filter": "Filter", "stop": "Stop (% against entry)",
+    "fh_rel": "First half hour vs the day's move", "late_rel": "Last 60 min vs the day's move",
+    "vol_gate": "Volume in the last 60 min (× its norm)", "direction": "Direction",
 }
-SHORT = {"timeframe": "Bar", "signal": "Signal", "agree": "Agree", "window": "Window", "filter": "Filter", "stop": "Stop"}
+SHORT = {"timeframe": "Bar", "signal": "Signal", "agree": "Agree", "window": "Window", "filter": "Filter", "stop": "Stop",
+         "fh_rel": "First half", "late_rel": "Last 60 min", "vol_gate": "Volume", "direction": "Direction"}
 MOVES = {"entry": "Entry", "exit": "Exit", "z": "z level", "stop_pct": "Stop"}
 
 
@@ -52,6 +56,12 @@ def _val(axis: str, v) -> str:
                 "first_half": "first half hour"}.get(v, v)
     if axis == "agree":
         return {"off": "no", "on": "yes"}.get(v, v)
+    if axis in ("fh_rel", "late_rel"):
+        return {"any": "any", "same": "same direction", "opp": "opposite direction"}.get(v, v)
+    if axis == "vol_gate":
+        return "none" if v == "none" else f"≥ {float(v):g}×"
+    if axis == "direction":
+        return {"follow": "follow the move", "fade": "fade the move"}.get(v, v)
     if axis == "window":
         return v.replace("-", "–")
     if axis == "filter":
@@ -120,10 +130,15 @@ def main(
     ec = load_execution_config(fcfg)
     run_dir = PROJECT_ROOT / "runs" / "funnel" / experiment_id
     hfiles = sorted(run_dir.glob("holdout_results_*.json"))
-    picks = sorted({c.get("dev_order") for hf in hfiles for c in json.loads(hf.read_text()).get("results", [])})
-    holdout_line = (f"Holdout (2025 onward) was run once for {', '.join(f'#{o}' for o in picks)}; the results are on "
-                    "this market's separate holdout tab." if picks else
-                    "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead.")
+    hres = [r for hf in hfiles for r in json.loads(hf.read_text()).get("results", [])]
+    if hres:
+        parts = [f"#{r['dev_order']} {'passed' if r['accepted'] else 'failed'} (Sharpe {r['metrics']['sharpe']:.2f}, "
+                 f"{r['metrics']['net_return'] * 100:+.1f}%, {r['metrics']['n_completed_trades']} trades)" for r in
+                 sorted(hres, key=lambda r: r["dev_order"])]
+        holdout_line = ("Holdout (2025 to Oct 2026) was run once, on frozen picks that were chosen from validation results: "
+                        + "; ".join(parts) + ". The holdout was already inspected for this family, so it is not a clean test.")
+    else:
+        holdout_line = "Holdout (2025 onward) has not been run. It is a one-time final test and needs an explicit go-ahead."
     if fcfg.strategy not in SPACES:
         raise typer.BadParameter(f"exporter knows the last-half-hour spaces {sorted(SPACES)} only")
     axes, key_prefix, label_prefix, (heat_r, heat_c) = SPACES[fcfg.strategy]
@@ -346,9 +361,16 @@ def main(
                                             "the entry (the paper's), today's 09:30 open to the same minute (no overnight "
                                             "gap), or the previous close to 10:00 (the first half hour only). Optionally "
                                             "it must have the same sign as the first-half-hour move."},
-                {"label": "Filter", "text": "None; the move bigger than 0.5σ or 1σ of the same signal over the previous "
+                *([{"label": "Filter", "text": "None; the move bigger than 0.5σ or 1σ of the same signal over the previous "
                                             "20 days; only when 20-day volatility is above its 120-day median; or only "
-                                            "down days (shorts only)."},
+                                            "down days (shorts only)."}] if "fh_rel" not in axes else
+                  [{"label": "Filter", "text": "None, or the move bigger than 0.5σ or 1σ of the same signal over the previous "
+                                            "20 days."},
+                   {"label": "Extra conditions (v2)", "text": "The first half hour (previous close to 10:00) and the last "
+                                            "60 minutes before entry each either don't matter, or must move the same way as the "
+                                            "day or the opposite way. The volume in the last 60 minutes must be at least 1.0× or "
+                                            "1.5× its normal level for those minutes (the average over the previous 20 sessions). "
+                                            "Direction: follow the day's move, or fade it."}]),
                 {"label": "Enter", "text": f"At {_words(sorted({w.split('-')[0] for w in axes['window']}), 'or')} ET, at "
                                            "that minute's open, long if the signal is up and short if down."},
                 {"label": "Exit", "text": "At 15:50 or 16:00 ET, at the close of the minute before (16:00 = the last "

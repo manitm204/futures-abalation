@@ -39,7 +39,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.analysis.neighborhood import LATTICE_LH_V1, NeighborhoodStats, neighborhood_stats
+from src.analysis.neighborhood import LATTICE_LH_V1, LATTICE_LH_V2, NeighborhoodStats, neighborhood_stats
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.experiments.data_access import (
     DEFAULT_LEDGER,
@@ -85,10 +85,10 @@ from src.experiments.funnel_robustness import (
     perturbations_lh,
     quantile,
 )
-from src.experiments.lh_grid import lh_grid_v1
+from src.experiments.lh_grid import lh_grid_v1, lh_grid_v2
 from src.experiments.lh_integrity import CHECKS, truncation_invariance
 from src.strategies.last_half_hour.backtest import LHParams, lh_day_bars
-from src.strategies.last_half_hour.config import LastHalfHourV1Config
+from src.strategies.last_half_hour.config import LastHalfHourV1Config, LastHalfHourV2Config
 from src.utils.hashing import canonical_json
 from src.utils.logging import configure_logging, get_logger
 from src.utils.seeds import derive_seed
@@ -102,7 +102,12 @@ PREP_SOURCES = ["src/strategies/last_half_hour/backtest.py", "src/strategies/las
                 "src/analysis/daily_performance.py", "src/experiments/funnel_prep.py",
                 "src/experiments/lh_integrity.py"]
 LH_KEYS = ("symbol", "timeframe", "signal", "agree", "window", "filter", "stop")
+LH_KEYS_V2 = ("symbol", "timeframe", "signal", "window", "filter", "fh_rel", "late_rel", "vol_gate", "direction", "stop")
 SPACES = {
+    "last_half_hour_v2": {
+        "grid": lh_grid_v2, "cls": LastHalfHourV2Config, "lattice": LATTICE_LH_V2,
+        "perturb": perturbations_lh, "local": local_perturbations_lh, "keys": LH_KEYS_V2,
+    },
     "last_half_hour_v1": {
         "grid": lh_grid_v1, "cls": LastHalfHourV1Config, "lattice": LATTICE_LH_V1,
         "perturb": perturbations_lh, "local": local_perturbations_lh, "keys": LH_KEYS,

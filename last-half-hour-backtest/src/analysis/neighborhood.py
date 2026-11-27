@@ -619,3 +619,11 @@ LATTICE_LH_V1 = Lattice({
     "window": ["15:00-16:00", "15:30-15:50", "15:30-16:00", "15:45-16:00", "15:50-16:00"],
     "stop": ["0.10", "0.20", "0.40", "none"],
 }, FIXED_AXES_LH)
+
+# Last-half-hour v2: window and stop are ordered; the rest are categorical.
+FIXED_AXES_LH_V2 = ["symbol", "signal", "filter", "fh_rel", "late_rel", "vol_gate", "direction"]
+LATTICE_LH_V2 = Lattice({
+    "timeframe": ["1min"],
+    "window": ["15:00-16:00", "15:30-16:00"],
+    "stop": ["0.20", "none"],
+}, FIXED_AXES_LH_V2)

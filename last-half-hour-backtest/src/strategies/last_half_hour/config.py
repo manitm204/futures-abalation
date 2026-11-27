@@ -112,3 +112,54 @@ class LastHalfHourV1Config(FrozenModel):
     @property
     def stop_pct_value(self) -> float | None:
         return None if self.stop == "none" else float(self.stop)
+
+
+# --- last_half_hour v2 (1,296 configs per contract) --------------------------------------------
+# Specified 2026-11-26 at the user's request ("a lot more variables ... how much is the change, is
+# the intraday momentum pointing the other way, is there sufficient volume"), after v1 on NQ (16 of
+# 500 passed validation; the prior-close -> 15:00 cluster; #49 +0.8% and #56 -3.7% on 2025+).
+#   signal    : prev_close / open               (the day's move so far, as in v1)
+#   window    : 15:00-16:00 / 15:30-16:00
+#   filter    : none / z0.5 / z1.0              (how big the day's move is, in units of its own 20-day sd)
+#   fh_rel    : any / same / opp                (first-half-hour move, prior close -> 10:00, has the same / the
+#                                                opposite sign to the day's move)
+#   late_rel  : any / same / opp                (the move over the LATE_MIN minutes before the entry, has the
+#                                                same / the opposite sign to the day's move: is the late-day
+#                                                momentum pointing the other way?)
+#   vol_gate  : none / 1.0 / 1.5                (volume over the LATE_MIN minutes before the entry / its
+#                                                time-of-day norm over the prior 20 sessions >= the gate)
+#   direction : follow / fade                   (trade with or against the day's move)
+#   stop      : none / 0.20                     (percent against the entry)
+# 2 x 2 x 3 x 3 x 3 x 3 x 2 x 2 = 1,296.
+LATE_MIN = 60
+VOLUME_LOOKBACK_SESSIONS = 20
+VOLUME_MIN_SESSIONS = 10
+
+V2_SIGNALS: tuple[str, ...] = ("prev_close", "open")
+V2_WINDOWS: tuple[str, ...] = ("15:00-16:00", "15:30-16:00")
+V2_FILTERS: tuple[str, ...] = ("none", "z0.5", "z1.0")
+V2_RELS: tuple[str, ...] = ("any", "same", "opp")
+V2_VOL_GATES: tuple[str, ...] = ("none", "1.0", "1.5")
+V2_DIRECTIONS: tuple[str, ...] = ("follow", "fade")
+V2_STOPS: tuple[str, ...] = ("none", "0.20")
+
+
+class LastHalfHourV2Config(FrozenModel):
+    symbol: str
+    timeframe: Literal["1min"] = "1min"
+    signal: Literal["prev_close", "open"] = "prev_close"
+    window: Literal["15:00-16:00", "15:30-16:00"] = "15:00-16:00"
+    filter: Literal["none", "z0.5", "z1.0"] = "none"
+    fh_rel: Literal["any", "same", "opp"] = "any"
+    late_rel: Literal["any", "same", "opp"] = "any"
+    vol_gate: Literal["none", "1.0", "1.5"] = "none"
+    direction: Literal["follow", "fade"] = "follow"
+    stop: Literal["none", "0.20"] = "none"
+
+    @property
+    def stop_pct_value(self) -> float | None:
+        return None if self.stop == "none" else float(self.stop)
+
+    @property
+    def vol_gate_value(self) -> float | None:
+        return None if self.vol_gate == "none" else float(self.vol_gate)

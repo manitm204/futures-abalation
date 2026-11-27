@@ -47,12 +47,15 @@ from src.strategies.last_half_hour.config import (
     DAY_END_MIN,
     DAY_START_MIN,
     FIRST_HALF_END_MIN,
+    LATE_MIN,
     MAX_ENTRY_LAG_MIN,
     MAX_OPEN_LAG_MIN,
     RV_LOOKBACK,
     RV_MEDIAN_LOOKBACK,
     RV_MEDIAN_MIN_PERIODS,
     SIGNALS,
+    VOLUME_LOOKBACK_SESSIONS,
+    VOLUME_MIN_SESSIONS,
     Z_LOOKBACK,
     Z_MIN_PERIODS,
     parse_filter,
@@ -87,6 +90,8 @@ class LHData(CBData):
 
     def __init__(self, bars: pl.DataFrame) -> None:
         super().__init__(bars)
+        self.volume = (bars.sort("bar_open_ts")["volume"].to_numpy().astype(float) if "volume" in bars.columns
+                       else np.zeros(self.n))
         self.day_list: list[date] = [d.astype(object) for d in self.days]
         S = len(self.days)
         self._key = self.sess * 1440 + self.tod
@@ -135,6 +140,35 @@ class LHData(CBData):
         return self._get(("sigma", name, entry_min),
                          lambda: rolling_prev_std(self.signal(name, entry_min), Z_LOOKBACK, Z_MIN_PERIODS))
 
+    def late_ret(self, entry_min: int) -> np.ndarray:
+        """Return over the LATE_MIN minutes before the entry: decision close / close LATE_MIN earlier - 1."""
+        return self._get(("late", entry_min),
+                         lambda: self.dec_close(entry_min) / self.dec_close(entry_min - LATE_MIN) - 1)
+
+    def vnorm(self) -> np.ndarray:
+        """Mean volume at each bar's minute of day over the prior VOLUME_LOOKBACK_SESSIONS sessions."""
+        def calc():
+            df = pl.DataFrame({"tod": self.tod, "v": self.volume})
+            out = df.select(pl.col("v").shift(1).rolling_mean(VOLUME_LOOKBACK_SESSIONS,
+                                                               min_samples=VOLUME_MIN_SESSIONS).over("tod"))
+            return out["v"].fill_null(np.nan).to_numpy().astype(float)
+        return self._get(("vnorm",), calc)
+
+    def late_volume_ratio(self, entry_min: int) -> np.ndarray:
+        """Per session: volume of the bars opening in [entry-LATE_MIN, entry) / the sum of their
+        time-of-day norms (NaN if a norm is missing or there are no bars)."""
+        def calc():
+            a = self.bar_at_or_after(entry_min - LATE_MIN)
+            b = self.bar_at_or_after(entry_min)
+            vn = self.vnorm()
+            cv = np.concatenate([[0.0], np.cumsum(self.volume)])
+            cn = np.concatenate([[0.0], np.cumsum(np.nan_to_num(vn))])
+            cbad = np.concatenate([[0], np.cumsum(~np.isfinite(vn))])
+            V, N, bad = cv[b] - cv[a], cn[b] - cn[a], cbad[b] - cbad[a]
+            with np.errstate(invalid="ignore", divide="ignore"):
+                return np.where((bad == 0) & (N > 0) & (b > a), V / N, np.nan)
+        return self._get(("lvr", entry_min), calc)
+
     def rv_high(self) -> np.ndarray:
         def f():
             ret = self.last_close / self.prev_close - 1
@@ -158,12 +192,18 @@ class LHParams:
     filter: str             # "none" / "z" / "rv_high" / "down_only"
     z: float | None = None  # z filter threshold
     stop_pct: float | None = None
+    fh_rel: str = "any"     # v2: first-half-hour move vs the day's move: any / same / opp
+    late_rel: str = "any"   # v2: move over the LATE_MIN minutes before entry vs the day's move
+    vol_gate: float | None = None   # v2: late volume / norm >= gate
+    direction: str = "follow"       # v2: follow / fade the day's move
 
     @classmethod
     def from_config(cls, cfg) -> "LHParams":
         e, x = window_minutes(cfg.window)
         kind, z = parse_filter(cfg.filter)
-        return cls(cfg.symbol, cfg.timeframe, cfg.signal, cfg.agree == "on", e, x, kind, z, cfg.stop_pct_value)
+        return cls(cfg.symbol, cfg.timeframe, cfg.signal, getattr(cfg, "agree", "off") == "on", e, x, kind, z,
+                   cfg.stop_pct_value, getattr(cfg, "fh_rel", "any"), getattr(cfg, "late_rel", "any"),
+                   getattr(cfg, "vol_gate_value", None), getattr(cfg, "direction", "follow"))
 
 
 def as_params(cfg) -> LHParams:
@@ -203,6 +243,18 @@ def session_side(data: LHData, p: LHParams) -> np.ndarray:
     if p.agree:
         fh = data.first_half()
         ok &= np.isfinite(fh) & (np.sign(fh) == np.sign(r))
+    if p.fh_rel != "any":
+        fh = data.first_half()
+        want = np.sign(r) if p.fh_rel == "same" else -np.sign(r)
+        ok &= np.isfinite(fh) & (np.sign(fh) == want)
+    if p.late_rel != "any":
+        lr = data.late_ret(p.entry_min)
+        want = np.sign(r) if p.late_rel == "same" else -np.sign(r)
+        ok &= np.isfinite(lr) & (np.sign(lr) == want)
+    if p.vol_gate is not None:
+        vr = data.late_volume_ratio(p.entry_min)
+        with np.errstate(invalid="ignore"):
+            ok &= np.isfinite(vr) & (vr >= p.vol_gate)
     if p.filter == "z":
         sg = data.sigma(p.signal, p.entry_min)
         with np.errstate(invalid="ignore"):
@@ -211,7 +263,8 @@ def session_side(data: LHData, p: LHParams) -> np.ndarray:
         ok &= data.rv_high()
     elif p.filter == "down_only":
         ok &= r < 0
-    return np.where(ok, np.sign(np.nan_to_num(r)), 0).astype(np.int64)
+    flip = -1 if p.direction == "fade" else 1
+    return np.where(ok, flip * np.sign(np.nan_to_num(r)), 0).astype(np.int64)
 
 
 def planned_trades(data: LHData, p: LHParams, session_sides: np.ndarray | None = None) -> dict[str, np.ndarray]:

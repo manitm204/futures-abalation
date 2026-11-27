@@ -1,0 +1,41 @@
+{
+  "audit_notes": [
+    "Bars: 1-minute bars with NY open time in [09:30, 16:00) on their own session date only (lh_day_bars); each NY date is one session and no position can be held overnight.",
+    "Signal per session: prev_close = close of the last bar opening before the entry time / the previous session's last close - 1; open = the same over today's first bar's open (bar opening by 09:35); first_half = close of the last bar opening before 10:00 / previous close - 1. The decision bar must open within 3 minutes of the entry time; the entry is the bar right after it.",
+    "Filters: z = |signal| above z x the std (ddof 1) of the same signal over the previous 20 sessions (>= 15 defined); rv_high = std of the previous 20 daily close-to-close returns above its median over the previous 120 sessions (>= 60 defined); down_only = signal < 0. Agreement: the first-half-hour return has the signal's sign. All recomputed with plain loops in the integrity check.",
+    "Entry: in the signal's direction (long > 0, short < 0) at the OPEN of the first bar opening at/after the entry time with market slippage; skipped when that bar opens more than 2 minutes late.",
+    "Exit at the CLOSE of the last bar opening before the exit time with market slippage; a 16:00 exit (and any early close) is the session's last bar. Stop (optional) = entry open x (1 -/+ stop%) against the position, live intrabar from the entry bar, filled at the worse of the bar's open and the stop with stop slippage.",
+    "One trade per session; sizing is the other families' (as many whole contracts as equity covers at full contract value, unlevered, compounding).",
+    "Development backtests run on data physically truncated at the development end; the final session's trade is closed at the last development bar and flagged forced (not counted as completed).",
+    "Sharpe: daily session-close mark-to-market returns over every trading day (flat days = 0), sqrt(252) annualization, rf = 0, idle cash earns 0."
+  ],
+  "checks_per_config": [
+    "signal_mismatch",
+    "entry_not_per_rule",
+    "day_not_allowed",
+    "wrong_direction",
+    "trade_skipped_while_flat",
+    "entry_fill_better_than_market",
+    "exit_before_entry",
+    "bar_outside_day_window",
+    "position_held_overnight",
+    "stop_not_per_rule",
+    "stop_exit_without_touch",
+    "stop_fill_better_than_rule",
+    "exit_not_at_first_touch",
+    "time_exit_not_per_rule",
+    "eod_exit_not_at_session_close",
+    "exit_fill_better_than_market",
+    "overlapping_positions",
+    "position_exceeds_equity",
+    "forced_close_not_final_trade",
+    "commission_below_minimum"
+  ],
+  "cut_fractions": [
+    0.3,
+    0.6000000000000001,
+    0.9
+  ],
+  "failures": {},
+  "truncation_sample": 40
+}

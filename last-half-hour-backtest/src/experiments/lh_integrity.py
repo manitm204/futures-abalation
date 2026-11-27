@@ -25,11 +25,14 @@ from src.strategies.last_half_hour.config import (
     DAY_END_MIN,
     DAY_START_MIN,
     FIRST_HALF_END_MIN,
+    LATE_MIN,
     MAX_ENTRY_LAG_MIN,
     MAX_OPEN_LAG_MIN,
     RV_LOOKBACK,
     RV_MEDIAN_LOOKBACK,
     RV_MEDIAN_MIN_PERIODS,
+    VOLUME_LOOKBACK_SESSIONS,
+    VOLUME_MIN_SESSIONS,
     Z_LOOKBACK,
     Z_MIN_PERIODS,
 )
@@ -70,6 +73,21 @@ def _prev_std(x: list[float], s: int, n: int, k: int) -> float:
     return float(np.std(w, ddof=1)) if len(w) >= k else np.nan
 
 
+def _indep_vnorm(data: LHData) -> np.ndarray:
+    """Mean volume at each bar's minute over the prior VOLUME_LOOKBACK_SESSIONS bars of that minute, by loops."""
+    def build():
+        hist: dict[int, list[float]] = {}
+        out = np.full(data.n, np.nan)
+        for i in range(data.n):
+            h = hist.setdefault(int(data.tod[i]), [])
+            last = h[-VOLUME_LOOKBACK_SESSIONS:]
+            if len(last) >= VOLUME_MIN_SESSIONS:
+                out[i] = float(np.mean(last))
+            h.append(float(data.volume[i]))
+        return out
+    return data._get(("indep_vnorm",), build)
+
+
 def independent_sides(data: LHData, p) -> list[tuple[int, int, int]]:
     """(decision bar, entry bar, side) for every session the rules trade, by explicit loops."""
     def build():
@@ -98,6 +116,25 @@ def independent_sides(data: LHData, p) -> list[tuple[int, int, int]]:
                 continue
             if p.agree and not (np.isfinite(fh[s]) and np.sign(fh[s]) == np.sign(r)):
                 continue
+            if p.fh_rel != "any":
+                want = np.sign(r) if p.fh_rel == "same" else -np.sign(r)
+                if not (np.isfinite(fh[s]) and np.sign(fh[s]) == want):
+                    continue
+            if p.late_rel != "any":
+                d0 = _dec(data, a, b, p.entry_min - LATE_MIN)
+                d1 = dec_of[s]
+                lr = data.close[d1] / data.close[d0] - 1 if d0 is not None and d1 is not None else np.nan
+                want = np.sign(r) if p.late_rel == "same" else -np.sign(r)
+                if not (np.isfinite(lr) and np.sign(lr) == want):
+                    continue
+            if p.vol_gate is not None:
+                vn = _indep_vnorm(data)
+                idx = [i for i in range(a, b + 1) if p.entry_min - LATE_MIN <= data.tod[i] < p.entry_min]
+                if not idx or not all(np.isfinite(vn[i]) for i in idx):
+                    continue
+                ratio = sum(float(data.volume[i]) for i in idx) / sum(float(vn[i]) for i in idx)
+                if not (np.isfinite(ratio) and ratio >= p.vol_gate):
+                    continue
             if p.filter == "z":
                 sd = _prev_std(sig, s, Z_LOOKBACK, Z_MIN_PERIODS)
                 if not (np.isfinite(sd) and sd > 0 and abs(r) > p.z * sd):
@@ -112,9 +149,9 @@ def independent_sides(data: LHData, p) -> list[tuple[int, int, int]]:
             e = next((i for i in range(a, b + 1) if data.tod[i] >= p.entry_min), None)
             if d is None or e is None or e != d + 1 or data.tod[e] - p.entry_min > MAX_ENTRY_LAG_MIN:
                 continue
-            out.append((d, e, int(np.sign(r))))
+            out.append((d, e, int(np.sign(r)) * (-1 if p.direction == "fade" else 1)))
         return out
-    return data._get(("indep_sides", p.signal, p.agree, p.entry_min, p.filter, p.z), build)
+    return data._get(("indep_sides", p.signal, p.agree, p.entry_min, p.filter, p.z, p.fh_rel, p.late_rel, p.vol_gate, p.direction), build)
 
 
 def independent_exit(data: LHData, e: int, exit_min: int) -> tuple[int, bool]:
