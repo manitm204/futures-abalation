@@ -79,6 +79,8 @@ def hold_bars(hold: str, lookback: int) -> int | None:
     """Bars a position is held (None = until the session close)."""
     if hold == "session":
         return None
+    if hold.startswith("b") and hold[1:].isdigit() and int(hold[1:]) >= 1:
+        return int(hold[1:])  # a fixed number of bars, whatever N is (v5)
     if hold == "full":
         return lookback
     if hold == "half":
@@ -201,3 +203,45 @@ class ConvexityV4_15mConfig(_ConvexityConfig):
     hold: Literal["full", "1.5n"] = "full"
     stop: Literal["none", "3.0"] = "none"
     trend_filter: Literal["none", "ema50"] = "none"
+
+
+# --- path_convexity v5 (15-minute bars, 8,640 configs) ---------------------------------------
+# Specified by the user (2026-11-26) after v3 on NQ / v2 on ES (picks lost on the 2025+ holdout;
+# among the 1,081 NQ finalists, long-only configs had a median validation Sharpe of +0.65 against
+# +0.03 for both-sided and -0.59 for short-only). Run on ES and NQ through validation only.
+# New: longer look-backs (26 bars = one session; 130 = five), a regime filter (daily trend or
+# high volatility), an entry-time window, fixed-bar holds (N-based holds collapse to "session" once
+# N >= 20 on 15-minute bars), long-only or both sides. Quadrant fixed to "all", no 15-minute EMA.
+#   regime : none | dtrend50 (long only above the prior sessions' 50-day SMA of daily closes, short
+#            only below) | volhi (ATR(14)/close at or above its median over the last 1,300 bars)
+#   window : all | mid (the entry bar opens 10:00 to 15:00)
+V5_LOOKBACKS: tuple[int, ...] = (20, 26, 52, 78, 130)
+V5_SIGNAL_FORMS: tuple[str, ...] = ("paper", "maxgap", "reversal")
+V5_Z_LOOKBACKS: tuple[int, ...] = (25, 100)
+V5_ENTRY_ZS: tuple[float, ...] = (1.0, 1.5)
+V5_QUADRANTS: tuple[str, ...] = ("all",)
+V5_MIN_MOVE_ATRS: tuple[float, ...] = (2.0, 3.0)
+V5_DIRECTIONS: tuple[str, ...] = ("long", "both")
+V5_HOLDS: tuple[str, ...] = ("b8", "b16", "session")
+V5_STOPS: tuple[str, ...] = ("2.0", "3.0")
+V5_TREND_FILTERS: tuple[str, ...] = ("none",)
+V5_REGIMES: tuple[str, ...] = ("none", "dtrend50", "volhi")
+V5_WINDOWS: tuple[str, ...] = ("all", "mid")
+VOLHI_WINDOW_BARS = 1300
+DTREND_SESSIONS = 50
+
+
+class ConvexityV5_15mConfig(_ConvexityConfig):
+    timeframe: Literal["15min"] = "15min"
+    lookback: Literal[20, 26, 52, 78, 130] = 26
+    signal_form: Literal["paper", "maxgap", "reversal"] = "paper"
+    z_lookback: Literal[25, 100] = 25
+    entry_z: Literal[1.0, 1.5] = 1.0
+    quadrant: Literal["all"] = "all"
+    min_move_atr: Literal[2.0, 3.0] = 2.0
+    direction: Literal["long", "both"] = "long"
+    hold: Literal["b8", "b16", "session"] = "b8"
+    stop: Literal["2.0", "3.0"] = "2.0"
+    trend_filter: Literal["none"] = "none"
+    regime: Literal["none", "dtrend50", "volhi"] = "none"
+    window: Literal["all", "mid"] = "all"

@@ -49,9 +49,11 @@ from src.strategies.compression_breakout.backtest import CBData
 from src.strategies.mean_reversion.backtest import CostModel, scale_variable_costs  # noqa: F401  (re-export)
 from src.strategies.path_convexity.config import (
     ATR_PERIOD,
+    DTREND_SESSIONS,
     LAST_ENTRY_CUTOFF_MINUTES,
     QUADRANTS,
     SIGNAL_FORMS,
+    VOLHI_WINDOW_BARS,
     hold_bars,
     trend_ema_span,
 )
@@ -112,6 +114,25 @@ class PCData(CBData):
                 return np.where(np.abs(mid) > 1e-9, gap / mid, np.nan)
         return self._get(("sig", form, n), calc)
 
+    def daily_sma_prior(self, sessions: int) -> np.ndarray:
+        """Per bar: the SMA of the last `sessions` daily closes (each session's last bar close),
+        through the PREVIOUS session only (NaN until `sessions` prior sessions exist)."""
+        def calc():
+            dc = self.close[self.day_end_idx]
+            sma = pd.Series(dc).rolling(sessions, min_periods=sessions).mean().to_numpy()
+            prev = np.concatenate([[np.nan], sma[:-1]])
+            return prev[self.sess]
+        return self._get(("dsma", sessions), calc)
+
+    def vol_high(self, window: int) -> np.ndarray:
+        """Per bar: ATR(14)/close at or above its median over the last `window` bars (incl. this one)."""
+        def calc():
+            r = pd.Series(self.atr(ATR_PERIOD) / self.close)
+            med = r.rolling(window, min_periods=window).median().to_numpy()
+            with np.errstate(invalid="ignore"):
+                return r.to_numpy() >= med
+        return self._get(("volhi", window), calc)
+
     def zscore(self, form: str, n: int, z_lookback: int) -> np.ndarray:
         def calc():
             s = pd.Series(self.signal(form, n))
@@ -140,12 +161,15 @@ class PCParams:
     stop_atr: float | None   # None = no stop
     trend_filter: str
     last_entry_cutoff: int = LAST_ENTRY_CUTOFF_MINUTES
+    regime: str = "none"      # v5: none | dtrend50 | volhi
+    window: str = "all"       # v5: all | mid (entry bar opens 10:00 to 15:00)
 
     @classmethod
     def from_config(cls, cfg) -> "PCParams":
         return cls(cfg.symbol, cfg.timeframe, int(cfg.lookback), cfg.signal_form, int(cfg.z_lookback),
                    float(cfg.entry_z), cfg.quadrant, float(cfg.min_move_atr), cfg.direction, cfg.hold,
-                   cfg.stop_atr_value, cfg.trend_filter)
+                   cfg.stop_atr_value, cfg.trend_filter, regime=getattr(cfg, "regime", "none"),
+                   window=getattr(cfg, "window", "all"))
 
     @property
     def hold_bars(self) -> int | None:
@@ -211,6 +235,18 @@ def signals(data: PCData, p: PCParams) -> dict[str, np.ndarray]:
         ema = data.ema(span)
         with np.errstate(invalid="ignore"):
             ok &= np.where(side > 0, data.close > ema, data.close < ema)
+    if p.regime == "dtrend50":
+        dsma = data.daily_sma_prior(DTREND_SESSIONS)
+        with np.errstate(invalid="ignore"):
+            ok &= np.where(side > 0, data.close > dsma, data.close < dsma)  # NaN -> False
+    elif p.regime == "volhi":
+        ok &= data.vol_high(VOLHI_WINDOW_BARS)
+    elif p.regime != "none":
+        raise ValueError(f"Unknown regime {p.regime!r}")
+    if p.window == "mid":
+        ok &= (data.tod + 15 >= 10 * 60) & (data.tod + 15 <= 15 * 60)  # entry bar opens 10:00-15:00
+    elif p.window != "all":
+        raise ValueError(f"Unknown window {p.window!r}")
     to_close = data.tod[data.sess_end] - data.tod
     ok &= ~data.is_last & (to_close >= p.last_entry_cutoff)
     ks = np.flatnonzero(ok)

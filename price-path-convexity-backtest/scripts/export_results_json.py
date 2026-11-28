@@ -39,6 +39,7 @@ SPACES = {
     "path_convexity_v2_15m": (AXES_PC_V2_15M, "path_convexity", "Price-path convexity", ("lookback", "entry_z")),
     "path_convexity_v3_15m": (AXES_PC_V3_15M, "path_convexity", "Price-path convexity", ("lookback", "entry_z")),
     "path_convexity_v4_15m": (AXES_PC_V4_15M, "path_convexity", "Price-path convexity", ("lookback", "entry_z")),
+    "path_convexity_v5_15m": (AXES_PC_V5_15M, "path_convexity", "Price-path convexity", ("lookback", "entry_z")),
 }
 MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini Dow", "RTY": "E-mini Russell 2000",
                 "CL": "Crude oil", "GC": "Gold", "6E": "Euro FX", "6J": "Japanese yen", "ZN": "10-year T-note",

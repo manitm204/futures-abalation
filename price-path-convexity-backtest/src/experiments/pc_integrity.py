@@ -109,6 +109,23 @@ def qualifying(data: PCData, p, tol: float = 1e-9) -> dict[str, np.ndarray]:
         ema = pd.Series(data.close).ewm(span=span, adjust=False, min_periods=span).mean().to_numpy()
         with np.errstate(invalid="ignore"):
             ok &= np.where(side > 0, data.close > ema, data.close < ema)
+    regime = getattr(p, "regime", "none")
+    if regime == "dtrend50":
+        sess = pd.Series(data.close).groupby(data.sess).last()          # daily closes, session by session
+        dsma = sess.rolling(50, min_periods=50).mean().shift(1)         # through the previous session
+        ref = dsma.reindex(data.sess).to_numpy()
+        with np.errstate(invalid="ignore"):
+            ok &= np.where(side > 0, data.close > ref, data.close < ref)
+    elif regime == "volhi":
+        r = pd.Series(atr / data.close)
+        med = r.rolling(1300, min_periods=1300).median().to_numpy()
+        with np.errstate(invalid="ignore"):
+            ok &= (r.to_numpy() >= med)
+    if getattr(p, "window", "all") == "mid":
+        # bar_open is UTC; the New York minute-of-day comes from pandas, not from the backtester's `tod`
+        ny = pd.DatetimeIndex(data.bar_open).tz_localize("UTC").tz_convert("America/New_York")
+        mins = (ny.hour * 60 + ny.minute).to_numpy() + 15
+        ok &= (mins >= 600) & (mins <= 900)
     gap = (data.bar_open[data.sess_end] - data.bar_open).astype("timedelta64[m]").astype(np.int64)
     ok &= ~data.is_last & (gap >= p.last_entry_cutoff)
     return {"side": np.where(ok, side, 0), "raw_side": side, "z": z, "zp": zp, "move": m}

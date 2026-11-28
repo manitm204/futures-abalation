@@ -1,0 +1,210 @@
+{
+ "acceptance_holdout": {
+  "max_drawdown": -0.3,
+  "min_completed_trades": null,
+  "min_net_return": 0.0,
+  "min_sharpe": 0.0
+ },
+ "acceptance_validation": {
+  "max_drawdown": -0.3,
+  "min_completed_trades": 40,
+  "min_net_return": 0.0,
+  "min_sharpe": 0.3
+ },
+ "candidates": [
+  {
+   "cluster": 3,
+   "config_id": "cfg_d9e37ed114c2e20f373b",
+   "dev_net_return": 0.21923696555043581,
+   "dev_order": 7,
+   "dev_sharpe": 0.9225044414976148,
+   "n_profitable_years": 3,
+   "neighbor_median_sharpe": 0.6358604843242324,
+   "params": {
+    "direction": "long",
+    "entry_z": 1.0,
+    "hold": "b8",
+    "lookback": 20,
+    "min_move_atr": 3.0,
+    "quadrant": "all",
+    "regime": "none",
+    "signal_form": "maxgap",
+    "stop": "3.0",
+    "symbol": "ES",
+    "timeframe": "15min",
+    "trend_filter": "none",
+    "window": "mid",
+    "z_lookback": 25
+   },
+   "stability_median_sharpe": 0.6081346133892047
+  },
+  {
+   "cluster": 3,
+   "config_id": "cfg_8aa3ba1452da6d4d81e7",
+   "dev_net_return": 0.2021286506278248,
+   "dev_order": 9,
+   "dev_sharpe": 0.8811321084027501,
+   "n_profitable_years": 3,
+   "neighbor_median_sharpe": 0.6448483475256355,
+   "params": {
+    "direction": "long",
+    "entry_z": 1.0,
+    "hold": "b8",
+    "lookback": 20,
+    "min_move_atr": 3.0,
+    "quadrant": "all",
+    "regime": "none",
+    "signal_form": "maxgap",
+    "stop": "2.0",
+    "symbol": "ES",
+    "timeframe": "15min",
+    "trend_filter": "none",
+    "window": "mid",
+    "z_lookback": 25
+   },
+   "stability_median_sharpe": 0.571351637386542
+  }
+ ],
+ "code_version": "acf4e9adf0bfe1c99b6dfebd6dce23b6222f8ee0",
+ "config_sha256": "9cbcc5c8917938ac01a9c832d825e0219078686214f96c996e9d22e1130b4083",
+ "data_windows": {
+  "clean_root": "data/clean",
+  "development": {
+   "end": "2022-12-31",
+   "start": "2018-01-01"
+  },
+  "holdout": {
+   "end": null,
+   "start": "2025-01-01"
+  },
+  "timeframes": [
+   "15min"
+  ],
+  "validation": {
+   "end": "2024-12-31",
+   "start": "2023-01-01"
+  }
+ },
+ "experiment_id": "pc_es_v5_15m",
+ "frozen_at": "2026-11-26T20:38:58.579912+00:00",
+ "frozen_manifest_sha256": "548a83a5581f4d36deeca3266bd1d156ba30a289e7d6e6e0219a99aa1aa6dfeb",
+ "git_diff_sha256": "8569fce853d9f25acb3115681993f54a4980490841c7cf1dc38ac9f54b5e9db3",
+ "git_dirty": true,
+ "seed": 20261126,
+ "selection_rules": {
+  "gates": [
+   "1 integrity",
+   "2 trade count",
+   "3 performance & risk",
+   "4 parameter stability",
+   "5 time stability",
+   "6 dedup (complete linkage, best 2 per cluster)",
+   "7 execution stress"
+  ],
+  "ordering": "median stage-4 Sharpe (local_perturbation) desc, profitable dev years desc, dev Sharpe desc, config_id asc",
+  "validation_is_not_used_for_ranking": true
+ },
+ "sizing_and_costs": {
+  "allow_overlapping_trades": false,
+  "allow_pyramiding": false,
+  "allow_short": false,
+  "commission_minimum": 0.0,
+  "commission_per_contract": 2.5,
+  "commission_per_share": 0.0,
+  "extended_hours_slippage_multiplier": 1.0,
+  "fractional_shares": false,
+  "include_sec_finra_fees": false,
+  "instrument_type": "futures",
+  "intrabar_collision_mode": "stop_first",
+  "leverage": 1.0,
+  "max_open_positions_per_symbol": 1,
+  "risk_per_trade_pct": 0.0025,
+  "slippage_bps_limit_adverse": 0.0,
+  "slippage_bps_market": 0.0,
+  "slippage_bps_stop": 0.0,
+  "slippage_ticks_market": 1.0,
+  "slippage_ticks_stop": 1.0,
+  "starting_equity": 1000000.0
+ },
+ "symbol": "ES",
+ "validated_at": "2026-11-26T20:39:12.918228+00:00",
+ "validation_summary": [
+  {
+   "config_id": "cfg_b684cd952b45f718f623",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_a22348361c5a17930449",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_e389aeaf9fd7cee96548",
+   "reasons": [
+    "net_return -0.0503 <= 0.0",
+    "sharpe -1.207 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_cc586b320bd5d9fa2d06",
+   "reasons": [
+    "net_return -0.0739 <= 0.0",
+    "sharpe -1.538 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_85ffa2222614dccbb3bd",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_2afecb2ccc61e25c4214",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_d9e37ed114c2e20f373b",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_be1a51400121ed60296f",
+   "reasons": [
+    "sharpe 0.240 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_8aa3ba1452da6d4d81e7",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_abcb322e7f21fd4e8969",
+   "reasons": [
+    "sharpe 0.150 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_bd2aa7510cd82eb049bc",
+   "reasons": [
+    "sharpe 0.141 < 0.3"
+   ],
+   "status": "hard_reject"
+  },
+  {
+   "config_id": "cfg_94c4f6d459fa687be2b4",
+   "reasons": [],
+   "status": "pass"
+  },
+  {
+   "config_id": "cfg_0e02b0ebbf46a5fc94a5",
+   "reasons": [],
+   "status": "pass"
+  }
+ ]
+}

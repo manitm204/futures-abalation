@@ -149,3 +149,41 @@ AXES_PC_V4_15M: dict[str, tuple] = {
 
 def pc_grid_v4_15m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
     return _grid(symbols, AXES_PC_V4_15M, ConvexityV4_15mConfig)
+
+
+# --- v5: 15-minute bars, 8,640 configs (regime filter, entry window, fixed-bar holds; ES and NQ) ---
+from src.strategies.path_convexity.config import (  # noqa: E402
+    V5_DIRECTIONS,
+    V5_ENTRY_ZS,
+    V5_HOLDS,
+    V5_LOOKBACKS,
+    V5_MIN_MOVE_ATRS,
+    V5_QUADRANTS,
+    V5_REGIMES,
+    V5_SIGNAL_FORMS,
+    V5_STOPS,
+    V5_TREND_FILTERS,
+    V5_WINDOWS,
+    V5_Z_LOOKBACKS,
+    ConvexityV5_15mConfig,
+)
+
+AXES_PC_V5_15M: dict[str, tuple] = {
+    "timeframe": ("15min",),
+    "lookback": V5_LOOKBACKS,
+    "signal_form": V5_SIGNAL_FORMS,
+    "z_lookback": V5_Z_LOOKBACKS,
+    "entry_z": V5_ENTRY_ZS,
+    "quadrant": V5_QUADRANTS,
+    "min_move_atr": V5_MIN_MOVE_ATRS,
+    "direction": V5_DIRECTIONS,
+    "hold": V5_HOLDS,
+    "stop": V5_STOPS,
+    "trend_filter": V5_TREND_FILTERS,
+    "regime": V5_REGIMES,
+    "window": V5_WINDOWS,
+}
+
+
+def pc_grid_v5_15m(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_PC_V5_15M, ConvexityV5_15mConfig)

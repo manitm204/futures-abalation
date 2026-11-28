@@ -38,7 +38,7 @@ import numpy as np
 import polars as pl
 import typer
 
-from src.analysis.neighborhood import LATTICE_PC_V1_5M, LATTICE_PC_V1_15M, LATTICE_PC_V2_15M, LATTICE_PC_V3_15M, LATTICE_PC_V4_15M, NeighborhoodStats, neighborhood_stats
+from src.analysis.neighborhood import LATTICE_PC_V1_5M, LATTICE_PC_V1_15M, LATTICE_PC_V2_15M, LATTICE_PC_V3_15M, LATTICE_PC_V4_15M, LATTICE_PC_V5_15M, NeighborhoodStats, neighborhood_stats
 from src.analysis.stability import correlation_eigenvalues, dsr_audit, effective_number_of_trials
 from src.data.aggregation import AGG_INTERVAL_MINUTES, aggregate_bars
 from src.experiments.data_access import (
@@ -85,10 +85,10 @@ from src.experiments.funnel_robustness import (
     perturbations_pc,
     quantile,
 )
-from src.experiments.pc_grid import pc_grid_v1_5m, pc_grid_v1_15m, pc_grid_v2_15m, pc_grid_v3_15m, pc_grid_v4_15m
+from src.experiments.pc_grid import pc_grid_v1_5m, pc_grid_v1_15m, pc_grid_v2_15m, pc_grid_v3_15m, pc_grid_v4_15m, pc_grid_v5_15m
 from src.experiments.pc_integrity import CHECKS, truncation_invariance
 from src.strategies.path_convexity.backtest import PCParams
-from src.strategies.path_convexity.config import ConvexityV1_5mConfig, ConvexityV1_15mConfig, ConvexityV2_15mConfig, ConvexityV3_15mConfig, ConvexityV4_15mConfig
+from src.strategies.path_convexity.config import ConvexityV1_5mConfig, ConvexityV1_15mConfig, ConvexityV2_15mConfig, ConvexityV3_15mConfig, ConvexityV4_15mConfig, ConvexityV5_15mConfig
 from src.utils.hashing import canonical_json
 from src.utils.logging import configure_logging, get_logger
 from src.utils.seeds import derive_seed
@@ -103,6 +103,7 @@ PREP_SOURCES = ["src/strategies/path_convexity/backtest.py", "src/strategies/pat
                 "src/experiments/pc_integrity.py", "src/experiments/cb_integrity.py"]
 PC_KEYS = ("symbol", "timeframe", "lookback", "signal_form", "z_lookback", "entry_z", "quadrant", "min_move_atr",
            "direction", "hold", "stop", "trend_filter")
+PC_KEYS_V5 = (*PC_KEYS, "regime", "window")
 SPACES = {
     "path_convexity_v1_15m": {
         "grid": pc_grid_v1_15m, "cls": ConvexityV1_15mConfig, "lattice": LATTICE_PC_V1_15M,
@@ -123,6 +124,10 @@ SPACES = {
     "path_convexity_v4_15m": {
         "grid": pc_grid_v4_15m, "cls": ConvexityV4_15mConfig, "lattice": LATTICE_PC_V4_15M,
         "perturb": perturbations_pc, "local": local_perturbations_pc, "keys": PC_KEYS,
+    },
+    "path_convexity_v5_15m": {
+        "grid": pc_grid_v5_15m, "cls": ConvexityV5_15mConfig, "lattice": LATTICE_PC_V5_15M,
+        "perturb": perturbations_pc, "local": local_perturbations_pc, "keys": PC_KEYS_V5,
     },
 }
 SPACE = SPACES["path_convexity_v1_15m"]

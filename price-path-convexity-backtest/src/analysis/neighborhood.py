@@ -505,7 +505,7 @@ LATTICE_CB_NR_V4_15M = Lattice({
 # Price-path convexity v1 (one lattice per bar size; same values). stop "none" (no stop, the
 # widest) orders after 2.5 ATR; hold orders half < full < session. Signal form, quadrant,
 # direction and trend filter are categorical.
-FIXED_AXES_PC = ["symbol", "signal_form", "quadrant", "direction", "trend_filter"]
+FIXED_AXES_PC = ["symbol", "signal_form", "quadrant", "direction", "trend_filter", "regime", "window"]
 _PC_V1 = {
     "lookback": [8, 12, 16, 24, 32, 48, 64, 96],
     "z_lookback": [250, 500],
@@ -545,4 +545,15 @@ LATTICE_PC_V4_15M = Lattice({
     "min_move_atr": [0.0, 2.0],
     "hold": ["full", "1.5n"],
     "stop": ["3.0", "none"],
+}, FIXED_AXES_PC)
+
+# Price-path convexity v5, 15-minute bars. hold b8 < b16 < session; stop 2.0 < 3.0.
+LATTICE_PC_V5_15M = Lattice({
+    "timeframe": ["15min"],
+    "lookback": [20, 26, 52, 78, 130],
+    "z_lookback": [25, 100],
+    "entry_z": [1.0, 1.5],
+    "min_move_atr": [2.0, 3.0],
+    "hold": ["b8", "b16", "session"],
+    "stop": ["2.0", "3.0"],
 }, FIXED_AXES_PC)
