@@ -25,7 +25,7 @@ import polars as pl
 import typer
 
 from src.data.futures import session_spec
-from src.experiments.db_grid import AXES_DB_V1, AXES_DB_V2
+from src.experiments.db_grid import AXES_DB_V1, AXES_DB_V2, AXES_DB_V3
 from src.experiments.funnel_config import load_execution_config, load_funnel_config
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -36,6 +36,7 @@ app = typer.Typer(add_completion=False)
 SPACES = {
     "drift_burst_v1": (AXES_DB_V1, "drift_burst", "Drift burst", ("threshold", "vol_gate")),
     "drift_burst_v2": (AXES_DB_V2, "drift_burst", "Drift burst", ("threshold", "vol_gate")),
+    "drift_burst_v3": (AXES_DB_V3, "drift_burst", "Drift burst", ("threshold", "vol_gate")),
 }
 MARKET_NAMES = {"ES": "E-mini S&P 500", "NQ": "E-mini Nasdaq-100", "YM": "E-mini Dow", "RTY": "E-mini Russell 2000",
                 "CL": "Crude oil", "GC": "Gold", "6E": "Euro FX", "6J": "Japanese yen", "ZN": "10-year T-note",

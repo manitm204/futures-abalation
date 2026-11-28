@@ -85,7 +85,7 @@ from src.experiments.funnel_robustness import (
     perturbations_db,
     quantile,
 )
-from src.experiments.db_grid import db_grid_v1, db_grid_v2
+from src.experiments.db_grid import db_grid_v1, db_grid_v2, db_grid_v3
 from src.experiments.db_integrity import CHECKS, truncation_invariance
 from src.strategies.drift_burst.backtest import DBParams, db_day_bars
 from src.strategies.drift_burst.config import DriftBurstV1Config, DriftBurstV2Config
@@ -110,6 +110,10 @@ SPACES = {
     },
     "drift_burst_v2": {
         "grid": db_grid_v2, "cls": DriftBurstV2Config, "lattice": LATTICE_DB_V2,
+        "perturb": perturbations_db, "local": local_perturbations_db, "keys": DB_KEYS_V2,
+    },
+    "drift_burst_v3": {
+        "grid": db_grid_v3, "cls": DriftBurstV2Config, "lattice": LATTICE_DB_V2,
         "perturb": perturbations_db, "local": local_perturbations_db, "keys": DB_KEYS_V2,
     },
 }

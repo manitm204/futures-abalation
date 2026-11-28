@@ -63,3 +63,18 @@ AXES_DB_V2: dict[str, tuple] = {
 
 def db_grid_v2(symbols: tuple[str, ...]) -> list[ConfigEntry]:
     return _grid(symbols, AXES_DB_V2, DriftBurstV2Config)
+
+
+# --- v3: 1,296 configs (trimmed v2, run on NQ) -------------------------------------------------
+# From the ES v2 winners: volume gate 2x/3x only, threshold 4.5/5.0 only, one trade per session.
+# 3 windows x 2 thresholds x 2 gates x 2 sides x 3 holds x 3 entry modes x 3 targets x 2 stops.
+AXES_DB_V3: dict[str, tuple] = {
+    **AXES_DB_V2,
+    "threshold": (4.5, 5.0),
+    "vol_gate": ("2.0", "3.0"),
+    "max_trades": (1,),
+}
+
+
+def db_grid_v3(symbols: tuple[str, ...]) -> list[ConfigEntry]:
+    return _grid(symbols, AXES_DB_V3, DriftBurstV2Config)
